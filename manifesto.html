@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manifiesto — Onda AI</title>
+<meta name="description" content="No somos una agencia de marketing. Somos infraestructura de inteligencia artificial para Centroamérica.">
+<meta property="og:title" content="Manifiesto — Onda AI">
+<meta property="og:description" content="Centroamérica construyó puentes entre dos mundos. El próximo puente es digital.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://onda.ai/manifesto.html">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/shared.css">
+<style>
+/* MANIFESTO HERO */
+.man-hero{text-align:center;padding:100px 40px 60px;opacity:0;animation:up .7s .2s forwards}
+.man-hero h1{font-size:clamp(28px,4vw,48px);font-weight:800;line-height:1.1;max-width:640px;margin:0 auto 18px}
+.man-hero h1 em{font-style:normal;color:var(--accent)}
+
+/* MANIFESTO CONTENT */
+.man-content{max-width:640px;margin:0 auto;padding:0 40px 80px}
+
+.man-block{padding:20px 0;margin-bottom:16px}
+.man-block p{font-size:16px;color:var(--gray);line-height:1.8;margin-bottom:14px}
+.man-block p:last-child{margin-bottom:0}
+
+.man-break{font-size:24px;font-weight:700;color:var(--accent);padding:20px 0;margin-bottom:16px}
+
+.man-hr{border:none;height:2px;background:var(--accent);margin:40px 0}
+
+.man-closing{font-size:22px;color:var(--white);font-weight:800;padding:20px 0;margin-bottom:16px}
+
+/* MANIFESTO CTA */
+.man-cta{text-align:center;padding:80px 40px;border-top:.5px solid var(--border)}
+.man-cta h2{font-size:26px;font-weight:800;margin-bottom:10px}
+.man-cta p{font-size:13px;color:var(--gray);margin-bottom:28px;max-width:440px;margin-left:auto;margin-right:auto}
+
+@media(max-width:768px){
+  .man-hero{padding:60px 20px 40px}
+  .man-content{padding:0 20px 60px}
+  .man-cta{padding:60px 20px}
+}
+</style>
+</head>
+<body>
+
+<canvas class="grid-bg" id="bg"></canvas>
+
+<div class="page">
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="brand">
+    <div class="brand-mark"></div>
+    <div class="brand-name">ONDA<span>.AI</span></div>
+  </a>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="index.html" data-i18n="nav.home">Inicio</a></li>
+      <li><a href="manifesto.html" class="active" data-i18n="nav.manifesto">Manifiesto</a></li>
+      <li><a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a></li>
+      <li><a href="contact.html" class="nav-cta" data-i18n="nav.contact">Contacto</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="langES" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" id="langEN" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-overlay" id="mobileOverlay"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" data-i18n="nav.home">Inicio</a>
+  <a href="manifesto.html" class="active" data-i18n="nav.manifesto">Manifiesto</a>
+  <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
+  <a href="contact.html" data-i18n="nav.contact">Contacto</a>
+</div>
+
+<main>
+<!-- HERO -->
+<section class="man-hero">
+  <div class="sec-tag" data-i18n="man.tag">// Manifiesto</div>
+  <h1 data-i18n-html="man.title">Centroamérica construyó puentes entre dos mundos. El próximo puente es <em>digital.</em></h1>
+</section>
+
+<div class="encrypt-strip" id="enc"></div>
+
+<!-- CONTENT -->
+<div class="man-content">
+
+  <div class="man-block fade-up">
+    <p data-i18n="man.p1">Las empresas que mueven la economía de Nicaragua están rodeadas de océanos de datos que no pueden ver, sistemas que no se comunican entre sí, y departamentos que operan en aislamiento — mientras sus líderes toman decisiones por instinto porque la información que necesitan está atrapada en algún lugar que no pueden alcanzar.</p>
+  </div>
+
+  <div class="man-block fade-up">
+    <p data-i18n="man.p2">Restaurantes que atienden turistas de todo el mundo siguen coordinando por WhatsApp. Clínicas que manejan cientos de pacientes agendan en cuadernos. Hoteles que compiten con Airbnb no tienen presencia digital más allá de una página de Facebook abandonada.</p>
+  </div>
+
+  <div class="man-block fade-up">
+    <p data-i18n="man.p3">La inteligencia para cambiar todo esto ya existe. La tecnología está lista. Lo que ha faltado es alguien dispuesto a construir la conexión entre lo que la IA puede hacer y lo que los negocios centroamericanos realmente necesitan.</p>
+  </div>
+
+  <div class="man-block fade-up">
+    <div class="man-break" data-i18n="man.break">Eso es Onda.</div>
+  </div>
+
+  <hr class="man-hr">
+
+  <div class="man-block fade-up">
+    <p data-i18n="man.p4">No somos una consultora que vende presentaciones. No somos una agencia que escribe código y desaparece. Nos metemos dentro de tu operación, aprendemos dónde sangra, y construimos los sistemas que detienen el sangrado — permanentemente.</p>
+  </div>
+
+  <div class="man-block fade-up">
+    <p data-i18n="man.p5">Trabajamos con un número reducido de socios. No porque no podamos escalar, sino porque la transformación exige proximidad, honestidad, y el tipo de atención que desaparece en el momento que intentas atender a todos. Cada empresa que tomamos recibe todo el peso de lo que sabemos. Eso no es una filosofía. Es una promesa.</p>
+  </div>
+
+  <div class="man-block fade-up">
+    <p data-i18n="man.p6">Nos llamamos Onda porque una onda se propaga. Cada automatización habilita la siguiente. Cada insight agudiza el que sigue. La brecha entre tu negocio y tu competencia se amplía silenciosamente, y luego de golpe.</p>
+  </div>
+
+  <div class="man-block fade-up">
+    <p data-i18n="man.p7">La próxima generación de líderes empresariales en Centroamérica se definirá por una sola decisión. No qué mercado entraron. No qué producto lanzaron. Si adoptaron IA antes que su competencia o pasaron años viendo cómo la brecha se ampliaba desde el lado equivocado.</p>
+  </div>
+
+  <div class="man-block fade-up">
+    <div class="man-closing" data-i18n="man.closing">No vendemos IA. Construimos infraestructura.</div>
+  </div>
+
+</div>
+
+<!-- CTA -->
+<section class="man-cta">
+  <h2 data-i18n="man.ctaTitle">Descubre tu potencial.</h2>
+  <a href="diagnostic.html" class="btn-primary" data-i18n-btn="man.ctaBtn">Iniciar Diagnóstico &rarr;</a>
+</section>
+</main>
+
+<div class="encrypt-strip" id="enc2"></div>
+
+<footer>
+  <div>
+    <div class="f-brand">ONDA<span>.AI</span></div>
+    <div class="f-tag" data-i18n="footer.tag">Cerrando la brecha de IA en Centroamérica.</div>
+  </div>
+  <div class="f-links">
+    <a href="index.html" data-i18n="nav.home">Inicio</a>
+    <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+    <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
+    <a href="mailto:hola@onda.ai">hola@onda.ai</a>
+  </div>
+  <div>&copy; 2026 Onda AI. <span data-i18n="footer.rights">Todos los derechos reservados.</span></div>
+</footer>
+
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/grid-bg.js"></script>
+<script src="js/encrypt.js"></script>
+<script>
+// Hamburger menu
+(function() {
+  var hamburger = document.getElementById('hamburger');
+  var mobileMenu = document.getElementById('mobileMenu');
+  var mobileOverlay = document.getElementById('mobileOverlay');
+
+  function toggleMenu() {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+    mobileOverlay.classList.toggle('open');
+  }
+
+  if (hamburger) hamburger.addEventListener('click', toggleMenu);
+  if (mobileOverlay) mobileOverlay.addEventListener('click', toggleMenu);
+})();
+
+// Scroll reveal for .fade-up elements
+(function() {
+  var blocks = document.querySelectorAll('.fade-up');
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.15 });
+  blocks.forEach(function(b) { observer.observe(b); });
+})();
+
+// Language change title update
+document.addEventListener('langchange', function(e) {
+  document.title = e.detail.lang === 'es' ? 'Manifiesto — Onda AI' : 'Manifesto — Onda AI';
+});
+
+// Init grid background (10 particles for interior page)
+OndaGrid.init(10);
+</script>
+</body>
+</html>

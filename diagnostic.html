@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico Digital — Onda AI</title>
+<meta name="description" content="11 preguntas para descubrir las ineficiencias ocultas en tu negocio y tu preparación para IA.">
+<meta property="og:title" content="Diagnóstico Digital — Onda AI">
+<meta property="og:description" content="11 questions to uncover hidden inefficiencies in your business and your AI readiness.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://onda.ai/diagnostic.html">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/shared.css">
+<style>
+/* PROGRESS BAR */
+.progress-wrap{max-width:600px;margin:0 auto;padding:20px 40px 0}
+.progress-bar{height:2px;background:var(--border);position:relative;margin-bottom:8px}
+.progress-fill{height:100%;background:var(--accent);transition:width .4s ease;width:0%}
+.progress-text{font-family:var(--fm);font-size:10px;color:var(--dimgray);letter-spacing:1px;text-align:right}
+
+/* Q-WRAP: all screens use this */
+.q-wrap{display:none;max-width:600px;margin:0 auto;padding:40px;opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
+.q-wrap.active{display:block;opacity:1;transform:translateY(0)}
+
+/* INTRO SCREEN */
+.intro-screen{text-align:center;padding-top:60px;padding-bottom:60px}
+.intro-screen .sec-tag{margin-bottom:16px}
+.intro-screen h1{font-size:clamp(24px,3.5vw,38px);font-weight:800;line-height:1.15;max-width:560px;margin:0 auto 16px}
+.intro-screen h1 em{font-style:normal;color:var(--accent)}
+.intro-screen .intro-sub{font-size:14px;color:var(--gray);max-width:480px;margin:0 auto 28px;line-height:1.65}
+.intro-chips{display:flex;justify-content:center;gap:18px;margin-bottom:24px;font-family:var(--fm);font-size:11px;color:var(--dimgray);letter-spacing:1px;flex-wrap:wrap}
+.intro-encrypt{font-family:var(--fm);font-size:10px;color:var(--dimgray);letter-spacing:1px;max-width:440px;margin:0 auto 32px;line-height:1.6}
+.intro-encrypt::before{content:'';display:inline-block;width:8px;height:8px;border:1.5px solid var(--accent);margin-right:8px;vertical-align:middle}
+
+/* QUESTION SCREENS */
+.q-number{font-family:var(--fm);font-size:11px;color:var(--accent);letter-spacing:2px;margin-bottom:10px}
+.q-text{font-size:18px;font-weight:700;line-height:1.35;margin-bottom:8px}
+.q-hint{font-size:12px;color:var(--dimgray);margin-bottom:24px;line-height:1.5}
+
+/* NAV BUTTONS */
+.q-nav{display:flex;gap:12px;justify-content:space-between;align-items:center;margin-top:32px}
+.q-nav-right{display:flex;gap:12px;align-items:center}
+
+/* CONTACT SCREEN */
+.contact-screen h2{font-size:22px;font-weight:700;margin-bottom:8px}
+.contact-screen .contact-sub{font-size:12px;color:var(--dimgray);margin-bottom:28px;line-height:1.55}
+.contact-field-group{margin-bottom:18px}
+.contact-required{color:var(--accent);font-size:9px;font-family:var(--fm);letter-spacing:1px;margin-left:6px}
+
+/* PROCESSING SCREEN */
+.processing-screen{text-align:center;padding-top:80px;padding-bottom:80px}
+.proc-msg{font-family:var(--fm);font-size:13px;color:var(--dimgray);letter-spacing:1px;margin-bottom:16px;opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
+.proc-msg.visible{opacity:1;transform:translateY(0);color:var(--accent)}
+.proc-spinner{width:32px;height:32px;border:2px solid var(--border);border-top:2px solid var(--accent);animation:spin 1s linear infinite;margin:0 auto 32px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:768px){
+  .q-wrap{padding:28px 20px}
+  .progress-wrap{padding:16px 20px 0}
+  .intro-screen{padding-top:40px;padding-bottom:40px}
+  .intro-chips{flex-direction:column;align-items:center;gap:8px}
+}
+@media(max-width:480px){
+  .intro-screen h1{font-size:22px}
+  .q-nav{flex-direction:column}
+  .q-nav .btn-ghost,.q-nav .btn-primary{width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<canvas class="grid-bg" id="bg"></canvas>
+
+<div class="page">
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="brand">
+    <div class="brand-mark"></div>
+    <div class="brand-name">ONDA<span>.AI</span></div>
+  </a>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="index.html" data-i18n="nav.home">Inicio</a></li>
+      <li><a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a></li>
+      <li><a href="diagnostic.html" class="active" data-i18n="nav.diagnostic">Diagnóstico</a></li>
+      <li><a href="contact.html" class="nav-cta" data-i18n="nav.contact">Contacto</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="langES" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" id="langEN" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-overlay" id="mobileOverlay"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" data-i18n="nav.home">Inicio</a>
+  <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+  <a href="diagnostic.html" class="active" data-i18n="nav.diagnostic">Diagnóstico</a>
+  <a href="contact.html" data-i18n="nav.contact">Contacto</a>
+</div>
+
+<main>
+<!-- PROGRESS BAR -->
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+  <div class="progress-text" id="progText">0 / 11</div>
+</div>
+
+<div class="encrypt-strip" id="enc"></div>
+
+<!-- ============================================ -->
+<!-- INTRO SCREEN -->
+<!-- ============================================ -->
+<div class="q-wrap intro-screen active" id="introScreen">
+  <div class="sec-tag" data-i18n="dx.tag">// Diagnóstico de Preparación Digital</div>
+  <h1 data-i18n-html="dx.title">Descubre lo que realmente te cuestan tus <em>operaciones.</em></h1>
+  <p class="intro-sub" data-i18n="dx.sub">Once preguntas. Cada una diseñada para revelar lo que más importa.</p>
+  <div class="intro-chips" data-i18n="dx.chips">11 preguntas &middot; 10–15 minutos &middot; Resultados inmediatos</div>
+  <p class="intro-encrypt" data-i18n="dx.encrypt">Tus respuestas están encriptadas de extremo a extremo. Existen únicamente para construir tu perfil de preparación personalizado.</p>
+  <button class="btn-primary" id="startBtn" data-i18n-btn="dx.start">Comenzar Diagnóstico &rarr;</button>
+</div>
+
+<!-- ============================================ -->
+<!-- Q1: TEXT INPUT — Business type -->
+<!-- ============================================ -->
+<div class="q-wrap q-screen" data-q="1">
+  <div class="q-number">01 / 11</div>
+  <div class="q-text" data-i18n="q1.text">¿A qué se dedica tu negocio?</div>
+  <div class="q-hint" data-i18n="q1.hint">Esto nos ayuda a calibrar los benchmarks de tu industria.</div>
+  <input type="text" class="text-input q-text-input" data-q="q1" data-i18n-placeholder="q1.ph" placeholder="Ej: Clínica dental, Hotel boutique, Restaurante..." autocomplete="off">
+  <div class="q-nav">
+    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
+    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Q2: SINGLE-SELECT MC — Team size -->
+<!-- ============================================ -->
+<div class="q-wrap q-screen" data-q="2">
+  <div class="q-number">02 / 11</div>
+  <div class="q-text" data-i18n="q2.text">¿Cuántos empleados tiene tu empresa?</div>
+  <div class="q-hint" data-i18n="q2.hint">El tamaño del equipo determina el impacto potencial de la automatización.</div>
+  <div class="mc-group" data-q="q2" data-type="single">
+    <div class="mc-opt" data-val="0"><div class="mc-dot"></div><div class="mc-label" data-i18n="q2.o1">1–5</div></div>
+    <div class="mc-opt" data-val="1"><div class="mc-dot"></div><div class="mc-label" data-i18n="q2.o2">6–15</div></div>
+    <div class="mc-opt" data-val="2"><div class="mc-dot"></div><div class="mc-label" data-i18n="q2.o3">16–50</div></div>
+    <div class="mc-opt" data-val="3"><div class="mc-dot"></div><div class="mc-label" data-i18n="q2.o4">50+</div></div>
+  </div>
+  <div class="q-nav">
+    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
+    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Q3: TEXTAREA — Top 3 tasks -->
+<!-- ============================================ -->
+<div class="q-wrap q-screen" data-q="3">
+  <div class="q-number">03 / 11</div>
+  <div class="q-text" data-i18n="q3.text">¿Cuáles son las 3 tareas que más tiempo consumen a tu equipo cada semana?</div>
+  <div class="q-hint" data-i18n="q3.hint">Piensa en las que más frustran o más se repiten.</div>
+  <textarea class="text-input q-textarea" data-q="q3" data-i18n-placeholder="q3.ph" placeholder="Ej: Responder mensajes de WhatsApp, agendar citas, hacer inventario..."></textarea>
+  <div class="q-nav">
+    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
+    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Q4: RANGE SLIDER — Customer hours -->
+<!-- ============================================ -->
+<div class="q-wrap q-screen" data-q="4">
+  <div class="q-number">04 / 11</div>
+  <div class="q-text" data-i18n="q4.text">¿Cuántas horas por semana dedica tu equipo a responder consultas de clientes?</div>
+  <div class="q-hint" data-i18n="q4.hint">Teléfono, WhatsApp, email, redes sociales — todo cuenta.</div>
+  <div class="range-wrap">
+    <div class="range-val" id="rangeQ4Val">20 hrs</div>
+    <input type="range" class="range-input" id="rangeQ4" min="0" max="80" step="5" value="20">
+    <div class="range-labels">
+      <span data-i18n="q4.label.min">0 hrs</span>
+      <span data-i18n="q4.label.max">80+ hrs</span>
+    </div>
+  </div>
+  <div class="q-nav">
+    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
+    <button class="btn-primary btn-next" data-i18n-btn="q.next">Siguiente &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Q5: SINGLE-SELECT MC — Website -->
+<!-- ============================================ -->
+<div class="q-wrap q-screen" data-q="5">
+  <div class="q-number">05 / 11</div>
+  <div class="q-text" data-i18n="q5.text">¿Tu negocio tiene sitio web actualmente?</div>
+  <div class="q-hint" data-i18n="q5.hint">Evaluamos tu presencia digital actual.</div>
+  <div class="mc-group" data-q="q5" data-type="single">
+    <div class="mc-opt" data-val="0"><div class="mc-dot"></div><div class="mc-label" data-i18n="q5.o1">No tenemos</div></div>
+    <div class="mc-opt" data-val="1"><div class="mc-dot"></div><div class="mc-label" data-i18n="q5.o2">Sí, pero no genera clientes</div></div>
+    <div class="mc-opt" data-val="2"><div class="mc-dot"></div><div class="mc-label" data-i18n="q5.o3">Sí, y genera algunos clientes</div></div>
+    <div class="mc-opt" data-val="3"><div class="mc-dot"></div><div class="mc-label" data-i18n="q5.o4">Sí, es nuestra principal fuente de clientes</div></div>
+  </div>
+  <div class="q-nav">
+    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
+    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Q6: MULTI-SELECT MC — Scheduling methods -->
+<!-- ============================================ -->
+<div class="q-wrap q-screen" data-q="6">
+  <div class="q-number">06 / 11</div>
+  <div class="q-text" data-i18n="q6.text">¿Cómo manejan actualmente la agenda, inventario o citas?</div>
+  <div class="q-hint" data-i18n="q6.hint">Selecciona todas las que apliquen.</div>
+  <div class="mc-group" data-q="q6" data-type="multi">
+    <div class="mc-opt" data-val="0"><div class="mc-check"></div><div class="mc-label" data-i18n="q6.o1">Cuaderno / papel</div></div>
+    <div class="mc-opt" data-val="1"><div class="mc-check"></div><div class="mc-label" data-i18n="q6.o2">Excel o Google Sheets</div></div>
+    <div class="mc-opt" data-val="2"><div class="mc-check"></div><div class="mc-label" data-i18n="q6.o3">Software especializado</div></div>
+    <div class="mc-opt" data-val="3"><div class="mc-check"></div><div class="mc-label" data-i18n="q6.o4">WhatsApp / llamadas</div></div>
+    <div class="mc-opt" data-val="4"><div class="mc-check"></div><div class="mc-label" data-i18n="q6.o5">De memoria</div></div>
+  </div>
+  <div class="q-nav">
+    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
+    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Q7: MULTI-SELECT MC — Tech stack -->
+<!-- ============================================ -->
+<div class="q-wrap q-screen" data-q="7">
+  <div class="q-number">07 / 11</div>
+  <div class="q-text" data-i18n="q7.text">¿Qué herramientas o software usa tu negocio actualmente?</div>
+  <div class="q-hint" data-i18n="q7.hint">Selecciona todas las que apliquen.</div>
+  <div class="mc-group" data-q="q7" data-type="multi">
+    <div class="mc-opt" data-val="0"><div class="mc-check"></div><div class="mc-label" data-i18n="q7.o1">Ninguno</div></div>
+    <div class="mc-opt" data-val="1"><div class="mc-check"></div><div class="mc-label" data-i18n="q7.o2">Redes sociales (Instagram, Facebook)</div></div>
+    <div class="mc-opt" data-val="2"><div class="mc-check"></div><div class="mc-label" data-i18n="q7.o3">WhatsApp Business</div></div>
+    <div class="mc-opt" data-val="3"><div class="mc-check"></div><div class="mc-label" data-i18n="q7.o4">Excel / Google Sheets</div></div>
+    <div class="mc-opt" data-val="4"><div class="mc-check"></div><div class="mc-label" data-i18n="q7.o5">Software de contabilidad</div></div>
+    <div class="mc-opt" data-val="5"><div class="mc-check"></div><div class="mc-label" data-i18n="q7.o6">CRM o sistema de ventas</div></div>
+    <div class="mc-opt" data-val="6"><div class="mc-check"></div><div class="mc-label" data-i18n="q7.o7">Sistema POS</div></div>
+    <div class="mc-opt" data-val="7"><div class="mc-check"></div><div class="mc-label" data-i18n="q7.o8">Otro</div></div>
+  </div>
+  <div class="q-nav">
+    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
+    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Q8: SINGLE-SELECT MC — AI familiarity -->
+<!-- ============================================ -->
+<div class="q-wrap q-screen" data-q="8">
+  <div class="q-number">08 / 11</div>
+  <div class="q-text" data-i18n="q8.text">¿Has usado alguna herramienta de IA (ChatGPT, Gemini, etc.)?</div>
+  <div class="q-hint" data-i18n="q8.hint">No hay respuesta incorrecta — esto calibra nuestras recomendaciones.</div>
+  <div class="mc-group" data-q="q8" data-type="single">
+    <div class="mc-opt" data-val="0"><div class="mc-dot"></div><div class="mc-label" data-i18n="q8.o1">Nunca he oído de ellas</div></div>
+    <div class="mc-opt" data-val="1"><div class="mc-dot"></div><div class="mc-label" data-i18n="q8.o2">He oído pero nunca las he usado</div></div>
+    <div class="mc-opt" data-val="2"><div class="mc-dot"></div><div class="mc-label" data-i18n="q8.o3">Las he probado algunas veces</div></div>
+    <div class="mc-opt" data-val="3"><div class="mc-dot"></div><div class="mc-label" data-i18n="q8.o4">Las uso regularmente</div></div>
+  </div>
+  <div class="q-nav">
+    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
+    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Q9: TEXTAREA — Biggest bottleneck -->
+<!-- ============================================ -->
+<div class="q-wrap q-screen" data-q="9">
+  <div class="q-number">09 / 11</div>
+  <div class="q-text" data-i18n="q9.text">¿Cuál es el mayor cuello de botella o frustración en tus operaciones diarias?</div>
+  <div class="q-hint" data-i18n="q9.hint">Sé honesto — mientras más específico seas, mejor será tu diagnóstico.</div>
+  <textarea class="text-input q-textarea" data-q="q9" data-i18n-placeholder="q9.ph" placeholder="Sé honesto — mientras más específico seas, mejor será tu diagnóstico."></textarea>
+  <div class="q-nav">
+    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
+    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Q10: TEXT INPUT — Dream automation -->
+<!-- ============================================ -->
+<div class="q-wrap q-screen" data-q="10">
+  <div class="q-number">10 / 11</div>
+  <div class="q-text" data-i18n="q10.text">Si pudieras automatizar UNA cosa en tu negocio mañana, ¿qué sería?</div>
+  <div class="q-hint" data-i18n="q10.hint">La respuesta a esta pregunta se convierte en tu primera recomendación.</div>
+  <input type="text" class="text-input q-text-input" data-q="q10" data-i18n-placeholder="q10.ph" placeholder="Ej: Responder WhatsApp automáticamente, generar facturas, agendar citas..." autocomplete="off">
+  <div class="q-nav">
+    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
+    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Q11: SINGLE-SELECT MC — Revenue -->
+<!-- ============================================ -->
+<div class="q-wrap q-screen" data-q="11">
+  <div class="q-number">11 / 11</div>
+  <div class="q-text" data-i18n="q11.text">¿Cuál es el ingreso mensual aproximado de tu negocio?</div>
+  <div class="q-hint" data-i18n="q11.hint">Esto calibra nuestras estimaciones de ROI. Es completamente confidencial.</div>
+  <div class="mc-group" data-q="q11" data-type="single">
+    <div class="mc-opt" data-val="0"><div class="mc-dot"></div><div class="mc-label" data-i18n="q11.o1">Menos de $2,000</div></div>
+    <div class="mc-opt" data-val="1"><div class="mc-dot"></div><div class="mc-label" data-i18n="q11.o2">$2,000 – $5,000</div></div>
+    <div class="mc-opt" data-val="2"><div class="mc-dot"></div><div class="mc-label" data-i18n="q11.o3">$5,000 – $15,000</div></div>
+    <div class="mc-opt" data-val="3"><div class="mc-dot"></div><div class="mc-label" data-i18n="q11.o4">$15,000 – $50,000</div></div>
+    <div class="mc-opt" data-val="4"><div class="mc-dot"></div><div class="mc-label" data-i18n="q11.o5">Más de $50,000</div></div>
+    <div class="mc-opt" data-val="5"><div class="mc-dot"></div><div class="mc-label" data-i18n="q11.o6">Prefiero no decir</div></div>
+  </div>
+  <div class="q-nav">
+    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
+    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- CONTACT COLLECTION SCREEN -->
+<!-- ============================================ -->
+<div class="q-wrap contact-screen" id="contactScreen">
+  <h2 data-i18n="qc.title">¿A dónde enviamos tu reporte?</h2>
+  <p class="contact-sub" data-i18n="qc.sub">Tu información es confidencial. La usamos únicamente para enviarte tu diagnóstico personalizado.</p>
+
+  <div class="contact-field-group">
+    <label class="form-label" for="cName" data-i18n="qc.name">Nombre</label>
+    <input type="text" class="form-input contact-field" id="cName" data-i18n-placeholder="qc.name.ph" placeholder="Tu nombre completo" required autocomplete="name">
+  </div>
+
+  <div class="contact-field-group">
+    <label class="form-label" for="cEmail" data-i18n="qc.email">Email</label>
+    <input type="email" class="form-input contact-field" id="cEmail" data-i18n-placeholder="qc.email.ph" placeholder="tu@correo.com" required autocomplete="email">
+  </div>
+
+  <div class="contact-field-group">
+    <label class="form-label" for="cWhatsapp">
+      <span data-i18n="qc.whatsapp">WhatsApp (opcional)</span>
+    </label>
+    <input type="tel" class="form-input contact-field" id="cWhatsapp" data-i18n-placeholder="qc.whatsapp.ph" placeholder="+505 0000 0000" autocomplete="tel">
+  </div>
+
+  <div class="contact-field-group">
+    <label class="form-label" for="cCompany" data-i18n="qc.company">Nombre de empresa</label>
+    <input type="text" class="form-input contact-field" id="cCompany" data-i18n-placeholder="qc.company.ph" placeholder="Tu empresa" required autocomplete="organization">
+  </div>
+
+  <div class="q-nav">
+    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
+    <button class="btn-primary btn-next" disabled data-i18n-btn="q.submit">Generar Reporte &rarr;</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- PROCESSING SCREEN -->
+<!-- ============================================ -->
+<div class="q-wrap processing-screen" id="processingScreen">
+  <div class="proc-spinner"></div>
+  <div class="proc-msg" data-i18n="dx.processing1">Procesando tu diagnóstico...</div>
+  <div class="proc-msg" data-i18n="dx.processing2">Calculando tu puntuación...</div>
+  <div class="proc-msg" data-i18n="dx.processing3">Generando recomendaciones...</div>
+</div>
+
+</main>
+
+<div class="encrypt-strip" id="enc2"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="f-brand">ONDA<span>.AI</span></div>
+    <div class="f-tag" data-i18n="footer.tag">Cerrando la brecha de IA en Centroamérica.</div>
+  </div>
+  <div class="f-links">
+    <a href="index.html" data-i18n="nav.home">Inicio</a>
+    <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+    <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
+    <a href="mailto:hola@onda.ai">hola@onda.ai</a>
+  </div>
+  <div>&copy; 2026 Onda AI. <span data-i18n="footer.rights">Todos los derechos reservados.</span></div>
+</footer>
+
+</div>
+
+<!-- SCRIPTS -->
+<script src="js/i18n.js"></script>
+<script src="js/grid-bg.js"></script>
+<script src="js/encrypt.js"></script>
+<script src="js/scoring.js"></script>
+<script src="js/diagnostic.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  OndaGrid.init(10); // 10 particles for interior pages
+
+  // Hamburger menu
+  var ham = document.getElementById('hamburger');
+  var menu = document.getElementById('mobileMenu');
+  var overlay = document.getElementById('mobileOverlay');
+  if (ham) {
+    ham.addEventListener('click', function() {
+      ham.classList.toggle('open');
+      menu.classList.toggle('open');
+      overlay.classList.toggle('open');
+    });
+    overlay.addEventListener('click', function() {
+      ham.classList.remove('open');
+      menu.classList.remove('open');
+      overlay.classList.remove('open');
+    });
+  }
+});
+</script>
+</body>
+</html>

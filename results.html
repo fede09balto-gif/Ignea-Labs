@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resultados — Onda AI</title>
+<meta name="description" content="Tu reporte de preparación digital personalizado. Descubre tu puntuación, recomendaciones y retorno estimado.">
+<meta property="og:title" content="Diagnostic Results — Onda AI">
+<meta property="og:description" content="Your personalized digital readiness report. Discover your score, recommendations, and estimated ROI.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/shared.css">
+<style>
+/* ---- RESULTS PAGE ---- */
+.res-wrap{max-width:700px;margin:0 auto;padding:80px 40px}
+
+/* HEADER */
+.res-header{text-align:center;margin-bottom:60px;opacity:0;animation:up .7s .2s forwards}
+
+/* SCORE RING */
+.score-ring{position:relative;width:160px;height:160px;margin:28px auto 20px}
+.score-ring svg{display:block;width:160px;height:160px;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:6}
+.ring-fill{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:butt;transition:stroke-dashoffset 1.5s ease}
+.score-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.score-num{font-family:var(--fm);font-size:36px;font-weight:700;color:var(--accent);line-height:1}
+.score-of{font-family:var(--fm);font-size:10px;color:var(--dimgray);margin-top:2px}
+
+#levelLabel{font-family:var(--fm);font-size:13px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:8px}
+#levelDesc{font-size:13px;color:var(--gray);line-height:1.6;max-width:480px;margin:0 auto}
+
+/* RADAR */
+.radar-wrap{max-width:300px;margin:0 auto 60px;text-align:center;opacity:0;animation:up .7s .5s forwards}
+#radarCanvas{display:block;margin:0 auto}
+
+/* BREAKDOWN */
+.bd-section{margin-bottom:60px;opacity:0;animation:up .7s .7s forwards}
+.bd-row{display:flex;flex-direction:column;padding:14px 0;border-bottom:.5px solid var(--border)}
+.bd-row:last-child{border-bottom:none}
+.bd-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.bd-name{font-size:13px;font-weight:600}
+.bd-score{font-family:var(--fm);font-size:12px;color:var(--accent)}
+.bd-bar{height:3px;background:var(--border);width:100%}
+.bd-fill{height:100%;background:var(--accent);width:0%;transition:width 1s ease}
+
+/* RECOMMENDATIONS */
+.reco-section{margin-bottom:60px;opacity:0;animation:up .7s .9s forwards}
+.reco-section h3{font-size:20px;font-weight:700;margin-bottom:24px}
+.reco-card{display:flex;gap:16px;padding:20px;border:.5px solid var(--border);margin-bottom:12px;transition:background .3s}
+.reco-card:hover{background:var(--accent3)}
+.reco-num{font-family:var(--fm);font-size:36px;font-weight:700;color:var(--accent2);line-height:1;flex-shrink:0}
+.reco-content{flex:1;min-width:0}
+.reco-title{font-size:14px;font-weight:700;margin-bottom:6px}
+.reco-desc{font-size:12px;color:var(--gray);line-height:1.55;margin-bottom:10px}
+.reco-meta{display:flex;gap:20px;flex-wrap:wrap;font-family:var(--fm);font-size:10px;color:var(--dimgray);letter-spacing:.5px}
+.reco-meta strong{color:var(--white)}
+
+/* ROI */
+.roi-section{margin-bottom:60px;opacity:0;animation:up .7s 1.1s forwards}
+.roi-grid{display:grid;grid-template-columns:1fr 1fr;border:.5px solid var(--border)}
+.roi-item{padding:24px 18px;text-align:center;border-bottom:.5px solid var(--border);border-right:.5px solid var(--border)}
+.roi-item:nth-child(2n){border-right:none}
+.roi-item:nth-child(n+3){border-bottom:none}
+.roi-val{font-family:var(--fm);font-size:22px;font-weight:700;color:var(--accent);margin-bottom:4px;word-break:break-word}
+.roi-label{font-size:10px;color:var(--dimgray);letter-spacing:1px;text-transform:uppercase;line-height:1.5}
+
+/* CTA */
+.res-cta{text-align:center;padding-top:40px;border-top:.5px solid var(--border);opacity:0;animation:up .7s 1.3s forwards}
+.res-cta h3{font-size:22px;font-weight:700;margin-bottom:18px}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.res-cta .email-link{font-family:var(--fm);font-size:12px;color:var(--dimgray);letter-spacing:.5px}
+.res-cta .email-link a{color:var(--accent);text-decoration:none;transition:opacity .3s}
+.res-cta .email-link a:hover{opacity:.8}
+
+@media(max-width:768px){
+  .res-wrap{padding:60px 20px}
+  .reco-meta{flex-direction:column;gap:6px}
+  .roi-grid{grid-template-columns:1fr}
+  .roi-item{border-right:none!important}
+  .roi-item:nth-child(3){border-bottom:.5px solid var(--border)}
+}
+@media(max-width:480px){
+  .cta-btns{flex-direction:column;width:100%}
+  .reco-card{flex-direction:column;gap:8px}
+  .reco-num{font-size:28px}
+}
+</style>
+</head>
+<body>
+
+<canvas class="grid-bg" id="bg"></canvas>
+
+<div class="page">
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="brand">
+    <div class="brand-mark"></div>
+    <div class="brand-name">ONDA<span>.AI</span></div>
+  </a>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="index.html" data-i18n="nav.home">Inicio</a></li>
+      <li><a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a></li>
+      <li><a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a></li>
+      <li><a href="contact.html" class="nav-cta" data-i18n="nav.contact">Contacto</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="langES" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" id="langEN" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-overlay" id="mobileOverlay"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" data-i18n="nav.home">Inicio</a>
+  <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+  <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
+  <a href="contact.html" data-i18n="nav.contact">Contacto</a>
+</div>
+
+<div class="encrypt-strip" id="enc"></div>
+
+<!-- RESULTS CONTENT -->
+<main>
+<div class="res-wrap">
+
+  <!-- HEADER: SCORE -->
+  <div class="res-header">
+    <div class="sec-tag" data-i18n="res.tag">// Diagnóstico Completado</div>
+    <h2 id="resName"></h2>
+
+    <div class="score-ring">
+      <svg viewBox="0 0 160 160">
+        <circle class="ring-bg" r="70" cx="80" cy="80"></circle>
+        <circle class="ring-fill" r="70" cx="80" cy="80" id="ringFill"></circle>
+      </svg>
+      <div class="score-val">
+        <div class="score-num" id="scoreNum">0</div>
+        <div class="score-of" data-i18n="res.of">/ 100</div>
+      </div>
+    </div>
+
+    <div id="levelLabel"></div>
+    <div id="levelDesc"></div>
+  </div>
+
+  <!-- RADAR CHART -->
+  <div class="radar-wrap">
+    <canvas id="radarCanvas" width="300" height="300"></canvas>
+  </div>
+
+  <!-- DIMENSION BREAKDOWN -->
+  <div class="bd-section">
+    <div id="breakdown"></div>
+  </div>
+
+  <!-- RECOMMENDATIONS -->
+  <div class="reco-section">
+    <div class="sec-tag" data-i18n="res.recoTag">// Oportunidades Identificadas</div>
+    <h3 data-i18n="res.recoTitle">Recomendaciones Prioritarias</h3>
+    <div id="recoCards"></div>
+  </div>
+
+  <!-- ROI SUMMARY -->
+  <div class="roi-section">
+    <div class="sec-tag" data-i18n="res.roiTag">// Resumen de Retorno</div>
+    <div class="roi-grid" id="roiGrid"></div>
+  </div>
+
+  <!-- CTA -->
+  <div class="res-cta">
+    <h3 data-i18n="res.ctaTitle">¿Listo para actuar?</h3>
+    <div class="cta-btns">
+      <a href="contact.html" class="btn-primary" data-i18n-btn="res.ctaCall">Agendar una llamada &rarr;</a>
+      <button class="btn-ghost" onclick="downloadPDF()" data-i18n="res.ctaPdf">Descargar reporte en PDF</button>
+    </div>
+    <div class="email-link">
+      <span data-i18n="res.ctaEmail">O escríbenos directamente:</span>
+      <a href="mailto:hola@onda.ai">hola@onda.ai</a>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<div class="encrypt-strip" id="enc2"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="f-brand">ONDA<span>.AI</span></div>
+    <div class="f-tag" data-i18n="footer.tag">Cerrando la brecha de IA en Centroamérica.</div>
+  </div>
+  <div class="f-links">
+    <a href="index.html" data-i18n="nav.home">Inicio</a>
+    <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+    <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
+    <a href="mailto:hola@onda.ai">hola@onda.ai</a>
+  </div>
+  <div>&copy; 2026 Onda AI. <span data-i18n="footer.rights">Todos los derechos reservados.</span></div>
+</footer>
+
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/grid-bg.js"></script>
+<script src="js/encrypt.js"></script>
+<script src="js/scoring.js"></script>
+<script src="js/results.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Grid background — 10 particles for interior page
+  OndaGrid.init(10);
+
+  // Hamburger menu
+  var ham = document.getElementById('hamburger');
+  var menu = document.getElementById('mobileMenu');
+  var overlay = document.getElementById('mobileOverlay');
+  if (ham) {
+    ham.addEventListener('click', function() {
+      ham.classList.toggle('open');
+      menu.classList.toggle('open');
+      overlay.classList.toggle('open');
+    });
+    overlay.addEventListener('click', function() {
+      ham.classList.remove('open');
+      menu.classList.remove('open');
+      overlay.classList.remove('open');
+    });
+  }
+});
+</script>
+</body>
+</html>

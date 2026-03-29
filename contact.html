@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contacto — Onda AI</title>
+<meta name="description" content="Hablemos sobre cómo la IA puede transformar tu operación. Agenda una llamada con nuestro equipo.">
+<meta property="og:title" content="Contacto — Onda AI">
+<meta property="og:description" content="No es una llamada de ventas. Es una conversación estratégica sobre las oportunidades en tu operación.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://onda.ai/contact.html">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/shared.css">
+<style>
+/* CONTACT GRID */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 60px)}
+
+/* LEFT - INFO */
+.contact-info{padding:80px 50px;display:flex;flex-direction:column;justify-content:center;border-right:.5px solid var(--border)}
+.contact-info h1{font-size:clamp(24px,3vw,36px);font-weight:800;line-height:1.15;margin-bottom:18px;opacity:0;animation:up .7s .35s forwards}
+.contact-info h1 em{font-style:normal;color:var(--accent)}
+.contact-info>.sec-tag{opacity:0;animation:up .7s .2s forwards}
+.contact-info>p{font-size:14px;color:var(--gray);line-height:1.65;margin-bottom:40px;opacity:0;animation:up .7s .5s forwards}
+
+.info-blocks{display:flex;flex-direction:column;gap:0;border:.5px solid var(--border);opacity:0;animation:up .7s .65s forwards}
+.info-block{padding:22px;border-bottom:.5px solid var(--border);transition:background .3s}
+.info-block:last-child{border-bottom:none}
+.info-block:hover{background:var(--accent3)}
+.ib-label{font-family:var(--fm);font-size:9px;letter-spacing:2px;color:var(--dimgray);text-transform:uppercase;margin-bottom:6px}
+.ib-val{font-size:14px;font-weight:600}
+.ib-val a{color:var(--accent);text-decoration:none;transition:opacity .3s}
+.ib-val a:hover{opacity:.8}
+
+.wa-direct{margin-top:24px;opacity:0;animation:up .7s .75s forwards}
+
+.response-note{margin-top:28px;padding:16px 18px;border:.5px solid var(--border);font-family:var(--fm);font-size:10px;color:var(--dimgray);letter-spacing:.5px;line-height:1.7;opacity:0;animation:up .7s .85s forwards}
+.response-note span{color:var(--accent)}
+
+/* RIGHT - FORM */
+.contact-form-wrap{padding:80px 50px;display:flex;flex-direction:column;justify-content:center}
+.form-tag{font-family:var(--fm);font-size:11px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:28px;opacity:0;animation:up .7s .3s forwards}
+
+.form-group{margin-bottom:20px;opacity:0;animation:up .7s forwards}
+.form-group:nth-child(1){animation-delay:.4s}
+.form-group:nth-child(2){animation-delay:.45s}
+.form-group:nth-child(3){animation-delay:.5s}
+.form-group:nth-child(4){animation-delay:.55s}
+.form-group:nth-child(5){animation-delay:.6s}
+
+/* SUCCESS */
+.success-msg{display:none;text-align:center;padding:40px 20px}
+.success-msg.active{display:block}
+.success-icon{font-family:var(--fm);font-size:48px;color:var(--accent);margin-bottom:16px}
+.success-msg h3{font-size:20px;font-weight:800;margin-bottom:10px}
+.success-msg p{font-size:13px;color:var(--gray);line-height:1.6}
+
+@media(max-width:768px){
+  .contact-grid{grid-template-columns:1fr}
+  .contact-info{padding:60px 20px 40px;border-right:none;border-bottom:.5px solid var(--border)}
+  .contact-form-wrap{padding:40px 20px 60px}
+}
+</style>
+</head>
+<body>
+
+<canvas class="grid-bg" id="bg"></canvas>
+
+<div class="page">
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="brand">
+    <div class="brand-mark"></div>
+    <div class="brand-name">ONDA<span>.AI</span></div>
+  </a>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="index.html" data-i18n="nav.home">Inicio</a></li>
+      <li><a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a></li>
+      <li><a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a></li>
+      <li><a href="contact.html" class="nav-cta active" data-i18n="nav.contact">Contacto</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="langES" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" id="langEN" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-overlay" id="mobileOverlay"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" data-i18n="nav.home">Inicio</a>
+  <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+  <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
+  <a href="contact.html" class="active" data-i18n="nav.contact">Contacto</a>
+</div>
+
+<div class="encrypt-strip" id="enc"></div>
+
+<main>
+<!-- CONTACT GRID -->
+<div class="contact-grid">
+
+  <!-- LEFT -->
+  <div class="contact-info">
+    <div class="sec-tag" data-i18n="ct.tag">// Contacto</div>
+    <h1 data-i18n-html="ct.title">¿Listo para descubrir el potencial de <em>tu negocio?</em></h1>
+    <p data-i18n="ct.sub">No es una llamada de ventas. Es una conversación estratégica sobre las oportunidades específicas en tu operación.</p>
+
+    <div class="info-blocks">
+      <div class="info-block">
+        <div class="ib-label" data-i18n="ct.emailLabel">Email</div>
+        <div class="ib-val"><a href="mailto:hola@onda.ai">hola@onda.ai</a></div>
+      </div>
+      <div class="info-block">
+        <div class="ib-label" data-i18n="ct.whatsappLabel">WhatsApp</div>
+        <div class="ib-val"><a href="https://wa.me/505XXXXXXXX">+505 ____-____</a></div>
+      </div>
+      <div class="info-block">
+        <div class="ib-label" data-i18n="ct.locationLabel">Ubicación</div>
+        <div class="ib-val" data-i18n="ct.location">Managua, Nicaragua — operamos en toda Centroamérica</div>
+      </div>
+    </div>
+
+    <div class="wa-direct">
+      <a href="https://wa.me/505XXXXXXXX?text=Hola,%20me%20interesa%20saber%20más%20sobre%20Onda%20AI" class="btn-ghost" data-i18n="ct.waText">Escríbenos directo</a>
+    </div>
+
+    <div class="response-note">
+      <span>&gt;</span> <span data-i18n="ct.response">Respondemos en menos de 24 horas hábiles.</span>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="contact-form-wrap">
+    <div class="form-tag" data-i18n="ct.formTag">// Enviar mensaje</div>
+
+    <form id="contactForm" onsubmit="return handleSubmit(event)">
+      <div class="form-group">
+        <label class="form-label" data-i18n="ct.nameLabel">Nombre</label>
+        <input type="text" class="form-input" name="name" required data-i18n-placeholder="ct.namePh" placeholder="Tu nombre">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-i18n="ct.emailFormLabel">Email</label>
+        <input type="email" class="form-input" name="email" required data-i18n-placeholder="ct.emailPh" placeholder="tu@correo.com">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-i18n="ct.companyLabel">Empresa</label>
+        <input type="text" class="form-input" name="company" data-i18n-placeholder="ct.companyPh" placeholder="Nombre de tu empresa (opcional)">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" data-i18n="ct.msgLabel">Mensaje</label>
+        <textarea class="form-input" name="message" rows="5" required data-i18n-placeholder="ct.msgPh" placeholder="Cuéntanos sobre tu negocio y qué desafíos enfrentas..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <button type="submit" class="btn-primary" data-i18n-btn="ct.submit">Enviar Mensaje &rarr;</button>
+      </div>
+    </form>
+
+    <div class="success-msg" id="successMsg">
+      <div class="success-icon">[&#10003;]</div>
+      <h3 data-i18n="ct.successTitle">Mensaje enviado.</h3>
+      <p data-i18n="ct.successSub">Te contactaremos dentro de 24 horas.</p>
+    </div>
+
+    <div class="success-msg" id="errorMsg">
+      <div class="success-icon" style="color:var(--coral)">[!]</div>
+      <h3 id="errorTitle">Error al enviar.</h3>
+      <p id="errorSub">Intenta de nuevo.</p>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<div class="encrypt-strip" id="enc2"></div>
+
+<footer>
+  <div>
+    <div class="f-brand">ONDA<span>.AI</span></div>
+    <div class="f-tag" data-i18n="footer.tag">Cerrando la brecha de IA en Centroamérica.</div>
+  </div>
+  <div class="f-links">
+    <a href="index.html" data-i18n="nav.home">Inicio</a>
+    <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+    <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
+    <a href="mailto:hola@onda.ai">hola@onda.ai</a>
+  </div>
+  <div>&copy; 2026 Onda AI. <span data-i18n="footer.rights">Todos los derechos reservados.</span></div>
+</footer>
+
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/grid-bg.js"></script>
+<script src="js/encrypt.js"></script>
+<script>
+// Hamburger menu
+(function() {
+  var hamburger = document.getElementById('hamburger');
+  var mobileMenu = document.getElementById('mobileMenu');
+  var mobileOverlay = document.getElementById('mobileOverlay');
+
+  function toggleMenu() {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+    mobileOverlay.classList.toggle('open');
+  }
+
+  if (hamburger) hamburger.addEventListener('click', toggleMenu);
+  if (mobileOverlay) mobileOverlay.addEventListener('click', toggleMenu);
+})();
+
+// Form submit handler
+function handleSubmit(e) {
+  e.preventDefault();
+  var form = document.getElementById('contactForm');
+  var formTag = document.querySelector('.form-tag');
+  var submitBtn = form.querySelector('button[type="submit"]');
+  var lang = OndaI18n.getLang();
+
+  // Loading state
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = lang === 'en'
+    ? (OndaI18n.t('ct.sending') || 'Sending...')
+    : (OndaI18n.t('ct.sending') || 'Enviando...');
+
+  var formData = new FormData(form);
+
+  fetch('https://formspree.io/f/PLACEHOLDER_ID', {
+    method: 'POST',
+    body: formData,
+    headers: { 'Accept': 'application/json' }
+  })
+  .then(function(response) {
+    if (response.ok) {
+      form.style.display = 'none';
+      if (formTag) formTag.style.display = 'none';
+      document.getElementById('successMsg').classList.add('active');
+    } else {
+      var errorTitle = document.getElementById('errorTitle');
+      var errorSub = document.getElementById('errorSub');
+      if (errorTitle) errorTitle.textContent = OndaI18n.t('ct.errorTitle') || (lang === 'en' ? 'Error sending.' : 'Error al enviar.');
+      if (errorSub) errorSub.textContent = OndaI18n.t('ct.errorSub') || (lang === 'en' ? 'Please try again.' : 'Intenta de nuevo.');
+      document.getElementById('errorMsg').classList.add('active');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = OndaI18n.t('ct.submit') || (lang === 'en' ? 'Send Message &rarr;' : 'Enviar Mensaje &rarr;');
+    }
+  })
+  .catch(function() {
+    var errorTitle = document.getElementById('errorTitle');
+    var errorSub = document.getElementById('errorSub');
+    if (errorTitle) errorTitle.textContent = OndaI18n.t('ct.errorTitle') || (lang === 'en' ? 'Error sending.' : 'Error al enviar.');
+    if (errorSub) errorSub.textContent = OndaI18n.t('ct.errorSub') || (lang === 'en' ? 'Please try again.' : 'Intenta de nuevo.');
+    document.getElementById('errorMsg').classList.add('active');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = OndaI18n.t('ct.submit') || (lang === 'en' ? 'Send Message &rarr;' : 'Enviar Mensaje &rarr;');
+  });
+
+  return false;
+}
+
+// Language change title update
+document.addEventListener('langchange', function(e) {
+  document.title = e.detail.lang === 'es' ? 'Contacto — Onda AI' : 'Contact — Onda AI';
+});
+
+// Init grid background (10 particles for interior page)
+OndaGrid.init(10);
+</script>
+</body>
+</html>
