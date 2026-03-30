@@ -32,7 +32,7 @@
   function renderHeader(data, contact) {
     // Name
     var nameEl = document.getElementById('resName');
-    if (nameEl && contact) nameEl.textContent = contact.name;
+    if (nameEl && contact) nameEl.textContent = (contact.first_name || contact.name || '') + (contact.last_name ? ' ' + contact.last_name : '');
 
     // Animated score
     var scoreEl = document.getElementById('scoreNum');
@@ -282,7 +282,8 @@
     // Name + Score
     doc.setFontSize(14);
     doc.setTextColor(234, 234, 240);
-    doc.text(answerData.contact.name, 20, 48);
+    var fullName = (answerData.contact.first_name || answerData.contact.name || '') + (answerData.contact.last_name ? ' ' + answerData.contact.last_name : '');
+    doc.text(fullName, 20, 48);
 
     doc.setFontSize(36);
     doc.setTextColor(0, 229, 191);
@@ -327,7 +328,8 @@
     doc.setTextColor(58, 58, 80);
     doc.text('hola@onda.ai — onda.ai', 20, 280);
 
-    doc.save('onda-ai-diagnostic-' + (answerData.contact.name || 'report').replace(/\s+/g, '-').toLowerCase() + '.pdf');
+    var pdfName = (answerData.contact.first_name || answerData.contact.name || 'report');
+    doc.save('onda-ai-diagnostic-' + pdfName.replace(/\s+/g, '-').toLowerCase() + '.pdf');
   }
 
 })();

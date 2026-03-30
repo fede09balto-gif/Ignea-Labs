@@ -32,9 +32,9 @@
     });
 
     // Info prev button (back to landing)
-    var infoScreen = document.getElementById('infoScreen');
-    if (infoScreen) {
-      var infoPrev = infoScreen.querySelector('.btn-prev');
+    var infoEl = document.getElementById('infoScreen');
+    if (infoEl) {
+      var infoPrev = infoEl.querySelector('.btn-prev');
       if (infoPrev) infoPrev.addEventListener('click', function() { goTo(0); });
     }
 
@@ -158,9 +158,9 @@
       var target = document.querySelector('.q-screen[data-q="' + qNum + '"]');
       if (target) target.classList.add('active');
       if (progWrap) progWrap.style.visibility = 'visible';
-      var pct = Math.round(((qNum - 1) / totalQ) * 100);
+      var pct = Math.round((qNum / totalQ) * 100);
       if (progBar) progBar.style.width = pct + '%';
-      if (progText) progText.textContent = (qNum - 1) + ' / ' + totalQ;
+      if (progText) progText.textContent = qNum + ' / ' + totalQ;
     } else if (n === 13) {
       // Processing
       processingScreen.classList.add('active');
