@@ -53,14 +53,20 @@ var OpsAuth = (function() {
 
     if (failCount >= 3) return;
 
+    var client = OndaSupabase.client;
+    if (!client) {
+      handleFailedAttempt();
+      return;
+    }
+
     hashSHA256(value).then(function(hexHash) {
-      return OndaSupabase.client
+      return client
         .from('ops_users')
         .select('*')
         .eq('password_hash', hexHash)
-        .single();
+        .maybeSingle();
     }).then(function(result) {
-      if (result.error || !result.data) {
+      if (!result || result.error || !result.data) {
         handleFailedAttempt();
         return;
       }
@@ -78,11 +84,11 @@ var OpsAuth = (function() {
       sessionStorage.setItem('onda_ops_token', 'authenticated');
 
       // Update last_login
-      OndaSupabase.client
+      client
         .from('ops_users')
         .update({ last_login: new Date().toISOString() })
         .eq('id', user.id)
-        .catch(function() {});
+        .then(function() {});
 
       showDashboard(userData);
     }).catch(function() {
