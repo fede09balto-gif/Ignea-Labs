@@ -5,8 +5,8 @@
    ============================================================ */
 
 var OndaSupabase = (function() {
-  var SUPABASE_URL = 'PLACEHOLDER_SUPABASE_URL';
-  var SUPABASE_ANON_KEY = 'PLACEHOLDER_SUPABASE_KEY';
+  var SUPABASE_URL = 'https://uqupiesctjvosvszovuq.supabase.co';
+  var SUPABASE_ANON_KEY = 'sb_publishable_wUXzJhf8mERI7m9hL4Th6g_GpWvSEMP';
 
   var client = null;
 
