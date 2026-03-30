@@ -1,0 +1,373 @@
+/* ============================================
+   PREMIUM VISUAL COMPONENTS — Onda AI
+   Vanilla CSS adaptations of 21st.dev components
+   ============================================ */
+
+/* --- @property for gradient animation --- */
+@property --gradient-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ============================================
+   1. GRADIENT BORDER BUTTON
+   ============================================ */
+
+.btn-gradient {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 40px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: #08080D;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 1;
+  text-decoration: none;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.btn-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    var(--gradient-angle),
+    #00E5BF,
+    #00B89A,
+    #5DCAA5,
+    #00E5BF
+  );
+  z-index: -2;
+  animation: rotateGradient 3s linear infinite;
+}
+
+.btn-gradient::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: #00E5BF;
+  z-index: -1;
+  transition: opacity 0.2s ease;
+}
+
+@keyframes rotateGradient {
+  to { --gradient-angle: 360deg; }
+}
+
+.btn-gradient:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.btn-gradient:active {
+  transform: translateY(0);
+  filter: brightness(0.95);
+}
+
+.btn-gradient:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+/* ============================================
+   2. ARROW SLIDE GHOST BUTTON
+   ============================================ */
+
+.btn-ghost-slide {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 18px 36px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: #6E6E88;
+  background: transparent;
+  border: 1px solid #1A1A2A;
+  cursor: pointer;
+  overflow: hidden;
+  text-decoration: none;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-ghost-slide .btn-arrow {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0;
+  width: 0;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #00E5BF;
+}
+
+.btn-ghost-slide:hover {
+  color: #EAEAF0;
+  border-color: #3A3A50;
+}
+
+.btn-ghost-slide:hover .btn-arrow {
+  width: 22px;
+  margin-left: 8px;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ============================================
+   3. STEPPED PROGRESS INDICATOR
+   ============================================ */
+
+.step-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0 32px;
+  gap: 0;
+}
+
+.step-progress .step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #1A1A2A;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.step-progress .step-dot.completed {
+  background: #00E5BF;
+}
+
+.step-progress .step-dot.active {
+  background: #00E5BF;
+  box-shadow: 0 0 0 4px rgba(0, 229, 191, 0.15);
+  width: 12px;
+  height: 12px;
+}
+
+.step-progress .step-connector {
+  width: 20px;
+  height: 2px;
+  background: #1A1A2A;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+}
+
+.step-progress .step-connector.completed {
+  background: #00E5BF;
+}
+
+.progress-bar-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: #00E5BF;
+  z-index: 9999;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+/* ============================================
+   4. CUSTOM SELECT DROPDOWNS
+   ============================================ */
+
+.custom-select {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select select[data-custom] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+  width: 0;
+}
+
+.custom-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 52px;
+  padding: 0 16px;
+  background: #0E0E16;
+  border: 0.5px solid #1A1A2A;
+  color: #EAEAF0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  user-select: none;
+}
+
+.custom-select-trigger.placeholder {
+  color: #6E6E88;
+}
+
+.custom-select-trigger:focus {
+  border-color: #00E5BF;
+  outline: none;
+}
+
+.custom-select-trigger.open {
+  border-color: #00E5BF;
+}
+
+.custom-select-trigger .cs-arrow {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #3A3A50;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.custom-select-trigger.open .cs-arrow {
+  transform: rotate(180deg);
+}
+
+.custom-select-options {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #0E0E16;
+  border: 0.5px solid #1A1A2A;
+  max-height: 0;
+  overflow: hidden;
+  z-index: 100;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+  opacity: 0;
+}
+
+.custom-select-options.open {
+  max-height: 260px;
+  overflow-y: auto;
+  opacity: 1;
+}
+
+.custom-select-option {
+  padding: 14px 16px;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  color: #6E6E88;
+  transition: all 0.15s ease;
+}
+
+.custom-select-option:hover {
+  background: rgba(0, 229, 191, 0.04);
+  color: #EAEAF0;
+}
+
+.custom-select-option.selected {
+  color: #00E5BF;
+}
+
+.custom-select-options::-webkit-scrollbar { width: 4px; }
+.custom-select-options::-webkit-scrollbar-track { background: transparent; }
+.custom-select-options::-webkit-scrollbar-thumb { background: #1A1A2A; border-radius: 2px; }
+
+/* ============================================
+   5. SCORE GAUGE & DISPLAY
+   ============================================ */
+
+.score-display {
+  position: relative;
+  margin: 0 auto 40px;
+  max-width: 320px;
+}
+
+.score-value {
+  text-align: center;
+  margin-top: -24px;
+  position: relative;
+}
+
+.score-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 48px;
+  font-weight: 700;
+  color: #EAEAF0;
+  line-height: 1;
+}
+
+.score-max {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #3A3A50;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.score-level-badge {
+  display: inline-block;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-align: center;
+  margin-top: 12px;
+  padding: 6px 20px;
+  border: 0.5px solid;
+}
+
+.score-level-badge.critical { color: #F0997B; border-color: #F0997B33; }
+.score-level-badge.developing { color: #EF9F27; border-color: #EF9F2733; }
+.score-level-badge.competent { color: #00E5BF; border-color: #00E5BF33; }
+.score-level-badge.advanced { color: #00B89A; border-color: #00B89A33; }
+
+/* ============================================
+   6. DIMENSION PROGRESS BARS
+   ============================================ */
+
+.dimension-bar-wrap {
+  margin-bottom: 20px;
+}
+
+.dimension-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.dimension-bar-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  color: #EAEAF0;
+  font-weight: 500;
+}
+
+.dimension-bar-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #6E6E88;
+}
+
+.dimension-bar-track {
+  width: 100%;
+  height: 4px;
+  background: #1A1A2A;
+  overflow: hidden;
+}
+
+.dimension-bar-fill {
+  height: 100%;
+  background: #00E5BF;
+  width: 0%;
+  transition: width 1s cubic-bezier(0.65, 0, 0.35, 1) 0.6s;
+}
