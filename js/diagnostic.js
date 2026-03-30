@@ -167,8 +167,57 @@
       if (progBar) progBar.style.width = '100%';
     }
 
+    // Update step progress + top bar
+    renderStepProgress(n);
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
     updateNav();
+  }
+
+  function renderStepProgress(n) {
+    var stepContainer = document.getElementById('stepProgress');
+    var topBar = document.getElementById('progressBarTop');
+
+    if (n === 0) {
+      if (stepContainer) stepContainer.style.display = 'none';
+      if (topBar) topBar.style.width = '0';
+      return;
+    }
+
+    if (n === 1) {
+      if (stepContainer) stepContainer.style.display = 'none';
+      if (topBar) topBar.style.width = '0';
+      return;
+    }
+
+    if (n >= 2 && n <= 12) {
+      var qNum = n - 1; // 1-11
+      var currentStep = qNum - 1; // 0-indexed for dots
+
+      if (stepContainer) {
+        stepContainer.style.display = 'flex';
+        var html = '';
+        for (var i = 0; i < totalQ; i++) {
+          var dotClass = 'step-dot';
+          if (i < currentStep) dotClass += ' completed';
+          if (i === currentStep) dotClass += ' active';
+          html += '<div class="' + dotClass + '"></div>';
+          if (i < totalQ - 1) {
+            var lineClass = 'step-line';
+            if (i < currentStep) lineClass += ' completed';
+            html += '<div class="' + lineClass + '"></div>';
+          }
+        }
+        stepContainer.innerHTML = html;
+      }
+
+      if (topBar) topBar.style.width = Math.round((qNum / totalQ) * 100) + '%';
+    }
+
+    if (n === 13) {
+      if (stepContainer) stepContainer.style.display = 'none';
+      if (topBar) topBar.style.width = '100%';
+    }
   }
 
   function updateInfoBtn() {

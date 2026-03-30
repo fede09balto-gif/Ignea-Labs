@@ -78,6 +78,7 @@
 
 <div class="gradient-dots-bg" id="gradientBg"></div>
 
+<div class="progress-bar-top" id="progressBarTop"></div>
 <div class="page">
 
 <!-- NAV -->
@@ -118,6 +119,9 @@
 <div class="progress-wrap" id="progressWrap" style="visibility:hidden">
   <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
   <div class="progress-text" id="progText">0 / 11</div>
+  </div>
+  <div class="diagnostic-progress step-progress" id="stepProgress"></div>
+  <div style="display:none">
 </div>
 
 <!-- ============================================ -->
@@ -181,7 +185,7 @@
     <!-- Row 4 -->
     <div class="info-field">
       <label class="form-label" for="dxIndustry" data-i18n="dx.field.industry">Industria</label>
-      <select class="form-select" id="dxIndustry">
+      <select class="form-select" id="dxIndustry" data-custom>
         <option value="">—</option>
         <option value="hotel" data-i18n="dx.industry.hotel">Hotelería y turismo</option>
         <option value="restaurant" data-i18n="dx.industry.restaurant">Restaurantes y alimentación</option>
@@ -200,7 +204,7 @@
     </div>
     <div class="info-field">
       <label class="form-label" for="dxSize" data-i18n="dx.field.size">Tamaño</label>
-      <select class="form-select" id="dxSize">
+      <select class="form-select" id="dxSize" data-custom>
         <option value="">—</option>
         <option value="1-5">1–5</option>
         <option value="6-15">6–15</option>
@@ -215,7 +219,7 @@
     </div>
     <div class="info-field">
       <label class="form-label" for="dxRevenue" data-i18n="dx.field.revenue">Ingresos mensuales</label>
-      <select class="form-select" id="dxRevenue">
+      <select class="form-select" id="dxRevenue" data-custom>
         <option value="">—</option>
         <option value="0" data-i18n="q11.o1">Menos de $2,000</option>
         <option value="1" data-i18n="q11.o2">$2,000 – $5,000</option>

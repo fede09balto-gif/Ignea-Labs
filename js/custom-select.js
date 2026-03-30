@@ -133,5 +133,5 @@ function initCustomSelect(selectEl) {
 }
 
 function initAllCustomSelects() {
-  document.querySelectorAll('.form-select').forEach(initCustomSelect);
+  document.querySelectorAll('select[data-custom]').forEach(initCustomSelect);
 }
