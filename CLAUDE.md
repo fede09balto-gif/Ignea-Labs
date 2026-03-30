@@ -33,13 +33,15 @@
 - Code keyword color: `#AFA9EC` (purple)
 
 ## Typography
-- Display font: `'Plus Jakarta Sans', sans-serif` (weights 400-800)
-- Monospace font: `'JetBrains Mono', monospace` (weights 300-700)
-- Section tags: monospace, 11px, uppercase, letter-spacing 3px, accent color, prefixed with "//"
-- Stat values: monospace, 28-30px, bold, accent color
-- Stat labels: 10-11px, uppercase, letter-spacing 1px, dim gray
-- Body text: 14-15px, secondary gray, line-height 1.7
-- Hero headlines: Plus Jakarta Sans, clamp(30px, 4.5vw, 54px), weight 800
+- Display font: `'Plus Jakarta Sans', sans-serif` (weights 400, 500, 600, 700)
+- Monospace font: `'JetBrains Mono', monospace` (weights 300, 400, 500, 700)
+- Headlines: Plus Jakarta Sans 700, letter-spacing -0.02em, line-height 1.15
+- Hero headlines: clamp(32px, 4.5vw, 56px)
+- Section tags: JetBrains Mono 11px, uppercase, letter-spacing 3px, accent color, prefixed with "//"
+- Stat values: JetBrains Mono 28px, bold, accent color
+- Stat labels: 10px, uppercase, letter-spacing 1px, dim gray
+- Body text: 15px, Plus Jakarta Sans 400, secondary gray, line-height 1.7
+- Manifesto body: 16-17px, #8E8EA0 (lighter for readability), line-height 1.8
 
 ## Visual Rules
 - Border radius: 0px everywhere. Sharp corners. Engineering aesthetic. Exception: brand mark circle and dots in terminal bar.
@@ -49,27 +51,27 @@
 ## Logo
 - Text: "ONDA" in white (#EAEAF0), ".AI" in accent (#00E5BF)
 - Letter spacing: 3px, Weight: 800
-- Mark: 28px circle, 2px accent border, animated wave line inside
+- Logo is text-only: "ONDA.AI" — no mark/circle
 
 ## Interactive Elements
-- Animated grid background (canvas, floating glowing particles in accent color)
-- Neural network animation (canvas, nodes with pulsing data flow) — homepage only
-- Terminal typewriter simulation (lines appear sequentially with fade-up) — homepage only
-- Encryption strip (scrambling random characters, updates every 80ms)
+- Gradient dots background (CSS radial-gradients with slow drift animation, js/grid-bg.js) — all pages
+- Terminal typewriter simulation (lines appear every 600ms with fade-up) — homepage only
+- Static encryption badge (lock SVG + "ENCRYPTED" text) — replaces old animated strip
 - Stat counters (animate from 0 to target value on page load)
+- NOTE: Neural network animation and encryption strip animation were REMOVED
 
 # Pre-edit Checklist
 
 1. Read the BUILD_SPEC.md file for full page specs, copy, and scoring logic before building any new page.
 2. Every new user-facing string → add to BOTH es and en translation objects in js/i18n.js. Never hardcode text.
-3. Every page must include: shared nav, shared footer, grid background animation, language toggle, responsive mobile layout.
+3. Every page must include: shared nav, shared footer, gradient dots background (js/grid-bg.js), language toggle, responsive mobile layout.
 4. Every input element: dark surface background (#0E0E16), 0.5px border, accent border on focus, minimum 44px tap target on mobile.
 5. Every multiple-choice option: styled as a card (dark surface, 0.5px border, accent border + subtle glow on selection). Never use native radio/checkbox styling.
-6. Every button: either btn-primary (accent bg, dark text, bold) or btn-ghost (transparent bg, border, gray text). No other button styles.
-7. Every canvas animation: use requestAnimationFrame. Reduce particle count on mobile (check window.innerWidth < 768). Target 60fps.
-8. Every page: proper semantic HTML (header, nav, main, section, footer). Proper meta tags in both languages.
-9. Every page transition: subtle fade-up animation on load (opacity 0 → 1, translateY 16px → 0).
-10. Grid background runs on EVERY page but at lower intensity on interior pages (10 particles instead of 20).
+6. Every button: either btn-primary (accent bg, dark text, 700 weight, 16px/32px padding) or btn-ghost (transparent bg, border, gray text, 500 weight). No other button styles.
+7. Gradient dots background is self-initializing (IIFE in grid-bg.js). No init() call needed. Drift animation disabled on mobile (< 768px).
+8. Every page: proper semantic HTML (header, nav, main, section, footer). Proper meta tags.
+9. Every page transition: subtle fade-in on load (opacity 0 → 1).
+10. Solutions section was REMOVED from homepage (reveals playbook). Replaced with "What We Do" prose section.
 11. Spanish is always written FIRST, English second. Default language is ES.
 12. No external JS frameworks. No jQuery. No React. Vanilla JS only.
 13. No images required for MVP — all visuals are CSS/Canvas/SVG.
@@ -81,13 +83,11 @@
 
 # Known Bugs (verify on every change)
 
-- Grid background canvas height must match document.body.scrollHeight, not window.innerHeight. Otherwise grid cuts off on long pages. Recalculate on resize.
-- Language toggle must also restart the terminal animation in the correct language and update neural network labels.
-- Hero CTA buttons with HTML entities (→) must use innerHTML, not textContent, when switching languages.
-- On mobile (< 768px), stats grid must switch to 2x2 layout. The 2nd and 4th stat cells lose their right border.
-- Range slider on diagnostic page must show current value in real-time next to the slider. Use input event, not change event.
-- Safari on iOS: canvas animations can be choppy. Add will-change: transform to canvas elements.
+- Language toggle must restart the terminal animation in the correct language.
+- Hero CTA buttons with HTML entities (→) must use innerHTML, not textContent, when switching languages. Use data-i18n-btn attribute.
+- Range slider on diagnostic page must show current value in real-time. Use 'input' event, not 'change' event.
 - Formspree form submission: must prevent default, show loading state, handle errors gracefully.
+- Diagnostic info collection is now BEFORE questions (screen 1), not after. Contact fields use dxFirstName/dxEmail/dxCompany IDs.
 
 # Code Patterns
 

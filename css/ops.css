@@ -388,7 +388,7 @@
 .pipe-count--closed_won  { background: #00E5BF22; color: var(--accent); }
 .pipe-count--closed_lost { background: #F0997B22; color: var(--coral); }
 .pipe-count--negotiating { background: #AFA9EC22; color: var(--purple); }
-.pipe-count--meeting_scheduled { background: #00E5BF11; color: #7DFADE; }
+.pipe-count--meeting_scheduled { background: #00E5BF11; color: var(--accent); }
 
 .pipe-col-body {
   flex: 1;
@@ -693,7 +693,7 @@
 
 .stage-pill--new              { background: #3A3A5022; color: var(--gray); border: .5px solid var(--dimgray); }
 .stage-pill--contacted        { background: #AFA9EC22; color: var(--purple); border: .5px solid var(--purple); }
-.stage-pill--meeting_scheduled{ background: #00E5BF11; color: #7DFADE; border: .5px solid #7DFADE66; }
+.stage-pill--meeting_scheduled{ background: #00E5BF11; color: var(--accent); border: .5px solid var(--accent2); }
 .stage-pill--proposal_sent    { background: #00E5BF22; color: var(--accent); border: .5px solid var(--accent); }
 .stage-pill--negotiating      { background: #F0997B22; color: var(--coral); border: .5px solid var(--coral); }
 .stage-pill--closed_won       { background: #00E5BF33; color: var(--accent); border: .5px solid var(--accent); }
