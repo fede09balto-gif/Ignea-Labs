@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Resultados — Onda AI</title>
 <meta name="description" content="Tu reporte de preparación digital personalizado. Descubre tu puntuación, recomendaciones y retorno estimado.">
-<meta property="og:title" content="Diagnostic Results — Onda AI">
-<meta property="og:description" content="Your personalized digital readiness report. Discover your score, recommendations, and estimated ROI.">
+<meta property="og:title" content="Resultados — Onda AI">
+<meta property="og:description" content="Tu reporte personalizado de preparación para IA. Puntuación, recomendaciones y ROI estimado.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/shared.css">
 <style>
 /* ---- RESULTS PAGE ---- */
@@ -90,34 +90,30 @@
 </head>
 <body>
 
-<canvas class="grid-bg" id="bg"></canvas>
+<div class="gradient-dots-bg" id="gradientBg"></div>
 
 <div class="page">
 
 <!-- NAV -->
 <nav>
   <a href="index.html" class="brand">
-    <div class="brand-mark"></div>
-    <div class="brand-name">ONDA<span>.AI</span></div>
+    <span class="brand-name">ONDA<span class="brand-accent">.AI</span></span>
   </a>
   <div class="nav-right">
     <ul class="nav-links">
       <li><a href="index.html" data-i18n="nav.home">Inicio</a></li>
       <li><a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a></li>
       <li><a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a></li>
-      <li><a href="contact.html" class="nav-cta" data-i18n="nav.contact">Contacto</a></li>
+      <li><a href="contact.html" data-i18n="nav.contact">Contacto</a></li>
     </ul>
-    <button class="hamburger" id="hamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
+    <a href="diagnostic.html" class="btn-primary btn-nav" data-i18n-btn="nav.cta">Iniciar Diagnóstico &rarr;</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
     <div class="lang-toggle">
       <button class="lang-btn active" id="langES" onclick="setLang('es')">ES</button>
       <button class="lang-btn" id="langEN" onclick="setLang('en')">EN</button>
     </div>
   </div>
 </nav>
-
-<!-- MOBILE MENU -->
 <div class="mobile-overlay" id="mobileOverlay"></div>
 <div class="mobile-menu" id="mobileMenu">
   <a href="index.html" data-i18n="nav.home">Inicio</a>
@@ -125,8 +121,6 @@
   <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
   <a href="contact.html" data-i18n="nav.contact">Contacto</a>
 </div>
-
-<div class="encrypt-strip" id="enc"></div>
 
 <!-- RESULTS CONTENT -->
 <main>
@@ -191,21 +185,24 @@
 </div>
 </main>
 
-<div class="encrypt-strip" id="enc2"></div>
-
 <!-- FOOTER -->
 <footer>
-  <div>
-    <div class="f-brand">ONDA<span>.AI</span></div>
-    <div class="f-tag" data-i18n="footer.tag">Cerrando la brecha de IA en Centroamérica.</div>
+  <div class="footer-inner content-wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="f-brand">ONDA<span>.AI</span></div>
+        <div class="f-tag" data-i18n="footer.tag">Cerrando la brecha de IA en Centroamérica.</div>
+      </div>
+      <div class="footer-nav">
+        <a href="index.html" data-i18n="nav.home">Inicio</a>
+        <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+        <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
+        <a href="contact.html" data-i18n="nav.contact">Contacto</a>
+      </div>
+      <div class="footer-contact"><a href="mailto:hola@onda.ai">hola@onda.ai</a></div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Onda AI. <span data-i18n="footer.rights">Todos los derechos reservados.</span></div>
   </div>
-  <div class="f-links">
-    <a href="index.html" data-i18n="nav.home">Inicio</a>
-    <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
-    <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
-    <a href="mailto:hola@onda.ai">hola@onda.ai</a>
-  </div>
-  <div>&copy; 2026 Onda AI. <span data-i18n="footer.rights">Todos los derechos reservados.</span></div>
 </footer>
 
 </div>
@@ -214,15 +211,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/grid-bg.js"></script>
-<script src="js/encrypt.js"></script>
 <script src="js/scoring.js"></script>
 <script src="js/results.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Grid background — 10 particles for interior page
-  OndaGrid.init(10);
+  OndaGradientDots.init(0.06);
 
-  // Hamburger menu
   var ham = document.getElementById('hamburger');
   var menu = document.getElementById('mobileMenu');
   var overlay = document.getElementById('mobileOverlay');

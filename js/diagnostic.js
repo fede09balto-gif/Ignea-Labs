@@ -1,29 +1,49 @@
 /* ============================================================
    ONDA AI — Diagnostic Survey Flow
-   Handles question navigation, validation, answer storage.
-   On submit: calculates scores, stores in sessionStorage,
-   redirects to results.html.
+   Flow: Landing (0) → Info (1) → Q1-Q11 (2-12) → Processing (13) → results.html
    ============================================================ */
 
 (function() {
-  var currentQ = 0; // 0 = intro screen, 1-11 = questions, 12 = contact
+  // currentQ: 0 = landing, 1 = info screen, 2-12 = questions 1-11, 13 = processing
+  var currentQ = 0;
   var totalQ = 11;
   var answers = {};
 
-  var introScreen, questionScreens, contactScreen, processingScreen;
-  var progBar, progText;
+  var landingScreen, infoScreen, questionScreens, processingScreen;
+  var progWrap, progBar, progText;
 
   document.addEventListener('DOMContentLoaded', function() {
-    introScreen = document.getElementById('introScreen');
-    contactScreen = document.getElementById('contactScreen');
+    landingScreen   = document.getElementById('landingScreen');
+    infoScreen      = document.getElementById('infoScreen');
     processingScreen = document.getElementById('processingScreen');
     questionScreens = document.querySelectorAll('.q-screen');
-    progBar = document.getElementById('progFill');
+    progWrap = document.getElementById('progressWrap');
+    progBar  = document.getElementById('progFill');
     progText = document.getElementById('progText');
 
-    // Start button
-    var startBtn = document.getElementById('startBtn');
-    if (startBtn) startBtn.addEventListener('click', function() { goTo(1); });
+    // Landing start button
+    var landingStartBtn = document.getElementById('landingStartBtn');
+    if (landingStartBtn) landingStartBtn.addEventListener('click', function() { goTo(1); });
+
+    // Info next button
+    var infoNextBtn = document.getElementById('infoNextBtn');
+    if (infoNextBtn) infoNextBtn.addEventListener('click', function() {
+      if (validateInfo()) goTo(2);
+    });
+
+    // Info prev button (back to landing)
+    var infoScreen = document.getElementById('infoScreen');
+    if (infoScreen) {
+      var infoPrev = infoScreen.querySelector('.btn-prev');
+      if (infoPrev) infoPrev.addEventListener('click', function() { goTo(0); });
+    }
+
+    // Info field live validation
+    var infoRequired = ['dxFirstName', 'dxEmail', 'dxCompany'];
+    infoRequired.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('input', updateInfoBtn);
+    });
 
     // MC single-select handlers
     document.querySelectorAll('.mc-group[data-type="single"] .mc-opt').forEach(function(opt) {
@@ -54,8 +74,10 @@
 
     // Range slider
     var rangeInput = document.getElementById('rangeQ4');
-    var rangeVal = document.getElementById('rangeQ4Val');
+    var rangeVal   = document.getElementById('rangeQ4Val');
     if (rangeInput && rangeVal) {
+      // Pre-set default value
+      answers.q4 = parseInt(rangeInput.value);
       rangeInput.addEventListener('input', function() {
         var v = parseInt(this.value);
         rangeVal.textContent = v + (v >= 80 ? '+' : '') + ' hrs';
@@ -82,77 +104,98 @@
       });
     });
 
-    // Contact fields
-    document.querySelectorAll('.contact-field').forEach(function(input) {
-      input.addEventListener('input', updateNav);
-    });
-
-    // Nav buttons
-    document.querySelectorAll('.btn-next').forEach(function(btn) {
+    // Question nav next buttons
+    document.querySelectorAll('.q-screen .btn-next').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        if (currentQ === 12) {
+        var qNum = parseInt(this.closest('.q-screen').getAttribute('data-q'));
+        if (qNum === 11) {
           submitDiag();
         } else {
           goTo(currentQ + 1);
         }
       });
     });
-    document.querySelectorAll('.btn-prev').forEach(function(btn) {
+
+    // Question nav prev buttons
+    document.querySelectorAll('.q-screen .btn-prev').forEach(function(btn) {
       btn.addEventListener('click', function() { goTo(currentQ - 1); });
     });
 
-    // Keyboard enter to advance
+    // Keyboard enter to advance (questions only)
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && currentQ >= 1) {
+      if (e.key === 'Enter' && currentQ >= 2 && currentQ <= 12) {
         var nextBtn = document.querySelector('.q-wrap.active .btn-next');
         if (nextBtn && !nextBtn.disabled) nextBtn.click();
       }
     });
+
+    // Initial state
+    updateInfoBtn();
   });
 
   function goTo(n) {
     currentQ = n;
 
-    // Hide all
-    if (introScreen) introScreen.classList.remove('active');
+    // Hide all screens
+    if (landingScreen) landingScreen.classList.remove('active');
+    if (infoScreen) infoScreen.classList.remove('active');
     questionScreens.forEach(function(s) { s.classList.remove('active'); });
-    if (contactScreen) contactScreen.classList.remove('active');
+    if (processingScreen) processingScreen.classList.remove('active');
 
     if (n === 0) {
-      introScreen.classList.add('active');
-    } else if (n >= 1 && n <= 11) {
-      var target = document.querySelector('.q-screen[data-q="' + n + '"]');
+      // Landing — hide progress
+      landingScreen.classList.add('active');
+      if (progWrap) progWrap.style.visibility = 'hidden';
+    } else if (n === 1) {
+      // Info screen — show progress at 0
+      infoScreen.classList.add('active');
+      if (progWrap) progWrap.style.visibility = 'visible';
+      if (progBar) progBar.style.width = '0%';
+      if (progText) progText.textContent = '0 / ' + totalQ;
+    } else if (n >= 2 && n <= 12) {
+      // Question screen — n=2 maps to data-q="1", n=12 maps to data-q="11"
+      var qNum = n - 1;
+      var target = document.querySelector('.q-screen[data-q="' + qNum + '"]');
       if (target) target.classList.add('active');
-    } else if (n === 12) {
-      contactScreen.classList.add('active');
+      if (progWrap) progWrap.style.visibility = 'visible';
+      var pct = Math.round(((qNum - 1) / totalQ) * 100);
+      if (progBar) progBar.style.width = pct + '%';
+      if (progText) progText.textContent = (qNum - 1) + ' / ' + totalQ;
+    } else if (n === 13) {
+      // Processing
+      processingScreen.classList.add('active');
+      if (progBar) progBar.style.width = '100%';
     }
 
-    // Progress
-    var pct = n === 0 ? 0 : Math.min(100, Math.round(((n - 1) / totalQ) * 100));
-    if (progBar) progBar.style.width = pct + '%';
-    if (progText) progText.textContent = (n === 0 ? 0 : Math.min(n, 11)) + ' / ' + totalQ;
-
-    updateNav();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    updateNav();
+  }
+
+  function updateInfoBtn() {
+    var btn = document.getElementById('infoNextBtn');
+    if (!btn) return;
+    btn.disabled = !validateInfo();
+  }
+
+  function validateInfo() {
+    var first   = document.getElementById('dxFirstName');
+    var email   = document.getElementById('dxEmail');
+    var company = document.getElementById('dxCompany');
+    return first && first.value.trim() &&
+           email && email.value.trim() &&
+           company && company.value.trim();
   }
 
   function updateNav() {
-    // Enable/disable next buttons based on whether current Q is answered
     var active = document.querySelector('.q-wrap.active');
     if (!active) return;
     var nextBtn = active.querySelector('.btn-next');
     if (!nextBtn) return;
 
     var valid = false;
-    if (currentQ === 0) {
-      valid = true;
-    } else if (currentQ >= 1 && currentQ <= 11) {
-      valid = isAnswered(currentQ);
-    } else if (currentQ === 12) {
-      var name = document.getElementById('cName');
-      var email = document.getElementById('cEmail');
-      var company = document.getElementById('cCompany');
-      valid = name && name.value.trim() && email && email.value.trim() && company && company.value.trim();
+    if (currentQ >= 2 && currentQ <= 12) {
+      var qNum = currentQ - 1;
+      valid = isAnswered(qNum);
     }
 
     nextBtn.disabled = !valid;
@@ -176,13 +219,25 @@
   }
 
   function submitDiag() {
-    // Collect contact info
+    // Collect contact info from info screen
     var contact = {
-      name: document.getElementById('cName').value.trim(),
-      email: document.getElementById('cEmail').value.trim(),
-      whatsapp: document.getElementById('cWhatsapp').value.trim(),
-      company: document.getElementById('cCompany').value.trim()
+      first_name: (document.getElementById('dxFirstName') || {}).value || '',
+      last_name:  (document.getElementById('dxLastName')  || {}).value || '',
+      email:      (document.getElementById('dxEmail')     || {}).value || '',
+      phone:      (document.getElementById('dxPhone')     || {}).value || '',
+      company:    (document.getElementById('dxCompany')   || {}).value || '',
+      position:   (document.getElementById('dxPosition')  || {}).value || '',
+      industry:   (document.getElementById('dxIndustry')  || {}).value || '',
+      size:       (document.getElementById('dxSize')      || {}).value || '',
+      website:    (document.getElementById('dxWebsite')   || {}).value || '',
+      revenue:    (document.getElementById('dxRevenue')   || {}).value || '',
+      linkedin:   (document.getElementById('dxLinkedin')  || {}).value || ''
     };
+
+    // Trim all string values
+    Object.keys(contact).forEach(function(k) {
+      if (typeof contact[k] === 'string') contact[k] = contact[k].trim();
+    });
 
     // Store answers + contact
     var data = { answers: answers, contact: contact };
@@ -205,21 +260,24 @@
     // Write to Supabase if available
     if (typeof OndaSupabase !== 'undefined' && OndaSupabase.client) {
       var leadData = {
-        first_name: contact.name.split(' ')[0] || contact.name,
-        last_name: contact.name.split(' ').slice(1).join(' ') || '',
-        email: contact.email,
-        phone: contact.whatsapp,
-        company_name: contact.company,
-        company_website: document.getElementById('cWebsite') ? document.getElementById('cWebsite').value.trim() : '',
-        company_linkedin: document.getElementById('cLinkedin') ? document.getElementById('cLinkedin').value.trim() : '',
+        first_name:       contact.first_name,
+        last_name:        contact.last_name,
+        email:            contact.email,
+        phone:            contact.phone,
+        company_name:     contact.company,
+        position:         contact.position,
+        industry:         contact.industry,
+        company_size:     contact.size,
+        company_website:  contact.website,
+        company_linkedin: contact.linkedin,
         diagnostic_answers: answers,
-        total_score: result.total,
-        score_breakdown: result.scores,
-        score_level: result.level,
-        recommendations: recos,
-        roi_estimate: roi,
-        pipeline_stage: 'new',
-        priority: 'medium'
+        total_score:      result.total,
+        score_breakdown:  result.scores,
+        score_level:      result.level,
+        recommendations:  recos,
+        roi_estimate:     roi,
+        pipeline_stage:   'new',
+        priority:         'medium'
       };
 
       try {
@@ -238,18 +296,12 @@
   }
 
   function showProcessing() {
-    // Hide everything, show processing
-    if (introScreen) introScreen.classList.remove('active');
-    questionScreens.forEach(function(s) { s.classList.remove('active'); });
-    if (contactScreen) contactScreen.classList.remove('active');
-    if (processingScreen) processingScreen.classList.add('active');
-
-    if (progBar) progBar.style.width = '100%';
+    goTo(13);
 
     // Animate processing messages
     var msgs = document.querySelectorAll('.proc-msg');
     var delay = 0;
-    msgs.forEach(function(msg, i) {
+    msgs.forEach(function(msg) {
       setTimeout(function() {
         msg.classList.add('visible');
       }, delay);

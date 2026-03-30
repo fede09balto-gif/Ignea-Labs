@@ -14,7 +14,7 @@ var OndaTerminal = (function() {
       { t: 'o', s: '> Ahorro mensual estimado: <span class="s">$2,400</span>' },
       { t: 'o', s: '> Período de recuperación: <span class="k">3.2 meses</span>' },
       { t: 'o', s: '> ROI a 12 meses: <span class="k">+340%</span>' },
-      { t: 'c', s: '$ onda deploy --solution="whatsapp-ai" --market="NI" <span class="blink">|</span>' },
+      { t: 'c', s: '$ onda deploy --solution="custom-ai" --market="NI" <span class="blink">|</span>' },
     ],
     en: [
       { t: 'c', s: '$ onda diagnose --target="your-business"' },
@@ -25,7 +25,7 @@ var OndaTerminal = (function() {
       { t: 'o', s: '> Estimated monthly savings: <span class="s">$2,400</span>' },
       { t: 'o', s: '> Payback period: <span class="k">3.2 months</span>' },
       { t: 'o', s: '> 12-month ROI: <span class="k">+340%</span>' },
-      { t: 'c', s: '$ onda deploy --solution="whatsapp-ai" --market="NI" <span class="blink">|</span>' },
+      { t: 'c', s: '$ onda deploy --solution="custom-ai" --market="NI" <span class="blink">|</span>' },
     ]
   };
 
@@ -66,7 +66,7 @@ var OndaTerminal = (function() {
     });
 
     idx++;
-    timer = setTimeout(typeLine, 500);
+    timer = setTimeout(typeLine, 600);
   }
 
   return { init: init, restart: restart };

@@ -11,9 +11,8 @@
 <meta property="og:image" content="/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://onda.ai/diagnostic.html">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/shared.css">
-<!-- Supabase: lightweight REST client in supabase-config.js, no SDK needed -->
 <style>
 /* PROGRESS BAR */
 .progress-wrap{max-width:600px;margin:0 auto;padding:20px 40px 0}
@@ -25,15 +24,24 @@
 .q-wrap{display:none;max-width:600px;margin:0 auto;padding:40px;opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
 .q-wrap.active{display:block;opacity:1;transform:translateY(0)}
 
-/* INTRO SCREEN */
-.intro-screen{text-align:center;padding-top:60px;padding-bottom:60px}
-.intro-screen .sec-tag{margin-bottom:16px}
-.intro-screen h1{font-size:clamp(24px,3.5vw,38px);font-weight:800;line-height:1.15;max-width:560px;margin:0 auto 16px}
-.intro-screen h1 em{font-style:normal;color:var(--accent)}
-.intro-screen .intro-sub{font-size:14px;color:var(--gray);max-width:480px;margin:0 auto 28px;line-height:1.65}
-.intro-chips{display:flex;justify-content:center;gap:18px;margin-bottom:24px;font-family:var(--fm);font-size:11px;color:var(--dimgray);letter-spacing:1px;flex-wrap:wrap}
-.intro-encrypt{font-family:var(--fm);font-size:10px;color:var(--dimgray);letter-spacing:1px;max-width:440px;margin:0 auto 32px;line-height:1.6}
-.intro-encrypt::before{content:'';display:inline-block;width:8px;height:8px;border:1.5px solid var(--accent);margin-right:8px;vertical-align:middle}
+/* ENCRYPT BADGE */
+.encrypt-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--fm);font-size:10px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px;opacity:.8}
+.encrypt-badge svg{flex-shrink:0}
+
+/* LANDING SCREEN */
+.dx-landing{text-align:center;padding-top:60px;padding-bottom:60px}
+.dx-landing .encrypt-badge{justify-content:center}
+.dx-landing h1{font-size:clamp(22px,3.5vw,38px);font-weight:800;line-height:1.15;max-width:560px;margin:0 auto 20px}
+.dx-landing-sub{font-size:14px;color:var(--gray);max-width:500px;margin:0 auto 28px;line-height:1.7}
+.dx-landing-stats{display:flex;justify-content:center;gap:20px;margin-bottom:28px;font-family:var(--fm);font-size:11px;color:var(--dimgray);letter-spacing:1px;flex-wrap:wrap}
+.dx-landing-note{font-family:var(--fm);font-size:11px;color:var(--dimgray);letter-spacing:.5px;margin-top:16px;line-height:1.6}
+
+/* INFO SCREEN */
+.info-screen h2{font-size:22px;font-weight:700;margin-bottom:8px}
+.info-sub{font-size:12px;color:var(--dimgray);margin-bottom:28px;line-height:1.6}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.info-full{grid-column:1 / -1}
+.info-confidential{font-family:var(--fm);font-size:10px;color:var(--dimgray);letter-spacing:1px;margin-top:12px;text-align:center}
 
 /* QUESTION SCREENS */
 .q-number{font-family:var(--fm);font-size:11px;color:var(--accent);letter-spacing:2px;margin-bottom:10px}
@@ -43,12 +51,6 @@
 /* NAV BUTTONS */
 .q-nav{display:flex;gap:12px;justify-content:space-between;align-items:center;margin-top:32px}
 .q-nav-right{display:flex;gap:12px;align-items:center}
-
-/* CONTACT SCREEN */
-.contact-screen h2{font-size:22px;font-weight:700;margin-bottom:8px}
-.contact-screen .contact-sub{font-size:12px;color:var(--dimgray);margin-bottom:28px;line-height:1.55}
-.contact-field-group{margin-bottom:18px}
-.contact-required{color:var(--accent);font-size:9px;font-family:var(--fm);letter-spacing:1px;margin-left:6px}
 
 /* PROCESSING SCREEN */
 .processing-screen{text-align:center;padding-top:80px;padding-bottom:80px}
@@ -60,11 +62,13 @@
 @media(max-width:768px){
   .q-wrap{padding:28px 20px}
   .progress-wrap{padding:16px 20px 0}
-  .intro-screen{padding-top:40px;padding-bottom:40px}
-  .intro-chips{flex-direction:column;align-items:center;gap:8px}
+  .dx-landing{padding-top:40px;padding-bottom:40px}
+  .dx-landing-stats{flex-direction:column;align-items:center;gap:8px}
+  .info-grid{grid-template-columns:1fr}
+  .info-full{grid-column:1}
 }
 @media(max-width:480px){
-  .intro-screen h1{font-size:22px}
+  .dx-landing h1{font-size:22px}
   .q-nav{flex-direction:column}
   .q-nav .btn-ghost,.q-nav .btn-primary{width:100%;justify-content:center}
 }
@@ -72,23 +76,23 @@
 </head>
 <body>
 
-<canvas class="grid-bg" id="bg"></canvas>
+<div class="gradient-dots-bg" id="gradientBg"></div>
 
 <div class="page">
 
 <!-- NAV -->
 <nav>
   <a href="index.html" class="brand">
-    <div class="brand-mark"></div>
-    <div class="brand-name">ONDA<span>.AI</span></div>
+    <span class="brand-name">ONDA<span class="brand-accent" style="color:var(--accent)">.AI</span></span>
   </a>
   <div class="nav-right">
     <ul class="nav-links">
       <li><a href="index.html" data-i18n="nav.home">Inicio</a></li>
       <li><a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a></li>
       <li><a href="diagnostic.html" class="active" data-i18n="nav.diagnostic">Diagnóstico</a></li>
-      <li><a href="contact.html" class="nav-cta" data-i18n="nav.contact">Contacto</a></li>
+      <li><a href="contact.html" data-i18n="nav.contact">Contacto</a></li>
     </ul>
+    <a href="diagnostic.html" class="btn-primary btn-nav" data-i18n-html="nav.cta">Iniciar Diagnóstico &rarr;</a>
     <button class="hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -109,24 +113,130 @@
 </div>
 
 <main>
-<!-- PROGRESS BAR -->
-<div class="progress-wrap">
+
+<!-- PROGRESS BAR (hidden on landing) -->
+<div class="progress-wrap" id="progressWrap" style="visibility:hidden">
   <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
   <div class="progress-text" id="progText">0 / 11</div>
 </div>
 
-<div class="encrypt-strip" id="enc"></div>
+<!-- ============================================ -->
+<!-- SCREEN 0: LANDING PAGE -->
+<!-- ============================================ -->
+<div class="q-wrap dx-landing active" id="landingScreen">
+  <div class="encrypt-badge">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    <span data-i18n="dx.encrypted">Diagnóstico Encriptado</span>
+  </div>
+  <h1 data-i18n="dx.landing.headline">Descubre cuánto le están costando realmente tus operaciones.</h1>
+  <p class="dx-landing-sub" data-i18n="dx.landing.sub">Once preguntas. Cada una diseñada para revelar lo que más importa — las ineficiencias ocultas a simple vista, los sistemas que deberían funcionar mejor, y las oportunidades que tu competencia aún no ha encontrado.</p>
+  <div class="dx-landing-stats">
+    <span data-i18n="diag.c1">11 preguntas</span>
+    <span data-i18n="diag.c2">10–15 min</span>
+    <span data-i18n="diag.c3">Resultados inmediatos</span>
+  </div>
+  <button class="btn-primary" id="landingStartBtn" data-i18n-btn="dx.landing.cta">Comenzar Diagnóstico &rarr;</button>
+  <p class="dx-landing-note" data-i18n="dx.landing.note">Tus respuestas quedan entre nosotros. Mientras más honesto seas, más preciso será tu diagnóstico.</p>
+</div>
 
 <!-- ============================================ -->
-<!-- INTRO SCREEN -->
+<!-- SCREEN 1: INFO COLLECTION (Before we begin) -->
 <!-- ============================================ -->
-<div class="q-wrap intro-screen active" id="introScreen">
-  <div class="sec-tag" data-i18n="dx.tag">// Diagnóstico de Preparación Digital</div>
-  <h1 data-i18n-html="dx.title">Descubre lo que realmente te cuestan tus <em>operaciones.</em></h1>
-  <p class="intro-sub" data-i18n="dx.sub">Once preguntas. Cada una diseñada para revelar lo que más importa.</p>
-  <div class="intro-chips" data-i18n="dx.chips">11 preguntas &middot; 10–15 minutos &middot; Resultados inmediatos</div>
-  <p class="intro-encrypt" data-i18n="dx.encrypt">Tus respuestas están encriptadas de extremo a extremo. Existen únicamente para construir tu perfil de preparación personalizado.</p>
-  <button class="btn-primary" id="startBtn" data-i18n-btn="dx.start">Comenzar Diagnóstico &rarr;</button>
+<div class="q-wrap info-screen" id="infoScreen">
+  <div class="encrypt-badge">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    <span data-i18n="dx.encrypted">Diagnóstico Encriptado</span>
+  </div>
+  <h2 data-i18n="dx.before.title">Antes de comenzar</h2>
+  <p class="info-sub" data-i18n="dx.before.sub">Esta información se utiliza exclusivamente para personalizar tus resultados. Tus datos están encriptados de extremo a extremo.</p>
+
+  <div class="info-grid">
+    <!-- Row 1 -->
+    <div class="info-field">
+      <label class="form-label" for="dxFirstName" data-i18n="dx.field.firstName">Nombre</label>
+      <input type="text" class="form-input" id="dxFirstName" required autocomplete="given-name">
+    </div>
+    <div class="info-field">
+      <label class="form-label" for="dxLastName" data-i18n="dx.field.lastName">Apellido</label>
+      <input type="text" class="form-input" id="dxLastName" autocomplete="family-name">
+    </div>
+    <!-- Row 2 -->
+    <div class="info-field">
+      <label class="form-label" for="dxEmail" data-i18n="dx.field.email">Email</label>
+      <input type="email" class="form-input" id="dxEmail" required autocomplete="email">
+    </div>
+    <div class="info-field">
+      <label class="form-label" for="dxPhone" data-i18n="dx.field.phone">Teléfono</label>
+      <input type="tel" class="form-input" id="dxPhone" autocomplete="tel">
+    </div>
+    <!-- Row 3 -->
+    <div class="info-field">
+      <label class="form-label" for="dxCompany" data-i18n="dx.field.company">Empresa</label>
+      <input type="text" class="form-input" id="dxCompany" required autocomplete="organization">
+    </div>
+    <div class="info-field">
+      <label class="form-label" for="dxPosition" data-i18n="dx.field.position">Cargo</label>
+      <input type="text" class="form-input" id="dxPosition" autocomplete="organization-title">
+    </div>
+    <!-- Row 4 -->
+    <div class="info-field">
+      <label class="form-label" for="dxIndustry" data-i18n="dx.field.industry">Industria</label>
+      <select class="form-select" id="dxIndustry">
+        <option value="">—</option>
+        <option value="hotel" data-i18n="dx.industry.hotel">Hotelería y turismo</option>
+        <option value="restaurant" data-i18n="dx.industry.restaurant">Restaurantes y alimentación</option>
+        <option value="medical" data-i18n="dx.industry.medical">Clínica médica</option>
+        <option value="dental" data-i18n="dx.industry.dental">Clínica dental</option>
+        <option value="legal" data-i18n="dx.industry.legal">Servicios legales</option>
+        <option value="accounting" data-i18n="dx.industry.accounting">Contabilidad y finanzas</option>
+        <option value="realestate" data-i18n="dx.industry.realestate">Bienes raíces</option>
+        <option value="retail" data-i18n="dx.industry.retail">Comercio minorista</option>
+        <option value="agriculture" data-i18n="dx.industry.agriculture">Agricultura y exportación</option>
+        <option value="education" data-i18n="dx.industry.education">Educación</option>
+        <option value="construction" data-i18n="dx.industry.construction">Construcción</option>
+        <option value="logistics" data-i18n="dx.industry.logistics">Logística y transporte</option>
+        <option value="other" data-i18n="dx.industry.other">Otro</option>
+      </select>
+    </div>
+    <div class="info-field">
+      <label class="form-label" for="dxSize" data-i18n="dx.field.size">Tamaño</label>
+      <select class="form-select" id="dxSize">
+        <option value="">—</option>
+        <option value="1-5">1–5</option>
+        <option value="6-15">6–15</option>
+        <option value="16-50">16–50</option>
+        <option value="50+">50+</option>
+      </select>
+    </div>
+    <!-- Row 5 -->
+    <div class="info-field">
+      <label class="form-label" for="dxWebsite" data-i18n="dx.field.website">Sitio web</label>
+      <input type="url" class="form-input" id="dxWebsite" placeholder="https://" autocomplete="url">
+    </div>
+    <div class="info-field">
+      <label class="form-label" for="dxRevenue" data-i18n="dx.field.revenue">Ingresos mensuales</label>
+      <select class="form-select" id="dxRevenue">
+        <option value="">—</option>
+        <option value="0" data-i18n="q11.o1">Menos de $2,000</option>
+        <option value="1" data-i18n="q11.o2">$2,000 – $5,000</option>
+        <option value="2" data-i18n="q11.o3">$5,000 – $15,000</option>
+        <option value="3" data-i18n="q11.o4">$15,000 – $50,000</option>
+        <option value="4" data-i18n="q11.o5">Más de $50,000</option>
+        <option value="5" data-i18n="q11.o6">Prefiero no decir</option>
+      </select>
+    </div>
+    <!-- Row 6 -->
+    <div class="info-field info-full">
+      <label class="form-label" for="dxLinkedin" data-i18n="dx.field.linkedin">LinkedIn</label>
+      <input type="text" class="form-input" id="dxLinkedin" placeholder="linkedin.com/company/..." autocomplete="off">
+    </div>
+  </div>
+
+  <div class="q-nav">
+    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
+    <button class="btn-primary" id="infoNextBtn" disabled data-i18n-btn="dx.before.continue">Continuar &rarr;</button>
+  </div>
+  <p class="info-confidential" data-i18n="dx.before.confidential">Tus respuestas son confidenciales.</p>
 </div>
 
 <!-- ============================================ -->
@@ -328,51 +438,6 @@
 </div>
 
 <!-- ============================================ -->
-<!-- CONTACT COLLECTION SCREEN -->
-<!-- ============================================ -->
-<div class="q-wrap contact-screen" id="contactScreen">
-  <h2 data-i18n="qc.title">¿A dónde enviamos tu reporte?</h2>
-  <p class="contact-sub" data-i18n="qc.sub">Tu información es confidencial. La usamos únicamente para enviarte tu diagnóstico personalizado.</p>
-
-  <div class="contact-field-group">
-    <label class="form-label" for="cName" data-i18n="qc.name">Nombre</label>
-    <input type="text" class="form-input contact-field" id="cName" data-i18n-placeholder="qc.name.ph" placeholder="Tu nombre completo" required autocomplete="name">
-  </div>
-
-  <div class="contact-field-group">
-    <label class="form-label" for="cEmail" data-i18n="qc.email">Email</label>
-    <input type="email" class="form-input contact-field" id="cEmail" data-i18n-placeholder="qc.email.ph" placeholder="tu@correo.com" required autocomplete="email">
-  </div>
-
-  <div class="contact-field-group">
-    <label class="form-label" for="cWebsite" data-i18n="ops.dx.website">Sitio web de la empresa (opcional)</label>
-    <input type="url" class="form-input contact-field" id="cWebsite" data-i18n-placeholder="ops.dx.websitePh" placeholder="https://tusitio.com" autocomplete="url">
-  </div>
-
-  <div class="contact-field-group">
-    <label class="form-label" for="cLinkedin" data-i18n="ops.dx.linkedin">LinkedIn de la empresa (opcional)</label>
-    <input type="text" class="form-input contact-field" id="cLinkedin" data-i18n-placeholder="ops.dx.linkedinPh" placeholder="linkedin.com/company/tunegocio" autocomplete="off">
-  </div>
-
-  <div class="contact-field-group">
-    <label class="form-label" for="cWhatsapp">
-      <span data-i18n="qc.whatsapp">WhatsApp (opcional)</span>
-    </label>
-    <input type="tel" class="form-input contact-field" id="cWhatsapp" data-i18n-placeholder="qc.whatsapp.ph" placeholder="+505 0000 0000" autocomplete="tel">
-  </div>
-
-  <div class="contact-field-group">
-    <label class="form-label" for="cCompany" data-i18n="qc.company">Nombre de empresa</label>
-    <input type="text" class="form-input contact-field" id="cCompany" data-i18n-placeholder="qc.company.ph" placeholder="Tu empresa" required autocomplete="organization">
-  </div>
-
-  <div class="q-nav">
-    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
-    <button class="btn-primary btn-next" disabled data-i18n-btn="q.submit">Generar Reporte &rarr;</button>
-  </div>
-</div>
-
-<!-- ============================================ -->
 <!-- PROCESSING SCREEN -->
 <!-- ============================================ -->
 <div class="q-wrap processing-screen" id="processingScreen">
@@ -384,21 +449,28 @@
 
 </main>
 
-<div class="encrypt-strip" id="enc2"></div>
-
 <!-- FOOTER -->
 <footer>
-  <div>
-    <div class="f-brand">ONDA<span>.AI</span></div>
-    <div class="f-tag" data-i18n="footer.tag">Cerrando la brecha de IA en Centroamérica.</div>
+  <div class="footer-inner content-wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="f-brand">ONDA<span>.AI</span></div>
+        <div class="f-tag" data-i18n="footer.tag">Cerrando la brecha de IA en Centroamérica.</div>
+      </div>
+      <div class="footer-nav">
+        <a href="index.html" data-i18n="nav.home">Inicio</a>
+        <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+        <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
+        <a href="contact.html" data-i18n="nav.contact">Contacto</a>
+      </div>
+      <div class="footer-contact">
+        <a href="mailto:hola@onda.ai">hola@onda.ai</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2026 Onda AI. <span data-i18n="footer.rights">Todos los derechos reservados.</span>
+    </div>
   </div>
-  <div class="f-links">
-    <a href="index.html" data-i18n="nav.home">Inicio</a>
-    <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
-    <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
-    <a href="mailto:hola@onda.ai">hola@onda.ai</a>
-  </div>
-  <div>&copy; 2026 Onda AI. <span data-i18n="footer.rights">Todos los derechos reservados.</span></div>
 </footer>
 
 </div>
@@ -406,14 +478,13 @@
 <!-- SCRIPTS -->
 <script src="js/i18n.js"></script>
 <script src="js/grid-bg.js"></script>
-<script src="js/encrypt.js"></script>
 <script src="js/scoring.js"></script>
 <script src="js/diagnostic.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/sheets-sync.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  OndaGrid.init(10); // 10 particles for interior pages
+  OndaGradientDots.init(0.06);
 
   // Hamburger menu
   var ham = document.getElementById('hamburger');

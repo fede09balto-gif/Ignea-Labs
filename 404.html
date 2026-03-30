@@ -10,52 +10,47 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/shared.css">
 <style>
-/* 404 LAYOUT */
 .e404-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:calc(100vh - 200px);padding:60px 40px}
-.e404-code{font-family:var(--fm);font-size:80px;font-weight:700;color:var(--accent);line-height:1;margin-bottom:20px;opacity:0;animation:up .7s .2s forwards}
-.e404-title{font-size:clamp(20px,3vw,28px);font-weight:700;margin-bottom:12px;opacity:0;animation:up .7s .35s forwards}
-.e404-sub{font-size:14px;color:var(--gray);margin-bottom:36px;opacity:0;animation:up .7s .5s forwards}
-.e404-cta{opacity:0;animation:up .7s .65s forwards}
+.e404-code{font-family:var(--fm);font-size:48px;color:var(--dimgray);margin-bottom:20px;opacity:0;animation:up .7s .2s forwards}
+.e404-title{font-size:22px;font-weight:700;margin-bottom:12px;opacity:0;animation:up .7s .35s forwards}
+.e404-sub{font-size:14px;color:var(--gray);margin-bottom:32px;opacity:0;animation:up .7s .5s forwards}
+.e404-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;opacity:0;animation:up .7s .65s forwards}
 
-@media(max-width:768px){
+@media(max-width:480px){
   .e404-wrap{padding:40px 20px}
-  .e404-code{font-size:60px}
+  .e404-cta{flex-direction:column;width:100%}
 }
 </style>
 </head>
 <body>
 
-<canvas class="grid-bg" id="bg"></canvas>
+<div class="gradient-dots-bg" id="gradientBg"></div>
 
 <div class="page">
 
 <!-- NAV -->
 <nav>
   <a href="index.html" class="brand">
-    <div class="brand-mark"></div>
-    <div class="brand-name">ONDA<span>.AI</span></div>
+    <span class="brand-name">ONDA<span class="brand-accent">.AI</span></span>
   </a>
   <div class="nav-right">
     <ul class="nav-links">
       <li><a href="index.html" data-i18n="nav.home">Inicio</a></li>
       <li><a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a></li>
       <li><a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a></li>
-      <li><a href="contact.html" class="nav-cta" data-i18n="nav.contact">Contacto</a></li>
+      <li><a href="contact.html" data-i18n="nav.contact">Contacto</a></li>
     </ul>
-    <button class="hamburger" id="hamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
+    <a href="diagnostic.html" class="btn-primary btn-nav" data-i18n-btn="nav.cta">Iniciar Diagnóstico &rarr;</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
     <div class="lang-toggle">
       <button class="lang-btn active" id="langES" onclick="setLang('es')">ES</button>
       <button class="lang-btn" id="langEN" onclick="setLang('en')">EN</button>
     </div>
   </div>
 </nav>
-
-<!-- MOBILE MENU -->
 <div class="mobile-overlay" id="mobileOverlay"></div>
 <div class="mobile-menu" id="mobileMenu">
   <a href="index.html" data-i18n="nav.home">Inicio</a>
@@ -65,40 +60,41 @@
 </div>
 
 <main>
-<!-- 404 CONTENT -->
-<div class="e404-wrap">
-  <div class="e404-code">404</div>
-  <h1 class="e404-title" data-i18n="e404.title">Esta página no existe.</h1>
-  <p class="e404-sub" data-i18n="e404.sub">Pero tu diagnóstico de IA sí.</p>
-  <div class="e404-cta">
-    <a href="diagnostic.html" class="btn-primary" data-i18n-btn="e404.btn">Iniciar Diagnóstico &rarr;</a>
+  <div class="e404-wrap">
+    <div class="e404-code">404</div>
+    <h1 class="e404-title" data-i18n="e404.title">Esta página no existe.</h1>
+    <p class="e404-sub" data-i18n="e404.sub">Pero tu diagnóstico de IA sí.</p>
+    <div class="e404-cta">
+      <a href="index.html" class="btn-ghost" data-i18n="e404.home">&#8592; Volver al inicio</a>
+      <a href="diagnostic.html" class="btn-primary" data-i18n-btn="e404.btn">Iniciar Diagnóstico &rarr;</a>
+    </div>
   </div>
-</div>
 </main>
 
-<div class="encrypt-strip" id="enc"></div>
-
 <footer>
-  <div>
-    <div class="f-brand">ONDA<span>.AI</span></div>
-    <div class="f-tag" data-i18n="footer.tag">Cerrando la brecha de IA en Centroamérica.</div>
+  <div class="footer-inner content-wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="f-brand">ONDA<span>.AI</span></div>
+        <div class="f-tag" data-i18n="footer.tag">Cerrando la brecha de IA en Centroamérica.</div>
+      </div>
+      <div class="footer-nav">
+        <a href="index.html" data-i18n="nav.home">Inicio</a>
+        <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+        <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
+        <a href="contact.html" data-i18n="nav.contact">Contacto</a>
+      </div>
+      <div class="footer-contact"><a href="mailto:hola@onda.ai">hola@onda.ai</a></div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Onda AI. <span data-i18n="footer.rights">Todos los derechos reservados.</span></div>
   </div>
-  <div class="f-links">
-    <a href="index.html" data-i18n="nav.home">Inicio</a>
-    <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
-    <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
-    <a href="mailto:hola@onda.ai">hola@onda.ai</a>
-  </div>
-  <div>&copy; 2026 Onda AI. <span data-i18n="footer.rights">Todos los derechos reservados.</span></div>
 </footer>
 
 </div>
 
 <script src="js/i18n.js"></script>
 <script src="js/grid-bg.js"></script>
-<script src="js/encrypt.js"></script>
 <script>
-// Hamburger menu
 (function() {
   var hamburger = document.getElementById('hamburger');
   var mobileMenu = document.getElementById('mobileMenu');
@@ -114,13 +110,7 @@
   if (mobileOverlay) mobileOverlay.addEventListener('click', toggleMenu);
 })();
 
-// Language change title update
-document.addEventListener('langchange', function(e) {
-  document.title = e.detail.lang === 'es' ? '404 — Onda AI' : '404 — Onda AI';
-});
-
-// Init grid background (10 particles for interior page)
-OndaGrid.init(10);
+OndaGradientDots.init(0.06);
 </script>
 </body>
 </html>

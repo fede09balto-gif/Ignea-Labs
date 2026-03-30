@@ -1,96 +1,73 @@
 /* ============================================================
-   ONDA AI — Animated Grid Background
-   Canvas-based grid with floating glowing particles.
-   Pass particleCount to init() — 20 for homepage, 10 for interior.
+   ONDA AI — Gradient Dots Background
+   CSS-based animated gradient dots. No canvas, no particles.
+   Call OndaGradientDots.init() on every page.
    ============================================================ */
 
-var OndaGrid = (function() {
-  var c, x, W, H, pts, running = false;
+var OndaGradientDots = (function() {
+  function init(opacity) {
+    var el = document.getElementById('gradientBg');
+    if (!el) return;
 
-  function init(particleCount) {
-    c = document.getElementById('bg');
-    if (!c) return;
-    x = c.getContext('2d');
-    c.style.willChange = 'transform';
-    pts = [];
+    var op = opacity || 0.08;
+    var bg = '#08080D';
+    var dotSize = 10;
+    var hexSpacing = dotSize * 1.732;
 
-    var count = particleCount || (window.innerWidth < 768 ? 8 : 10);
+    el.style.backgroundColor = bg;
+    el.style.backgroundImage = [
+      'radial-gradient(circle at 50% 50%, transparent 1px, ' + bg + ' 1px, ' + bg + ' ' + dotSize + 'px, transparent ' + dotSize + 'px)',
+      'radial-gradient(circle at 50% 50%, transparent 1px, ' + bg + ' 1px, ' + bg + ' ' + dotSize + 'px, transparent ' + dotSize + 'px)',
+      'radial-gradient(circle at 30% 40%, rgba(0,229,191,' + op + '), transparent 50%)',
+      'radial-gradient(circle at 70% 60%, rgba(10,74,63,' + (op * 1.5) + '), transparent 50%)',
+      'radial-gradient(circle at 50% 80%, rgba(0,229,191,' + (op * 0.5) + '), transparent 50%)'
+    ].join(',');
 
-    for (var i = 0; i < count; i++) {
-      pts.push({
-        x: Math.random() * 1400,
-        y: Math.random() * 5000,
-        vx: (Math.random() - .5) * .2,
-        vy: (Math.random() - .5) * .2,
-        r: 80 + Math.random() * 160,
-        p: Math.random() * 6.28
-      });
+    el.style.backgroundSize = [
+      dotSize + 'px ' + hexSpacing + 'px',
+      dotSize + 'px ' + hexSpacing + 'px',
+      '120% 120%',
+      '120% 120%',
+      '120% 120%'
+    ].join(',');
+
+    el.style.backgroundPosition = [
+      '0 0',
+      (dotSize/2) + 'px ' + (hexSpacing/2) + 'px',
+      '0% 0%',
+      '100% 100%',
+      '50% 50%'
+    ].join(',');
+
+    // Very slow drift animation
+    var start = null;
+    function animate(ts) {
+      if (!start) start = ts;
+      var p = ((ts - start) % 60000) / 60000; // 60s cycle
+
+      var x1 = Math.sin(p * Math.PI * 2) * 15;
+      var y1 = Math.cos(p * Math.PI * 2) * 10;
+      var x2 = Math.cos(p * Math.PI * 2 + 1) * 20;
+      var y2 = Math.sin(p * Math.PI * 2 + 1) * 15;
+      var x3 = Math.sin(p * Math.PI * 2 + 2) * 10;
+      var y3 = Math.cos(p * Math.PI * 2 + 2) * 20;
+
+      el.style.backgroundPosition = [
+        '0 0',
+        (dotSize/2) + 'px ' + (hexSpacing/2) + 'px',
+        (50 + x1) + '% ' + (50 + y1) + '%',
+        (50 + x2) + '% ' + (50 + y2) + '%',
+        (50 + x3) + '% ' + (50 + y3) + '%'
+      ].join(',');
+
+      requestAnimationFrame(animate);
     }
 
-    resize();
-    window.addEventListener('resize', resize);
-
-    if (!running) {
-      running = true;
-      requestAnimationFrame(draw);
+    // Skip animation on mobile
+    if (window.innerWidth > 768) {
+      requestAnimationFrame(animate);
     }
   }
 
-  function resize() {
-    if (!c) return;
-    W = c.width = window.innerWidth;
-    H = c.height = Math.max(document.body.scrollHeight, window.innerHeight, 4000);
-  }
-
-  function draw(t) {
-    if (!c || !x) { running = false; return; }
-    x.clearRect(0, 0, W, H);
-
-    for (var i = 0; i < pts.length; i++) {
-      var d = pts[i];
-      d.x += d.vx; d.y += d.vy;
-      if (d.x < -200) d.x = W + 200;
-      if (d.x > W + 200) d.x = -200;
-      if (d.y < -200) d.y = H + 200;
-      if (d.y > H + 200) d.y = -200;
-    }
-
-    var S = 50;
-    var cols = Math.ceil(W / S);
-    var rows = Math.ceil(H / S);
-
-    // Grid lines
-    x.strokeStyle = 'rgba(26,26,42,0.3)';
-    x.lineWidth = .5;
-    for (var ci = 0; ci <= cols; ci++) {
-      x.beginPath(); x.moveTo(ci * S, 0); x.lineTo(ci * S, H); x.stroke();
-    }
-    for (var ri = 0; ri <= rows; ri++) {
-      x.beginPath(); x.moveTo(0, ri * S); x.lineTo(W, ri * S); x.stroke();
-    }
-
-    // Glowing intersections
-    for (var ci = 0; ci <= cols; ci++) {
-      for (var ri = 0; ri <= rows; ri++) {
-        var px = ci * S, py = ri * S, b = 0;
-        for (var k = 0; k < pts.length; k++) {
-          var d = pts[k], dx = px - d.x, dy = py - d.y;
-          var dist = Math.sqrt(dx * dx + dy * dy);
-          var pulse = .7 + .3 * Math.sin(t * .001 + d.p);
-          if (dist < d.r * pulse) {
-            b += (1 - dist / (d.r * pulse)) * .1;
-          }
-        }
-        b = Math.min(b, .18);
-        if (b > .015) {
-          x.fillStyle = 'rgba(0,229,191,' + b + ')';
-          x.fillRect(px - .5, py - .5, 1.5, 1.5);
-        }
-      }
-    }
-
-    requestAnimationFrame(draw);
-  }
-
-  return { init: init, resize: resize };
+  return { init: init };
 })();

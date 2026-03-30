@@ -15,6 +15,7 @@ var OndaI18n = (function() {
       "nav.manifesto": "Manifiesto",
       "nav.diagnostic": "Diagnóstico",
       "nav.contact": "Contacto",
+      "nav.cta": "Iniciar Diagnóstico &rarr;",
 
       // ---- HOMEPAGE: HERO ----
       "hero.tag": "// Infraestructura de IA para Centroamérica",
@@ -29,6 +30,19 @@ var OndaI18n = (function() {
       "stats.s3": "reducción de costos",
       "stats.s4": "min para diagnosticar",
 
+      // ---- HOMEPAGE: WHAT WE DO ----
+      "whatwedo.tag": "// Qué hacemos",
+      "whatwedo.p1": "Identificamos dónde la IA crea mayor valor en tus operaciones — y lo construimos.",
+      "whatwedo.p2": "Nuestro proceso comienza con un diagnóstico profundo de tu organización. Mapeamos tus flujos de trabajo, identificamos cuellos de botella y señalamos dónde la inteligencia artificial genera impacto medible. Luego diseñamos y desplegamos sistemas de IA personalizados — adaptados a tu operación, tus datos, tus objetivos.",
+      "whatwedo.p3": "Trabajamos con un número reducido de socios. Esto no es un negocio de volumen. Cada empresa que tomamos recibe toda nuestra atención.",
+
+
+      // ---- HOMEPAGE: CTA ----
+      "cta.tag": "// ¿Listo?",
+      "cta.headline": "Descubre dónde la IA encaja en tu organización.",
+      "cta.btn": "Iniciar Diagnóstico &rarr;",
+      "cta.note": "Completamente encriptado. Resultados instantáneos.",
+
       // ---- HOMEPAGE: PROCESS ----
       "process.tag": "// Proceso",
       "process.title": "Encontramos dónde la IA genera más valor — y lo construimos.",
@@ -39,20 +53,11 @@ var OndaI18n = (function() {
       "process.s2t": "Mapa de valor",
       "process.s2d": "Calculamos exactamente cuánto tiempo y dinero estás perdiendo.",
       "process.s3t": "Construir y desplegar",
-      "process.s3d": "IA personalizada: bots de WhatsApp, automatización, flujos inteligentes.",
+      "process.s3d": "Sistemas de IA personalizados, integrados a tu operación.",
       "process.s4t": "Optimizar",
       "process.s4d": "Iteración continua. El sistema aprende. Tu ventaja se multiplica.",
 
-      // ---- HOMEPAGE: SOLUTIONS ----
-      "sol.tag": "// Soluciones",
-      "sol.title": "Sistemas de IA diseñados para tu operación.",
-      "sol.desc": "No vendemos software genérico. Construimos infraestructura personalizada que se integra a cómo realmente funciona tu negocio.",
-      "sol.c1t": "Bot de WhatsApp con IA",
-      "sol.c1d": "Atención al cliente 24/7. Responde preguntas, agenda citas, procesa pedidos — automáticamente.",
-      "sol.c2t": "Sitio Web + Chat IA",
-      "sol.c2d": "Presencia digital profesional con un asistente inteligente integrado que convierte visitantes en clientes.",
-      "sol.c3t": "Automatización Interna",
-      "sol.c3d": "Inventario, agenda, reportes, facturación — sistemas que eliminan el trabajo manual repetitivo.",
+      // ---- HOMEPAGE: SOLUTIONS ---- (removed)
 
       // ---- HOMEPAGE: DIAGNOSTIC CTA ----
       "diag.title": "Descubre lo que realmente te cuestan tus operaciones.",
@@ -60,16 +65,54 @@ var OndaI18n = (function() {
       "diag.c1": "11 preguntas",
       "diag.c2": "10–15 min",
       "diag.c3": "Resultados inmediatos",
-      "diag.c4": "Encriptado",
       "diag.btn": "Iniciar Diagnóstico &rarr;",
 
       // ---- DIAGNOSTIC PAGE ----
       "dx.tag": "// Diagnóstico de Preparación Digital",
       "dx.title": 'Descubre lo que realmente te cuestan tus <em>operaciones.</em>',
       "dx.sub": "Once preguntas. Cada una diseñada para revelar lo que más importa.",
-      "dx.chips": "11 preguntas · 10–15 minutos · Resultados inmediatos",
       "dx.encrypt": "Tus respuestas están encriptadas de extremo a extremo. Existen únicamente para construir tu perfil de preparación personalizado.",
       "dx.start": "Comenzar Diagnóstico &rarr;",
+
+      // ---- DIAGNOSTIC: LANDING & BEFORE ----
+      "dx.landing.headline": "Descubre cuánto le están costando realmente tus operaciones.",
+      "dx.landing.sub": "Once preguntas. Cada una diseñada para revelar lo que más importa — las ineficiencias ocultas a simple vista, los sistemas que deberían funcionar mejor, y las oportunidades que tu competencia aún no ha encontrado.",
+      "dx.landing.note": "Tus respuestas quedan entre nosotros. Mientras más honesto seas, más preciso será tu diagnóstico.",
+      "dx.landing.cta": "Comenzar Diagnóstico &rarr;",
+      "dx.encrypted": "Diagnóstico Encriptado",
+
+      "dx.before.title": "Antes de comenzar",
+      "dx.before.sub": "Esta información se utiliza exclusivamente para personalizar tus resultados. Tus datos están encriptados de extremo a extremo.",
+      "dx.before.continue": "Continuar &rarr;",
+      "dx.before.confidential": "Tus respuestas son confidenciales.",
+
+      // ---- DIAGNOSTIC: FORM FIELDS ----
+      "dx.field.firstName": "Nombre",
+      "dx.field.lastName": "Apellido",
+      "dx.field.email": "Email",
+      "dx.field.phone": "Teléfono",
+      "dx.field.company": "Empresa",
+      "dx.field.position": "Cargo",
+      "dx.field.industry": "Industria",
+      "dx.field.size": "Tamaño",
+      "dx.field.website": "Sitio web",
+      "dx.field.revenue": "Ingresos mensuales",
+      "dx.field.linkedin": "LinkedIn",
+
+      // ---- DIAGNOSTIC: INDUSTRY OPTIONS ----
+      "dx.industry.hotel": "Hotelería y turismo",
+      "dx.industry.restaurant": "Restaurantes y alimentación",
+      "dx.industry.medical": "Clínica médica",
+      "dx.industry.dental": "Clínica dental",
+      "dx.industry.legal": "Servicios legales",
+      "dx.industry.accounting": "Contabilidad y finanzas",
+      "dx.industry.realestate": "Bienes raíces",
+      "dx.industry.retail": "Comercio minorista",
+      "dx.industry.agriculture": "Agricultura y exportación",
+      "dx.industry.education": "Educación",
+      "dx.industry.construction": "Construcción",
+      "dx.industry.logistics": "Logística y transporte",
+      "dx.industry.other": "Otro",
 
       // ---- DIAGNOSTIC: QUESTIONS ----
       "q.next": "Siguiente &rarr;",
@@ -229,6 +272,9 @@ var OndaI18n = (function() {
 
       // ---- CONTACT ----
       "ct.tag": "// Contacto",
+      "ct.headline": "Hablemos.",
+      "ct.newSub": "Trabajamos con un número selecto de organizaciones. Si estás listo para explorar lo que la IA puede hacer por tu negocio, contáctanos.",
+      "ct.emailDirect": "O escríbenos directamente a",
       "ct.title": '¿Listo para descubrir el potencial de <em>tu negocio?</em>',
       "ct.sub": "No es una llamada de ventas. Es una conversación estratégica sobre las oportunidades específicas en tu operación.",
       "ct.emailLabel": "Email",
@@ -244,6 +290,8 @@ var OndaI18n = (function() {
       "ct.emailPh": "tu@correo.com",
       "ct.companyLabel": "Empresa",
       "ct.companyPh": "Nombre de tu empresa (opcional)",
+      "ct.websiteLabel": "Sitio web",
+      "ct.websitePh": "https://tuempresa.com (opcional)",
       "ct.msgLabel": "Mensaje",
       "ct.msgPh": "Cuéntanos sobre tu negocio y qué desafíos enfrentas...",
       "ct.submit": "Enviar Mensaje &rarr;",
@@ -261,6 +309,7 @@ var OndaI18n = (function() {
       "e404.title": "Esta página no existe.",
       "e404.sub": "Pero tu diagnóstico de IA sí.",
       "e404.btn": "Iniciar Diagnóstico &rarr;",
+      "e404.home": "&larr; Volver al inicio",
 
       // ---- OPS DASHBOARD ----
       "ops.logout": "salir",
@@ -418,6 +467,7 @@ var OndaI18n = (function() {
       "nav.manifesto": "Manifesto",
       "nav.diagnostic": "Diagnostic",
       "nav.contact": "Contact",
+      "nav.cta": "Start Diagnostic &rarr;",
 
       // ---- HOMEPAGE: HERO ----
       "hero.tag": "// AI infrastructure for Central America",
@@ -432,6 +482,18 @@ var OndaI18n = (function() {
       "stats.s3": "cost reduction",
       "stats.s4": "min to diagnose",
 
+      // ---- HOMEPAGE: WHAT WE DO ----
+      "whatwedo.tag": "// What We Do",
+      "whatwedo.p1": "We identify where AI creates the most value in your operations — then we build it.",
+      "whatwedo.p2": "Our process begins with a deep diagnostic of your organization. We map your workflows, identify bottlenecks, and pinpoint where artificial intelligence delivers measurable impact. Then we design and deploy custom AI systems — tailored to your operations, your data, your objectives.",
+      "whatwedo.p3": "We work with a small number of partners. This is not a volume business. Every engagement gets our full attention.",
+
+      // ---- HOMEPAGE: CTA ----
+      "cta.tag": "// Ready?",
+      "cta.headline": "Discover where AI fits in your organization.",
+      "cta.btn": "Begin Diagnostic &rarr;",
+      "cta.note": "Fully encrypted. Instant results.",
+
       // ---- HOMEPAGE: PROCESS ----
       "process.tag": "// Process",
       "process.title": "We find where AI creates the most value — then we build it.",
@@ -442,20 +504,11 @@ var OndaI18n = (function() {
       "process.s2t": "Value map",
       "process.s2d": "We calculate exactly how much time and money you're losing.",
       "process.s3t": "Build & deploy",
-      "process.s3d": "Custom AI: WhatsApp bots, automation, intelligent workflows.",
+      "process.s3d": "Custom AI systems, integrated into your operation.",
       "process.s4t": "Optimize",
       "process.s4d": "Ongoing iteration. The system learns. Your advantage compounds.",
 
-      // ---- HOMEPAGE: SOLUTIONS ----
-      "sol.tag": "// Solutions",
-      "sol.title": "AI systems designed for your operation.",
-      "sol.desc": "We don't sell generic software. We build custom infrastructure that integrates into how your business actually works.",
-      "sol.c1t": "AI WhatsApp Bot",
-      "sol.c1d": "24/7 customer service. Answers questions, books appointments, processes orders — automatically.",
-      "sol.c2t": "Website + AI Chat",
-      "sol.c2d": "Professional digital presence with an integrated intelligent assistant that converts visitors into clients.",
-      "sol.c3t": "Internal Automation",
-      "sol.c3d": "Inventory, scheduling, reports, invoicing — systems that eliminate repetitive manual work.",
+      // ---- HOMEPAGE: SOLUTIONS ---- (removed)
 
       // ---- HOMEPAGE: DIAGNOSTIC CTA ----
       "diag.title": "Discover what your operations are really costing you.",
@@ -463,16 +516,54 @@ var OndaI18n = (function() {
       "diag.c1": "11 questions",
       "diag.c2": "10–15 min",
       "diag.c3": "Instant results",
-      "diag.c4": "Encrypted",
       "diag.btn": "Begin Diagnostic &rarr;",
 
       // ---- DIAGNOSTIC PAGE ----
       "dx.tag": "// Digital Readiness Diagnostic",
       "dx.title": 'Discover what your operations are really <em>costing you.</em>',
       "dx.sub": "Eleven questions. Each one designed to surface what matters most.",
-      "dx.chips": "11 questions · 10–15 minutes · Instant results",
       "dx.encrypt": "Your responses are encrypted end-to-end. They exist solely to build your personalized readiness profile.",
       "dx.start": "Begin Diagnostic &rarr;",
+
+      // ---- DIAGNOSTIC: LANDING & BEFORE ----
+      "dx.landing.headline": "Discover what your operations are really costing you.",
+      "dx.landing.sub": "Eleven questions. Each one designed to surface what matters most — the inefficiencies hiding in plain sight, the systems that should be working harder, and the opportunities your competitors haven't found yet.",
+      "dx.landing.note": "Your answers stay between us. The more honest you are, the sharper your edge.",
+      "dx.landing.cta": "Begin Diagnostic &rarr;",
+      "dx.encrypted": "Encrypted Diagnostic",
+
+      "dx.before.title": "Before we begin",
+      "dx.before.sub": "This information is used exclusively to personalize your results. Your data is encrypted end-to-end.",
+      "dx.before.continue": "Continue &rarr;",
+      "dx.before.confidential": "Your responses are confidential.",
+
+      // ---- DIAGNOSTIC: FORM FIELDS ----
+      "dx.field.firstName": "First name",
+      "dx.field.lastName": "Last name",
+      "dx.field.email": "Email",
+      "dx.field.phone": "Phone",
+      "dx.field.company": "Company",
+      "dx.field.position": "Position",
+      "dx.field.industry": "Industry",
+      "dx.field.size": "Company size",
+      "dx.field.website": "Website",
+      "dx.field.revenue": "Monthly revenue",
+      "dx.field.linkedin": "LinkedIn",
+
+      // ---- DIAGNOSTIC: INDUSTRY OPTIONS ----
+      "dx.industry.hotel": "Hospitality & tourism",
+      "dx.industry.restaurant": "Restaurants & food",
+      "dx.industry.medical": "Medical clinic",
+      "dx.industry.dental": "Dental clinic",
+      "dx.industry.legal": "Legal services",
+      "dx.industry.accounting": "Accounting & finance",
+      "dx.industry.realestate": "Real estate",
+      "dx.industry.retail": "Retail",
+      "dx.industry.agriculture": "Agriculture & export",
+      "dx.industry.education": "Education",
+      "dx.industry.construction": "Construction",
+      "dx.industry.logistics": "Logistics & transport",
+      "dx.industry.other": "Other",
 
       // ---- DIAGNOSTIC: QUESTIONS ----
       "q.next": "Next &rarr;",
@@ -632,6 +723,9 @@ var OndaI18n = (function() {
 
       // ---- CONTACT ----
       "ct.tag": "// Contact",
+      "ct.headline": "Let's talk.",
+      "ct.newSub": "We work with a select number of organizations. If you're ready to explore what AI can do for your business, get in touch.",
+      "ct.emailDirect": "Or write to us directly at",
       "ct.title": 'Ready to discover the potential of <em>your business?</em>',
       "ct.sub": "This isn't a sales call. It's a strategic conversation about the specific opportunities in your operation.",
       "ct.emailLabel": "Email",
@@ -647,6 +741,8 @@ var OndaI18n = (function() {
       "ct.emailPh": "you@email.com",
       "ct.companyLabel": "Company",
       "ct.companyPh": "Your company name (optional)",
+      "ct.websiteLabel": "Website",
+      "ct.websitePh": "https://yourcompany.com (optional)",
       "ct.msgLabel": "Message",
       "ct.msgPh": "Tell us about your business and what challenges you face...",
       "ct.submit": "Send Message &rarr;",
@@ -664,6 +760,7 @@ var OndaI18n = (function() {
       "e404.title": "This page doesn't exist.",
       "e404.sub": "But your AI diagnostic does.",
       "e404.btn": "Begin Diagnostic &rarr;",
+      "e404.home": "&larr; Back to home",
 
       // ---- OPS DASHBOARD ----
       "ops.logout": "logout",
