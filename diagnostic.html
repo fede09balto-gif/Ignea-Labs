@@ -13,6 +13,7 @@
 <link rel="canonical" href="https://onda.ai/diagnostic.html">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/shared.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* PROGRESS BAR */
 .progress-wrap{max-width:600px;margin:0 auto;padding:20px 40px 0}
@@ -344,6 +345,16 @@
   </div>
 
   <div class="contact-field-group">
+    <label class="form-label" for="cWebsite" data-i18n="ops.dx.website">Sitio web de la empresa (opcional)</label>
+    <input type="url" class="form-input contact-field" id="cWebsite" data-i18n-placeholder="ops.dx.websitePh" placeholder="https://tusitio.com" autocomplete="url">
+  </div>
+
+  <div class="contact-field-group">
+    <label class="form-label" for="cLinkedin" data-i18n="ops.dx.linkedin">LinkedIn de la empresa (opcional)</label>
+    <input type="text" class="form-input contact-field" id="cLinkedin" data-i18n-placeholder="ops.dx.linkedinPh" placeholder="linkedin.com/company/tunegocio" autocomplete="off">
+  </div>
+
+  <div class="contact-field-group">
     <label class="form-label" for="cWhatsapp">
       <span data-i18n="qc.whatsapp">WhatsApp (opcional)</span>
     </label>
@@ -398,6 +409,8 @@
 <script src="js/encrypt.js"></script>
 <script src="js/scoring.js"></script>
 <script src="js/diagnostic.js"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/sheets-sync.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   OndaGrid.init(10); // 10 particles for interior pages

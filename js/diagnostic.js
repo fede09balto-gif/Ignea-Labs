@@ -202,6 +202,37 @@
     };
     sessionStorage.setItem('onda_diagnostic_scores', JSON.stringify(scoreData));
 
+    // Write to Supabase if available
+    if (typeof OndaSupabase !== 'undefined' && OndaSupabase.client) {
+      var leadData = {
+        first_name: contact.name.split(' ')[0] || contact.name,
+        last_name: contact.name.split(' ').slice(1).join(' ') || '',
+        email: contact.email,
+        phone: contact.whatsapp,
+        company_name: contact.company,
+        company_website: document.getElementById('cWebsite') ? document.getElementById('cWebsite').value.trim() : '',
+        company_linkedin: document.getElementById('cLinkedin') ? document.getElementById('cLinkedin').value.trim() : '',
+        diagnostic_answers: answers,
+        total_score: result.total,
+        score_breakdown: result.scores,
+        score_level: result.level,
+        recommendations: recos,
+        roi_estimate: roi,
+        pipeline_stage: 'new',
+        priority: 'medium'
+      };
+
+      try {
+        OndaSupabase.client.from('leads').insert([leadData]).then(function() {
+          if (typeof OndaSheetsSync !== 'undefined') {
+            OndaSheetsSync.sync(leadData);
+          }
+        });
+      } catch (e) {
+        // Silent fail — sessionStorage still has the data
+      }
+    }
+
     // Show processing animation
     showProcessing();
   }

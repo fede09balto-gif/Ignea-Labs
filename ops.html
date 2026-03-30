@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onda OPS — Panel Interno</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/shared.css">
+<link rel="stylesheet" href="css/ops.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<canvas class="grid-bg" id="bg"></canvas>
+
+<div class="page">
+
+  <!-- ====================================================
+       ACCESS GATE
+       ==================================================== -->
+  <div id="accessGate">
+    <div class="gate-terminal">
+      <div class="gate-logo">ONDA<span>.OPS</span></div>
+      <div class="gate-line">
+        <span class="gate-prompt">&gt;&nbsp;</span>
+        <span class="gate-label" data-i18n="ops.gate.label">access_code</span>
+        <span class="gate-cursor blink">_</span>
+      </div>
+      <input
+        type="password"
+        id="accessInput"
+        autocomplete="off"
+        spellcheck="false"
+        data-i18n-placeholder="ops.gate.placeholder"
+        placeholder="········"
+        aria-label="Código de acceso"
+      >
+      <span id="accessDenied" class="gate-denied" data-i18n="ops.gate.denied">// ACCESO DENEGADO</span>
+      <span id="accessTerminated" class="gate-terminated" data-i18n="ops.gate.terminated">// CONEXIÓN TERMINADA. RECARGA LA PÁGINA.</span>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       DASHBOARD (hidden until auth)
+       ==================================================== -->
+  <div id="dashboardWrap" style="display:none">
+
+    <!-- TOP BAR -->
+    <div class="ops-topbar">
+      <div class="ops-brand">ONDA<span>.OPS</span></div>
+      <div class="ops-clock" id="opsTime" aria-live="polite">--:--:--</div>
+      <div class="ops-user">
+        <span id="opsUserName" class="ops-username"></span>
+        <span class="ops-role" id="opsUserRole"></span>
+        <a href="#" id="logoutBtn" class="ops-logout" data-i18n="ops.logout">salir</a>
+      </div>
+    </div>
+
+    <!-- TAB NAVIGATION -->
+    <div class="ops-tabs" role="tablist">
+      <button class="ops-tab active" data-tab="pipeline" role="tab" aria-selected="true" aria-controls="panelPipeline" data-i18n="ops.tab.pipeline">Pipeline</button>
+      <button class="ops-tab" data-tab="leads" role="tab" aria-selected="false" aria-controls="panelLeads" data-i18n="ops.tab.leads">Leads</button>
+      <button class="ops-tab" data-tab="calculator" role="tab" aria-selected="false" aria-controls="panelCalculator" data-i18n="ops.tab.calculator">Calculadora</button>
+      <button class="ops-tab" data-tab="scraper" role="tab" aria-selected="false" aria-controls="panelScraper" data-i18n="ops.tab.scraper">Scraper</button>
+    </div>
+
+    <!-- ================================================
+         TAB PANELS
+         ================================================ -->
+
+    <!-- PIPELINE PANEL -->
+    <div id="panelPipeline" class="ops-panel active" role="tabpanel" aria-labelledby="tab-pipeline">
+
+      <div class="panel-header">
+        <span class="sec-tag" data-i18n="ops.pipeline.tag">// Pipeline de ventas</span>
+      </div>
+
+      <!-- KANBAN BOARD -->
+      <div id="pipelineBoard" class="pipeline-board">
+
+        <!-- NEW -->
+        <div class="pipe-col" data-stage="new">
+          <div class="pipe-col-header">
+            <span class="pipe-col-title" data-i18n="ops.stage.new">Nuevo</span>
+            <span class="pipe-count pipe-count--new">0</span>
+          </div>
+          <div class="pipe-col-body" data-drop-stage="new" aria-label="Columna Nuevo"></div>
+        </div>
+
+        <!-- CONTACTED -->
+        <div class="pipe-col" data-stage="contacted">
+          <div class="pipe-col-header">
+            <span class="pipe-col-title" data-i18n="ops.stage.contacted">Contactado</span>
+            <span class="pipe-count pipe-count--contacted">0</span>
+          </div>
+          <div class="pipe-col-body" data-drop-stage="contacted" aria-label="Columna Contactado"></div>
+        </div>
+
+        <!-- MEETING SCHEDULED -->
+        <div class="pipe-col" data-stage="meeting_scheduled">
+          <div class="pipe-col-header">
+            <span class="pipe-col-title" data-i18n="ops.stage.meeting_scheduled">Reunión</span>
+            <span class="pipe-count pipe-count--meeting_scheduled">0</span>
+          </div>
+          <div class="pipe-col-body" data-drop-stage="meeting_scheduled" aria-label="Columna Reunión"></div>
+        </div>
+
+        <!-- PROPOSAL SENT -->
+        <div class="pipe-col" data-stage="proposal_sent">
+          <div class="pipe-col-header">
+            <span class="pipe-col-title" data-i18n="ops.stage.proposal_sent">Propuesta</span>
+            <span class="pipe-count pipe-count--proposal_sent">0</span>
+          </div>
+          <div class="pipe-col-body" data-drop-stage="proposal_sent" aria-label="Columna Propuesta"></div>
+        </div>
+
+        <!-- NEGOTIATING -->
+        <div class="pipe-col" data-stage="negotiating">
+          <div class="pipe-col-header">
+            <span class="pipe-col-title" data-i18n="ops.stage.negotiating">Negociando</span>
+            <span class="pipe-count pipe-count--negotiating">0</span>
+          </div>
+          <div class="pipe-col-body" data-drop-stage="negotiating" aria-label="Columna Negociando"></div>
+        </div>
+
+        <!-- CLOSED WON -->
+        <div class="pipe-col" data-stage="closed_won">
+          <div class="pipe-col-header">
+            <span class="pipe-col-title" data-i18n="ops.stage.closed_won">Cerrado ✓</span>
+            <span class="pipe-count pipe-count--closed_won">0</span>
+          </div>
+          <div class="pipe-col-body" data-drop-stage="closed_won" aria-label="Columna Cerrado Ganado"></div>
+        </div>
+
+        <!-- CLOSED LOST -->
+        <div class="pipe-col" data-stage="closed_lost">
+          <div class="pipe-col-header">
+            <span class="pipe-col-title" data-i18n="ops.stage.closed_lost">Perdido ✗</span>
+            <span class="pipe-count pipe-count--closed_lost">0</span>
+          </div>
+          <div class="pipe-col-body" data-drop-stage="closed_lost" aria-label="Columna Cerrado Perdido"></div>
+        </div>
+
+        <!-- ON HOLD -->
+        <div class="pipe-col" data-stage="on_hold">
+          <div class="pipe-col-header">
+            <span class="pipe-col-title" data-i18n="ops.stage.on_hold">Pausado</span>
+            <span class="pipe-count pipe-count--on_hold">0</span>
+          </div>
+          <div class="pipe-col-body" data-drop-stage="on_hold" aria-label="Columna Pausado"></div>
+        </div>
+
+      </div><!-- /pipelineBoard -->
+
+      <!-- PIPELINE STATS -->
+      <div id="pipeStats" class="pipe-stats">
+        <div class="pipe-stat-cell">
+          <div class="pipe-stat-val" id="pipeStatTotal">—</div>
+          <div class="pipe-stat-label" data-i18n="ops.pipe.totalLeads">Total Leads</div>
+        </div>
+        <div class="pipe-stat-cell">
+          <div class="pipe-stat-val" id="pipeStatValue">—</div>
+          <div class="pipe-stat-label" data-i18n="ops.pipe.pipelineValue">Valor Pipeline</div>
+        </div>
+        <div class="pipe-stat-cell">
+          <div class="pipe-stat-val" id="pipeStatWon">—</div>
+          <div class="pipe-stat-label" data-i18n="ops.pipe.closedWon">Cerrados Ganados</div>
+        </div>
+        <div class="pipe-stat-cell">
+          <div class="pipe-stat-val" id="pipeStatConversion">—</div>
+          <div class="pipe-stat-label" data-i18n="ops.pipe.conversion">Tasa Conversión</div>
+        </div>
+      </div>
+
+    </div><!-- /panelPipeline -->
+
+
+    <!-- LEADS PANEL -->
+    <div id="panelLeads" class="ops-panel" role="tabpanel" aria-labelledby="tab-leads" hidden>
+
+      <div class="panel-header">
+        <span class="sec-tag" data-i18n="ops.leads.tag">// Directorio de leads</span>
+      </div>
+
+      <!-- FILTER ROW -->
+      <div class="leads-filters">
+        <div class="leads-search-wrap">
+          <input
+            type="search"
+            id="leadsSearch"
+            class="form-input leads-search"
+            data-i18n-placeholder="ops.leads.searchPlaceholder"
+            placeholder="Buscar empresa, contacto..."
+            aria-label="Buscar leads"
+          >
+        </div>
+        <div class="select-wrap">
+          <select id="stageFilter" class="form-select" aria-label="Filtrar por etapa">
+            <option value="" data-i18n="ops.leads.allStages">Todas las etapas</option>
+            <option value="new" data-i18n="ops.stage.new">Nuevo</option>
+            <option value="contacted" data-i18n="ops.stage.contacted">Contactado</option>
+            <option value="meeting_scheduled" data-i18n="ops.stage.meeting_scheduled">Reunión</option>
+            <option value="proposal_sent" data-i18n="ops.stage.proposal_sent">Propuesta</option>
+            <option value="negotiating" data-i18n="ops.stage.negotiating">Negociando</option>
+            <option value="closed_won" data-i18n="ops.stage.closed_won">Cerrado ✓</option>
+            <option value="closed_lost" data-i18n="ops.stage.closed_lost">Perdido ✗</option>
+            <option value="on_hold" data-i18n="ops.stage.on_hold">Pausado</option>
+          </select>
+        </div>
+        <div class="select-wrap">
+          <select id="priorityFilter" class="form-select" aria-label="Filtrar por prioridad">
+            <option value="" data-i18n="ops.leads.allPriorities">Todas las prioridades</option>
+            <option value="hot" data-i18n="ops.priority.hot">Caliente</option>
+            <option value="warm" data-i18n="ops.priority.warm">Tibio</option>
+            <option value="cold" data-i18n="ops.priority.cold">Frío</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- LEADS TABLE -->
+      <div class="leads-table-wrap">
+        <table class="leads-table" aria-label="Tabla de leads">
+          <thead>
+            <tr>
+              <th data-sort="created_at" data-i18n="ops.leads.col.date">Fecha</th>
+              <th data-sort="company" data-i18n="ops.leads.col.company">Empresa</th>
+              <th data-sort="contact" data-i18n="ops.leads.col.contact">Contacto</th>
+              <th data-sort="industry" data-i18n="ops.leads.col.industry">Industria</th>
+              <th data-sort="score" data-i18n="ops.leads.col.score">Score</th>
+              <th data-sort="stage" data-i18n="ops.leads.col.stage">Etapa</th>
+              <th data-sort="priority" data-i18n="ops.leads.col.priority">Prioridad</th>
+              <th data-sort="deal_value" data-i18n="ops.leads.col.dealValue">Valor</th>
+              <th data-i18n="ops.leads.col.actions">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="leadsTableBody">
+            <tr class="leads-empty-state">
+              <td colspan="9">
+                <span data-i18n="ops.leads.empty">No hay leads. Ajusta los filtros o agrega uno nuevo.</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /panelLeads -->
+
+
+    <!-- CALCULATOR PANEL -->
+    <div id="panelCalculator" class="ops-panel" role="tabpanel" aria-labelledby="tab-calculator" hidden>
+
+      <div class="panel-header">
+        <span class="sec-tag" data-i18n="ops.calc.tag">// Calculadora de propuesta</span>
+      </div>
+
+      <div class="calc-grid">
+
+        <!-- LEFT: INPUTS -->
+        <div id="calcInputs" class="calc-inputs">
+
+          <!-- Lead Selector -->
+          <div class="calc-field">
+            <label class="form-label" for="calcLeadSelect" data-i18n="ops.calc.leadLabel">Lead vinculado</label>
+            <div class="select-wrap">
+              <select id="calcLeadSelect" class="form-select">
+                <option value="" data-i18n="ops.calc.leadNone">— Sin vincular —</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Industry -->
+          <div class="calc-field">
+            <label class="form-label" for="calcIndustry" data-i18n="ops.calc.industryLabel">Industria / Giro</label>
+            <input type="text" id="calcIndustry" class="form-input" data-i18n-placeholder="ops.calc.industryPlaceholder" placeholder="ej. Restaurante, Clínica, Hotel...">
+          </div>
+
+          <!-- Team Size -->
+          <div class="calc-field">
+            <label class="form-label" for="calcTeamSize" data-i18n="ops.calc.teamLabel">Tamaño del equipo</label>
+            <input type="number" id="calcTeamSize" class="form-input" min="1" max="500" value="5" aria-describedby="calcTeamHint">
+            <span class="field-hint" id="calcTeamHint" data-i18n="ops.calc.teamHint">Número de empleados</span>
+          </div>
+
+          <!-- Hours Wasted -->
+          <div class="calc-field">
+            <label class="form-label" for="calcHours" data-i18n="ops.calc.hoursLabel">Horas desperdiciadas / semana</label>
+            <div class="range-val" id="calcHoursVal">0 hrs</div>
+            <div class="range-wrap">
+              <input type="range" id="calcHours" class="range-input" min="0" max="80" step="5" value="20" aria-valuenow="20" aria-valuemin="0" aria-valuemax="80">
+              <div class="range-labels">
+                <span>0</span><span>20</span><span>40</span><span>60</span><span>80</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Methods -->
+          <div class="calc-field">
+            <label class="form-label" data-i18n="ops.calc.methodsLabel">Métodos actuales de gestión</label>
+            <div id="calcMethods" class="mc-group" role="group" aria-label="Métodos de gestión">
+              <div class="mc-opt" data-val="paper" role="checkbox" aria-checked="false" tabindex="0">
+                <span class="mc-check"></span>
+                <span class="mc-label" data-i18n="ops.calc.method.paper">Papel / cuadernos</span>
+              </div>
+              <div class="mc-opt" data-val="excel" role="checkbox" aria-checked="false" tabindex="0">
+                <span class="mc-check"></span>
+                <span class="mc-label" data-i18n="ops.calc.method.excel">Excel / hojas de cálculo</span>
+              </div>
+              <div class="mc-opt" data-val="software" role="checkbox" aria-checked="false" tabindex="0">
+                <span class="mc-check"></span>
+                <span class="mc-label" data-i18n="ops.calc.method.software">Software especializado</span>
+              </div>
+              <div class="mc-opt" data-val="whatsapp" role="checkbox" aria-checked="false" tabindex="0">
+                <span class="mc-check"></span>
+                <span class="mc-label" data-i18n="ops.calc.method.whatsapp">WhatsApp / mensajería</span>
+              </div>
+              <div class="mc-opt" data-val="memory" role="checkbox" aria-checked="false" tabindex="0">
+                <span class="mc-check"></span>
+                <span class="mc-label" data-i18n="ops.calc.method.memory">Memoria / verbal</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tech Stack -->
+          <div class="calc-field">
+            <label class="form-label" data-i18n="ops.calc.techLabel">Herramientas tecnológicas actuales</label>
+            <div id="calcTech" class="mc-group" role="group" aria-label="Herramientas tecnológicas">
+              <div class="mc-opt" data-val="none" role="checkbox" aria-checked="false" tabindex="0">
+                <span class="mc-check"></span>
+                <span class="mc-label" data-i18n="ops.calc.tech.none">Ninguna</span>
+              </div>
+              <div class="mc-opt" data-val="social" role="checkbox" aria-checked="false" tabindex="0">
+                <span class="mc-check"></span>
+                <span class="mc-label" data-i18n="ops.calc.tech.social">Redes sociales</span>
+              </div>
+              <div class="mc-opt" data-val="wa_business" role="checkbox" aria-checked="false" tabindex="0">
+                <span class="mc-check"></span>
+                <span class="mc-label" data-i18n="ops.calc.tech.wa_business">WhatsApp Business</span>
+              </div>
+              <div class="mc-opt" data-val="excel" role="checkbox" aria-checked="false" tabindex="0">
+                <span class="mc-check"></span>
+                <span class="mc-label" data-i18n="ops.calc.tech.excel">Excel / Google Sheets</span>
+              </div>
+              <div class="mc-opt" data-val="accounting" role="checkbox" aria-checked="false" tabindex="0">
+                <span class="mc-check"></span>
+                <span class="mc-label" data-i18n="ops.calc.tech.accounting">Software contable</span>
+              </div>
+              <div class="mc-opt" data-val="crm" role="checkbox" aria-checked="false" tabindex="0">
+                <span class="mc-check"></span>
+                <span class="mc-label" data-i18n="ops.calc.tech.crm">CRM</span>
+              </div>
+              <div class="mc-opt" data-val="pos" role="checkbox" aria-checked="false" tabindex="0">
+                <span class="mc-check"></span>
+                <span class="mc-label" data-i18n="ops.calc.tech.pos">POS / Caja registradora</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Website Presence -->
+          <div class="calc-field">
+            <label class="form-label" data-i18n="ops.calc.websiteLabel">Presencia web actual</label>
+            <div id="calcWebsite" class="mc-group mc-single" role="radiogroup" aria-label="Presencia web">
+              <div class="mc-opt" data-val="0" role="radio" aria-checked="false" tabindex="0">
+                <span class="mc-dot"></span>
+                <span class="mc-label" data-i18n="ops.calc.website.0">Sin presencia</span>
+              </div>
+              <div class="mc-opt" data-val="1" role="radio" aria-checked="false" tabindex="0">
+                <span class="mc-dot"></span>
+                <span class="mc-label" data-i18n="ops.calc.website.1">Solo redes sociales</span>
+              </div>
+              <div class="mc-opt" data-val="2" role="radio" aria-checked="false" tabindex="0">
+                <span class="mc-dot"></span>
+                <span class="mc-label" data-i18n="ops.calc.website.2">Sitio web básico</span>
+              </div>
+              <div class="mc-opt" data-val="3" role="radio" aria-checked="false" tabindex="0">
+                <span class="mc-dot"></span>
+                <span class="mc-label" data-i18n="ops.calc.website.3">Sitio web + e-commerce</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Adoption -->
+          <div class="calc-field">
+            <label class="form-label" data-i18n="ops.calc.aiLabel">Adopción de IA actual</label>
+            <div id="calcAI" class="mc-group mc-single" role="radiogroup" aria-label="Adopción de IA">
+              <div class="mc-opt" data-val="0" role="radio" aria-checked="false" tabindex="0">
+                <span class="mc-dot"></span>
+                <span class="mc-label" data-i18n="ops.calc.ai.0">No usa IA</span>
+              </div>
+              <div class="mc-opt" data-val="1" role="radio" aria-checked="false" tabindex="0">
+                <span class="mc-dot"></span>
+                <span class="mc-label" data-i18n="ops.calc.ai.1">Experimenta ocasionalmente</span>
+              </div>
+              <div class="mc-opt" data-val="2" role="radio" aria-checked="false" tabindex="0">
+                <span class="mc-dot"></span>
+                <span class="mc-label" data-i18n="ops.calc.ai.2">Usa herramientas IA básicas</span>
+              </div>
+              <div class="mc-opt" data-val="3" role="radio" aria-checked="false" tabindex="0">
+                <span class="mc-dot"></span>
+                <span class="mc-label" data-i18n="ops.calc.ai.3">IA integrada en procesos</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Monthly Revenue -->
+          <div class="calc-field">
+            <label class="form-label" for="calcRevenue" data-i18n="ops.calc.revenueLabel">Ingresos mensuales (USD)</label>
+            <div class="select-wrap">
+              <select id="calcRevenue" class="form-select">
+                <option value="0" data-i18n="ops.calc.revenue.0">Menos de $5K</option>
+                <option value="1" data-i18n="ops.calc.revenue.1">$5K – $15K</option>
+                <option value="2" data-i18n="ops.calc.revenue.2" selected>$15K – $50K</option>
+                <option value="3" data-i18n="ops.calc.revenue.3">$50K – $150K</option>
+                <option value="4" data-i18n="ops.calc.revenue.4">Más de $150K</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Capture Rate -->
+          <div class="calc-field">
+            <label class="form-label" for="calcCapture" data-i18n="ops.calc.captureLabel">% de ahorro a capturar</label>
+            <div class="range-val" id="calcCaptureVal">35%</div>
+            <div class="range-wrap">
+              <input type="range" id="calcCapture" class="range-input" min="25" max="50" step="1" value="35" aria-valuenow="35" aria-valuemin="25" aria-valuemax="50">
+              <div class="range-labels">
+                <span>25%</span><span>35%</span><span>50%</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /calcInputs -->
+
+        <!-- RIGHT: RESULTS -->
+        <div id="calcResults" class="calc-results">
+
+          <!-- Score Section -->
+          <div id="calcScoreSection" class="calc-result-card">
+            <div class="calc-result-header" data-i18n="ops.calc.score.title">Score de oportunidad</div>
+            <div class="calc-score-display">
+              <div class="calc-score-value" id="calcScoreValue">—</div>
+              <div class="calc-score-label" id="calcScoreLabel" data-i18n="ops.calc.score.label">/ 100</div>
+            </div>
+            <div class="calc-score-bar-wrap">
+              <div class="calc-score-bar" id="calcScoreBar" style="width:0%"></div>
+            </div>
+            <div class="calc-score-tier" id="calcScoreTier"></div>
+          </div>
+
+          <!-- Savings Section -->
+          <div id="calcSavingsSection" class="calc-result-card">
+            <div class="calc-result-header" data-i18n="ops.calc.savings.title">Ahorro proyectado</div>
+            <div class="calc-savings-lines">
+              <div class="calc-saving-row">
+                <span class="calc-saving-label" data-i18n="ops.calc.savings.hoursMonth">Horas recuperadas / mes</span>
+                <span class="calc-saving-val" id="calcSavingHours">—</span>
+              </div>
+              <div class="calc-saving-row">
+                <span class="calc-saving-label" data-i18n="ops.calc.savings.costMonth">Costo evitado / mes</span>
+                <span class="calc-saving-val accent" id="calcSavingCost">—</span>
+              </div>
+              <div class="calc-saving-row">
+                <span class="calc-saving-label" data-i18n="ops.calc.savings.costYear">Costo evitado / año</span>
+                <span class="calc-saving-val accent" id="calcSavingYear">—</span>
+              </div>
+              <div class="calc-saving-row calc-saving-row--total">
+                <span class="calc-saving-label" data-i18n="ops.calc.savings.payback">Retorno de inversión</span>
+                <span class="calc-saving-val" id="calcSavingPayback">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pricing Section -->
+          <div id="calcPricingSection" class="calc-result-card">
+            <div class="calc-result-header" data-i18n="ops.calc.pricing.title">Propuesta de precio</div>
+            <div class="calc-pricing-main">
+              <div class="calc-pricing-range" id="calcPricingRange">— — —</div>
+              <div class="calc-pricing-note" id="calcPricingNote" data-i18n="ops.calc.pricing.note">Inversión única · soporte incluido</div>
+            </div>
+            <div class="calc-pricing-items" id="calcPricingItems"></div>
+          </div>
+
+          <!-- Comparison Bar -->
+          <div id="calcComparisonBar" class="calc-result-card">
+            <div class="calc-result-header" data-i18n="ops.calc.compare.title">Inversión vs. costo de inacción</div>
+            <div class="calc-compare-wrap">
+              <div class="calc-compare-row">
+                <span class="calc-compare-label" data-i18n="ops.calc.compare.investment">Inversión Onda AI</span>
+                <div class="calc-compare-bar-wrap">
+                  <div class="calc-compare-bar calc-compare-bar--invest" id="calcBarInvest" style="width:0%"></div>
+                </div>
+                <span class="calc-compare-val" id="calcValInvest">—</span>
+              </div>
+              <div class="calc-compare-row">
+                <span class="calc-compare-label" data-i18n="ops.calc.compare.inaction">Costo inacción (1 año)</span>
+                <div class="calc-compare-bar-wrap">
+                  <div class="calc-compare-bar calc-compare-bar--inaction" id="calcBarInaction" style="width:0%"></div>
+                </div>
+                <span class="calc-compare-val" id="calcValInaction">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="calc-actions">
+            <button id="calcSaveBtn" class="btn-primary" data-i18n="ops.calc.save">Guardar propuesta</button>
+            <button id="calcCopyBtn" class="btn-ghost" data-i18n="ops.calc.copy">Copiar resumen</button>
+            <button id="calcPdfBtn" class="btn-ghost" disabled aria-disabled="true" data-i18n="ops.calc.pdf">Exportar PDF</button>
+          </div>
+
+        </div><!-- /calcResults -->
+
+      </div><!-- /calc-grid -->
+
+    </div><!-- /panelCalculator -->
+
+
+    <!-- SCRAPER PANEL -->
+    <div id="panelScraper" class="ops-panel" role="tabpanel" aria-labelledby="tab-scraper" hidden>
+
+      <div class="panel-header">
+        <span class="sec-tag" data-i18n="ops.scraper.tag">// Scraper de empresas</span>
+      </div>
+
+      <div class="scraper-layout">
+
+        <!-- INPUT SECTION -->
+        <div class="scraper-inputs">
+          <div class="scraper-inputs-title" data-i18n="ops.scraper.inputsTitle">Configuración del scrape</div>
+
+          <div class="calc-field">
+            <label class="form-label" for="scraperUrl" data-i18n="ops.scraper.urlLabel">URL del negocio</label>
+            <input type="url" id="scraperUrl" class="form-input" data-i18n-placeholder="ops.scraper.urlPlaceholder" placeholder="https://ejemplo.com" aria-describedby="scraperUrlHint">
+            <span class="field-hint" id="scraperUrlHint" data-i18n="ops.scraper.urlHint">Sitio web, Google Maps, Facebook...</span>
+          </div>
+
+          <div class="calc-field">
+            <label class="form-label" for="scraperName" data-i18n="ops.scraper.nameLabel">Nombre de la empresa</label>
+            <input type="text" id="scraperName" class="form-input" data-i18n-placeholder="ops.scraper.namePlaceholder" placeholder="Nombre del negocio">
+          </div>
+
+          <div class="calc-field">
+            <label class="form-label" for="scraperLocation" data-i18n="ops.scraper.locationLabel">Ubicación</label>
+            <input type="text" id="scraperLocation" class="form-input" value="Managua, Nicaragua">
+          </div>
+
+          <div class="calc-field">
+            <label class="form-label" for="scraperLeadSelect" data-i18n="ops.scraper.leadLabel">Vincular a lead existente</label>
+            <div class="select-wrap">
+              <select id="scraperLeadSelect" class="form-select">
+                <option value="" data-i18n="ops.scraper.leadNone">— Crear nuevo lead —</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="scraperRunBtn" class="btn-primary scraper-run-btn" data-i18n="ops.scraper.runBtn">
+            <span class="scraper-btn-text">Iniciar Scrape &rarr;</span>
+          </button>
+
+          <!-- Status -->
+          <div class="scraper-status-wrap">
+            <span id="scraperStatus" class="scraper-status" aria-live="polite"></span>
+          </div>
+
+        </div><!-- /scraper-inputs -->
+
+        <!-- RESULTS -->
+        <div id="scraperResults" class="scraper-results">
+          <div class="scraper-empty">
+            <div class="scraper-empty-icon">&gt;_</div>
+            <div class="scraper-empty-msg" data-i18n="ops.scraper.emptyMsg">Ejecuta un scrape para ver los resultados aquí.</div>
+          </div>
+        </div>
+
+      </div><!-- /scraper-layout -->
+
+    </div><!-- /panelScraper -->
+
+  </div><!-- /dashboardWrap -->
+
+  <!-- ====================================================
+       LEAD DETAIL PANEL (slide-in from right)
+       ==================================================== -->
+  <div id="detailPanel" class="detail-panel" role="dialog" aria-modal="true" aria-label="Detalle del lead" hidden>
+    <button id="detailClose" class="detail-close" aria-label="Cerrar panel">&times;</button>
+    <div id="detailContent" class="detail-content"></div>
+  </div>
+  <div class="detail-overlay" id="detailOverlay"></div>
+
+</div><!-- /page -->
+
+<!-- SCRIPTS -->
+<script src="js/i18n.js"></script>
+<script src="js/grid-bg.js"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/sheets-sync.js"></script>
+<script src="js/ops-auth.js"></script>
+<script src="js/ops-dashboard.js"></script>
+<script src="js/ops-leads.js"></script>
+<script src="js/ops-calculator.js"></script>
+<script src="js/ops-scraper.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    OndaGrid.init(8);
+  });
+</script>
+</body>
+</html>
