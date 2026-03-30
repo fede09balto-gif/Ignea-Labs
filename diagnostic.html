@@ -135,7 +135,7 @@
     <span data-i18n="diag.c2">10–15 min</span>
     <span data-i18n="diag.c3">Resultados inmediatos</span>
   </div>
-  <button class="btn-primary" id="landingStartBtn" data-i18n-btn="dx.landing.cta">Comenzar Diagnóstico &rarr;</button>
+  <button class="btn-gradient" id="landingStartBtn" data-i18n-btn="dx.landing.cta">Comenzar Diagnóstico &rarr;</button>
   <p class="dx-landing-note" data-i18n="dx.landing.note">Tus respuestas quedan entre nosotros. Mientras más honesto seas, más preciso será tu diagnóstico.</p>
 </div>
 
@@ -479,11 +479,15 @@
 <script src="js/i18n.js"></script>
 <script src="js/grid-bg.js"></script>
 <script src="js/scoring.js"></script>
+<script src="js/custom-select.js"></script>
 <script src="js/diagnostic.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/sheets-sync.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
+  // Init custom selects
+  if (typeof initAllCustomSelects === 'function') initAllCustomSelects();
 
   // Hamburger menu
   var ham = document.getElementById('hamburger');

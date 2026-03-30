@@ -131,11 +131,8 @@
     <div class="sec-tag" data-i18n="res.tag">// Diagnóstico Completado</div>
     <h2 id="resName"></h2>
 
+    <div class="score-gauge" id="scoreGauge"></div>
     <div class="score-ring">
-      <svg viewBox="0 0 160 160">
-        <circle class="ring-bg" r="70" cx="80" cy="80"></circle>
-        <circle class="ring-fill" r="70" cx="80" cy="80" id="ringFill"></circle>
-      </svg>
       <div class="score-val">
         <div class="score-num" id="scoreNum">0</div>
         <div class="score-of" data-i18n="res.of">/ 100</div>
@@ -212,6 +209,7 @@
 <script src="js/i18n.js"></script>
 <script src="js/grid-bg.js"></script>
 <script src="js/scoring.js"></script>
+<script src="js/score-gauge.js"></script>
 <script src="js/results.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {

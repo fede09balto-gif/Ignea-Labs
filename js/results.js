@@ -34,21 +34,15 @@
     var nameEl = document.getElementById('resName');
     if (nameEl && contact) nameEl.textContent = (contact.first_name || contact.name || '') + (contact.last_name ? ' ' + contact.last_name : '');
 
-    // Animated score
+    // Score gauge (half-circle)
+    var gaugeEl = document.getElementById('scoreGauge');
+    if (gaugeEl && typeof createScoreGauge === 'function') {
+      createScoreGauge(gaugeEl, data.total, 100);
+    }
+
+    // Animated score number
     var scoreEl = document.getElementById('scoreNum');
     if (scoreEl) animateNumber(scoreEl, data.total, 1500);
-
-    // Score ring
-    var ring = document.getElementById('ringFill');
-    if (ring) {
-      var circumference = 2 * Math.PI * 70; // r=70
-      var offset = circumference - (data.total / 100) * circumference;
-      ring.style.strokeDasharray = circumference;
-      ring.style.strokeDashoffset = circumference;
-      setTimeout(function() {
-        ring.style.strokeDashoffset = offset;
-      }, 300);
-    }
 
     // Level label + description
     var levelEl = document.getElementById('levelLabel');
