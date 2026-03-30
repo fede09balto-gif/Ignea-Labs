@@ -19,7 +19,7 @@
   --coral:#F0997B;
   --purple:#AFA9EC;
   --body-light:#8E8EA0;
-  --ff:'Syne',sans-serif;
+  --ff:'Plus Jakarta Sans',sans-serif;
   --fm:'JetBrains Mono',monospace;
 }
 
@@ -73,10 +73,10 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:18px 4
 .mobile-overlay.open{opacity:1;pointer-events:auto}
 
 /* ---- BUTTONS ---- */
-.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--accent);color:var(--bg);font-family:var(--ff);font-weight:700;font-size:13px;letter-spacing:.5px;border:none;cursor:pointer;transition:opacity .3s;text-decoration:none}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:16px 32px;background:var(--accent);color:var(--bg);font-family:var(--ff);font-weight:700;font-size:15px;border:none;cursor:pointer;transition:opacity .2s;text-decoration:none}
 .btn-primary:hover{opacity:.85}
 .btn-primary:disabled{opacity:.3;cursor:not-allowed}
-.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border:1px solid var(--border);color:var(--gray);font-family:var(--ff);font-weight:600;font-size:13px;background:transparent;cursor:pointer;transition:all .3s;text-decoration:none}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:16px 32px;border:1px solid var(--border);color:var(--gray);font-family:var(--ff);font-weight:500;font-size:15px;background:transparent;cursor:pointer;transition:all .2s;text-decoration:none}
 .btn-ghost:hover{border-color:var(--gray);color:var(--white)}
 
 /* ---- SECTION TAGS ---- */

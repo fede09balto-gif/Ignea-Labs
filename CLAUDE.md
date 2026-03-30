@@ -5,7 +5,7 @@
 
 - **Framework:** Vanilla HTML/CSS/JS (static site, no framework — keep it lightweight for slow connections in Nicaragua)
 - **Database:** None for MVP. Diagnostic answers stored in localStorage/sessionStorage. Future: Supabase for storing diagnostic results + contact info.
-- **APIs:** Google Fonts CDN (Syne + JetBrains Mono), Formspree (contact form submission), jsPDF (client-side PDF report generation)
+- **APIs:** Google Fonts CDN (Plus Jakarta Sans + JetBrains Mono), Formspree (contact form submission), jsPDF (client-side PDF report generation)
 - **Auth:** None for MVP. Future: Supabase Auth for admin dashboard to view diagnostics.
 - **Styling:** Vanilla CSS with CSS custom properties. No Tailwind, no preprocessors. Single shared stylesheet + page-specific styles.
 - **i18n:** Custom JS i18n system using data-i18n attributes. Spanish is PRIMARY language. English is secondary. Every string must exist in both ES and EN. Default: ES. Language choice persisted in localStorage.
@@ -33,13 +33,13 @@
 - Code keyword color: `#AFA9EC` (purple)
 
 ## Typography
-- Display font: `'Syne', sans-serif` (weights 400-800)
+- Display font: `'Plus Jakarta Sans', sans-serif` (weights 400-800)
 - Monospace font: `'JetBrains Mono', monospace` (weights 300-700)
 - Section tags: monospace, 11px, uppercase, letter-spacing 3px, accent color, prefixed with "//"
 - Stat values: monospace, 28-30px, bold, accent color
 - Stat labels: 10-11px, uppercase, letter-spacing 1px, dim gray
 - Body text: 14-15px, secondary gray, line-height 1.7
-- Hero headlines: Syne, clamp(30px, 4.5vw, 54px), weight 800
+- Hero headlines: Plus Jakarta Sans, clamp(30px, 4.5vw, 54px), weight 800
 
 ## Visual Rules
 - Border radius: 0px everywhere. Sharp corners. Engineering aesthetic. Exception: brand mark circle and dots in terminal bar.
@@ -118,7 +118,7 @@
 --border: #1A1A2A
 --coral: #F0997B
 --purple: #AFA9EC
---ff: 'Syne', sans-serif
+--ff: 'Plus Jakarta Sans', sans-serif
 --fm: 'JetBrains Mono', monospace
 ```
 

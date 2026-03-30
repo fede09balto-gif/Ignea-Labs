@@ -1,73 +1,68 @@
 /* ============================================================
    ONDA AI — Gradient Dots Background
-   CSS-based animated gradient dots. No canvas, no particles.
-   Call OndaGradientDots.init() on every page.
+   Self-initializing. Creates its own container element.
+   No canvas, no particles. Pure CSS radial-gradients + JS drift.
    ============================================================ */
 
-var OndaGradientDots = (function() {
-  function init(opacity) {
-    var el = document.getElementById('gradientBg');
-    if (!el) return;
-
-    var op = opacity || 0.08;
-    var bg = '#08080D';
-    var dotSize = 10;
-    var hexSpacing = dotSize * 1.732;
-
-    el.style.backgroundColor = bg;
-    el.style.backgroundImage = [
-      'radial-gradient(circle at 50% 50%, transparent 1px, ' + bg + ' 1px, ' + bg + ' ' + dotSize + 'px, transparent ' + dotSize + 'px)',
-      'radial-gradient(circle at 50% 50%, transparent 1px, ' + bg + ' 1px, ' + bg + ' ' + dotSize + 'px, transparent ' + dotSize + 'px)',
-      'radial-gradient(circle at 30% 40%, rgba(0,229,191,' + op + '), transparent 50%)',
-      'radial-gradient(circle at 70% 60%, rgba(10,74,63,' + (op * 1.5) + '), transparent 50%)',
-      'radial-gradient(circle at 50% 80%, rgba(0,229,191,' + (op * 0.5) + '), transparent 50%)'
-    ].join(',');
-
-    el.style.backgroundSize = [
-      dotSize + 'px ' + hexSpacing + 'px',
-      dotSize + 'px ' + hexSpacing + 'px',
-      '120% 120%',
-      '120% 120%',
-      '120% 120%'
-    ].join(',');
-
-    el.style.backgroundPosition = [
-      '0 0',
-      (dotSize/2) + 'px ' + (hexSpacing/2) + 'px',
-      '0% 0%',
-      '100% 100%',
-      '50% 50%'
-    ].join(',');
-
-    // Very slow drift animation
-    var start = null;
-    function animate(ts) {
-      if (!start) start = ts;
-      var p = ((ts - start) % 60000) / 60000; // 60s cycle
-
-      var x1 = Math.sin(p * Math.PI * 2) * 15;
-      var y1 = Math.cos(p * Math.PI * 2) * 10;
-      var x2 = Math.cos(p * Math.PI * 2 + 1) * 20;
-      var y2 = Math.sin(p * Math.PI * 2 + 1) * 15;
-      var x3 = Math.sin(p * Math.PI * 2 + 2) * 10;
-      var y3 = Math.cos(p * Math.PI * 2 + 2) * 20;
-
-      el.style.backgroundPosition = [
-        '0 0',
-        (dotSize/2) + 'px ' + (hexSpacing/2) + 'px',
-        (50 + x1) + '% ' + (50 + y1) + '%',
-        (50 + x2) + '% ' + (50 + y2) + '%',
-        (50 + x3) + '% ' + (50 + y3) + '%'
-      ].join(',');
-
-      requestAnimationFrame(animate);
-    }
-
-    // Skip animation on mobile
-    if (window.innerWidth > 768) {
-      requestAnimationFrame(animate);
-    }
+(function() {
+  var container = document.getElementById('gradientBg');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'gradientBg';
+    document.body.prepend(container);
   }
 
-  return { init: init };
+  container.style.cssText = 'position:fixed;inset:0;z-index:-1;pointer-events:none;';
+
+  var dotSize = 8;
+  var spacing = 10;
+  var hexSpacing = spacing * 1.732;
+  var bg = '#08080D';
+
+  container.style.backgroundColor = bg;
+  container.style.backgroundImage = [
+    'radial-gradient(circle at 50% 50%, transparent 1.5px, ' + bg + ' 0 ' + dotSize + 'px, transparent ' + dotSize + 'px)',
+    'radial-gradient(circle at 50% 50%, transparent 1.5px, ' + bg + ' 0 ' + dotSize + 'px, transparent ' + dotSize + 'px)',
+    'radial-gradient(circle at 50% 50%, rgba(0,229,191,0.07), transparent 60%)',
+    'radial-gradient(circle at 50% 50%, rgba(0,180,150,0.05), transparent 60%)',
+    'radial-gradient(circle at 50% 50%, rgba(0,229,191,0.03), transparent 60%)'
+  ].join(',');
+
+  container.style.backgroundSize = [
+    spacing + 'px ' + hexSpacing + 'px',
+    spacing + 'px ' + hexSpacing + 'px',
+    '200% 200%',
+    '200% 200%',
+    '200% 200%'
+  ].join(',');
+
+  container.style.backgroundPosition = [
+    '0px 0px',
+    (spacing / 2) + 'px ' + (hexSpacing / 2) + 'px',
+    '50% 50%',
+    '50% 50%',
+    '50% 50%'
+  ].join(',');
+
+  var startTime = null;
+  var duration = 30000;
+
+  function animate(timestamp) {
+    if (!startTime) startTime = timestamp;
+    var progress = ((timestamp - startTime) % duration) / duration;
+
+    container.style.backgroundPosition = [
+      '0px 0px',
+      (spacing / 2) + 'px ' + (hexSpacing / 2) + 'px',
+      (progress * 800) + '% ' + (progress * 400) + '%',
+      (progress * 1000) + '% ' + (progress * -400) + '%',
+      (progress * -1200) + '% ' + (progress * -600) + '%'
+    ].join(',');
+
+    requestAnimationFrame(animate);
+  }
+
+  if (window.innerWidth > 768) {
+    requestAnimationFrame(animate);
+  }
 })();
