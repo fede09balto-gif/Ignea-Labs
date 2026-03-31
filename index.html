@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Onda AI — Infraestructura de IA para Centroamérica</title>
+<title>Ignea Labs — Infraestructura de IA para Centroamérica</title>
 <meta name="description" content="Diagnosticamos ineficiencias operativas, cuantificamos el costo y desplegamos sistemas de IA personalizados. Soluciones de IA para empresas en Nicaragua y Centroamérica.">
-<meta property="og:title" content="Onda AI — AI Infrastructure for Central America">
+<meta property="og:title" content="Ignea Labs — AI Infrastructure for Central America">
 <meta property="og:description" content="We diagnose inefficiencies, quantify the cost, and deploy custom AI systems that eliminate them.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="canonical" href="https://onda.ai/">
+<link rel="canonical" href="https://ignealabs.com/">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/shared.css">
 <link rel="stylesheet" href="css/components.css">
 <style>
-/* ---- GRADIENT DOTS BACKGROUND ---- */
-.gradient-dots-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+/* Old gradient div hidden — new canvas renderer in grid-bg.js */
+.gradient-dots-bg{display:none}
 
 /* ---- HERO ---- */
 .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:120px 40px 80px;position:relative}
@@ -116,7 +116,7 @@ footer{border-top:.5px solid var(--border)}
 }
 </style>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"LocalBusiness","name":"Onda AI","description":"AI infrastructure for Central American SMBs","address":{"@type":"PostalAddress","addressLocality":"Managua","addressCountry":"NI"},"email":"hola@onda.ai"}
+{"@context":"https://schema.org","@type":"LocalBusiness","name":"Ignea Labs","description":"AI infrastructure for Central American SMBs","address":{"@type":"PostalAddress","addressLocality":"Managua","addressCountry":"NI"},"email":"hola@ignealabs.com"}
 </script>
 </head>
 <body>
@@ -129,7 +129,7 @@ footer{border-top:.5px solid var(--border)}
 <!-- NAV -->
 <nav>
   <a href="index.html" class="brand">
-    <span class="brand-name">ONDA<span class="brand-accent" style="color:var(--accent)">.AI</span></span>
+    <span class="brand-name">IGNEA<span class="brand-accent" style="color:var(--accent)">.LABS</span></span>
   </a>
   <div class="nav-right">
     <ul class="nav-links">
@@ -268,7 +268,7 @@ footer{border-top:.5px solid var(--border)}
   <div class="footer-inner content-wrap">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="f-brand">ONDA<span>.AI</span></div>
+        <div class="f-brand">IGNEA<span>.LABS</span></div>
         <div class="f-tag" data-i18n="footer.tag">Cerrando la brecha de IA en Centroamérica.</div>
       </div>
       <div class="footer-nav">
@@ -278,11 +278,11 @@ footer{border-top:.5px solid var(--border)}
         <a href="contact.html" data-i18n="nav.contact">Contacto</a>
       </div>
       <div class="footer-contact">
-        <a href="mailto:hola@onda.ai">hola@onda.ai</a>
+        <a href="mailto:hola@ignealabs.com">hola@ignealabs.com</a>
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2026 Onda AI. <span data-i18n="footer.rights">Todos los derechos reservados.</span>
+      &copy; 2026 Ignea Labs. <span data-i18n="footer.rights">Todos los derechos reservados.</span>
     </div>
   </div>
 </footer>
@@ -295,7 +295,7 @@ footer{border-top:.5px solid var(--border)}
 <script src="js/terminal.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  OndaTerminal.init();
+  IgneaTerminal.init();
 
   // Stat counters
   function anim(el, end, suf, dur) {

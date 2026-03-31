@@ -1,5 +1,5 @@
 /* ============================================================
-   ONDA AI — Shared Styles
+   IGNEA LABS — Shared Styles
    Design system, nav, footer, buttons, inputs, animations.
    ============================================================ */
 
@@ -29,7 +29,7 @@ body{background:var(--bg);color:var(--white);font-family:var(--ff);overflow-x:hi
 ::selection{background:var(--accent);color:var(--bg)}
 
 /* ---- GRADIENT DOTS BACKGROUND ---- */
-.gradient-dots-bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+.gradient-dots-bg{display:none}
 .page{position:relative;z-index:2}
 
 /* ---- CONTENT WRAP ---- */

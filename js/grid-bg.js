@@ -1,220 +1,214 @@
-/* ============================================================
-   ONDA AI — Interactive Gradient Dots Background
-   Self-initializing IIFE. Canvas-based hexagonal dot grid with
-   drifting color orbs + mouse-follow spotlight effect.
-   ============================================================ */
-
 (function() {
-  var container = document.getElementById('gradientBg');
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'gradientBg';
-    document.body.prepend(container);
-  }
-
-  container.style.cssText = 'position:fixed;inset:0;z-index:0;pointer-events:none;';
-
   var canvas = document.createElement('canvas');
-  canvas.style.cssText = 'display:block;width:100%;height:100%;';
-  container.innerHTML = '';
-  container.appendChild(canvas);
+  canvas.id = 'ignea-dots';
+  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;';
+  document.body.prepend(canvas);
+
   var ctx = canvas.getContext('2d');
+  var w, h;
+  var cols, rows;
+  var spacing = 14;
+  var hexH = spacing * 1.732;
+  var dotRadius = 1.3;
 
-  var spacing = 12;
-  var hexSpacing = spacing * 1.732;
-  var bgColor = { r: 8, g: 8, b: 13 };
-  var accentColor = { r: 0, g: 229, b: 191 };
-  var secondaryColor = { r: 0, g: 140, b: 120 };
-  var tertiaryColor = { r: 90, g: 70, b: 180 };
-
-  var mouse = { x: -1000, y: -1000, active: false };
-  var smoothMouse = { x: -1000, y: -1000 };
-  var lastActivity = Date.now();
-  var idleTimeout = 2000;
+  // --- COLORS ---
+  // Primary: teal glow (our accent)
+  // Secondary: deeper teal
+  // Tertiary: warm amber/coral hint (fire theme — Ignea = fire)
+  // These are VISIBLE. Not 5% opacity. Real color.
 
   var orbs = [
-    { x: 0.3, y: 0.4, vx: 0.0003, vy: 0.0002, radius: 0.4, color: accentColor, opacity: 0.18 },
-    { x: 0.7, y: 0.6, vx: -0.0002, vy: 0.0003, radius: 0.35, color: secondaryColor, opacity: 0.12 },
-    { x: 0.5, y: 0.3, vx: 0.0001, vy: -0.0002, radius: 0.3, color: tertiaryColor, opacity: 0.09 }
+    { x: 0.25, y: 0.35, vx: 0.0004, vy: 0.00025, r: 0.40, cr: 0, cg: 229, cb: 191, opacity: 0.22 },
+    { x: 0.70, y: 0.55, vx: -0.0003, vy: 0.00035, r: 0.35, cr: 0, cg: 160, cb: 140, opacity: 0.16 },
+    { x: 0.50, y: 0.75, vx: 0.00025, vy: -0.0003, r: 0.30, cr: 240, cg: 153, cb: 123, opacity: 0.10 },
+    { x: 0.80, y: 0.20, vx: -0.00015, vy: 0.0002, r: 0.25, cr: 0, cg: 200, cb: 170, opacity: 0.12 }
   ];
 
-  var mouseOrb = { radius: 0.2, color: accentColor, opacity: 0 };
-  var targetMouseOpacity = 0;
+  // Mouse tracking
+  var mx = -9999, my = -9999;
+  var smx = -9999, smy = -9999;
+  var mouseOpacity = 0;
+  var mouseTarget = 0;
+  var lastMove = 0;
+  var IDLE_MS = 1500;
+
+  // Pointer events
+  document.addEventListener('mousemove', function(e) {
+    mx = e.clientX; my = e.clientY;
+    lastMove = Date.now();
+    mouseTarget = 0.30; // STRONG mouse glow
+  });
+  document.addEventListener('mouseleave', function() { mouseTarget = 0; });
+  document.addEventListener('touchmove', function(e) {
+    if (e.touches[0]) { mx = e.touches[0].clientX; my = e.touches[0].clientY; lastMove = Date.now(); mouseTarget = 0.25; }
+  }, { passive: true });
+  document.addEventListener('touchend', function() { mouseTarget = 0; });
 
   function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    cols = Math.ceil(w / spacing) + 2;
+    rows = Math.ceil(h / hexH) + 2;
   }
 
   window.addEventListener('resize', resize);
-  setTimeout(resize, 50);
   resize();
 
-  document.addEventListener('mousemove', function(e) {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-    mouse.active = true;
-    lastActivity = Date.now();
-    targetMouseOpacity = 0.2;
-  });
+  // Low-res gradient sampling for performance
+  var SAMPLE = 6;
+  var sw, sh, samples;
 
-  document.addEventListener('mouseleave', function() {
-    mouse.active = false;
-    targetMouseOpacity = 0;
-  });
+  function rebuildSamples() {
+    sw = Math.ceil(w / SAMPLE);
+    sh = Math.ceil(h / SAMPLE);
+    samples = new Float32Array(sw * sh * 3);
+  }
+  rebuildSamples();
+  window.addEventListener('resize', rebuildSamples);
 
-  document.addEventListener('touchmove', function(e) {
-    if (e.touches.length > 0) {
-      mouse.x = e.touches[0].clientX;
-      mouse.y = e.touches[0].clientY;
-      mouse.active = true;
-      lastActivity = Date.now();
-      targetMouseOpacity = 0.15;
-    }
-  }, { passive: true });
+  function computeGradients() {
+    var idle = (Date.now() - lastMove) > IDLE_MS;
+    if (idle) mouseTarget = 0;
 
-  document.addEventListener('touchend', function() {
-    targetMouseOpacity = 0;
-  });
+    // Smooth mouse
+    smx += (mx - smx) * 0.1;
+    smy += (my - smy) * 0.1;
+    mouseOpacity += (mouseTarget - mouseOpacity) * 0.06;
 
-  function drawDotGrid() {
-    var w = canvas.width;
-    var h = canvas.height;
-
-    ctx.fillStyle = 'rgb(' + bgColor.r + ',' + bgColor.g + ',' + bgColor.b + ')';
-    ctx.fillRect(0, 0, w, h);
-
-    var isIdle = (Date.now() - lastActivity) > idleTimeout;
-    if (isIdle) targetMouseOpacity = 0;
-
-    smoothMouse.x += (mouse.x - smoothMouse.x) * 0.08;
-    smoothMouse.y += (mouse.y - smoothMouse.y) * 0.08;
-
-    mouseOrb.opacity += (targetMouseOpacity - mouseOrb.opacity) * 0.05;
-
-    for (var o = 0; o < orbs.length; o++) {
-      var orb = orbs[o];
-      if (mouse.active && !isIdle) {
-        var targetX = mouse.x / w;
-        var targetY = mouse.y / h;
-        orb.x += (targetX - orb.x) * 0.005;
-        orb.y += (targetY - orb.y) * 0.005;
+    // Update orb positions
+    for (var i = 0; i < orbs.length; i++) {
+      var o = orbs[i];
+      if (!idle && mouseTarget > 0) {
+        // Pull toward mouse gently
+        o.x += ((mx / w) - o.x) * 0.008;
+        o.y += ((my / h) - o.y) * 0.008;
       } else {
-        orb.x += orb.vx;
-        orb.y += orb.vy;
-        if (orb.x < 0.1 || orb.x > 0.9) orb.vx *= -1;
-        if (orb.y < 0.1 || orb.y > 0.9) orb.vy *= -1;
+        o.x += o.vx;
+        o.y += o.vy;
+        if (o.x < 0.05 || o.x > 0.95) o.vx *= -1;
+        if (o.y < 0.05 || o.y > 0.95) o.vy *= -1;
       }
     }
 
-    var sampleScale = 4;
-    var sw = Math.ceil(w / sampleScale);
-    var sh = Math.ceil(h / sampleScale);
-    var samples = new Float32Array(sw * sh * 3);
-
+    // Sample gradient field
+    samples.fill(0);
     for (var sy = 0; sy < sh; sy++) {
       for (var sx = 0; sx < sw; sx++) {
         var px = (sx + 0.5) / sw;
         var py = (sy + 0.5) / sh;
         var r = 0, g = 0, b = 0;
-
-        for (var oi = 0; oi < orbs.length; oi++) {
-          var ob = orbs[oi];
-          var dx = px - ob.x;
-          var dy = py - ob.y;
-          var dist = Math.sqrt(dx * dx + dy * dy);
-          var influence = Math.max(0, 1 - dist / ob.radius);
-          influence = influence * influence * ob.opacity;
-          r += ob.color.r * influence;
-          g += ob.color.g * influence;
-          b += ob.color.b * influence;
-        }
-
-        if (mouseOrb.opacity > 0.001) {
-          var mx = smoothMouse.x / w;
-          var my = smoothMouse.y / h;
-          var dx2 = px - mx;
-          var dy2 = py - my;
-          var dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-          var influence2 = Math.max(0, 1 - dist2 / mouseOrb.radius);
-          influence2 = influence2 * influence2 * influence2 * mouseOrb.opacity;
-          r += mouseOrb.color.r * influence2;
-          g += mouseOrb.color.g * influence2;
-          b += mouseOrb.color.b * influence2;
-        }
-
         var idx = (sy * sw + sx) * 3;
+
+        for (var i = 0; i < orbs.length; i++) {
+          var o = orbs[i];
+          var dx = px - o.x, dy = py - o.y;
+          var d = Math.sqrt(dx * dx + dy * dy);
+          var inf = Math.max(0, 1 - d / o.r);
+          inf = inf * inf * inf * o.opacity; // cubic falloff
+          r += o.cr * inf;
+          g += o.cg * inf;
+          b += o.cb * inf;
+        }
+
+        // Mouse spotlight
+        if (mouseOpacity > 0.005) {
+          var mxn = smx / w, myn = smy / h;
+          var dx2 = px - mxn, dy2 = py - myn;
+          var d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+          var inf2 = Math.max(0, 1 - d2 / 0.25);
+          inf2 = inf2 * inf2 * inf2 * mouseOpacity;
+          r += 0 * inf2;   // teal r=0
+          g += 229 * inf2;  // teal g=229
+          b += 191 * inf2;  // teal b=191
+        }
+
         samples[idx] = r;
         samples[idx + 1] = g;
         samples[idx + 2] = b;
       }
     }
+  }
 
-    var dotRadius = 1.5;
+  function draw() {
+    ctx.fillStyle = '#08080D';
+    ctx.fillRect(0, 0, w, h);
 
-    for (var row = 0; row * hexSpacing < h + spacing; row++) {
-      var offsetX = (row % 2) * (spacing / 2);
+    computeGradients();
 
-      for (var col = 0; col * spacing < w + spacing; col++) {
-        var x = col * spacing + offsetX;
-        var y = row * hexSpacing;
+    // Draw dots
+    for (var row = 0; row < rows; row++) {
+      var offX = (row % 2) * (spacing * 0.5);
+      var y = row * hexH;
 
-        var sx2 = Math.min(Math.floor(x / w * sw), sw - 1);
-        var sy2 = Math.min(Math.floor(y / h * sh), sh - 1);
-        var sIdx = (sy2 * sw + sx2) * 3;
+      for (var col = 0; col < cols; col++) {
+        var x = col * spacing + offX;
+
+        // Sample gradient at this dot
+        var si = Math.min(Math.floor(x / w * sw), sw - 1);
+        var sj = Math.min(Math.floor(y / h * sh), sh - 1);
+        if (si < 0) si = 0;
+        if (sj < 0) sj = 0;
+        var sIdx = (sj * sw + si) * 3;
 
         var cr = samples[sIdx];
         var cg = samples[sIdx + 1];
         var cb = samples[sIdx + 2];
 
-        var baseAlpha = 0.22;
-        var colorAlpha = Math.min(1, Math.sqrt(cr * cr + cg * cg + cb * cb) / 150);
+        var brightness = Math.sqrt(cr * cr + cg * cg + cb * cb);
 
-        if (colorAlpha > 0.01) {
-          ctx.fillStyle = 'rgba(' +
-            Math.round(cr + bgColor.r * 0.3) + ',' +
-            Math.round(cg + bgColor.g * 0.3) + ',' +
-            Math.round(cb + bgColor.b * 0.3) + ',' +
-            Math.min(0.7, baseAlpha + colorAlpha * 0.6) + ')';
+        if (brightness > 2) {
+          // Colored dot — the gradient is showing through
+          var alpha = Math.min(0.85, 0.12 + brightness / 120);
+          var finalR = Math.min(255, Math.round(cr * 1.2 + 15));
+          var finalG = Math.min(255, Math.round(cg * 1.2 + 15));
+          var finalB = Math.min(255, Math.round(cb * 1.2 + 15));
+
+          ctx.fillStyle = 'rgba(' + finalR + ',' + finalG + ',' + finalB + ',' + alpha + ')';
+
+          // Dots near the gradient center are slightly larger
+          var sizeBoost = Math.min(1, brightness / 200);
+          var r = dotRadius + sizeBoost * 0.8;
+
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, 6.2832);
+          ctx.fill();
         } else {
-          ctx.fillStyle = 'rgba(30, 30, 45, ' + baseAlpha + ')';
+          // Base dot — dim but visible (the grid texture)
+          ctx.fillStyle = 'rgba(26, 26, 42, 0.22)';
+          ctx.beginPath();
+          ctx.arc(x, y, dotRadius, 0, 6.2832);
+          ctx.fill();
         }
-
-        ctx.beginPath();
-        ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
-        ctx.fill();
       }
     }
   }
 
-  var animating = true;
-  var frameCount = 0;
+  // Animation
+  var running = true;
+  var frame = 0;
 
-  function animate() {
-    if (!animating) return;
+  function loop() {
+    if (!running) return;
 
-    frameCount++;
-    if (window.innerWidth < 768 && frameCount % 2 !== 0) {
-      requestAnimationFrame(animate);
+    // Mobile: skip every other frame
+    frame++;
+    if (w < 768 && frame % 2 !== 0) {
+      requestAnimationFrame(loop);
       return;
     }
 
-    drawDotGrid();
-    requestAnimationFrame(animate);
+    draw();
+    requestAnimationFrame(loop);
   }
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    drawDotGrid();
+    draw();
   } else {
-    requestAnimationFrame(animate);
+    loop();
   }
 
   document.addEventListener('visibilitychange', function() {
-    if (document.hidden) {
-      animating = false;
-    } else {
-      animating = true;
-      requestAnimationFrame(animate);
-    }
+    running = !document.hidden;
+    if (running) loop();
   });
 })();
