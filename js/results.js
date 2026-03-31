@@ -1,5 +1,5 @@
 /* ============================================================
-   ONDA AI — Results Page Renderer
+   IGNEA LABS — Results Page Renderer
    Reads scores from sessionStorage, renders premium report.
    NO PRICES. Only time wasted, cost of inaction, and savings.
    ============================================================ */
@@ -9,8 +9,8 @@
   var scoreData, answerData, contact, answers;
 
   document.addEventListener('DOMContentLoaded', function() {
-    var raw = sessionStorage.getItem('onda_diagnostic_scores');
-    var rawAnswers = sessionStorage.getItem('onda_diagnostic_answers');
+    var raw = sessionStorage.getItem('ignea_diagnostic_scores');
+    var rawAnswers = sessionStorage.getItem('ignea_diagnostic_answers');
 
     if (!raw || !rawAnswers) {
       window.location.href = 'diagnostic.html';
@@ -33,8 +33,8 @@
     setupIntersectionAnimations();
   });
 
-  function t(key) { return OndaI18n.t(key); }
-  function lang() { return OndaI18n.getLang(); }
+  function t(key) { return IgneaI18n.t(key); }
+  function lang() { return IgneaI18n.getLang(); }
 
   function fmt(n) { return Number(n).toLocaleString('es-NI'); }
 
@@ -268,7 +268,7 @@
     var waLink = document.getElementById('ctaWhatsApp');
     if (waLink) {
       var msg = encodeURIComponent(
-        'Hola, completé el diagnóstico de Onda AI y me gustaría agendar una llamada. Mi puntuación fue ' + score + '/100.'
+        'Hola, completé el diagnóstico de Ignea Labs y me gustaría agendar una llamada. Mi puntuación fue ' + score + '/100.'
       );
       waLink.href = 'https://wa.me/50500000000?text=' + msg;
       waLink.setAttribute('target', '_blank');
@@ -318,7 +318,7 @@
     // Header
     doc.setFontSize(22);
     doc.setTextColor(0, 229, 191);
-    doc.text('ONDA.AI', 20, y);
+    doc.text('IGNEA.LABS', 20, y);
     y += 10;
 
     doc.setFontSize(10);
@@ -405,10 +405,10 @@
     // Footer
     doc.setFontSize(8);
     doc.setTextColor(110, 110, 136);
-    doc.text('hola@onda.ai — onda.ai', 20, 282);
+    doc.text('hola@ignealabs.com — ignealabs.com', 20, 282);
 
     var pdfName = (contact.first_name || 'reporte');
-    doc.save('onda-ai-diagnostico-' + pdfName.replace(/\s+/g, '-').toLowerCase() + '.pdf');
+    doc.save('ignea-labs-diagnostico-' + pdfName.replace(/\s+/g, '-').toLowerCase() + '.pdf');
   }
 
   /* ---- RE-RENDER ON LANGUAGE CHANGE ---- */

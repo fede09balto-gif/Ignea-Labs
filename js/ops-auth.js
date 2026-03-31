@@ -1,5 +1,5 @@
 /* ============================================================
-   ONDA AI — Ops Auth Module
+   IGNEA LABS — Ops Auth Module
    Handles access gate, session management, tab navigation.
    ============================================================ */
 
@@ -12,8 +12,8 @@ var OpsAuth = (function() {
   function init() {
     document.addEventListener('DOMContentLoaded', function() {
       // Check for existing session first
-      var token = sessionStorage.getItem('onda_ops_token');
-      var userData = sessionStorage.getItem('onda_ops_user');
+      var token = sessionStorage.getItem('ignea_ops_token');
+      var userData = sessionStorage.getItem('ignea_ops_user');
 
       if (token === 'authenticated' && userData) {
         try {
@@ -50,7 +50,7 @@ var OpsAuth = (function() {
 
     if (failCount >= 3) return;
 
-    var client = OndaSupabase.client;
+    var client = IgneaSupabase.client;
 
     // Try Supabase auth first, fall back to local passphrase
     hashSHA256(value).then(function(hexHash) {
@@ -71,8 +71,8 @@ var OpsAuth = (function() {
           permissions: user.permissions
         };
 
-        sessionStorage.setItem('onda_ops_user', JSON.stringify(userData));
-        sessionStorage.setItem('onda_ops_token', 'authenticated');
+        sessionStorage.setItem('ignea_ops_user', JSON.stringify(userData));
+        sessionStorage.setItem('ignea_ops_token', 'authenticated');
 
         client
           .from('ops_users')
@@ -105,8 +105,8 @@ var OpsAuth = (function() {
       permissions: ['read', 'write']
     };
 
-    sessionStorage.setItem('onda_ops_user', JSON.stringify(userData));
-    sessionStorage.setItem('onda_ops_token', 'authenticated');
+    sessionStorage.setItem('ignea_ops_user', JSON.stringify(userData));
+    sessionStorage.setItem('ignea_ops_token', 'authenticated');
     showDashboard(userData);
   }
 
@@ -140,7 +140,7 @@ var OpsAuth = (function() {
     }
 
     if (denied) {
-      denied.textContent = OndaI18n.t('ops.access.denied') || 'acceso denegado';
+      denied.textContent = IgneaI18n.t('ops.access.denied') || 'acceso denegado';
       denied.style.color = 'var(--coral, #F0997B)';
       denied.style.display = 'block';
 
@@ -274,14 +274,14 @@ var OpsAuth = (function() {
   }
 
   function logout() {
-    sessionStorage.removeItem('onda_ops_token');
-    sessionStorage.removeItem('onda_ops_user');
+    sessionStorage.removeItem('ignea_ops_token');
+    sessionStorage.removeItem('ignea_ops_user');
     window.location.reload();
   }
 
   function getUser() {
     if (currentUser) return currentUser;
-    var userData = sessionStorage.getItem('onda_ops_user');
+    var userData = sessionStorage.getItem('ignea_ops_user');
     if (userData) {
       try {
         return JSON.parse(userData);

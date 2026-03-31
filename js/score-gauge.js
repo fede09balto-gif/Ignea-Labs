@@ -1,5 +1,5 @@
 /* ============================================================
-   ONDA AI — Score Gauge (half-circle SVG with gradient fill)
+   IGNEA LABS — Score Gauge (half-circle SVG with gradient fill)
    Usage: createScoreGauge(container, score, max)
    ============================================================ */
 

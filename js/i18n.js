@@ -1,12 +1,12 @@
 /* ============================================================
-   ONDA AI — i18n System
+   IGNEA LABS — i18n System
    All translations for all pages. Spanish is primary.
    Usage: data-i18n="key" for textContent
           data-i18n-html="key" for innerHTML
           data-i18n-placeholder="key" for placeholder
    ============================================================ */
 
-var OndaI18n = (function() {
+var IgneaI18n = (function() {
 
   var translations = {
     es: {
@@ -328,10 +328,10 @@ var OndaI18n = (function() {
       "man.p1": "Las empresas que mueven la economía de Nicaragua están rodeadas de océanos de datos que no pueden ver, sistemas que no se comunican entre sí, y departamentos que operan en aislamiento — mientras sus líderes toman decisiones por instinto porque la información que necesitan está atrapada en algún lugar que no pueden alcanzar.",
       "man.p2": "Restaurantes que atienden turistas de todo el mundo siguen coordinando por WhatsApp. Clínicas que manejan cientos de pacientes agendan en cuadernos. Hoteles que compiten con Airbnb no tienen presencia digital más allá de una página de Facebook abandonada.",
       "man.p3": "La inteligencia para cambiar todo esto ya existe. La tecnología está lista. Lo que ha faltado es alguien dispuesto a construir la conexión entre lo que la IA puede hacer y lo que los negocios centroamericanos realmente necesitan.",
-      "man.break": "Eso es Onda.",
+      "man.break": "Eso es Ignea.",
       "man.p4": "No somos una consultora que vende presentaciones. No somos una agencia que escribe código y desaparece. Nos metemos dentro de tu operación, aprendemos dónde sangra, y construimos los sistemas que detienen el sangrado — permanentemente.",
       "man.p5": "Trabajamos con un número reducido de socios. No porque no podamos escalar, sino porque la transformación exige proximidad, honestidad, y el tipo de atención que desaparece en el momento que intentas atender a todos. Cada empresa que tomamos recibe todo el peso de lo que sabemos. Eso no es una filosofía. Es una promesa.",
-      "man.p6": "Nos llamamos Onda porque una onda se propaga. Cada automatización habilita la siguiente. Cada insight agudiza el que sigue. La brecha entre tu negocio y tu competencia se amplía silenciosamente, y luego de golpe.",
+      "man.p6": "Nos llamamos Ignea porque la transformación, como el fuego, se propaga. Cada automatización enciende la siguiente. Cada insight agudiza el que sigue. La brecha entre tu negocio y tu competencia se amplía silenciosamente, y luego de golpe.",
       "man.p7": "La próxima generación de líderes empresariales en Centroamérica se definirá por una sola decisión. No qué mercado entraron. No qué producto lanzaron. Si adoptaron IA antes que su competencia o pasaron años viendo cómo la brecha se ampliaba desde el lado equivocado.",
       "man.closing": "No vendemos IA. Construimos infraestructura.",
       "man.ctaTitle": "Descubre tu potencial.",
@@ -846,10 +846,10 @@ var OndaI18n = (function() {
       "man.p1": "The enterprises that power Nicaragua's economy are surrounded by oceans of data they cannot see, systems that don't speak to each other, and departments operating in isolation — while their leaders make decisions on instinct because the information they need is trapped somewhere they cannot reach.",
       "man.p2": "Restaurants serving tourists from around the world still coordinate by WhatsApp. Clinics managing hundreds of patients schedule in notebooks. Hotels competing with Airbnb have no digital presence beyond an abandoned Facebook page.",
       "man.p3": "The intelligence to change all of this already exists. The technology is ready. What's been missing is someone willing to build the connection between what AI can do and what Central American businesses actually need.",
-      "man.break": "That is Onda.",
+      "man.break": "That is Ignea.",
       "man.p4": "We are not a consultancy that sells slide decks. We are not an agency that writes code and disappears. We embed ourselves in your operation, learn where it bleeds, and build the systems that stop the bleeding — permanently.",
       "man.p5": "We work with a small number of partners. Not because we can't scale, but because transformation demands proximity, honesty, and the kind of attention that vanishes the moment you try to serve everyone. Every company we take on gets the full weight of what we know. That is not a philosophy. It is a promise.",
-      "man.p6": "We named ourselves Onda because a wave propagates. Every automation enables the next. Every insight sharpens the one that follows. The gap between your business and your competition widens quietly, then all at once.",
+      "man.p6": "We named ourselves Ignea because transformation, like fire, spreads. Every automation ignites the next. Every insight sharpens the one that follows. The gap between your business and your competition widens quietly, then all at once.",
       "man.p7": "The next generation of business leaders in Central America will be defined by a single decision. Not which market they entered. Not which product they launched. Whether they embraced AI before their competitors or spent years watching the gap widen from the wrong side.",
       "man.closing": "We don't sell AI. We build infrastructure.",
       "man.ctaTitle": "Discover your potential.",
@@ -1048,7 +1048,7 @@ var OndaI18n = (function() {
     if (esBtn) esBtn.classList.toggle('active', lang === 'es');
     if (enBtn) enBtn.classList.toggle('active', lang === 'en');
 
-    localStorage.setItem('onda_lang', lang);
+    localStorage.setItem('ignea_lang', lang);
 
     // Update text content
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
@@ -1090,7 +1090,7 @@ var OndaI18n = (function() {
   }
 
   function init() {
-    var saved = localStorage.getItem('onda_lang');
+    var saved = localStorage.getItem('ignea_lang');
     if (saved && saved !== currentLang) {
       setLang(saved);
     }
@@ -1110,7 +1110,7 @@ var OndaI18n = (function() {
 })();
 
 // Global convenience
-function setLang(lang) { OndaI18n.setLang(lang); }
+function setLang(lang) { IgneaI18n.setLang(lang); }
 
 // Init on load
-document.addEventListener('DOMContentLoaded', OndaI18n.init);
+document.addEventListener('DOMContentLoaded', IgneaI18n.init);

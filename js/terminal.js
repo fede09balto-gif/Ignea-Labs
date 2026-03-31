@@ -1,12 +1,12 @@
 /* ============================================================
-   ONDA AI — Terminal Typewriter Effect (homepage only)
+   IGNEA LABS — Terminal Typewriter Effect (homepage only)
    Lines appear sequentially with fade-up.
    ============================================================ */
 
-var OndaTerminal = (function() {
+var IgneaTerminal = (function() {
   var lines = {
     es: [
-      { t: 'c', s: '$ onda diagnose --target="tu-negocio"' },
+      { t: 'c', s: '$ ignea diagnose --target="tu-negocio"' },
       { t: 'cm', s: '// Escaneando flujos de trabajo...' },
       { t: 'cm', s: '// Mapeando canales de interacción con clientes...' },
       { t: 'cm', s: '// Analizando asignación de tiempo del equipo...' },
@@ -14,10 +14,10 @@ var OndaTerminal = (function() {
       { t: 'o', s: '> Ahorro mensual estimado: <span class="s">$2,400</span>' },
       { t: 'o', s: '> Período de recuperación: <span class="k">3.2 meses</span>' },
       { t: 'o', s: '> ROI a 12 meses: <span class="k">+340%</span>' },
-      { t: 'c', s: '$ onda deploy --solution="custom-ai" --market="NI" <span class="blink">|</span>' },
+      { t: 'c', s: '$ ignea deploy --solution="custom-ai" --market="NI" <span class="blink">|</span>' },
     ],
     en: [
-      { t: 'c', s: '$ onda diagnose --target="your-business"' },
+      { t: 'c', s: '$ ignea diagnose --target="your-business"' },
       { t: 'cm', s: '// Scanning operational workflows...' },
       { t: 'cm', s: '// Mapping customer interaction channels...' },
       { t: 'cm', s: '// Analyzing team time allocation...' },
@@ -25,7 +25,7 @@ var OndaTerminal = (function() {
       { t: 'o', s: '> Estimated monthly savings: <span class="s">$2,400</span>' },
       { t: 'o', s: '> Payback period: <span class="k">3.2 months</span>' },
       { t: 'o', s: '> 12-month ROI: <span class="k">+340%</span>' },
-      { t: 'c', s: '$ onda deploy --solution="custom-ai" --market="NI" <span class="blink">|</span>' },
+      { t: 'c', s: '$ ignea deploy --solution="custom-ai" --market="NI" <span class="blink">|</span>' },
     ]
   };
 
@@ -48,7 +48,7 @@ var OndaTerminal = (function() {
   }
 
   function typeLine() {
-    var lang = (typeof OndaI18n !== 'undefined') ? OndaI18n.getLang() : 'es';
+    var lang = (typeof IgneaI18n !== 'undefined') ? IgneaI18n.getLang() : 'es';
     var ln = lines[lang] || lines['es'];
     if (idx >= ln.length) return;
 

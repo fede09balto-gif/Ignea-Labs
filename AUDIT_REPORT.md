@@ -1,4 +1,4 @@
-# Onda AI — Full Codebase Audit Report
+# Ignea Labs — Full Codebase Audit Report
 
 **Date:** 2026-03-29
 **Auditor:** Claude Code
@@ -10,7 +10,7 @@
 
 ### Directory Tree
 ```
-onda-ai/
+ignea-labs/
 ├── .git/
 ├── assets/              (empty)
 ├── css/
@@ -136,7 +136,7 @@ All CSS custom properties match the design system exactly:
 
 ### Language System
 - Default: ES ✓
-- Persists to `localStorage` key `onda_lang` ✓
+- Persists to `localStorage` key `ignea_lang` ✓
 - `data-i18n-btn` handler uses `innerHTML` for HTML entities ✓
 - Custom `langchange` event dispatched ✓
 
@@ -206,7 +206,7 @@ All CSS custom properties match the design system exactly:
 
 ### Hardcoded URLs
 - `https://wa.me/5050000000` in `contact.html:120,129` — **placeholder phone number** (0000 0000). This needs a real number before launch.
-- `https://onda.ai/` canonical URLs — fine if this is the planned domain.
+- `https://ignealabs.com/` canonical URLs — fine if this is the planned domain.
 
 ### Meta Tags
 | Page | title | description | og:title | og:description | og:type | og:image |

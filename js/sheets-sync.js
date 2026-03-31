@@ -1,12 +1,12 @@
 /* ============================================================
-   ONDA AI — Google Sheets Sync
+   IGNEA LABS — Google Sheets Sync
    Mirrors lead data to a Google Sheet for quick access.
    Supabase is source of truth — this is best-effort only.
    Deploy google-apps-script/sync.gs as a web app and paste
    the deployment URL below.
    ============================================================ */
 
-var OndaSheetsSync = (function() {
+var IgneaSheetsSync = (function() {
   var SHEETS_SYNC_URL = 'SHEETS_SYNC_URL';
 
   function sync(leadData) {

@@ -1,5 +1,5 @@
 /* ============================================================
-   ONDA AI — Ops Scraper Module
+   IGNEA LABS — Ops Scraper Module
    Website analysis, social presence detection, Google Places
    lookup, and competitor analysis for the ops dashboard.
    ============================================================ */
@@ -568,7 +568,7 @@ var OpsScraper = (function() {
   function saveResults() {
     if (!collectedData) return;
 
-    if (typeof OndaSupabase === 'undefined' || !OndaSupabase.client) {
+    if (typeof IgneaSupabase === 'undefined' || !IgneaSupabase.client) {
       alert('Supabase no configurado — configura las credenciales primero');
       return;
     }
@@ -580,7 +580,7 @@ var OpsScraper = (function() {
       return;
     }
 
-    OndaSupabase.client
+    IgneaSupabase.client
       .from('leads')
       .update({
         scraper_data:   collectedData,
@@ -594,7 +594,7 @@ var OpsScraper = (function() {
 
         var user = OpsAuth.getUser ? OpsAuth.getUser() : null;
         if (user) {
-          OndaSupabase.client
+          IgneaSupabase.client
             .from('lead_activity')
             .insert([{
               lead_id:    leadId,

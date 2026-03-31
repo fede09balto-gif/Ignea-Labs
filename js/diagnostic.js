@@ -1,5 +1,5 @@
 /* ============================================================
-   ONDA AI — Diagnostic Survey Flow (v2 — dual-mode, 10 questions)
+   IGNEA LABS — Diagnostic Survey Flow (v2 — dual-mode, 10 questions)
    Flow: Landing (0) → Info (1) → Q1-Q10 (2-11) → Processing (12) → results.html
 
    Answer storage:
@@ -9,7 +9,7 @@
      Q10 text only: answers.q10_text = "..."
 
    Scoring compatibility: legacy keys (q5, q6, q7, q8) are kept in sync
-   so OndaScoring.calculate() still works without modification.
+   so IgneaScoring.calculate() still works without modification.
    ============================================================ */
 
 (function() {
@@ -124,7 +124,7 @@
 
   /* ----------------------------------------------------------
      syncLegacyKeys: keep answers.q5 / q6 / q7 / q8 in sync
-     so OndaScoring.calculate() works without changes.
+     so IgneaScoring.calculate() works without changes.
      Mapping:
        Q7 (new) = digital presence → maps to old q5 (website)
        Q6 (new) = tech stack       → maps to old q7 (tools)
@@ -291,7 +291,7 @@
      saveProgress: persist answers to sessionStorage
   ---------------------------------------------------------- */
   function saveProgress() {
-    sessionStorage.setItem('onda_diagnostic_progress', JSON.stringify(answers));
+    sessionStorage.setItem('ignea_diagnostic_progress', JSON.stringify(answers));
   }
 
   /* ----------------------------------------------------------
@@ -322,11 +322,11 @@
     };
 
     var data = { answers: answers, contact: contact };
-    sessionStorage.setItem('onda_diagnostic_answers', JSON.stringify(data));
+    sessionStorage.setItem('ignea_diagnostic_answers', JSON.stringify(data));
 
-    var result = OndaScoring.calculate(answers);
-    var recos  = OndaScoring.getRecommendations(result.streams);
-    var roi    = OndaScoring.calculateROI(answers, formData, result.streams);
+    var result = IgneaScoring.calculate(answers);
+    var recos  = IgneaScoring.getRecommendations(result.streams);
+    var roi    = IgneaScoring.calculateROI(answers, formData, result.streams);
 
     var scoreData = {
       streams:         result.streams,
@@ -336,10 +336,10 @@
       recommendations: recos,
       roi:             roi
     };
-    sessionStorage.setItem('onda_diagnostic_scores', JSON.stringify(scoreData));
+    sessionStorage.setItem('ignea_diagnostic_scores', JSON.stringify(scoreData));
 
     // Supabase write (fire-and-forget)
-    if (typeof OndaSupabase !== 'undefined' && OndaSupabase.client) {
+    if (typeof IgneaSupabase !== 'undefined' && IgneaSupabase.client) {
       try {
         var leadData = {
           first_name:          contact.first_name,
@@ -361,8 +361,8 @@
           pipeline_stage:      'new',
           priority:            'medium'
         };
-        OndaSupabase.client.from('leads').insert([leadData]).then(function() {
-          if (typeof OndaSheetsSync !== 'undefined') OndaSheetsSync.sync(leadData);
+        IgneaSupabase.client.from('leads').insert([leadData]).then(function() {
+          if (typeof IgneaSheetsSync !== 'undefined') IgneaSheetsSync.sync(leadData);
         });
       } catch(e) {}
     }

@@ -1,5 +1,5 @@
 /* ============================================================
-   ONDA AI — Ops Calculator Module
+   IGNEA LABS — Ops Calculator Module
    ROI calculator for the ops dashboard. Replicates scoring.js
    formulas exactly for use in an interactive UI context.
    ============================================================ */
@@ -439,7 +439,7 @@ var OpsCalculator = (function() {
   function savePricing() {
     if (!lastResult) return;
 
-    if (typeof OndaSupabase === 'undefined' || !OndaSupabase.client) {
+    if (typeof IgneaSupabase === 'undefined' || !IgneaSupabase.client) {
       alert('Supabase no configurado — configura las credenciales primero');
       return;
     }
@@ -456,7 +456,7 @@ var OpsCalculator = (function() {
       tools:   inp.tools
     };
 
-    OndaSupabase.client
+    IgneaSupabase.client
       .from('pricing_calculations')
       .insert([{
         lead_id:            leadId || null,
@@ -483,8 +483,8 @@ var OpsCalculator = (function() {
           setTimeout(function() { btn.textContent = orig; }, 2000);
         }
 
-        if (typeof OndaSheetsSync !== 'undefined' && OndaSheetsSync.sync) {
-          OndaSheetsSync.sync({
+        if (typeof IgneaSheetsSync !== 'undefined' && IgneaSheetsSync.sync) {
+          IgneaSheetsSync.sync({
             type:   'pricing_calculation',
             leadId: leadId,
             roi:    roi,

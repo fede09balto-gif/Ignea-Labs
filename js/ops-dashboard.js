@@ -1,5 +1,5 @@
 /* ============================================================
-   ONDA AI — Ops Dashboard Module
+   IGNEA LABS — Ops Dashboard Module
    Pipeline board with drag-and-drop, stats bar.
    ============================================================ */
 
@@ -23,7 +23,7 @@ var OpsDashboard = (function() {
   function init() {
     (async function() {
       try {
-        var result = await OndaSupabase.client
+        var result = await IgneaSupabase.client
           .from('leads')
           .select('*')
           .order('created_at', { ascending: false });
@@ -148,14 +148,14 @@ var OpsDashboard = (function() {
       // Then try Supabase (best-effort)
       (async function() {
         try {
-          await OndaSupabase.client
+          await IgneaSupabase.client
             .from('leads')
             .update({ pipeline_stage: newStage, updated_at: now })
             .eq('id', leadId);
 
           var user = OpsAuth.getUser();
           if (user) {
-            await OndaSupabase.client
+            await IgneaSupabase.client
               .from('lead_activity')
               .insert({
                 lead_id: leadId,
@@ -165,8 +165,8 @@ var OpsDashboard = (function() {
               });
           }
 
-          if (typeof OndaSheetsSync !== 'undefined' && OndaSheetsSync.sync) {
-            OndaSheetsSync.sync(Object.assign({}, lead)).catch(function() {});
+          if (typeof IgneaSheetsSync !== 'undefined' && IgneaSheetsSync.sync) {
+            IgneaSheetsSync.sync(Object.assign({}, lead)).catch(function() {});
           }
         } catch (e) {
           // Supabase failed — local state already updated

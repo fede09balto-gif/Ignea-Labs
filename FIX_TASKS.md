@@ -1,4 +1,4 @@
-# Onda AI — Fix Tasks (Priority Ordered)
+# Ignea Labs — Fix Tasks (Priority Ordered)
 
 ---
 
@@ -32,7 +32,7 @@
 ## 4. [HIGH] Placeholder WhatsApp number in contact page
 - **File:** `contact.html`, lines 120, 129
 - **Problem:** WhatsApp links use `+505 0000 0000` and `wa.me/5050000000` — these are placeholder numbers that won't work for real users.
-- **Fix:** Replace with actual Onda AI WhatsApp number before launch.
+- **Fix:** Replace with actual Ignea Labs WhatsApp number before launch.
 - **Effort:** Quick fix (needs business info)
 
 ---
@@ -57,7 +57,7 @@
 ## 6. [HIGH] Missing og:image on all pages
 - **Files:** All 6 HTML files
 - **Problem:** No `og:image` meta tag and no `assets/og-image.png`. Social sharing will show no preview image.
-- **Fix:** Create an OG image (1200x630px) with Onda AI branding, place in `assets/`, add `<meta property="og:image" content="https://onda.ai/assets/og-image.png">` to all pages.
+- **Fix:** Create an OG image (1200x630px) with Ignea Labs branding, place in `assets/`, add `<meta property="og:image" content="https://ignealabs.com/assets/og-image.png">` to all pages.
 - **Effort:** Moderate (needs design asset)
 
 ---

@@ -1,10 +1,10 @@
 /* ============================================================
-   ONDA AI — Diagnostic Scoring Engine v2
+   IGNEA LABS — Diagnostic Scoring Engine v2
    4 Value Streams: Customer Flow, Operations Flow,
    Information Flow, Growth Flow. Each 0-25, total 0-100.
    ============================================================ */
 
-var OndaScoring = (function() {
+var IgneaScoring = (function() {
 
   function calculate(answers) {
     var streams = {

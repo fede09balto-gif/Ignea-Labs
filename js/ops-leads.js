@@ -1,5 +1,5 @@
 /* ============================================================
-   ONDA AI — Ops Leads Module
+   IGNEA LABS — Ops Leads Module
    Lead table with filters, detail panel, inline editing.
    ============================================================ */
 
@@ -276,7 +276,7 @@ var OpsLeads = (function() {
     var tag1 = document.createElement('div');
     tag1.className = 'detail-section-tag';
     tag1.setAttribute('data-i18n', 'ops.detail.contact');
-    tag1.textContent = OndaI18n.t('ops.detail.contact') || '// Contacto';
+    tag1.textContent = IgneaI18n.t('ops.detail.contact') || '// Contacto';
     sec1.appendChild(tag1);
 
     CONTACT_FIELDS.forEach(function(fieldDef) {
@@ -311,7 +311,7 @@ var OpsLeads = (function() {
 
     var tag2 = document.createElement('div');
     tag2.className = 'detail-section-tag';
-    tag2.textContent = OndaI18n.t('ops.detail.diagnostic') || '// Diagnóstico';
+    tag2.textContent = IgneaI18n.t('ops.detail.diagnostic') || '// Diagnóstico';
     sec2.appendChild(tag2);
 
     var score = lead.total_score || 0;
@@ -354,7 +354,7 @@ var OpsLeads = (function() {
       recoList.className = 'detail-recos';
       recos.forEach(function(r) {
         var li = document.createElement('li');
-        li.textContent = OndaI18n.t('reco.' + r.key) || r.key;
+        li.textContent = IgneaI18n.t('reco.' + r.key) || r.key;
         li.className = 'reco-' + (r.priority || 'medium');
         recoList.appendChild(li);
       });
@@ -369,7 +369,7 @@ var OpsLeads = (function() {
 
     var tag3 = document.createElement('div');
     tag3.className = 'detail-section-tag';
-    tag3.textContent = OndaI18n.t('ops.detail.scraper') || '// Datos del Scraper';
+    tag3.textContent = IgneaI18n.t('ops.detail.scraper') || '// Datos del Scraper';
     sec3.appendChild(tag3);
 
     if (lead.scraper_data) {
@@ -389,13 +389,13 @@ var OpsLeads = (function() {
       } catch (e) {
         var noData = document.createElement('div');
         noData.className = 'detail-empty';
-        noData.textContent = OndaI18n.t('ops.detail.noData') || 'Sin datos';
+        noData.textContent = IgneaI18n.t('ops.detail.noData') || 'Sin datos';
         sec3.appendChild(noData);
       }
     } else {
       var noScraper = document.createElement('div');
       noScraper.className = 'detail-empty';
-      noScraper.textContent = OndaI18n.t('ops.detail.noData') || 'Sin datos';
+      noScraper.textContent = IgneaI18n.t('ops.detail.noData') || 'Sin datos';
       sec3.appendChild(noScraper);
     }
 
@@ -407,7 +407,7 @@ var OpsLeads = (function() {
 
     var tag4 = document.createElement('div');
     tag4.className = 'detail-section-tag';
-    tag4.textContent = OndaI18n.t('ops.detail.notes') || '// Notas';
+    tag4.textContent = IgneaI18n.t('ops.detail.notes') || '// Notas';
     sec4.appendChild(tag4);
 
     var textarea = document.createElement('textarea');
@@ -428,7 +428,7 @@ var OpsLeads = (function() {
 
     var tag5 = document.createElement('div');
     tag5.className = 'detail-section-tag';
-    tag5.textContent = OndaI18n.t('ops.detail.activity') || '// Actividad';
+    tag5.textContent = IgneaI18n.t('ops.detail.activity') || '// Actividad';
     sec5.appendChild(tag5);
 
     var activityLog = document.createElement('div');
@@ -446,7 +446,7 @@ var OpsLeads = (function() {
 
     var btnCalc = document.createElement('button');
     btnCalc.className = 'btn-ghost';
-    btnCalc.textContent = OndaI18n.t('ops.detail.goCalc') || 'Calcular Precio →';
+    btnCalc.textContent = IgneaI18n.t('ops.detail.goCalc') || 'Calcular Precio →';
     btnCalc.addEventListener('click', function() {
       closeDetail();
       switchToTab('calculator');
@@ -455,7 +455,7 @@ var OpsLeads = (function() {
 
     var btnScraper = document.createElement('button');
     btnScraper.className = 'btn-ghost';
-    btnScraper.textContent = OndaI18n.t('ops.detail.goScraper') || 'Ejecutar Scraper →';
+    btnScraper.textContent = IgneaI18n.t('ops.detail.goScraper') || 'Ejecutar Scraper →';
     btnScraper.addEventListener('click', function() {
       closeDetail();
       switchToTab('scraper');
@@ -504,7 +504,7 @@ var OpsLeads = (function() {
         updateObj[fieldKey] = value;
         updateObj.updated_at = now;
 
-        await OndaSupabase.client
+        await IgneaSupabase.client
           .from('leads')
           .update(updateObj)
           .eq('id', leadId);
@@ -520,7 +520,7 @@ var OpsLeads = (function() {
 
         var user = OpsAuth.getUser();
         if (user) {
-          await OndaSupabase.client
+          await IgneaSupabase.client
             .from('lead_activity')
             .insert({
               lead_id: leadId,
@@ -546,14 +546,14 @@ var OpsLeads = (function() {
 
     (async function() {
       try {
-        await OndaSupabase.client
+        await IgneaSupabase.client
           .from('leads')
           .update({ pipeline_stage: newStage, updated_at: now })
           .eq('id', leadId);
 
         var user = OpsAuth.getUser();
         if (user) {
-          await OndaSupabase.client
+          await IgneaSupabase.client
             .from('lead_activity')
             .insert({
               lead_id: leadId,
@@ -566,8 +566,8 @@ var OpsLeads = (function() {
         lead.pipeline_stage = newStage;
         lead.updated_at = now;
 
-        if (typeof OndaSheetsSync !== 'undefined' && OndaSheetsSync.sync) {
-          OndaSheetsSync.sync(Object.assign({}, lead)).catch(function() {});
+        if (typeof IgneaSheetsSync !== 'undefined' && IgneaSheetsSync.sync) {
+          IgneaSheetsSync.sync(Object.assign({}, lead)).catch(function() {});
         }
 
         OpsDashboard.refresh();
@@ -582,7 +582,7 @@ var OpsLeads = (function() {
   function loadActivityLog(leadId, container) {
     (async function() {
       try {
-        var result = await OndaSupabase.client
+        var result = await IgneaSupabase.client
           .from('lead_activity')
           .select('*')
           .eq('lead_id', leadId)
@@ -594,7 +594,7 @@ var OpsLeads = (function() {
         container.innerHTML = '';
 
         if (!activities.length) {
-          container.textContent = OndaI18n.t('ops.detail.noActivity') || 'Sin actividad registrada.';
+          container.textContent = IgneaI18n.t('ops.detail.noActivity') || 'Sin actividad registrada.';
           return;
         }
 
@@ -645,7 +645,7 @@ var OpsLeads = (function() {
 
   function getStageLabel(stage) {
     var i18nKey = STAGE_I18N_MAP[stage];
-    if (i18nKey) return OndaI18n.t(i18nKey) || stage;
+    if (i18nKey) return IgneaI18n.t(i18nKey) || stage;
     return stage || '';
   }
 

@@ -1,4 +1,4 @@
-<!-- CLAUDE.md — ONDA AI -->
+<!-- CLAUDE.md — IGNEA LABS -->
 <!-- Claude Code reads this file before every task. Follow these rules on every change. -->
 
 # Architecture
@@ -10,7 +10,7 @@
 - **Styling:** Vanilla CSS with CSS custom properties. No Tailwind, no preprocessors. Single shared stylesheet + page-specific styles.
 - **i18n:** Custom JS i18n system using data-i18n attributes. Spanish is PRIMARY language. English is secondary. Every string must exist in both ES and EN. Default: ES. Language choice persisted in localStorage.
 - **Deployment:** Vercel (static site) or Netlify
-- **Repo:** github.com/federico/onda-ai
+- **Repo:** github.com/fede09balto-gif/onda-ai
 
 ## Database Tables (Future — Supabase)
 - `diagnostics` (id, created_at, language, answers_json, scores_json, total_score, level, contact_name, contact_email, contact_whatsapp, company_name, status)
@@ -49,9 +49,9 @@
 - Hover states: background shifts to accent subtle glow (#00E5BF0A).
 
 ## Logo
-- Text: "ONDA" in white (#EAEAF0), ".AI" in accent (#00E5BF)
+- Text: "IGNEA" in white (#EAEAF0), ".LABS" in accent (#00E5BF)
 - Letter spacing: 3px, Weight: 800
-- Logo is text-only: "ONDA.AI" — no mark/circle
+- Logo is text-only: "IGNEA.LABS" — no mark/circle
 
 ## Interactive Elements
 - Gradient dots background (CSS radial-gradients with slow drift animation, js/grid-bg.js) — all pages
@@ -78,7 +78,7 @@
 14. Mobile responsive: test at 375px (iPhone SE), 768px (tablet), 1440px (desktop).
 15. Navigation on mobile: hamburger menu with slide-in panel from right.
 16. Forms submit to Formspree endpoint. Show success state with encryption animation after submission.
-17. localStorage keys prefixed with "onda_" (e.g., onda_lang, onda_diagnostic_answers, onda_diagnostic_scores).
+17. localStorage keys prefixed with "ignea_" (e.g., ignea_lang, ignea_diagnostic_answers, ignea_diagnostic_scores).
 18. All console.log statements removed before committing.
 
 # Known Bugs (verify on every change)
@@ -96,7 +96,7 @@
 - Text elements: `<span data-i18n="key">Default Spanish text</span>`
 - HTML elements: `<h1 data-i18n-html="key">Default <em>Spanish</em> text</h1>`
 - setLang(lang) function updates all elements, saves to localStorage, updates document.lang
-- On page load: check localStorage for onda_lang, default to 'es'
+- On page load: check localStorage for ignea_lang, default to 'es'
 
 ## Shared components (loaded via JS/CSS on every page)
 - Nav: sticky, backdrop-filter blur, logo + links + lang toggle

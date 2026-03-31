@@ -1,4 +1,4 @@
-# Onda AI — Supabase Setup
+# Ignea Labs — Supabase Setup
 
 ## 1. Create a Supabase project
 
@@ -35,7 +35,7 @@ In the Supabase SQL Editor, run:
 
 ```sql
 INSERT INTO ops_users (name, email, password_hash, role, permissions)
-VALUES ('Admin', 'admin@onda.ai', '<SHA-256 hash of your access code>', 'admin', '{"read","write","admin"}');
+VALUES ('Admin', 'admin@ignealabs.com', '<SHA-256 hash of your access code>', 'admin', '{"read","write","admin"}');
 ```
 
 To generate a SHA-256 hash of your chosen access code, run in your terminal:

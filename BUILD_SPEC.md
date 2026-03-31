@@ -1,4 +1,4 @@
-# ONDA AI — Complete Build Specification
+# IGNEA LABS — Complete Build Specification
 
 ## Table of Contents
 1. Project Overview
@@ -16,7 +16,7 @@
 
 ## 1. PROJECT OVERVIEW
 
-Onda AI is a website + web app for an AI solutions company in Nicaragua. The site has two jobs:
+Ignea Labs is a website + web app for an AI solutions company in Nicaragua. The site has two jobs:
 1. **Marketing**: Convince business owners they need AI (homepage, manifesto)
 2. **Conversion**: Get them to take the diagnostic and see their results (diagnostic, results)
 
@@ -30,7 +30,7 @@ The diagnostic survey is the core product. Everything else drives traffic to it.
 Sticky top nav with backdrop blur. Same across all pages.
 
 ```
-[Logo: ONDA.AI]                    [Inicio] [Manifiesto] [Diagnóstico] [Contacto] [ES|EN]
+[Logo: IGNEA.LABS]                    [Inicio] [Manifiesto] [Diagnóstico] [Contacto] [ES|EN]
 ```
 
 - Logo links to index.html
@@ -42,9 +42,9 @@ Sticky top nav with backdrop blur. Same across all pages.
 Same across all pages.
 
 ```
-ONDA.AI                                    Inicio | Manifiesto | Diagnóstico | hola@onda.ai
+IGNEA.LABS                                    Inicio | Manifiesto | Diagnóstico | hola@ignealabs.com
 Cerrando la brecha de IA en Centroamérica.
-                                           © 2026 Onda AI. Todos los derechos reservados.
+                                           © 2026 Ignea Labs. Todos los derechos reservados.
 ```
 
 ### 2.3 Animated Grid Background
@@ -289,7 +289,7 @@ Listo para actuar?
 
 [Agendar una llamada ->]     [Descargar reporte en PDF]
 
-O escribenos directamente: hola@onda.ai
+O escribenos directamente: hola@ignealabs.com
 ```
 
 ---
@@ -315,13 +315,13 @@ Restaurantes que atienden turistas de todo el mundo siguen coordinando por Whats
 
 La inteligencia para cambiar todo esto ya existe. La tecnologia esta lista. Lo que ha faltado es alguien dispuesto a construir la conexion entre lo que la IA puede hacer y lo que los negocios centroamericanos realmente necesitan.
 
-Eso es Onda.
+Eso es Ignea.
 
 No somos una consultora que vende presentaciones. No somos una agencia que escribe codigo y desaparece. Nos metemos dentro de tu operacion, aprendemos donde sangra, y construimos los sistemas que detienen el sangrado — permanentemente.
 
 Trabajamos con un numero reducido de socios. No porque no podamos escalar, sino porque la transformacion exige proximidad, honestidad, y el tipo de atencion que desaparece en el momento que intentas atender a todos. Cada empresa que tomamos recibe todo el peso de lo que sabemos. Eso no es una filosofia. Es una promesa.
 
-Nos llamamos Onda porque una onda se propaga. Cada automatizacion habilita la siguiente. Cada insight agudiza el que sigue. La brecha entre tu negocio y tu competencia se amplia silenciosamente, y luego de golpe.
+Nos llamamos Ignea porque la transformación, como el fuego, se propaga. Cada automatización enciende la siguiente. Cada insight agudiza el que sigue. La brecha entre tu negocio y tu competencia se amplia silenciosamente, y luego de golpe.
 
 La proxima generacion de lideres empresariales en Centroamerica se definira por una sola decision. No que mercado entraron. No que producto lanzaron. Si adoptaron IA antes que su competencia o pasaron anos viendo como la brecha se ampliaba desde el lado equivocado.
 
@@ -341,13 +341,13 @@ Restaurants serving tourists from around the world still coordinate by WhatsApp.
 
 The intelligence to change all of this already exists. The technology is ready. What's been missing is someone willing to build the connection between what AI can do and what Central American businesses actually need.
 
-That is Onda.
+That is Ignea.
 
 We are not a consultancy that sells slide decks. We are not an agency that writes code and disappears. We embed ourselves in your operation, learn where it bleeds, and build the systems that stop the bleeding — permanently.
 
 We work with a small number of partners. Not because we can't scale, but because transformation demands proximity, honesty, and the kind of attention that vanishes the moment you try to serve everyone. Every company we take on gets the full weight of what we know. That is not a philosophy. It is a promise.
 
-We named ourselves Onda because a wave propagates. Every automation enables the next. Every insight sharpens the one that follows. The gap between your business and your competition widens quietly, then all at once.
+We named ourselves Ignea because transformation, like fire, spreads. Every automation ignites the next. Every insight sharpens the one that follows. The gap between your business and your competition widens quietly, then all at once.
 
 The next generation of business leaders in Central America will be defined by a single decision. Not which market they entered. Not which product they launched. Whether they embraced AI before their competitors or spent years watching the gap widen from the wrong side.
 

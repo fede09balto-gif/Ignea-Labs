@@ -1,5 +1,5 @@
 /* ============================================================
-   ONDA AI — Custom Select Dropdown
+   IGNEA LABS — Custom Select Dropdown
    Usage: initCustomSelect(selectElement)
    Hides native <select>, creates styled trigger + dropdown.
    ============================================================ */

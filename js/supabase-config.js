@@ -1,10 +1,10 @@
 /* ============================================================
-   ONDA AI — Supabase REST Client (lightweight, no SDK)
+   IGNEA LABS — Supabase REST Client (lightweight, no SDK)
    Direct fetch wrapper against the PostgREST API.
    No SES, no eval, no CSP issues.
    ============================================================ */
 
-var OndaSupabase = (function() {
+var IgneaSupabase = (function() {
   var URL = 'https://uqupiesctjvosvszovuq.supabase.co/rest/v1';
   var KEY = 'sb_publishable_wUXzJhf8mERI7m9hL4Th6g_GpWvSEMP';
 
@@ -138,7 +138,7 @@ var OndaSupabase = (function() {
     });
   };
 
-  // Mimic the SDK interface: OndaSupabase.client.from('table')
+  // Mimic the SDK interface: IgneaSupabase.client.from('table')
   var client = { from: from };
 
   return {
