@@ -115,39 +115,35 @@ var OpsCalculator = (function() {
 
   function calculateROI(hours, web, revenueIdx, captureRate) {
     var hourlyCost = getHourlyCost(revenueIdx);
+    var capture    = (captureRate || 35) / 100;
 
     var botHoursSaved       = hours * 0.7;
     var botMonthlySavings   = botHoursSaved * hourlyCost * 4;
-    var webMonthlySavings   = web <= 1 ? 400 : 200;
-    var autoMonthlySavings  = 20 * hourlyCost * 4;
-    var totalMonthlySavings = Math.round(botMonthlySavings + webMonthlySavings + autoMonthlySavings);
+    var webMonthlySavings   = (web <= 1) ? 400 : 200;
+    var autoHoursSaved      = 20;
+    var autoMonthlySavings  = autoHoursSaved * hourlyCost * 4;
+    var totalMonthlySavings = botMonthlySavings + webMonthlySavings + autoMonthlySavings;
 
-    var investMin, investMax;
-    if (revenueIdx <= 1)      { investMin = 1500; investMax = 3000; }
-    else if (revenueIdx <= 3) { investMin = 3000; investMax = 5000; }
-    else                      { investMin = 5000; investMax = 8000; }
+    var recommendedPrice = totalMonthlySavings * 4 * capture;
+    var paybackMonths    = totalMonthlySavings > 0
+      ? Math.round((recommendedPrice / totalMonthlySavings) * 10) / 10
+      : 0;
+    var roi12 = recommendedPrice > 0
+      ? Math.round(((totalMonthlySavings * 12) - recommendedPrice) / recommendedPrice * 100)
+      : 0;
 
-    var avgInvestment  = (investMin + investMax) / 2;
-    var paybackMonths  = Math.max(1, Math.round(avgInvestment / totalMonthlySavings * 10) / 10);
-    var roi12          = Math.round(((totalMonthlySavings * 12) - avgInvestment) / avgInvestment * 100);
-
-    // Recommended price = totalMonthlySavings * 4 * captureRate
-    var capture        = (captureRate || 35) / 100;
-    var recPrice       = Math.round(totalMonthlySavings * 4 * capture);
-
-    var clientKeeps    = totalMonthlySavings - Math.round(recPrice / 12);
+    var clientKeeps = totalMonthlySavings - Math.round(recommendedPrice / 12);
 
     return {
+      botHoursSaved:       Math.round(botHoursSaved),
       botMonthlySavings:   Math.round(botMonthlySavings),
       webMonthlySavings:   Math.round(webMonthlySavings),
+      autoHoursSaved:      autoHoursSaved,
       autoMonthlySavings:  Math.round(autoMonthlySavings),
-      totalMonthlySavings: totalMonthlySavings,
-      investMin:           investMin,
-      investMax:           investMax,
-      avgInvestment:       avgInvestment,
+      totalMonthlySavings: Math.round(totalMonthlySavings),
+      recommendedPrice:    Math.round(recommendedPrice),
       paybackMonths:       paybackMonths,
       roi12:               roi12,
-      recPrice:            recPrice,
       captureRate:         captureRate || 35,
       clientKeeps:         Math.max(0, clientKeeps),
       hourlyCost:          hourlyCost
@@ -253,7 +249,7 @@ var OpsCalculator = (function() {
     el.innerHTML =
       '<div class="calc-savings-title" data-i18n="ops.calc.savingsTitle">Desglose de Ahorro</div>' +
       '<div class="calc-line">' +
-        '<span>Bot de WhatsApp</span>' +
+        '<span>Bot de WhatsApp (' + roi.botHoursSaved + ' hrs)</span>' +
         '<span class="calc-val">$' + fmt(roi.botMonthlySavings) + '/mes</span>' +
       '</div>' +
       '<div class="calc-line">' +
@@ -261,7 +257,7 @@ var OpsCalculator = (function() {
         '<span class="calc-val">$' + fmt(roi.webMonthlySavings) + '/mes</span>' +
       '</div>' +
       '<div class="calc-line">' +
-        '<span>Automatización</span>' +
+        '<span>Automatización (' + roi.autoHoursSaved + ' hrs)</span>' +
         '<span class="calc-val">$' + fmt(roi.autoMonthlySavings) + '/mes</span>' +
       '</div>' +
       '<div class="calc-line calc-total-line">' +
@@ -278,10 +274,10 @@ var OpsCalculator = (function() {
       '<div class="calc-pricing-title">Precio y Retorno</div>' +
       '<div class="calc-line">' +
         '<span>Precio recomendado</span>' +
-        '<span>$' + fmt(roi.investMin) + ' — $' + fmt(roi.investMax) + '</span>' +
+        '<span class="calc-val-big">$' + fmt(roi.recommendedPrice) + '</span>' +
       '</div>' +
       '<div class="calc-formula">' +
-        '(Ahorro × 4 meses) × ' + roi.captureRate + '% tasa de captura' +
+        '($' + fmt(roi.totalMonthlySavings) + ' × 4 meses) × ' + roi.captureRate + '% captura' +
       '</div>' +
       '<div class="calc-line">' +
         '<span>Período de recuperación</span>' +
@@ -302,13 +298,13 @@ var OpsCalculator = (function() {
     if (!el) return;
 
     var value12m    = roi.totalMonthlySavings * 12;
-    var total       = roi.avgInvestment + value12m;
-    var investPct   = Math.round((roi.avgInvestment / total) * 100);
+    var total       = roi.recommendedPrice + value12m;
+    var investPct   = total > 0 ? Math.round((roi.recommendedPrice / total) * 100) : 0;
     var valuePct    = 100 - investPct;
 
     el.innerHTML =
       '<div class="comp-bar">' +
-        '<div class="comp-invest" style="width:' + investPct + '%">Inversión $' + fmt(Math.round(roi.avgInvestment)) + '</div>' +
+        '<div class="comp-invest" style="width:' + investPct + '%">Inversión $' + fmt(roi.recommendedPrice) + '</div>' +
         '<div class="comp-value"  style="width:' + valuePct  + '%">Valor 12m $' + fmt(value12m) + '</div>' +
       '</div>';
   }
@@ -356,7 +352,7 @@ var OpsCalculator = (function() {
       if (hoursEl) {
         hoursEl.value = answers.q4;
         var hoursValEl = document.getElementById('calcHoursVal');
-        if (hoursValEl) hoursValEl.textContent = answers.q4;
+        if (hoursValEl) hoursValEl.textContent = answers.q4 + ' hrs';
       }
     }
 
@@ -443,6 +439,11 @@ var OpsCalculator = (function() {
   function savePricing() {
     if (!lastResult) return;
 
+    if (typeof OndaSupabase === 'undefined' || !OndaSupabase.client) {
+      alert('Supabase no configurado — configura las credenciales primero');
+      return;
+    }
+
     var leadSel = document.getElementById('calcLeadSelect');
     var leadId  = leadSel ? leadSel.value : null;
     var user    = OpsAuth.getUser ? OpsAuth.getUser() : {};
@@ -465,7 +466,7 @@ var OpsCalculator = (function() {
         hourly_cost:        roi.hourlyCost,
         revenue_bracket:    inp.revenueIdx,
         monthly_savings:    roi.totalMonthlySavings,
-        recommended_price:  roi.recPrice,
+        recommended_price:  roi.recommendedPrice,
         payback_months:     roi.paybackMonths,
         roi_12_months:      roi.roi12,
         capture_rate:       inp.captureRate,
@@ -478,7 +479,7 @@ var OpsCalculator = (function() {
         var btn = document.getElementById('calcSaveBtn');
         if (btn) {
           var orig = btn.textContent;
-          btn.textContent = 'Guardado ✓';
+          btn.textContent = '¡Guardado!';
           setTimeout(function() { btn.textContent = orig; }, 2000);
         }
 
@@ -509,22 +510,28 @@ var OpsCalculator = (function() {
     var roi   = lastResult.roi;
 
     var text =
-      '📊 Diagnóstico: ' + (company || 'Prospecto') + '\n' +
+      'Diagnóstico: ' + (company || 'Prospecto') + '\n' +
       'Puntuación: ' + score.total + '/100 (' + levelLabel(score.level) + ')\n\n' +
-      '💰 Ahorro mensual estimado: $' + fmt(roi.totalMonthlySavings) + '/mes\n' +
-      '📈 ROI a 12 meses: +' + fmt(roi.roi12) + '%\n' +
-      '⏱ Período de recuperación: ' + roi.paybackMonths + ' meses\n\n' +
+      'Ahorro mensual estimado: $' + fmt(roi.totalMonthlySavings) + '/mes\n' +
+      'ROI a 12 meses: +' + fmt(roi.roi12) + '%\n' +
+      'Período de recuperación: ' + roi.paybackMonths + ' meses\n\n' +
       'Soluciones recomendadas:\n' +
       '1. Bot de WhatsApp — $' + fmt(roi.botMonthlySavings) + '/mes ahorro\n' +
       '2. Website + Chat — $' + fmt(roi.webMonthlySavings) + '/mes ahorro\n' +
       '3. Automatización — $' + fmt(roi.autoMonthlySavings) + '/mes ahorro\n\n' +
-      'Inversión recomendada: $' + fmt(roi.investMin) + ' — $' + fmt(roi.investMax);
+      'Precio recomendado: $' + fmt(roi.recommendedPrice);
 
+    var btn = document.getElementById('calcCopyBtn');
     navigator.clipboard.writeText(text).then(function() {
-      var btn = document.getElementById('calcCopyBtn');
       if (btn) {
         var orig = btn.textContent;
-        btn.textContent = 'Copiado ✓';
+        btn.textContent = '¡Copiado!';
+        setTimeout(function() { btn.textContent = orig; }, 2000);
+      }
+    }).catch(function() {
+      if (btn) {
+        var orig = btn.textContent;
+        btn.textContent = 'Error';
         setTimeout(function() { btn.textContent = orig; }, 2000);
       }
     });
@@ -549,8 +556,9 @@ var OpsCalculator = (function() {
     var hoursRange   = document.getElementById('calcHours');
     var hoursValSpan = document.getElementById('calcHoursVal');
     if (hoursRange && hoursValSpan) {
+      hoursValSpan.textContent = hoursRange.value + ' hrs';
       hoursRange.addEventListener('input', function() {
-        hoursValSpan.textContent = hoursRange.value;
+        hoursValSpan.textContent = hoursRange.value + ' hrs';
         recalculate();
       });
     }
@@ -558,8 +566,9 @@ var OpsCalculator = (function() {
     var captureRange   = document.getElementById('calcCapture');
     var captureValSpan = document.getElementById('calcCaptureVal');
     if (captureRange && captureValSpan) {
+      captureValSpan.textContent = captureRange.value + '%';
       captureRange.addEventListener('input', function() {
-        captureValSpan.textContent = captureRange.value;
+        captureValSpan.textContent = captureRange.value + '%';
         recalculate();
       });
     }

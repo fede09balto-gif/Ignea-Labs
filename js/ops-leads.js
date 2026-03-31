@@ -7,6 +7,7 @@ var OpsLeads = (function() {
 
   var currentDetailId = null;
   var debounceTimer = null;
+  var currentSort = { col: 'created_at', asc: false };
 
   var STAGE_I18N_MAP = {
     'new':               'ops.stage.new',
@@ -54,10 +55,14 @@ var OpsLeads = (function() {
 
   function init() {
     setupFilters();
+    setupSortHeaders();
     renderTable({});
 
     var closeBtn = document.getElementById('detailClose');
     if (closeBtn) closeBtn.addEventListener('click', closeDetail);
+
+    var overlay = document.getElementById('detailOverlay');
+    if (overlay) overlay.addEventListener('click', closeDetail);
   }
 
   function setupFilters() {
@@ -99,8 +104,70 @@ var OpsLeads = (function() {
     };
   }
 
+  function setupSortHeaders() {
+    var headers = document.querySelectorAll('.leads-table th[data-sort]');
+    headers.forEach(function(th) {
+      th.style.cursor = 'pointer';
+      th.addEventListener('click', function() {
+        var col = th.getAttribute('data-sort');
+        if (currentSort.col === col) {
+          currentSort.asc = !currentSort.asc;
+        } else {
+          currentSort.col = col;
+          currentSort.asc = true;
+        }
+        // Update visual indicator (CSS uses aria-sort)
+        headers.forEach(function(h) { h.removeAttribute('aria-sort'); });
+        th.setAttribute('aria-sort', currentSort.asc ? 'ascending' : 'descending');
+        renderTable(getFilters());
+      });
+    });
+  }
+
+  function sortLeads(leads) {
+    var col = currentSort.col;
+    var asc = currentSort.asc;
+
+    return leads.sort(function(a, b) {
+      var va, vb;
+      if (col === 'created_at') {
+        va = new Date(a.created_at || 0).getTime();
+        vb = new Date(b.created_at || 0).getTime();
+      } else if (col === 'score') {
+        va = Number(a.total_score) || 0;
+        vb = Number(b.total_score) || 0;
+      } else if (col === 'deal_value') {
+        va = Number(a.deal_value) || 0;
+        vb = Number(b.deal_value) || 0;
+      } else if (col === 'company') {
+        va = (a.company_name || '').toLowerCase();
+        vb = (b.company_name || '').toLowerCase();
+        return asc ? va.localeCompare(vb) : vb.localeCompare(va);
+      } else if (col === 'contact') {
+        va = ((a.first_name || '') + ' ' + (a.last_name || '')).toLowerCase();
+        vb = ((b.first_name || '') + ' ' + (b.last_name || '')).toLowerCase();
+        return asc ? va.localeCompare(vb) : vb.localeCompare(va);
+      } else if (col === 'stage') {
+        va = a.pipeline_stage || '';
+        vb = b.pipeline_stage || '';
+        return asc ? va.localeCompare(vb) : vb.localeCompare(va);
+      } else if (col === 'priority') {
+        var pOrder = { hot: 0, high: 1, medium: 2, low: 3 };
+        va = pOrder[a.priority] !== undefined ? pOrder[a.priority] : 9;
+        vb = pOrder[b.priority] !== undefined ? pOrder[b.priority] : 9;
+      } else if (col === 'industry') {
+        va = (a.industry || '').toLowerCase();
+        vb = (b.industry || '').toLowerCase();
+        return asc ? va.localeCompare(vb) : vb.localeCompare(va);
+      } else {
+        va = 0; vb = 0;
+      }
+      return asc ? va - vb : vb - va;
+    });
+  }
+
   function renderTable(filters) {
-    var leads = OpsDashboard.getAllLeads();
+    var leads = typeof OpsDashboard !== 'undefined' ? OpsDashboard.getAllLeads() : [];
     var f = filters || {};
 
     var filtered = leads.filter(function(lead) {
@@ -120,13 +187,19 @@ var OpsLeads = (function() {
       return true;
     });
 
-    filtered.sort(function(a, b) {
-      return new Date(b.created_at) - new Date(a.created_at);
-    });
+    filtered = sortLeads(filtered);
 
     var tbody = document.getElementById('leadsTableBody');
     if (!tbody) return;
     tbody.innerHTML = '';
+
+    if (!filtered.length) {
+      var emptyRow = document.createElement('tr');
+      emptyRow.className = 'leads-empty-state';
+      emptyRow.innerHTML = '<td colspan="9"><span>No hay leads aún. Los diagnósticos completados aparecerán aquí.</span></td>';
+      tbody.appendChild(emptyRow);
+      return;
+    }
 
     filtered.forEach(function(lead) {
       var tr = document.createElement('tr');
@@ -171,7 +244,7 @@ var OpsLeads = (function() {
   }
 
   function openDetail(leadId) {
-    var lead = OpsDashboard.getAllLeads().find(function(l) {
+    var lead = (typeof OpsDashboard !== 'undefined' ? OpsDashboard.getAllLeads() : []).find(function(l) {
       return String(l.id) === String(leadId);
     });
     if (!lead) return;
@@ -179,7 +252,13 @@ var OpsLeads = (function() {
     currentDetailId = leadId;
 
     var panel = document.getElementById('detailPanel');
-    if (panel) panel.classList.add('open');
+    if (panel) {
+      panel.removeAttribute('hidden');
+      panel.classList.add('open');
+    }
+
+    var overlay = document.getElementById('detailOverlay');
+    if (overlay) overlay.classList.add('visible');
 
     populateDetail(lead);
   }
@@ -252,7 +331,7 @@ var OpsLeads = (function() {
     sec2.appendChild(levelEl);
 
     // Dimension bars
-    var scores = lead.scores_json || {};
+    var scores = lead.score_breakdown || lead.scores_json || {};
     Object.keys(DIMENSION_LABELS).forEach(function(dim) {
       var dimScore = Number(scores[dim]) || 0;
       var dimPct = Math.round((dimScore / 20) * 100);
@@ -269,7 +348,7 @@ var OpsLeads = (function() {
     });
 
     // Recommendations
-    var recos = lead.recommendations_json || [];
+    var recos = lead.recommendations || lead.recommendations_json || [];
     if (recos.length) {
       var recoList = document.createElement('ul');
       recoList.className = 'detail-recos';
@@ -369,16 +448,18 @@ var OpsLeads = (function() {
     btnCalc.className = 'btn-ghost';
     btnCalc.textContent = OndaI18n.t('ops.detail.goCalc') || 'Calcular Precio →';
     btnCalc.addEventListener('click', function() {
+      closeDetail();
       switchToTab('calculator');
-      document.dispatchEvent(new CustomEvent('onda:prefill:calculator', { detail: lead }));
+      document.dispatchEvent(new CustomEvent('ops:openCalculator', { detail: { lead: lead } }));
     });
 
     var btnScraper = document.createElement('button');
     btnScraper.className = 'btn-ghost';
     btnScraper.textContent = OndaI18n.t('ops.detail.goScraper') || 'Ejecutar Scraper →';
     btnScraper.addEventListener('click', function() {
+      closeDetail();
       switchToTab('scraper');
-      document.dispatchEvent(new CustomEvent('onda:prefill:scraper', { detail: lead }));
+      document.dispatchEvent(new CustomEvent('ops:openScraper', { detail: { lead: lead } }));
     });
 
     sec6.appendChild(btnCalc);
@@ -538,6 +619,10 @@ var OpsLeads = (function() {
   function closeDetail() {
     var panel = document.getElementById('detailPanel');
     if (panel) panel.classList.remove('open');
+
+    var overlay = document.getElementById('detailOverlay');
+    if (overlay) overlay.classList.remove('visible');
+
     currentDetailId = null;
   }
 

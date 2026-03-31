@@ -6,10 +6,9 @@
 
 var OpsScraper = (function() {
 
-  var CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+  var CORS_PROXY = 'https://api.allorigins.win/get?url=';
   var GOOGLE_PLACES_API_KEY = 'GOOGLE_PLACES_API_KEY'; // placeholder
 
-  /* ---- Collected data from last run ---- */
   var collectedData = null;
 
   /* ---- Helpers ---- */
@@ -27,13 +26,17 @@ var OpsScraper = (function() {
       .replace(/"/g, '&quot;');
   }
 
+  function hasGoogleKey() {
+    return GOOGLE_PLACES_API_KEY && GOOGLE_PLACES_API_KEY !== 'GOOGLE_PLACES_API_KEY';
+  }
+
   /* ---- Populate lead select ---- */
 
   function populateLeadSelect() {
     var sel = document.getElementById('scraperLeadSelect');
     if (!sel) return;
     sel.innerHTML = '<option value="">— Seleccionar prospecto —</option>';
-    var leads = OpsDashboard.getAllLeads();
+    var leads = typeof OpsDashboard !== 'undefined' ? OpsDashboard.getAllLeads() : [];
     leads.forEach(function(lead) {
       var opt = document.createElement('option');
       opt.value = lead.id;
@@ -48,13 +51,13 @@ var OpsScraper = (function() {
     if (!lead) return;
 
     var urlEl = document.getElementById('scraperUrl');
-    if (urlEl) urlEl.value = lead.website || '';
+    if (urlEl) urlEl.value = lead.website || lead.company_website || '';
 
     var nameEl = document.getElementById('scraperName');
     if (nameEl) nameEl.value = lead.company_name || '';
 
     var locEl = document.getElementById('scraperLocation');
-    if (locEl) locEl.value = lead.location || lead.city || '';
+    if (locEl) locEl.value = lead.location || lead.city || 'Managua, Nicaragua';
 
     var selEl = document.getElementById('scraperLeadSelect');
     if (selEl) selEl.value = lead.id;
@@ -63,283 +66,292 @@ var OpsScraper = (function() {
   /* ---- Step 1: Website Analysis ---- */
 
   function analyzeWebsite(url) {
-    return new Promise(function(resolve) {
-      if (!url || !url.trim()) {
-        resolve({ error: 'no_url' });
-        return;
-      }
+    if (!url || !url.trim()) {
+      return Promise.resolve({ error: 'no_url' });
+    }
 
-      var cleanUrl = url.trim();
-      if (!/^https?:\/\//i.test(cleanUrl)) {
-        cleanUrl = 'https://' + cleanUrl;
-      }
+    var cleanUrl = url.trim();
+    if (!/^https?:\/\//i.test(cleanUrl)) {
+      cleanUrl = 'https://' + cleanUrl;
+    }
 
-      setStatus('Analizando sitio web...');
+    setStatus('Paso 1/4 — Analizando sitio web...');
 
-      var proxyUrl = CORS_PROXY + encodeURIComponent(cleanUrl);
+    var proxyUrl = CORS_PROXY + encodeURIComponent(cleanUrl);
 
-      fetch(proxyUrl)
-        .then(function(res) { return res.text(); })
-        .then(function(html) {
-          var parser   = new DOMParser();
-          var doc      = parser.parseFromString(html, 'text/html');
-          var lowerHtml = html.toLowerCase();
+    return fetch(proxyUrl)
+      .then(function(res) { return res.json(); })
+      .then(function(json) {
+        var html = json.contents || '';
+        var parser   = new DOMParser();
+        var doc      = parser.parseFromString(html, 'text/html');
+        var lowerHtml = html.toLowerCase();
 
-          // Title
-          var titleEl = doc.querySelector('title');
-          var title   = titleEl ? titleEl.textContent.trim() : '';
+        // Title
+        var titleEl = doc.querySelector('title');
+        var title   = titleEl ? titleEl.textContent.trim() : '';
 
-          // Meta description
-          var descEl      = doc.querySelector('meta[name="description"]');
-          var description = descEl ? (descEl.getAttribute('content') || '') : '';
+        // Meta description
+        var descEl      = doc.querySelector('meta[name="description"]');
+        var description = descEl ? (descEl.getAttribute('content') || '') : '';
 
-          // Social links
-          var anchors     = doc.querySelectorAll('a[href]');
-          var socialLinks = {};
-          var socialDomains = {
-            facebook:  'facebook.com',
-            instagram: 'instagram.com',
-            twitter:   'twitter.com',
-            linkedin:  'linkedin.com',
-            tiktok:    'tiktok.com'
-          };
+        // Social links
+        var anchors     = doc.querySelectorAll('a[href]');
+        var socialLinks = {};
+        var socialDomains = {
+          facebook:  'facebook.com',
+          instagram: 'instagram.com',
+          twitter:   'twitter.com',
+          linkedin:  'linkedin.com',
+          tiktok:    'tiktok.com'
+        };
 
-          Array.prototype.forEach.call(anchors, function(a) {
-            var href = (a.getAttribute('href') || '').toLowerCase();
-            Object.keys(socialDomains).forEach(function(platform) {
-              if (href.indexOf(socialDomains[platform]) !== -1 && !socialLinks[platform]) {
-                socialLinks[platform] = a.getAttribute('href');
-              }
-            });
+        Array.prototype.forEach.call(anchors, function(a) {
+          var href = (a.getAttribute('href') || '').toLowerCase();
+          Object.keys(socialDomains).forEach(function(platform) {
+            if (href.indexOf(socialDomains[platform]) !== -1 && !socialLinks[platform]) {
+              socialLinks[platform] = a.getAttribute('href');
+            }
           });
-
-          // Tech signals
-          var hasAnalytics      = lowerHtml.indexOf('google-analytics.com') !== -1 ||
-                                   lowerHtml.indexOf('googletagmanager.com') !== -1 ||
-                                   lowerHtml.indexOf('gtag(') !== -1;
-          var hasFBPixel         = lowerHtml.indexOf('facebook.net/en_us/fbevents.js') !== -1 ||
-                                   lowerHtml.indexOf('fbq(') !== -1;
-          var hasWhatsAppWidget  = lowerHtml.indexOf('wa.me') !== -1 ||
-                                   lowerHtml.indexOf('api.whatsapp.com') !== -1 ||
-                                   lowerHtml.indexOf('whatsapp') !== -1;
-          var hasLiveChat        = lowerHtml.indexOf('tawk.to') !== -1 ||
-                                   lowerHtml.indexOf('intercom') !== -1 ||
-                                   lowerHtml.indexOf('drift') !== -1 ||
-                                   lowerHtml.indexOf('crisp') !== -1 ||
-                                   lowerHtml.indexOf('livechat') !== -1;
-          var hasBooking         = lowerHtml.indexOf('calendly') !== -1 ||
-                                   lowerHtml.indexOf('booking') !== -1 ||
-                                   lowerHtml.indexOf('reserv') !== -1;
-          var hasViewportMeta    = !!doc.querySelector('meta[name="viewport"]');
-          var isSSL              = /^https:\/\//i.test(cleanUrl);
-
-          var copyrightMatch = html.match(/(?:©|&copy;|copyright)\s*(\d{4})/i);
-          var copyrightYear  = copyrightMatch ? copyrightMatch[1] : null;
-
-          resolve({
-            url:              cleanUrl,
-            title:            title,
-            description:      description,
-            socialLinks:      socialLinks,
-            hasAnalytics:     hasAnalytics,
-            hasFBPixel:       hasFBPixel,
-            hasWhatsAppWidget: hasWhatsAppWidget,
-            hasLiveChat:      hasLiveChat,
-            hasBooking:       hasBooking,
-            hasViewportMeta:  hasViewportMeta,
-            isSSL:            isSSL,
-            copyrightYear:    copyrightYear
-          });
-        })
-        .catch(function() {
-          resolve({ url: cleanUrl, error: 'fetch_failed' });
         });
-    });
+
+        // Tech signals
+        var hasAnalytics      = lowerHtml.indexOf('google-analytics.com') !== -1 ||
+                                 lowerHtml.indexOf('googletagmanager.com') !== -1 ||
+                                 lowerHtml.indexOf('gtag(') !== -1;
+        var hasFBPixel         = lowerHtml.indexOf('facebook.net/en_us/fbevents.js') !== -1 ||
+                                 lowerHtml.indexOf('fbq(') !== -1;
+        var hasWhatsAppWidget  = lowerHtml.indexOf('wa.me') !== -1 ||
+                                 lowerHtml.indexOf('api.whatsapp.com') !== -1 ||
+                                 lowerHtml.indexOf('whatsapp') !== -1;
+        var hasLiveChat        = lowerHtml.indexOf('tawk.to') !== -1 ||
+                                 lowerHtml.indexOf('intercom') !== -1 ||
+                                 lowerHtml.indexOf('drift') !== -1 ||
+                                 lowerHtml.indexOf('crisp') !== -1 ||
+                                 lowerHtml.indexOf('livechat') !== -1;
+        var hasBooking         = lowerHtml.indexOf('calendly') !== -1 ||
+                                 lowerHtml.indexOf('booking') !== -1 ||
+                                 lowerHtml.indexOf('reserv') !== -1;
+        var hasViewportMeta    = !!doc.querySelector('meta[name="viewport"]');
+        var isSSL              = /^https:\/\//i.test(cleanUrl);
+
+        var copyrightMatch = html.match(/(?:©|&copy;|copyright)\s*(\d{4})/i);
+        var copyrightYear  = copyrightMatch ? copyrightMatch[1] : null;
+
+        return {
+          url:              cleanUrl,
+          title:            title,
+          description:      description,
+          socialLinks:      socialLinks,
+          hasAnalytics:     hasAnalytics,
+          hasFBPixel:       hasFBPixel,
+          hasWhatsAppWidget: hasWhatsAppWidget,
+          hasLiveChat:      hasLiveChat,
+          hasBooking:       hasBooking,
+          hasViewportMeta:  hasViewportMeta,
+          isSSL:            isSSL,
+          copyrightYear:    copyrightYear
+        };
+      })
+      .catch(function() {
+        return { url: cleanUrl, error: 'fetch_failed' };
+      });
   }
 
   /* ---- Step 2: Social Media Presence ---- */
 
   function analyzeSocial(websiteData, companyName, location) {
-    var platforms = [];
-    var socialDomains = {
-      facebook:  'facebook.com',
-      instagram: 'instagram.com',
-      twitter:   'twitter.com',
-      linkedin:  'linkedin.com',
-      tiktok:    'tiktok.com'
-    };
+    setStatus('Paso 2/4 — Verificando redes sociales...');
 
-    setStatus('Verificando presencia en redes sociales...');
+    try {
+      var socialDomains = {
+        facebook:  'facebook.com',
+        instagram: 'instagram.com',
+        twitter:   'twitter.com',
+        linkedin:  'linkedin.com',
+        tiktok:    'tiktok.com'
+      };
 
-    if (websiteData && websiteData.socialLinks) {
+      var platforms = [];
+
       Object.keys(socialDomains).forEach(function(platform) {
-        if (websiteData.socialLinks[platform]) {
-          platforms.push({ platform: platform, url: websiteData.socialLinks[platform], found: true });
-        } else {
-          var query = encodeURIComponent((companyName || '') + ' ' + (location || ''));
-          var searchUrl;
-          if (platform === 'facebook') {
-            searchUrl = 'https://facebook.com/search/top?q=' + query;
-          } else if (platform === 'instagram') {
-            var slug = (companyName || '').toLowerCase().replace(/\s+/g, '');
-            searchUrl = 'https://instagram.com/' + encodeURIComponent(slug);
-          } else {
-            searchUrl = null;
-          }
-          platforms.push({ platform: platform, url: searchUrl, found: false });
-        }
-      });
-    } else {
-      var query = encodeURIComponent((companyName || '') + ' ' + (location || ''));
-      platforms.push({ platform: 'facebook',  url: 'https://facebook.com/search/top?q=' + query, found: false });
-      var slug = (companyName || '').toLowerCase().replace(/\s+/g, '');
-      platforms.push({ platform: 'instagram', url: 'https://instagram.com/' + encodeURIComponent(slug), found: false });
-    }
+        var found = false;
+        var url   = null;
 
-    return Promise.resolve(platforms);
+        if (websiteData && websiteData.socialLinks && websiteData.socialLinks[platform]) {
+          found = true;
+          url   = websiteData.socialLinks[platform];
+        }
+
+        platforms.push({ platform: platform, url: url, found: found });
+      });
+
+      return Promise.resolve(platforms);
+    } catch (e) {
+      return Promise.resolve([]);
+    }
   }
 
   /* ---- Step 3: Google Places ---- */
 
   function fetchGooglePlaces(companyName, location) {
-    return new Promise(function(resolve) {
-      if (!GOOGLE_PLACES_API_KEY || GOOGLE_PLACES_API_KEY === 'GOOGLE_PLACES_API_KEY') {
-        setStatus('API key no configurada — omitiendo Google Places');
-        resolve(null);
-        return;
-      }
+    setStatus('Paso 3/4 — Consultando Google Places...');
 
-      setStatus('Consultando Google Places...');
+    if (!hasGoogleKey()) {
+      return Promise.resolve({ skipped: true, reason: 'API key de Google Places no configurada' });
+    }
 
-      var input  = encodeURIComponent((companyName || '') + ' ' + (location || ''));
-      var fields = 'place_id,name,formatted_address,rating,user_ratings_total,photos,types,opening_hours,geometry';
-      var url    = 'https://maps.googleapis.com/maps/api/place/findplacefromtext/json' +
-                   '?input=' + input +
-                   '&inputtype=textquery' +
-                   '&fields=' + fields +
-                   '&key=' + GOOGLE_PLACES_API_KEY;
+    var input  = encodeURIComponent((companyName || '') + ' ' + (location || ''));
+    var fields = 'place_id,name,formatted_address,rating,user_ratings_total,photos,types,opening_hours,geometry';
+    var url    = 'https://maps.googleapis.com/maps/api/place/findplacefromtext/json' +
+                 '?input=' + input +
+                 '&inputtype=textquery' +
+                 '&fields=' + fields +
+                 '&key=' + GOOGLE_PLACES_API_KEY;
 
-      fetch(CORS_PROXY + encodeURIComponent(url))
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          if (!data.candidates || !data.candidates.length) {
-            resolve(null);
-            return;
-          }
-          var place = data.candidates[0];
-          resolve({
-            placeId:     place.place_id,
-            name:        place.name,
-            address:     place.formatted_address,
-            rating:      place.rating,
-            reviewCount: place.user_ratings_total,
-            types:       place.types || [],
-            hasPhotos:   !!(place.photos && place.photos.length),
-            isOpen:      place.opening_hours ? place.opening_hours.open_now : null,
-            geometry:    place.geometry
-          });
-        })
-        .catch(function() { resolve(null); });
-    });
+    return fetch(CORS_PROXY + encodeURIComponent(url))
+      .then(function(res) { return res.json(); })
+      .then(function(wrapper) {
+        var data = wrapper.contents ? JSON.parse(wrapper.contents) : wrapper;
+        if (!data.candidates || !data.candidates.length) {
+          return { skipped: true, reason: 'No se encontró el negocio en Google Places' };
+        }
+        var place = data.candidates[0];
+        return {
+          placeId:     place.place_id,
+          name:        place.name,
+          address:     place.formatted_address,
+          rating:      place.rating,
+          reviewCount: place.user_ratings_total,
+          types:       place.types || [],
+          hasPhotos:   !!(place.photos && place.photos.length),
+          isOpen:      place.opening_hours ? place.opening_hours.open_now : null,
+          geometry:    place.geometry
+        };
+      })
+      .catch(function() {
+        return { skipped: true, reason: 'Error al consultar Google Places' };
+      });
   }
 
   /* ---- Step 4: Competitor Analysis ---- */
 
   function fetchCompetitors(placesData) {
-    return new Promise(function(resolve) {
-      if (!placesData || !placesData.geometry || GOOGLE_PLACES_API_KEY === 'GOOGLE_PLACES_API_KEY') {
-        resolve(null);
-        return;
-      }
+    setStatus('Paso 4/4 — Analizando competidores...');
 
-      setStatus('Analizando competidores cercanos...');
+    if (!hasGoogleKey()) {
+      return Promise.resolve({ skipped: true, reason: 'Requiere API key de Google Places' });
+    }
 
-      var lat  = placesData.geometry.location.lat;
-      var lng  = placesData.geometry.location.lng;
-      var type = placesData.types && placesData.types[0] ? placesData.types[0] : 'establishment';
+    if (!placesData || placesData.skipped || !placesData.geometry) {
+      return Promise.resolve({ skipped: true, reason: 'Se requieren datos de Google Places primero' });
+    }
 
-      var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json' +
-                '?location=' + lat + ',' + lng +
-                '&radius=5000' +
-                '&type=' + encodeURIComponent(type) +
-                '&key=' + GOOGLE_PLACES_API_KEY;
+    var lat  = placesData.geometry.location.lat;
+    var lng  = placesData.geometry.location.lng;
+    var type = placesData.types && placesData.types[0] ? placesData.types[0] : 'establishment';
 
-      fetch(CORS_PROXY + encodeURIComponent(url))
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          if (!data.results) { resolve(null); return; }
+    var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json' +
+              '?location=' + lat + ',' + lng +
+              '&radius=5000' +
+              '&type=' + encodeURIComponent(type) +
+              '&key=' + GOOGLE_PLACES_API_KEY;
 
-          var competitors = data.results
-            .filter(function(p) { return p.place_id !== placesData.placeId; })
-            .slice(0, 5)
-            .map(function(p) {
-              return {
-                name:        p.name,
-                rating:      p.rating || 0,
-                reviewCount: p.user_ratings_total || 0,
-                website:     p.website || null
-              };
-            });
+    return fetch(CORS_PROXY + encodeURIComponent(url))
+      .then(function(res) { return res.json(); })
+      .then(function(wrapper) {
+        var data = wrapper.contents ? JSON.parse(wrapper.contents) : wrapper;
+        if (!data.results || !data.results.length) {
+          return { skipped: true, reason: 'No se encontraron competidores cercanos' };
+        }
 
-          var avgRating = competitors.length
-            ? (competitors.reduce(function(sum, c) { return sum + c.rating; }, 0) / competitors.length)
-            : 0;
-          avgRating = Math.round(avgRating * 10) / 10;
+        var competitors = data.results
+          .filter(function(p) { return p.place_id !== placesData.placeId; })
+          .slice(0, 5)
+          .map(function(p) {
+            return {
+              name:        p.name,
+              rating:      p.rating || 0,
+              reviewCount: p.user_ratings_total || 0
+            };
+          });
 
-          var insight = '';
-          if (placesData.rating && avgRating) {
-            if (placesData.rating < avgRating - 0.3) {
-              insight = 'Su rating (' + placesData.rating + '★) está por debajo del promedio de competidores (' + avgRating + '★). Oportunidad de mejorar reputación online.';
-            } else if (placesData.rating >= avgRating + 0.3) {
-              insight = 'Su rating (' + placesData.rating + '★) supera el promedio de competidores (' + avgRating + '★). Ventaja competitiva a aprovechar.';
-            } else {
-              insight = 'Su rating (' + placesData.rating + '★) está al nivel del promedio del mercado (' + avgRating + '★).';
-            }
+        var avgRating = competitors.length
+          ? Math.round(competitors.reduce(function(sum, c) { return sum + c.rating; }, 0) / competitors.length * 10) / 10
+          : 0;
+
+        var insight = '';
+        if (placesData.rating && avgRating) {
+          if (placesData.rating < avgRating - 0.3) {
+            insight = 'Su rating (' + placesData.rating + '★) está por debajo del promedio de competidores (' + avgRating + '★). Oportunidad de mejorar reputación online.';
+          } else if (placesData.rating >= avgRating + 0.3) {
+            insight = 'Su rating (' + placesData.rating + '★) supera el promedio de competidores (' + avgRating + '★). Ventaja competitiva a aprovechar.';
+          } else {
+            insight = 'Su rating (' + placesData.rating + '★) está al nivel del promedio del mercado (' + avgRating + '★).';
           }
+        }
 
-          resolve({ competitors: competitors, avgRating: avgRating, insight: insight });
-        })
-        .catch(function() { resolve(null); });
-    });
+        return { competitors: competitors, avgRating: avgRating, insight: insight };
+      })
+      .catch(function() {
+        return { skipped: true, reason: 'Error al buscar competidores' };
+      });
   }
 
   /* ---- Main runner ---- */
 
   function runScraper() {
-    var url         = (document.getElementById('scraperUrl')      ? document.getElementById('scraperUrl').value      : '').trim();
-    var companyName = (document.getElementById('scraperName')     ? document.getElementById('scraperName').value     : '').trim();
-    var location    = (document.getElementById('scraperLocation') ? document.getElementById('scraperLocation').value : '').trim();
+    var url         = (document.getElementById('scraperUrl')      || {}).value || '';
+    var companyName = (document.getElementById('scraperName')     || {}).value || '';
+    var location    = (document.getElementById('scraperLocation') || {}).value || '';
+
+    url = url.trim();
+    companyName = companyName.trim();
+    location = location.trim();
 
     var resultsEl = document.getElementById('scraperResults');
     if (resultsEl) resultsEl.innerHTML = '';
 
-    var runBtn = document.getElementById('scraperRunBtn');
+    var runBtn     = document.getElementById('scraperRunBtn');
+    var btnTextEl  = runBtn ? runBtn.querySelector('.scraper-btn-text') : null;
+    var origBtnText = btnTextEl ? btnTextEl.innerHTML : '';
+
     if (runBtn) runBtn.disabled = true;
+    if (btnTextEl) btnTextEl.textContent = 'Escaneando...';
 
     setStatus('Iniciando análisis...');
 
+    var websiteData = null;
+    var socialData  = null;
+    var placesData  = null;
+    var compData    = null;
+
     analyzeWebsite(url)
-      .then(function(websiteData) {
-        return analyzeSocial(websiteData, companyName, location)
-          .then(function(socialData) {
-            return fetchGooglePlaces(companyName, location)
-              .then(function(placesData) {
-                return fetchCompetitors(placesData)
-                  .then(function(compData) {
-                    return {
-                      website:     websiteData,
-                      social:      socialData,
-                      places:      placesData,
-                      competitors: compData
-                    };
-                  });
-              });
-          });
+      .then(function(wd) {
+        websiteData = wd;
+        return analyzeSocial(websiteData, companyName, location);
       })
-      .then(function(data) {
-        collectedData = data;
+      .then(function(sd) {
+        socialData = sd;
+        return fetchGooglePlaces(companyName, location);
+      })
+      .then(function(pd) {
+        placesData = pd;
+        return fetchCompetitors(placesData);
+      })
+      .then(function(cd) {
+        compData = cd;
+
+        collectedData = {
+          website:     websiteData,
+          social:      socialData,
+          places:      placesData,
+          competitors: compData
+        };
+
         setStatus('Análisis completado.');
-        renderResults(data);
+        renderResults(collectedData);
+
         var saveBtn = document.getElementById('scraperSaveBtn');
         if (saveBtn) saveBtn.disabled = false;
       })
@@ -348,6 +360,7 @@ var OpsScraper = (function() {
       })
       .finally(function() {
         if (runBtn) runBtn.disabled = false;
+        if (btnTextEl) btnTextEl.innerHTML = origBtnText;
       });
   }
 
@@ -359,82 +372,132 @@ var OpsScraper = (function() {
     container.innerHTML = '';
 
     // ---- Card 1: Website ----
-    var w = data.website || {};
-    var websiteCard = document.createElement('div');
-    websiteCard.className = 'scraper-card';
+    renderWebsiteCard(container, data.website);
 
-    var badgesHtml = '';
+    // ---- Card 2: Social Media ----
+    renderSocialCard(container, data.social);
+
+    // ---- Card 3: Google Places ----
+    renderPlacesCard(container, data.places);
+
+    // ---- Card 4: Competitors ----
+    renderCompetitorsCard(container, data.competitors, data.places);
+
+    // ---- Card 5: Opportunities ----
+    renderOpportunities(container, data);
+  }
+
+  function renderWebsiteCard(container, w) {
+    w = w || {};
+    var card = document.createElement('div');
+    card.className = 'scraper-card';
+
     function badge(label, ok) {
       return '<span class="scraper-badge ' + (ok ? 'ok' : 'fail') + '">' +
              escHtml(label) + ' ' + (ok ? '✓' : '✗') + '</span>';
     }
 
+    var content = '<div class="scraper-card-title">1. Website</div>';
+
     if (w.error === 'no_url') {
-      badgesHtml = '<div class="scraper-no-url">No se proporcionó URL de sitio web.</div>';
+      content += '<div class="scraper-msg">No se proporcionó URL de sitio web.</div>';
     } else if (w.error === 'fetch_failed') {
-      badgesHtml = '<div class="scraper-no-url">No se pudo acceder al sitio web.</div>';
+      content += '<div class="scraper-msg scraper-msg--warn">No se pudo acceder al sitio — verifica la URL e intenta de nuevo.</div>';
     } else {
-      badgesHtml =
-        badge('SSL',       w.isSSL) +
-        badge('Mobile',    w.hasViewportMeta) +
-        badge('Analytics', w.hasAnalytics) +
-        badge('WhatsApp',  w.hasWhatsAppWidget) +
-        badge('Chat',      w.hasLiveChat) +
-        badge('Booking',   w.hasBooking);
+      content +=
+        (w.url ? '<div class="scraper-card-url"><a href="' + escHtml(w.url) + '" target="_blank" rel="noopener">' + escHtml(w.url) + '</a></div>' : '') +
+        (w.title ? '<div class="scraper-card-meta"><strong>' + escHtml(w.title) + '</strong></div>' : '') +
+        (w.description ? '<div class="scraper-card-meta">' + escHtml(w.description) + '</div>' : '') +
+        '<div class="scraper-badges">' +
+          badge('SSL', w.isSSL) +
+          badge('Mobile', w.hasViewportMeta) +
+          badge('Analytics', w.hasAnalytics) +
+          badge('WhatsApp', w.hasWhatsAppWidget) +
+          badge('Chat', w.hasLiveChat) +
+          badge('Reservas', w.hasBooking) +
+        '</div>';
     }
 
-    var socialsHtml = '';
-    if (w.socialLinks) {
-      var socialLabels = {
+    card.innerHTML = content;
+    container.appendChild(card);
+  }
+
+  function renderSocialCard(container, platforms) {
+    var card = document.createElement('div');
+    card.className = 'scraper-card';
+
+    var content = '<div class="scraper-card-title">2. Redes Sociales</div>';
+
+    if (!platforms || !platforms.length) {
+      content += '<div class="scraper-msg">No se detectaron redes sociales.</div>';
+    } else {
+      var labels = {
         facebook:  'Facebook',
         instagram: 'Instagram',
         twitter:   'Twitter/X',
         linkedin:  'LinkedIn',
         tiktok:    'TikTok'
       };
-      Object.keys(w.socialLinks).forEach(function(platform) {
-        socialsHtml +=
-          '<a href="' + escHtml(w.socialLinks[platform]) + '" target="_blank" rel="noopener" class="scraper-social-link">' +
-            escHtml(socialLabels[platform] || platform) + ' →' +
-          '</a> ';
+
+      content += '<div class="scraper-social-badges">';
+      platforms.forEach(function(p) {
+        if (p.found && p.url) {
+          content += '<a href="' + escHtml(p.url) + '" target="_blank" rel="noopener" class="scraper-badge ok">' +
+                     escHtml(labels[p.platform] || p.platform) + ' ✓</a>';
+        } else {
+          content += '<span class="scraper-badge fail">' +
+                     escHtml(labels[p.platform] || p.platform) + ' ✗</span>';
+        }
       });
+      content += '</div>';
+
+      var found = platforms.filter(function(p) { return p.found; });
+      content += '<div class="scraper-card-meta">' + found.length + ' de ' + platforms.length + ' plataformas detectadas</div>';
     }
 
-    websiteCard.innerHTML =
-      '<div class="scraper-card-title">Website</div>' +
-      (w.url ? '<div class="scraper-card-url"><a href="' + escHtml(w.url) + '" target="_blank" rel="noopener">' + escHtml(w.url) + '</a></div>' : '') +
-      (w.title ? '<div class="scraper-card-meta">' + escHtml(w.title) + '</div>' : '') +
-      '<div class="scraper-badges">' + badgesHtml + '</div>' +
-      (socialsHtml ? '<div class="scraper-socials">' + socialsHtml + '</div>' : '');
+    card.innerHTML = content;
+    container.appendChild(card);
+  }
 
-    container.appendChild(websiteCard);
+  function renderPlacesCard(container, places) {
+    var card = document.createElement('div');
+    card.className = 'scraper-card';
 
-    // ---- Card 2: Google Maps ----
-    if (data.places) {
-      var p = data.places;
-      var mapsCard = document.createElement('div');
-      mapsCard.className = 'scraper-card';
+    var content = '<div class="scraper-card-title">3. Google Places</div>';
 
-      var mapsQuery = encodeURIComponent((p.name || '') + ' ' + (p.address || ''));
-
-      mapsCard.innerHTML =
-        '<div class="scraper-card-title">Google Maps</div>' +
-        (p.rating
-          ? '<div class="scraper-rating">' + p.rating + ' ★ (' + (p.reviewCount || 0) + ' reseñas)</div>'
+    if (!places) {
+      content += '<div class="scraper-msg">Sin datos de Google Places.</div>';
+    } else if (places.skipped) {
+      content += '<div class="scraper-msg scraper-msg--warn">' + escHtml(places.reason) + '</div>';
+    } else {
+      var mapsQuery = encodeURIComponent((places.name || '') + ' ' + (places.address || ''));
+      content +=
+        '<div class="scraper-card-meta"><strong>' + escHtml(places.name) + '</strong></div>' +
+        (places.rating
+          ? '<div class="scraper-rating">' + places.rating + ' ★ (' + (places.reviewCount || 0) + ' reseñas)</div>'
           : '<div class="scraper-rating">Sin calificación</div>') +
-        '<div class="scraper-address">' + escHtml(p.address || '') + '</div>' +
+        '<div class="scraper-address">' + escHtml(places.address || '') + '</div>' +
         '<a href="https://maps.google.com/?q=' + mapsQuery + '" target="_blank" rel="noopener" class="scraper-link">Ver en Maps →</a>';
-
-      container.appendChild(mapsCard);
     }
 
-    // ---- Card 3: Competitors ----
-    if (data.competitors && data.competitors.competitors && data.competitors.competitors.length) {
-      var c   = data.competitors;
-      var compCard = document.createElement('div');
-      compCard.className = 'scraper-card';
+    card.innerHTML = content;
+    container.appendChild(card);
+  }
 
-      var rows = c.competitors.map(function(comp) {
+  function renderCompetitorsCard(container, compData, placesData) {
+    var card = document.createElement('div');
+    card.className = 'scraper-card';
+
+    var content = '<div class="scraper-card-title">4. Competidores</div>';
+
+    if (!compData) {
+      content += '<div class="scraper-msg">Sin datos de competidores.</div>';
+    } else if (compData.skipped) {
+      content += '<div class="scraper-msg scraper-msg--warn">' + escHtml(compData.reason) + '</div>';
+    } else if (!compData.competitors || !compData.competitors.length) {
+      content += '<div class="scraper-msg">No se encontraron competidores cercanos.</div>';
+    } else {
+      var rows = compData.competitors.map(function(comp) {
         return '<tr>' +
           '<td>' + escHtml(comp.name) + '</td>' +
           '<td>' + (comp.rating ? comp.rating + ' ★' : '—') + '</td>' +
@@ -442,61 +505,62 @@ var OpsScraper = (function() {
         '</tr>';
       }).join('');
 
-      compCard.innerHTML =
-        '<div class="scraper-card-title">Competidores</div>' +
+      content +=
         '<table class="scraper-comp-table">' +
           '<thead><tr><th>Nombre</th><th>Rating</th><th>Reseñas</th></tr></thead>' +
           '<tbody>' + rows + '</tbody>' +
         '</table>' +
-        (c.insight ? '<div class="scraper-insight">' + escHtml(c.insight) + '</div>' : '');
-
-      container.appendChild(compCard);
+        (compData.insight ? '<div class="scraper-insight">' + escHtml(compData.insight) + '</div>' : '');
     }
 
-    // ---- Card 4: Opportunities ----
-    var opportunities = [];
-    var w2 = data.website || {};
+    card.innerHTML = content;
+    container.appendChild(card);
+  }
 
-    if (w2.error === 'no_url' || !w2.url) {
+  function renderOpportunities(container, data) {
+    var opportunities = [];
+    var w = data.website || {};
+
+    if (w.error === 'no_url' || !w.url) {
       opportunities.push('No tiene sitio web — oportunidad de Website + Chat IA');
     }
 
-    var hasSocial = w2.socialLinks && Object.keys(w2.socialLinks).length > 0;
+    var hasSocial = data.social && data.social.some(function(p) { return p.found; });
     if (!hasSocial) {
       opportunities.push('Sin presencia en redes sociales detectada — oportunidad de marketing digital');
     }
 
-    if (data.places && data.competitors && data.competitors.avgRating &&
-        data.places.rating && data.places.rating < data.competitors.avgRating - 0.3) {
+    if (data.places && !data.places.skipped && data.competitors && !data.competitors.skipped &&
+        data.competitors.avgRating && data.places.rating && data.places.rating < data.competitors.avgRating - 0.3) {
       opportunities.push('Rating bajo vs competidores — oportunidad de mejorar reputación online');
     }
 
-    if (!w2.hasAnalytics && !w2.error) {
+    if (!w.error && !w.hasAnalytics) {
       opportunities.push('Sin analytics — no está midiendo el tráfico web');
     }
 
-    if (!w2.hasWhatsAppWidget && !w2.error) {
+    if (!w.error && !w.hasWhatsAppWidget) {
       opportunities.push('Sin WhatsApp en web — oportunidad de Bot de WhatsApp');
     }
 
-    if (!w2.hasBooking && !w2.error) {
+    if (!w.error && !w.hasBooking) {
       opportunities.push('Sin sistema de reservas — oportunidad de automatización');
     }
 
-    if (opportunities.length) {
-      var summCard = document.createElement('div');
-      summCard.className = 'scraper-card scraper-summary';
+    if (!opportunities.length) return;
 
-      var liItems = opportunities.map(function(o) {
-        return '<li>' + escHtml(o) + '</li>';
-      }).join('');
+    var card = document.createElement('div');
+    card.className = 'scraper-card scraper-summary';
 
-      summCard.innerHTML =
-        '<div class="scraper-card-title">Oportunidades</div>' +
-        '<ul class="scraper-opportunities">' + liItems + '</ul>';
+    var liItems = opportunities.map(function(o) {
+      return '<li>' + escHtml(o) + '</li>';
+    }).join('');
 
-      container.appendChild(summCard);
-    }
+    card.innerHTML =
+      '<div class="scraper-card-title">Oportunidades detectadas</div>' +
+      '<ul class="scraper-opportunities">' + liItems + '</ul>';
+
+    container.appendChild(card);
   }
 
   /* ---- Save results to Supabase ---- */
@@ -504,9 +568,17 @@ var OpsScraper = (function() {
   function saveResults() {
     if (!collectedData) return;
 
+    if (typeof OndaSupabase === 'undefined' || !OndaSupabase.client) {
+      alert('Supabase no configurado — configura las credenciales primero');
+      return;
+    }
+
     var leadSel = document.getElementById('scraperLeadSelect');
     var leadId  = leadSel ? leadSel.value : null;
-    if (!leadId) return;
+    if (!leadId) {
+      alert('Selecciona un lead para guardar los resultados');
+      return;
+    }
 
     OndaSupabase.client
       .from('leads')
@@ -518,24 +590,19 @@ var OpsScraper = (function() {
       .then(function(result) {
         if (result.error) return;
 
-        var saveBtn = document.getElementById('scraperSaveBtn');
-        if (saveBtn) {
-          var orig = saveBtn.textContent;
-          saveBtn.textContent = 'Guardado ✓';
-          setTimeout(function() { saveBtn.textContent = orig; }, 2000);
-        }
+        setStatus('Datos guardados en lead.');
 
-        // Log activity
-        var user = OpsAuth.getUser ? OpsAuth.getUser() : {};
-        OndaSupabase.client
-          .from('activity_log')
-          .insert([{
-            lead_id:    leadId,
-            user_id:    user ? user.id : null,
-            action:     'scraper_ran',
-            details:    JSON.stringify({ url: collectedData.website ? collectedData.website.url : null }),
-            created_at: new Date().toISOString()
-          }]);
+        var user = OpsAuth.getUser ? OpsAuth.getUser() : null;
+        if (user) {
+          OndaSupabase.client
+            .from('lead_activity')
+            .insert([{
+              lead_id:    leadId,
+              user_id:    user.id,
+              action:     'scraper_ran',
+              details:    collectedData.website ? collectedData.website.url : null
+            }]);
+        }
       });
   }
 
@@ -547,7 +614,7 @@ var OpsScraper = (function() {
     var leadSel = document.getElementById('scraperLeadSelect');
     if (leadSel) {
       leadSel.addEventListener('change', function() {
-        var leads = OpsDashboard.getAllLeads();
+        var leads = typeof OpsDashboard !== 'undefined' ? OpsDashboard.getAllLeads() : [];
         var lead  = leads.find(function(l) { return String(l.id) === leadSel.value; });
         if (lead) prefillFromLead(lead);
       });
@@ -557,10 +624,7 @@ var OpsScraper = (function() {
     if (runBtn) runBtn.addEventListener('click', runScraper);
 
     var saveBtn = document.getElementById('scraperSaveBtn');
-    if (saveBtn) {
-      saveBtn.disabled = true;
-      saveBtn.addEventListener('click', saveResults);
-    }
+    if (saveBtn) saveBtn.addEventListener('click', saveResults);
 
     document.addEventListener('ops:openScraper', function(e) {
       if (e.detail && e.detail.lead) {
@@ -573,7 +637,8 @@ var OpsScraper = (function() {
 
   return {
     init:            init,
-    prefillFromLead: prefillFromLead
+    prefillFromLead: prefillFromLead,
+    saveResults:     saveResults
   };
 
 })();

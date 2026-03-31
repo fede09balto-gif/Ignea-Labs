@@ -31,11 +31,11 @@ var OpsDashboard = (function() {
         if (result.error) throw result.error;
 
         allLeads = result.data || [];
-        renderPipeline();
-        renderStats();
       } catch (e) {
         allLeads = [];
       }
+      renderPipeline();
+      renderStats();
     })();
   }
 
@@ -139,14 +139,19 @@ var OpsDashboard = (function() {
 
       var now = new Date().toISOString();
 
+      // Always update local state first
+      lead.pipeline_stage = newStage;
+      lead.updated_at = now;
+      renderPipeline();
+      renderStats();
+
+      // Then try Supabase (best-effort)
       (async function() {
         try {
-          var updateResult = await OndaSupabase.client
+          await OndaSupabase.client
             .from('leads')
             .update({ pipeline_stage: newStage, updated_at: now })
             .eq('id', leadId);
-
-          if (updateResult.error) throw updateResult.error;
 
           var user = OpsAuth.getUser();
           if (user) {
@@ -160,20 +165,11 @@ var OpsDashboard = (function() {
               });
           }
 
-          // Update local array
-          lead.pipeline_stage = newStage;
-          lead.updated_at = now;
-
-          var updatedLead = Object.assign({}, lead);
-
           if (typeof OndaSheetsSync !== 'undefined' && OndaSheetsSync.sync) {
-            OndaSheetsSync.sync(updatedLead).catch(function() {});
+            OndaSheetsSync.sync(Object.assign({}, lead)).catch(function() {});
           }
-
-          renderPipeline();
-          renderStats();
         } catch (e) {
-          // Silently fail — keep current state
+          // Supabase failed — local state already updated
         }
       })();
     });
@@ -200,15 +196,15 @@ var OpsDashboard = (function() {
       ? Math.round((won / (won + lost)) * 100)
       : 0;
 
-    var totalLeadsEl = document.getElementById('pipeTotalLeads');
-    var totalValueEl = document.getElementById('pipeTotalValue');
-    var avgScoreEl = document.getElementById('pipeAvgScore');
-    var winRateEl = document.getElementById('pipeWinRate');
+    var totalLeadsEl = document.getElementById('pipeStatTotal');
+    var totalValueEl = document.getElementById('pipeStatValue');
+    var wonEl = document.getElementById('pipeStatWon');
+    var conversionEl = document.getElementById('pipeStatConversion');
 
-    if (totalLeadsEl) totalLeadsEl.textContent = activeLeads.length;
+    if (totalLeadsEl) totalLeadsEl.textContent = allLeads.length;
     if (totalValueEl) totalValueEl.textContent = '$' + totalValue.toLocaleString();
-    if (avgScoreEl) avgScoreEl.textContent = avgScore;
-    if (winRateEl) winRateEl.textContent = winRate + '%';
+    if (wonEl) wonEl.textContent = won;
+    if (conversionEl) conversionEl.textContent = winRate + '%';
   }
 
   function escHtml(str) {

@@ -1,72 +1,101 @@
 /* ============================================================
-   ONDA AI — Scoring Algorithm + Recommendation Engine + ROI
-   Per BUILD_SPEC section 8.
-   5 dimensions, each 0-20, total 0-100.
+   ONDA AI — Diagnostic Scoring Engine v2
+   4 Value Streams: Customer Flow, Operations Flow,
+   Information Flow, Growth Flow. Each 0-25, total 0-100.
    ============================================================ */
 
 var OndaScoring = (function() {
 
   function calculate(answers) {
-    var scores = {
-      customerInteraction: 0,
-      processMaturity: 0,
-      digitalPresence: 0,
-      dataUtilization: 0,
-      aiReadiness: 0
+    var streams = {
+      customerFlow: 0,
+      operationsFlow: 0,
+      informationFlow: 0,
+      growthFlow: 0
     };
 
-    // Q4: Customer interaction hours (0-80, step 5)
-    // Higher hours = lower score = more opportunity
-    var hours = parseInt(answers.q4) || 0;
-    if (hours >= 60) scores.customerInteraction += 2;
-    else if (hours >= 40) scores.customerInteraction += 5;
-    else if (hours >= 20) scores.customerInteraction += 10;
-    else if (hours >= 10) scores.customerInteraction += 15;
-    else scores.customerInteraction += 20;
+    // Q1: Customer Journey (Customer Flow)
+    var q1Cards = answers.q1_cards || [];
+    var channelCount = q1Cards.length;
+    var q1Score = 0;
+    if (channelCount === 0) q1Score = 0;
+    else if (channelCount === 1) q1Score = 2;
+    else if (channelCount === 2) q1Score = 4;
+    else if (channelCount === 3) q1Score = 6;
+    else if (channelCount === 4) q1Score = 8;
+    else q1Score = 10;
 
-    // Q5: Digital presence (index 0-3)
-    // 0="No tenemos", 1="Sí pero no genera", 2="Genera algunos", 3="Principal fuente"
-    var web = parseInt(answers.q5) || 0;
-    scores.digitalPresence += [0, 5, 12, 20][web] || 0;
+    var digitalChannels = ['website_form', 'google_search', 'social_media', 'email'];
+    var hasDigital = false;
+    for (var i = 0; i < q1Cards.length; i++) {
+      if (digitalChannels.indexOf(q1Cards[i]) !== -1) { hasDigital = true; break; }
+    }
+    if (hasDigital) q1Score += 2;
+    if (!hasDigital && channelCount > 0) q1Score = Math.min(q1Score, 3);
 
-    // Also factor Q5 into customer interaction
-    if (web <= 1) {
-      scores.customerInteraction = Math.max(0, scores.customerInteraction - 5);
+    // Q2: Response Time (Customer Flow)
+    var q2Scores = [12, 9, 6, 3, 0];
+    var q2Score = q2Scores[answers.q2_card !== undefined ? answers.q2_card : 4] || 0;
+
+    streams.customerFlow = Math.min(25, q1Score + q2Score);
+
+    // Q3: Repetitive Tasks (Operations Flow)
+    var q3Cards = answers.q3_cards || [];
+    var taskPenalties = [2, 2, 2, 2, 1, 3, 2, 2];
+    var q3Score = 16;
+    for (var j = 0; j < q3Cards.length; j++) {
+      var idx = parseInt(q3Cards[j]);
+      if (taskPenalties[idx] !== undefined) q3Score -= taskPenalties[idx];
+    }
+    q3Score = Math.max(0, q3Score);
+
+    // Q4: Order-to-Fulfillment (Operations Flow)
+    var q4Scores = [0, 3, 6, 9];
+    var q4Score = q4Scores[answers.q4_card !== undefined ? answers.q4_card : 0] || 0;
+
+    streams.operationsFlow = Math.min(25, q3Score + q4Score);
+
+    // Q5: Financial Flow (Information Flow)
+    var q5Cards = answers.q5_cards || [];
+    var q5AllAuto = q5Cards.indexOf('all_automated') !== -1 || q5Cards.indexOf(5) !== -1;
+    var q5Score = 12;
+    if (!q5AllAuto) {
+      var financePenalties = { '0': 2, '1': 2, '2': 3, '3': 2, '4': 3 };
+      for (var k = 0; k < q5Cards.length; k++) {
+        var pen = financePenalties[String(q5Cards[k])];
+        if (pen) q5Score -= pen;
+      }
+      q5Score = Math.max(0, q5Score);
     }
 
-    // Q6: Scheduling methods (array of indices)
-    // 0=Notebook, 1=Excel, 2=Software, 3=WhatsApp, 4=Memory
-    var methods = answers.q6 || [];
-    var processScore = 20;
-    if (methods.indexOf(0) !== -1) processScore -= 8;  // Notebook
-    if (methods.indexOf(3) !== -1) processScore -= 5;  // WhatsApp
-    if (methods.indexOf(4) !== -1) processScore -= 7;  // Memory
-    if (methods.indexOf(1) !== -1) processScore -= 2;  // Excel
-    scores.processMaturity = Math.max(0, processScore);
+    // Q6: Systems & Integration (Information Flow)
+    var q6Cards = answers.q6_cards || [];
+    var toolScores = { '0': 0, '1': 1, '2': 2, '3': 2, '4': 3, '5': 3, '6': 4, '7': 5 };
+    var q6Score = 0;
+    for (var m = 0; m < q6Cards.length; m++) {
+      q6Score += (toolScores[String(q6Cards[m])] || 0);
+    }
+    if (q6Cards.indexOf(7) !== -1 || q6Cards.indexOf('integrated') !== -1) q6Score += 2;
+    q6Score = Math.min(13, q6Score);
 
-    // Q7: Tech stack (array of indices)
-    // 0=None, 1=Social, 2=WA Business, 3=Excel, 4=Accounting, 5=CRM, 6=POS, 7=Other
-    var tools = answers.q7 || [];
-    var techScore = 0;
-    if (tools.indexOf(1) !== -1) techScore += 3;  // Social media
-    if (tools.indexOf(2) !== -1) techScore += 4;  // WhatsApp Business
-    if (tools.indexOf(3) !== -1) techScore += 3;  // Excel
-    if (tools.indexOf(4) !== -1) techScore += 5;  // Accounting
-    if (tools.indexOf(5) !== -1) techScore += 8;  // CRM
-    if (tools.indexOf(6) !== -1) techScore += 5;  // POS
-    scores.dataUtilization = Math.min(20, techScore);
+    // Q7: Decision-Making (Information Flow)
+    var q7Scores = [0, 3, 5, 8, 12];
+    var q7Score = q7Scores[answers.q7_card !== undefined ? answers.q7_card : 0] || 0;
 
-    // Q8: AI familiarity (index 0-3)
-    // 0="Never heard", 1="Heard not used", 2="Tried", 3="Use regularly"
-    var ai = parseInt(answers.q8) || 0;
-    scores.aiReadiness = [2, 6, 12, 20][ai] || 2;
+    streams.informationFlow = Math.min(25, q5Score + q6Score + q7Score);
 
-    // Digital presence also gets boost from social/WA Business in Q7
-    if (tools.indexOf(1) !== -1) scores.digitalPresence = Math.min(20, scores.digitalPresence + 3);
-    if (tools.indexOf(2) !== -1) scores.digitalPresence = Math.min(20, scores.digitalPresence + 2);
+    // Q8: Revenue Leakage (Growth Flow)
+    var q8Scores = [12, 9, 5, 2, 0];
+    var q8Score = q8Scores[answers.q8_card !== undefined ? answers.q8_card : 4] || 0;
 
-    var total = 0;
-    for (var key in scores) total += scores[key];
+    // Q9: Scale Stress Test (Growth Flow)
+    var q9Scores = [0, 3, 7, 12];
+    var q9Score = q9Scores[answers.q9_card !== undefined ? answers.q9_card : 0] || 0;
+
+    streams.growthFlow = Math.min(25, q8Score + q9Score);
+
+    // Total
+    var total = streams.customerFlow + streams.operationsFlow + streams.informationFlow + streams.growthFlow;
 
     var level;
     if (total <= 25) level = 'critical';
@@ -74,84 +103,64 @@ var OndaScoring = (function() {
     else if (total <= 75) level = 'competent';
     else level = 'advanced';
 
-    return { scores: scores, total: total, level: level };
+    return { streams: streams, total: total, level: level };
   }
 
-  function getRecommendations(scores) {
-    var recos = [];
+  function getRecommendations(streams) {
+    var recs = [];
+    var ranked = Object.keys(streams).sort(function(a, b) { return streams[a] - streams[b]; });
 
-    if (scores.customerInteraction < 10) {
-      recos.push({ key: 'whatsapp', priority: 'high' });
-    }
-    if (scores.digitalPresence < 10) {
-      recos.push({ key: 'website', priority: 'high' });
-    }
-    if (scores.processMaturity < 10) {
-      recos.push({ key: 'automation', priority: 'high' });
-    }
-    if (scores.dataUtilization < 10) {
-      recos.push({ key: 'analytics', priority: 'medium' });
-    }
-    if (scores.aiReadiness < 10) {
-      recos.push({ key: 'training', priority: 'medium' });
-    }
+    ranked.forEach(function(stream) {
+      var score = streams[stream];
+      if (stream === 'customerFlow' && score < 15) {
+        recs.push({ key: 'whatsapp_bot', stream: 'customerFlow' });
+      }
+      if (stream === 'customerFlow' && score < 12) {
+        recs.push({ key: 'website_ai_chat', stream: 'customerFlow' });
+      }
+      if (stream === 'operationsFlow' && score < 15) {
+        recs.push({ key: 'internal_automation', stream: 'operationsFlow' });
+      }
+      if (stream === 'informationFlow' && score < 15) {
+        recs.push({ key: 'data_integration', stream: 'informationFlow' });
+      }
+      if (stream === 'growthFlow' && score < 12) {
+        recs.push({ key: 'full_transformation', stream: 'growthFlow' });
+      }
+    });
 
-    // Ensure at least 2 recommendations
-    if (recos.length === 0) {
-      recos.push({ key: 'automation', priority: 'medium' });
-      recos.push({ key: 'analytics', priority: 'medium' });
-    }
-
-    return recos.slice(0, 4);
+    return recs.slice(0, 3);
   }
 
-  function getHourlyCost(revenueIndex) {
-    // Map Q11 revenue brackets to estimated hourly employee cost (USD)
-    // 0=<$2K, 1=$2-5K, 2=$5-15K, 3=$15-50K, 4=>$50K, 5=prefer not to say
-    return [1.5, 2.5, 4, 6, 10, 3][revenueIndex] || 3;
-  }
+  function calculateROI(answers, formData, streams) {
+    var teamSizes = [3, 10, 30, 75];
+    var teamSize = teamSizes[formData.size_index || 0] || 10;
+    var hourlyCosts = [1.5, 2.5, 4, 6, 10, 3];
+    var hourlyCost = hourlyCosts[formData.revenue_index || 5] || 3;
 
-  function calculateROI(answers, scores) {
-    var teamSizes = [3, 10, 30, 75]; // midpoints for Q2 options
-    var teamSize = teamSizes[parseInt(answers.q2) || 0] || 10;
-    var hours = parseInt(answers.q4) || 20;
-    var revenueIdx = parseInt(answers.q11) || 5;
-    var hourlyCost = getHourlyCost(revenueIdx);
-    var web = parseInt(answers.q5) || 0;
+    var tasksSelected = (answers.q3_cards || []).length;
+    var weeklyWastedHours = tasksSelected * 7;
+    var monthlyWastedHours = weeklyWastedHours * 4;
 
-    // WhatsApp bot savings (handles ~70% of routine inquiries)
-    var botHoursSaved = hours * 0.7;
-    var botMonthlySavings = botHoursSaved * hourlyCost * 4;
+    var responseTimePenalty = [0, 50, 150, 300, 500][answers.q2_card || 4] || 0;
+    var leakageEstimate = [0, 100, 300, 600, 800][answers.q8_card || 4] || 0;
 
-    // Website savings (lead generation value)
-    var webMonthlySavings = web <= 1 ? 400 : 200;
+    var totalMonthlyCost = (monthlyWastedHours * hourlyCost) + responseTimePenalty + leakageEstimate;
 
-    // Automation savings (~20 hrs/month conservative)
-    var autoMonthlySavings = 20 * hourlyCost * 4;
-
-    var totalMonthlySavings = Math.round(botMonthlySavings + webMonthlySavings + autoMonthlySavings);
-
-    // Investment range based on revenue tier
-    var investMin, investMax;
-    if (revenueIdx <= 1) { investMin = 1500; investMax = 3000; }
-    else if (revenueIdx <= 3) { investMin = 3000; investMax = 5000; }
-    else { investMin = 5000; investMax = 8000; }
-
-    var avgInvestment = (investMin + investMax) / 2;
-    var paybackMonths = Math.max(1, Math.round(avgInvestment / totalMonthlySavings * 10) / 10);
-    var roi12 = Math.round(((totalMonthlySavings * 12) - avgInvestment) / avgInvestment * 100);
-
-    // Savings range (±20%)
-    var savingsMin = Math.round(totalMonthlySavings * 0.8);
-    var savingsMax = Math.round(totalMonthlySavings * 1.2);
+    var recommendedInvestment = Math.round(totalMonthlyCost * 4 * 0.35);
+    var paybackMonths = totalMonthlyCost > 0 ? Math.round((recommendedInvestment / totalMonthlyCost) * 10) / 10 : 0;
+    var roi12 = recommendedInvestment > 0 ? Math.round(((totalMonthlyCost * 12) - recommendedInvestment) / recommendedInvestment * 100) : 0;
 
     return {
-      savingsMin: savingsMin,
-      savingsMax: savingsMax,
-      investMin: investMin,
-      investMax: investMax,
+      monthlyWastedHours: monthlyWastedHours,
+      weeklyWastedHours: weeklyWastedHours,
+      totalMonthlyCost: Math.round(totalMonthlyCost),
+      annualCost: Math.round(totalMonthlyCost * 12),
+      recommendedInvestment: recommendedInvestment,
       paybackMonths: paybackMonths,
-      roi12: roi12
+      roi12: roi12,
+      hourlyCost: hourlyCost,
+      fteEquivalent: Math.round((weeklyWastedHours / 40) * 10) / 10
     };
   }
 
