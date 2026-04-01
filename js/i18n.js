@@ -20,7 +20,7 @@ var IgneaI18n = (function() {
       // ---- HOMEPAGE: HERO ----
       "hero.tag": "// Infraestructura de IA para Centroamérica",
       "hero.title": 'Tus operaciones funcionan por instinto. Nosotros las hacemos funcionar con <em>inteligencia.</em>',
-      "hero.sub": "Diagnosticamos ineficiencias, cuantificamos el costo y desplegamos sistemas de IA personalizados que las eliminan. Para empresas listas para liderar.",
+      "hero.sub": "Encontramos el potencial dormido bajo la superficie de tu operación — las ineficiencias ocultas, los procesos manuales, los datos que nadie está usando — y lo transformamos en nuevo terreno competitivo.",
       "hero.cta1": "Iniciar Diagnóstico &rarr;",
       "hero.cta2": "Leer Manifiesto",
 
@@ -32,14 +32,14 @@ var IgneaI18n = (function() {
 
       // ---- HOMEPAGE: WHAT WE DO ----
       "whatwedo.tag": "// Qué hacemos",
-      "whatwedo.p1": "Identificamos dónde la IA crea mayor valor en tus operaciones — y lo construimos.",
-      "whatwedo.p2": "Nuestro proceso comienza con un diagnóstico profundo de tu organización. Mapeamos tus flujos de trabajo, identificamos cuellos de botella y señalamos dónde la inteligencia artificial genera impacto medible. Luego diseñamos y desplegamos sistemas de IA personalizados — adaptados a tu operación, tus datos, tus objetivos.",
-      "whatwedo.p3": "Trabajamos con un número reducido de socios. Esto no es un negocio de volumen. Cada empresa que tomamos recibe toda nuestra atención.",
+      "whatwedo.p1": "Vamos bajo la superficie de tu organización para encontrar lo que ha estado dormido.",
+      "whatwedo.p2": "Nuestro proceso comienza con un diagnóstico profundo. Mapeamos tus flujos de trabajo, identificamos cuellos de botella y señalamos dónde la inteligencia artificial genera impacto medible. Luego diseñamos y desplegamos sistemas de IA personalizados — adaptados a tu operación, tus datos, tus objetivos.",
+      "whatwedo.p3": "Trabajamos con un número reducido de socios. Esto no es un negocio de volumen. Cada empresa que tomamos recibe toda nuestra atención. El resultado no es optimización — es nuevo terreno.",
 
 
       // ---- HOMEPAGE: CTA ----
       "cta.tag": "// ¿Listo?",
-      "cta.headline": "Descubre dónde la IA encaja en tu organización.",
+      "cta.headline": "Descubre el potencial dormido en tu operación.",
       "cta.btn": "Iniciar Diagnóstico &rarr;",
       "cta.note": "Completamente encriptado. Resultados instantáneos.",
 
@@ -75,8 +75,8 @@ var IgneaI18n = (function() {
       "dx.start": "Comenzar Diagnóstico &rarr;",
 
       // ---- DIAGNOSTIC: LANDING & BEFORE ----
-      "dx.landing.headline": "Descubre cuánto le están costando realmente tus operaciones.",
-      "dx.landing.sub": "Once preguntas. Cada una diseñada para revelar lo que más importa — las ineficiencias ocultas a simple vista, los sistemas que deberían funcionar mejor, y las oportunidades que tu competencia aún no ha encontrado.",
+      "dx.landing.headline": "Descubre cuánto potencial tiene tu negocio bajo la superficie.",
+      "dx.landing.sub": "Once preguntas. Cada una diseñada para revelar lo que importa — las ineficiencias ocultas a simple vista, los sistemas que deberían funcionar mejor, y las oportunidades que tu competencia aún no ha encontrado.",
       "dx.landing.note": "Tus respuestas quedan entre nosotros. Mientras más honesto seas, más preciso será tu diagnóstico.",
       "dx.landing.cta": "Comenzar Diagnóstico &rarr;",
       "dx.encrypted": "Diagnóstico Encriptado",
@@ -244,6 +244,11 @@ var IgneaI18n = (function() {
       "res.reco.full_transformation.t": "Transformación Digital Completa",
       "res.reco.full_transformation.d": "Infraestructura completa para escalar sin aumentar personal proporcionalmente.",
 
+      // ---- DIAGNOSTIC: PHASE TRANSITION ----
+      "dx.phase2.tag": "// Fase 2",
+      "dx.phase2.text": "Perfecto. Ahora unas preguntas específicas para calcular tu puntuación de preparación digital.",
+      "dx.phase2.continue": "Continuar &rarr;",
+
       // ---- DIAGNOSTIC: PROCESSING ----
       "dx.processing1": "Procesando tu diagnóstico...",
       "dx.processing2": "Calculando tu puntuación...",
@@ -259,10 +264,10 @@ var IgneaI18n = (function() {
       "res.level.competent": "Competente",
       "res.level.advanced": "Avanzado",
 
-      "res.level.critical.desc": "Tu negocio tiene un potencial enorme de transformación con IA. Cada semana que pasa sin actuar, estás dejando dinero sobre la mesa.",
-      "res.level.developing.desc": "Las bases están, pero hay brechas importantes. La buena noticia: las soluciones existen y el impacto sería inmediato.",
-      "res.level.competent.desc": "Tu negocio tiene buena base digital. El siguiente paso es inteligencia artificial para multiplicar lo que ya funciona.",
-      "res.level.advanced.desc": "Tu operación ya está digitalizada. Estás listo para soluciones avanzadas de IA que te pongan por delante de tu competencia.",
+      "res.level.critical.desc": "Tu negocio tiene potencial dormido enorme. Cada semana sin actuar, ese potencial se queda bajo la superficie mientras tu competencia avanza.",
+      "res.level.developing.desc": "Las bases están, pero hay brechas importantes por cerrar. La buena noticia: el potencial está ahí, listo para ser activado.",
+      "res.level.competent.desc": "Tu negocio tiene buena base digital. El siguiente paso es IA para transformar lo que ya funciona en nuevo terreno competitivo.",
+      "res.level.advanced.desc": "Tu operación ya está digitalizada. Estás listo para soluciones avanzadas de IA que te pongan en terreno que tu competencia ni sabe que existe.",
 
       "res.dimTag": "// Desglose por Dimensión",
       "res.dim.customerInteraction": "Interacción con Clientes",
@@ -324,23 +329,25 @@ var IgneaI18n = (function() {
 
       // ---- MANIFESTO ----
       "man.tag": "// Manifiesto",
-      "man.title": 'Centroamérica construyó puentes entre dos mundos. El próximo puente es <em>digital.</em>',
-      "man.p1": "Las empresas que mueven la economía de Nicaragua están rodeadas de océanos de datos que no pueden ver, sistemas que no se comunican entre sí, y departamentos que operan en aislamiento — mientras sus líderes toman decisiones por instinto porque la información que necesitan está atrapada en algún lugar que no pueden alcanzar.",
-      "man.p2": "Restaurantes que atienden turistas de todo el mundo siguen coordinando por WhatsApp. Clínicas que manejan cientos de pacientes agendan en cuadernos. Hoteles que compiten con Airbnb no tienen presencia digital más allá de una página de Facebook abandonada.",
-      "man.p3": "La inteligencia para cambiar todo esto ya existe. La tecnología está lista. Lo que ha faltado es alguien dispuesto a construir la conexión entre lo que la IA puede hacer y lo que los negocios centroamericanos realmente necesitan.",
-      "man.break": "Eso es Ignea.",
-      "man.p4": "No somos una consultora que vende presentaciones. No somos una agencia que escribe código y desaparece. Nos metemos dentro de tu operación, aprendemos dónde sangra, y construimos los sistemas que detienen el sangrado — permanentemente.",
+      "man.title": 'Centroamérica se construyó sobre fuego. El próximo terreno es <em>digital.</em>',
+      "man.p1": "Nicaragua es tierra de volcanes. Masaya, Momotombo, Cerro Negro — cada uno formó nuevo terreno a través del mismo proceso: presión desde abajo, calor aplicado a materia prima, nueva tierra emergiendo donde antes no había nada.",
+      "man.p2": "Ignea Labs toma su nombre de ese proceso. Ígnea — nacida del fuego. La roca ígnea se forma cuando el magma atrapado bajo la superficie encuentra su camino hacia arriba y se transforma en terreno sólido. Eso es exactamente lo que hacemos.",
+      "man.p3": "Las empresas que mueven la economía de Nicaragua están rodeadas de potencial dormido — océanos de datos que no pueden ver, sistemas que no se comunican entre sí, departamentos operando en aislamiento. Sus líderes toman decisiones por instinto porque la información que necesitan está atrapada en algún lugar que no pueden alcanzar.",
+      "man.p3b": "Restaurantes que atienden turistas de todo el mundo siguen coordinando por WhatsApp. Clínicas que manejan cientos de pacientes agendan en cuadernos. Hoteles que compiten con Airbnb no tienen presencia digital más allá de una página de Facebook abandonada.",
+      "man.p3c": "El potencial para cambiar todo esto ya existe. La tecnología está lista. Lo que ha faltado es alguien dispuesto a ir bajo la superficie y aplicar el calor necesario para transformar ese potencial en nuevo terreno operativo.",
+      "man.break": "Eso es Ignea Labs.",
+      "man.p4": "No somos una consultora que vende presentaciones. No somos una agencia que escribe código y desaparece. Nos metemos dentro de tu operación, encontramos dónde está el potencial dormido, y construimos la infraestructura que lo activa — permanentemente.",
       "man.p5": "Trabajamos con un número reducido de socios. No porque no podamos escalar, sino porque la transformación exige proximidad, honestidad, y el tipo de atención que desaparece en el momento que intentas atender a todos. Cada empresa que tomamos recibe todo el peso de lo que sabemos. Eso no es una filosofía. Es una promesa.",
-      "man.p6": "Nos llamamos Ignea porque la transformación, como el fuego, se propaga. Cada automatización enciende la siguiente. Cada insight agudiza el que sigue. La brecha entre tu negocio y tu competencia se amplía silenciosamente, y luego de golpe.",
-      "man.p7": "La próxima generación de líderes empresariales en Centroamérica se definirá por una sola decisión. No qué mercado entraron. No qué producto lanzaron. Si adoptaron IA antes que su competencia o pasaron años viendo cómo la brecha se ampliaba desde el lado equivocado.",
-      "man.closing": "No vendemos IA. Construimos infraestructura.",
+      "man.p6": "Nos llamamos Ignea porque la transformación, como el fuego volcánico, se propaga. Cada automatización enciende la siguiente. Cada insight agudiza el que sigue. La brecha entre tu negocio y tu competencia se amplía silenciosamente, y luego de golpe.",
+      "man.p7": "La próxima generación de líderes empresariales en Centroamérica se definirá por una sola decisión. No qué mercado entraron. No qué producto lanzaron. Si activaron el potencial dormido en su operación antes que su competencia — o pasaron años viendo cómo la brecha se ampliaba desde el lado equivocado.",
+      "man.closing": "No vendemos IA. Construimos nuevo terreno.",
       "man.ctaTitle": "Descubre tu potencial.",
       "man.ctaBtn": "Iniciar Diagnóstico &rarr;",
 
       // ---- CONTACT ----
       "ct.tag": "// Contacto",
       "ct.headline": "Hablemos.",
-      "ct.newSub": "Trabajamos con un número selecto de organizaciones. Si estás listo para explorar lo que la IA puede hacer por tu negocio, contáctanos.",
+      "ct.newSub": "Trabajamos con un número selecto de organizaciones. Si estás listo para descubrir el potencial dormido en tu negocio, contáctanos.",
       "ct.emailDirect": "O escríbenos directamente a",
       "ct.title": '¿Listo para descubrir el potencial de <em>tu negocio?</em>',
       "ct.sub": "No es una llamada de ventas. Es una conversación estratégica sobre las oportunidades específicas en tu operación.",
@@ -369,7 +376,7 @@ var IgneaI18n = (function() {
       "ct.errorSub": "Intenta de nuevo.",
 
       // ---- FOOTER ----
-      "footer.tag": "Cerrando la brecha de IA en Centroamérica.",
+      "footer.tag": "Bajo la superficie, el potencial.",
       "footer.rights": "Todos los derechos reservados.",
 
       // ---- 404 ----
@@ -539,7 +546,7 @@ var IgneaI18n = (function() {
       // ---- HOMEPAGE: HERO ----
       "hero.tag": "// AI infrastructure for Central America",
       "hero.title": 'Your operations run on instinct. We make them run on <em>intelligence.</em>',
-      "hero.sub": "We diagnose inefficiencies, quantify the cost, and deploy custom AI systems that eliminate them. Built for businesses ready to lead.",
+      "hero.sub": "We find the dormant potential beneath the surface of your operations — the hidden inefficiencies, the manual processes, the data no one is using — and transform it into competitive new ground.",
       "hero.cta1": "Begin Diagnostic &rarr;",
       "hero.cta2": "Read Manifesto",
 
@@ -551,13 +558,13 @@ var IgneaI18n = (function() {
 
       // ---- HOMEPAGE: WHAT WE DO ----
       "whatwedo.tag": "// What We Do",
-      "whatwedo.p1": "We identify where AI creates the most value in your operations — then we build it.",
-      "whatwedo.p2": "Our process begins with a deep diagnostic of your organization. We map your workflows, identify bottlenecks, and pinpoint where artificial intelligence delivers measurable impact. Then we design and deploy custom AI systems — tailored to your operations, your data, your objectives.",
-      "whatwedo.p3": "We work with a small number of partners. This is not a volume business. Every engagement gets our full attention.",
+      "whatwedo.p1": "We go beneath the surface of your organization to find what's been dormant.",
+      "whatwedo.p2": "Our process begins with a deep diagnostic. We map your workflows, identify bottlenecks, and pinpoint where artificial intelligence delivers measurable impact. Then we design and deploy custom AI systems — tailored to your operations, your data, your objectives.",
+      "whatwedo.p3": "We work with a small number of partners. This is not a volume business. Every engagement gets our full attention. The result isn't optimization — it's new ground.",
 
       // ---- HOMEPAGE: CTA ----
       "cta.tag": "// Ready?",
-      "cta.headline": "Discover where AI fits in your organization.",
+      "cta.headline": "Discover the dormant potential in your operation.",
       "cta.btn": "Begin Diagnostic &rarr;",
       "cta.note": "Fully encrypted. Instant results.",
 
@@ -593,9 +600,9 @@ var IgneaI18n = (function() {
       "dx.start": "Begin Diagnostic &rarr;",
 
       // ---- DIAGNOSTIC: LANDING & BEFORE ----
-      "dx.landing.headline": "Discover what your operations are really costing you.",
+      "dx.landing.headline": "Discover how much potential lies beneath the surface of your business.",
       "dx.landing.sub": "Eleven questions. Each one designed to surface what matters most — the inefficiencies hiding in plain sight, the systems that should be working harder, and the opportunities your competitors haven't found yet.",
-      "dx.landing.note": "Your answers stay between us. The more honest you are, the sharper your edge.",
+      "dx.landing.note": "Your answers stay between us. The more honest you are, the sharper your results.",
       "dx.landing.cta": "Begin Diagnostic &rarr;",
       "dx.encrypted": "Encrypted Diagnostic",
 
@@ -762,6 +769,11 @@ var IgneaI18n = (function() {
       "res.reco.full_transformation.t": "Full Digital Transformation",
       "res.reco.full_transformation.d": "Complete infrastructure to scale without proportionally increasing headcount.",
 
+      // ---- DIAGNOSTIC: PHASE TRANSITION ----
+      "dx.phase2.tag": "// Phase 2",
+      "dx.phase2.text": "Perfect. Now some specific questions to calculate your digital readiness score.",
+      "dx.phase2.continue": "Continue &rarr;",
+
       // ---- DIAGNOSTIC: PROCESSING ----
       "dx.processing1": "Processing your diagnostic...",
       "dx.processing2": "Calculating your score...",
@@ -777,10 +789,10 @@ var IgneaI18n = (function() {
       "res.level.competent": "Competent",
       "res.level.advanced": "Advanced",
 
-      "res.level.critical.desc": "Your business has enormous transformation potential with AI. Every week without action, you're leaving money on the table.",
-      "res.level.developing.desc": "The foundation is there, but there are significant gaps. The good news: solutions exist and the impact would be immediate.",
-      "res.level.competent.desc": "Your business has a solid digital foundation. The next step is AI to multiply what already works.",
-      "res.level.advanced.desc": "Your operation is already digitized. You're ready for advanced AI solutions that put you ahead of your competition.",
+      "res.level.critical.desc": "Your business has enormous dormant potential. Every week without action, that potential stays beneath the surface while your competition advances.",
+      "res.level.developing.desc": "The foundation is there, but there are significant gaps to close. The good news: the potential is there, ready to be activated.",
+      "res.level.competent.desc": "Your business has a solid digital foundation. The next step is AI to transform what already works into competitive new ground.",
+      "res.level.advanced.desc": "Your operation is already digitized. You're ready for advanced AI solutions that put you on ground your competition doesn't even know exists.",
 
       "res.dimTag": "// Dimension Breakdown",
       "res.dim.customerInteraction": "Customer Interaction",
@@ -842,23 +854,25 @@ var IgneaI18n = (function() {
 
       // ---- MANIFESTO ----
       "man.tag": "// Manifesto",
-      "man.title": 'Central America built bridges between two worlds. The next bridge is <em>digital.</em>',
-      "man.p1": "The enterprises that power Nicaragua's economy are surrounded by oceans of data they cannot see, systems that don't speak to each other, and departments operating in isolation — while their leaders make decisions on instinct because the information they need is trapped somewhere they cannot reach.",
-      "man.p2": "Restaurants serving tourists from around the world still coordinate by WhatsApp. Clinics managing hundreds of patients schedule in notebooks. Hotels competing with Airbnb have no digital presence beyond an abandoned Facebook page.",
-      "man.p3": "The intelligence to change all of this already exists. The technology is ready. What's been missing is someone willing to build the connection between what AI can do and what Central American businesses actually need.",
-      "man.break": "That is Ignea.",
-      "man.p4": "We are not a consultancy that sells slide decks. We are not an agency that writes code and disappears. We embed ourselves in your operation, learn where it bleeds, and build the systems that stop the bleeding — permanently.",
+      "man.title": 'Central America was built on fire. The next ground is <em>digital.</em>',
+      "man.p1": "Nicaragua is a land of volcanoes. Masaya, Momotombo, Cerro Negro — each one formed new ground through the same process: pressure from below, heat applied to raw material, new terrain emerging where none existed before.",
+      "man.p2": "Ignea Labs takes its name from that process. Ignea — born of fire. Igneous rock forms when trapped magma beneath the surface finds its way up and transforms into solid ground. That is exactly what we do.",
+      "man.p3": "The enterprises that power Nicaragua's economy are surrounded by dormant potential — oceans of data they cannot see, systems that don't speak to each other, departments operating in isolation. Their leaders make decisions on instinct because the information they need is trapped somewhere they cannot reach.",
+      "man.p3b": "Restaurants serving tourists from around the world still coordinate by WhatsApp. Clinics managing hundreds of patients schedule in notebooks. Hotels competing with Airbnb have no digital presence beyond an abandoned Facebook page.",
+      "man.p3c": "The potential to change all of this already exists. The technology is ready. What's been missing is someone willing to go beneath the surface and apply the heat needed to transform that potential into new operational ground.",
+      "man.break": "That is Ignea Labs.",
+      "man.p4": "We are not a consultancy that sells slide decks. We are not an agency that writes code and disappears. We embed ourselves in your operation, find where the dormant potential lies, and build the infrastructure that activates it — permanently.",
       "man.p5": "We work with a small number of partners. Not because we can't scale, but because transformation demands proximity, honesty, and the kind of attention that vanishes the moment you try to serve everyone. Every company we take on gets the full weight of what we know. That is not a philosophy. It is a promise.",
-      "man.p6": "We named ourselves Ignea because transformation, like fire, spreads. Every automation ignites the next. Every insight sharpens the one that follows. The gap between your business and your competition widens quietly, then all at once.",
-      "man.p7": "The next generation of business leaders in Central America will be defined by a single decision. Not which market they entered. Not which product they launched. Whether they embraced AI before their competitors or spent years watching the gap widen from the wrong side.",
-      "man.closing": "We don't sell AI. We build infrastructure.",
+      "man.p6": "We named ourselves Ignea because transformation, like volcanic fire, spreads. Every automation ignites the next. Every insight sharpens the one that follows. The gap between your business and your competition widens quietly, then all at once.",
+      "man.p7": "The next generation of business leaders in Central America will be defined by a single decision. Not which market they entered. Not which product they launched. Whether they activated the dormant potential in their operations before their competitors — or spent years watching the gap widen from the wrong side.",
+      "man.closing": "We don't sell AI. We build new ground.",
       "man.ctaTitle": "Discover your potential.",
       "man.ctaBtn": "Begin Diagnostic &rarr;",
 
       // ---- CONTACT ----
       "ct.tag": "// Contact",
       "ct.headline": "Let's talk.",
-      "ct.newSub": "We work with a select number of organizations. If you're ready to explore what AI can do for your business, get in touch.",
+      "ct.newSub": "We work with a select number of organizations. If you're ready to discover the dormant potential in your business, reach out.",
       "ct.emailDirect": "Or write to us directly at",
       "ct.title": 'Ready to discover the potential of <em>your business?</em>',
       "ct.sub": "This isn't a sales call. It's a strategic conversation about the specific opportunities in your operation.",
@@ -887,7 +901,7 @@ var IgneaI18n = (function() {
       "ct.errorSub": "Please try again.",
 
       // ---- FOOTER ----
-      "footer.tag": "Bridging the AI gap in Central America.",
+      "footer.tag": "Beneath the surface, the potential.",
       "footer.rights": "All rights reserved.",
 
       // ---- 404 ----
