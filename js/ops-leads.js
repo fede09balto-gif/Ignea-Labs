@@ -689,6 +689,7 @@ var OpsLeads = (function() {
         if (saveBtn) {
           saveBtn.addEventListener('click', function() {
             saveLeadField(lead.id, 'recommendations', data.recommendations);
+            logActivity(lead.id, 'ai_recommendations', (data.recommendations || []).length + ' recommendations generated');
             saveBtn.textContent = lang === 'es' ? 'Guardado ✓' : 'Saved ✓';
             saveBtn.disabled = true;
           });
@@ -722,6 +723,7 @@ var OpsLeads = (function() {
       }
 
       IgneaAI.generateProposal(lead, calcData).then(function(text) {
+        logActivity(lead.id, 'ai_proposal', 'Proposal/MOU generated');
         var proposalText = text;
         var previewDiv = document.createElement('div');
         previewDiv.className = 'ai-proposal-preview';
@@ -1077,6 +1079,24 @@ var OpsLeads = (function() {
     })();
   }
 
+  function logActivity(leadId, action, details) {
+    (async function() {
+      try {
+        var user = typeof OpsAuth !== 'undefined' && OpsAuth.getUser ? OpsAuth.getUser() : null;
+        await IgneaSupabase.client
+          .from('lead_activity')
+          .insert({
+            lead_id: leadId,
+            user_id: user ? user.id : null,
+            action: action,
+            details: details || ''
+          });
+      } catch (e) {
+        // Best-effort logging
+      }
+    })();
+  }
+
   function loadActivityLog(leadId, container) {
     (async function() {
       try {
@@ -1116,7 +1136,15 @@ var OpsLeads = (function() {
 
   function closeDetail() {
     var panel = document.getElementById('detailPanel');
-    if (panel) panel.classList.remove('open');
+    if (panel) {
+      panel.classList.remove('open');
+      // Restore hidden after transition completes
+      setTimeout(function() {
+        if (!panel.classList.contains('open')) {
+          panel.setAttribute('hidden', '');
+        }
+      }, 350);
+    }
 
     var overlay = document.getElementById('detailOverlay');
     if (overlay) overlay.classList.remove('visible');
