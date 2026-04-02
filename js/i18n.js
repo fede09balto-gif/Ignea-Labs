@@ -571,6 +571,43 @@ var IgneaI18n = (function() {
       "ops.scraper.competitors.title": "Competidores",
       "ops.scraper.saved": "Resultados guardados ✓",
 
+      // Lead detail panel
+      "ops.detail.tab.summary": "Resumen",
+      "ops.detail.tab.answers": "Respuestas",
+      "ops.detail.tab.actions": "Acciones",
+
+      "ops.detail.sec.contact": "// Información de contacto",
+      "ops.detail.sec.score": "// Puntuación",
+      "ops.detail.sec.pipeline": "// Pipeline",
+      "ops.detail.sec.notes": "// Notas",
+      "ops.detail.sec.activity": "// Actividad",
+      "ops.detail.sec.stages": "// Cambiar etapa",
+
+      "ops.detail.field.firstName": "Nombre",
+      "ops.detail.field.lastName": "Apellido",
+      "ops.detail.field.email": "Email",
+      "ops.detail.field.phone": "Teléfono",
+      "ops.detail.field.company": "Empresa",
+      "ops.detail.field.position": "Cargo",
+      "ops.detail.field.industry": "Industria",
+      "ops.detail.field.companySize": "Tamaño empresa",
+      "ops.detail.field.website": "Sitio web",
+      "ops.detail.field.linkedin": "LinkedIn",
+      "ops.detail.field.revenue": "Ingresos",
+      "ops.detail.field.priority": "Prioridad",
+      "ops.detail.field.dealValue": "Valor del deal",
+      "ops.detail.field.daysInStage": "Días en etapa",
+
+      "ops.detail.btn.calcPrice": "Calcular precio →",
+      "ops.detail.btn.aiProposal": "Generar propuesta IA →",
+      "ops.detail.btn.scraper": "Ejecutar scraper →",
+      "ops.detail.btn.downloadPdf": "Descargar PDF del diagnóstico",
+      "ops.detail.btn.copyAnswers": "Copiar respuestas",
+
+      "ops.detail.noAnswers": "Sin respuestas del diagnóstico.",
+      "ops.detail.noActivity": "Sin actividad registrada.",
+      "ops.detail.notesSaved": "Notas guardadas ✓",
+
       // Auth
       "ops.auth.denied": "denied",
       "ops.auth.terminated": "connection terminated",
@@ -1123,6 +1160,43 @@ var IgneaI18n = (function() {
       "ops.scraper.opportunities": "Opportunities",
       "ops.scraper.competitors.title": "Competitors",
       "ops.scraper.saved": "Results saved ✓",
+
+      // Lead detail panel
+      "ops.detail.tab.summary": "Summary",
+      "ops.detail.tab.answers": "Answers",
+      "ops.detail.tab.actions": "Actions",
+
+      "ops.detail.sec.contact": "// Contact info",
+      "ops.detail.sec.score": "// Score",
+      "ops.detail.sec.pipeline": "// Pipeline",
+      "ops.detail.sec.notes": "// Notes",
+      "ops.detail.sec.activity": "// Activity",
+      "ops.detail.sec.stages": "// Change stage",
+
+      "ops.detail.field.firstName": "First name",
+      "ops.detail.field.lastName": "Last name",
+      "ops.detail.field.email": "Email",
+      "ops.detail.field.phone": "Phone",
+      "ops.detail.field.company": "Company",
+      "ops.detail.field.position": "Position",
+      "ops.detail.field.industry": "Industry",
+      "ops.detail.field.companySize": "Company size",
+      "ops.detail.field.website": "Website",
+      "ops.detail.field.linkedin": "LinkedIn",
+      "ops.detail.field.revenue": "Revenue",
+      "ops.detail.field.priority": "Priority",
+      "ops.detail.field.dealValue": "Deal value",
+      "ops.detail.field.daysInStage": "Days in stage",
+
+      "ops.detail.btn.calcPrice": "Calculate price →",
+      "ops.detail.btn.aiProposal": "Generate AI proposal →",
+      "ops.detail.btn.scraper": "Run scraper →",
+      "ops.detail.btn.downloadPdf": "Download diagnostic PDF",
+      "ops.detail.btn.copyAnswers": "Copy answers",
+
+      "ops.detail.noAnswers": "No diagnostic answers.",
+      "ops.detail.noActivity": "No activity recorded.",
+      "ops.detail.notesSaved": "Notes saved ✓",
 
       "ops.auth.denied": "denied",
       "ops.auth.terminated": "connection terminated",

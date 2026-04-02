@@ -109,6 +109,14 @@ var OpsDashboard = (function() {
       card.classList.remove('dragging');
     });
 
+    // Open detail panel on click (not during drag)
+    card.addEventListener('click', function() {
+      if (card.classList.contains('dragging')) return;
+      if (typeof OpsLeads !== 'undefined' && OpsLeads.openDetail) {
+        OpsLeads.openDetail(lead.id);
+      }
+    });
+
     return card;
   }
 

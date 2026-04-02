@@ -53,6 +53,35 @@ var OpsLeads = (function() {
     aiReadiness:         'Preparación IA'
   };
 
+  var QUESTION_LABELS = {
+    es: {
+      q1: '¿A qué se dedica tu negocio?',
+      q2: '¿Cuántos empleados tiene tu empresa?',
+      q3: '¿Cuáles son las 3 tareas que más tiempo consumen en tu operación diaria?',
+      q4: '¿Cuántas horas a la semana dedica tu equipo a responder consultas de clientes?',
+      q5: '¿Tu negocio tiene presencia digital?',
+      q6: '¿Cómo gestionan la agenda y coordinación de tu equipo?',
+      q7: '¿Qué herramientas tecnológicas usan actualmente?',
+      q8: '¿Qué tan familiarizado estás con la inteligencia artificial?',
+      q9: '¿Cuál es el mayor cuello de botella en tu operación?',
+      q10: '¿Si pudieras automatizar UNA cosa en tu negocio, cuál sería?',
+      q11: '¿Cuál es el rango de ingresos mensuales de tu empresa?'
+    },
+    en: {
+      q1: 'What does your business do?',
+      q2: 'How many employees does your company have?',
+      q3: 'What are the 3 most time-consuming tasks in your daily operation?',
+      q4: 'How many hours per week does your team spend answering client inquiries?',
+      q5: 'Does your business have a digital presence?',
+      q6: 'How do you manage scheduling and team coordination?',
+      q7: 'What technology tools do you currently use?',
+      q8: 'How familiar are you with artificial intelligence?',
+      q9: 'What is the biggest bottleneck in your operation?',
+      q10: 'If you could automate ONE thing in your business, what would it be?',
+      q11: 'What is your company\'s monthly revenue range?'
+    }
+  };
+
   function init() {
     setupFilters();
     setupSortHeaders();
@@ -63,6 +92,18 @@ var OpsLeads = (function() {
 
     var overlay = document.getElementById('detailOverlay');
     if (overlay) overlay.addEventListener('click', closeDetail);
+
+    // Delegated click handler for pipeline cards
+    var pipeBoard = document.getElementById('pipelineBoard');
+    if (pipeBoard) {
+      pipeBoard.addEventListener('click', function(e) {
+        var card = e.target.closest('.pipe-card');
+        if (!card) return;
+        if (card.classList.contains('dragging')) return;
+        var leadId = card.getAttribute('data-lead-id');
+        if (leadId) openDetail(leadId);
+      });
+    }
   }
 
   function setupFilters() {
@@ -269,231 +310,524 @@ var OpsLeads = (function() {
 
     content.innerHTML = '';
 
-    // Section 1: Contact Info
-    var sec1 = document.createElement('div');
-    sec1.className = 'detail-section';
+    var lang = (typeof IgneaI18n !== 'undefined' && IgneaI18n.getLang) ? IgneaI18n.getLang() : 'es';
+    var score = lead.total_score || 0;
+    var level = lead.score_level || getScoreLevel(score);
 
-    var tag1 = document.createElement('div');
-    tag1.className = 'detail-section-tag';
-    tag1.setAttribute('data-i18n', 'ops.detail.contact');
-    tag1.textContent = IgneaI18n.t('ops.detail.contact') || '// Contacto';
-    sec1.appendChild(tag1);
+    // ── Panel Header (always visible) ──
+    var header = document.createElement('div');
+    header.className = 'detail-header';
+    header.innerHTML =
+      '<div class="detail-name">' + escHtml((lead.first_name || '') + ' ' + (lead.last_name || '')) + '</div>' +
+      '<div class="detail-company-name">' + escHtml(lead.company_name || '') + '</div>' +
+      '<span class="score-badge score-' + escHtml(level) + '">' + score + '</span>';
+    content.appendChild(header);
 
+    // ── Tab Navigation ──
+    var tabNav = document.createElement('div');
+    tabNav.className = 'detail-tabs';
+    tabNav.innerHTML =
+      '<button class="detail-tab active" data-dtab="summary">' + (lang === 'es' ? 'Resumen' : 'Summary') + '</button>' +
+      '<button class="detail-tab" data-dtab="answers">' + (lang === 'es' ? 'Respuestas' : 'Answers') + '</button>' +
+      '<button class="detail-tab" data-dtab="actions">' + (lang === 'es' ? 'Acciones' : 'Actions') + '</button>';
+    content.appendChild(tabNav);
+
+    // ── TAB 1: Summary ──
+    var tabSummary = document.createElement('div');
+    tabSummary.className = 'detail-tab-content';
+    tabSummary.setAttribute('data-dtab', 'summary');
+    tabSummary.style.display = 'block';
+
+    // Contact grid
+    var contactGrid = document.createElement('div');
+    contactGrid.className = 'detail-contact-grid';
     CONTACT_FIELDS.forEach(function(fieldDef) {
-      var fieldDiv = document.createElement('div');
-      fieldDiv.className = 'detail-field';
+      var cell = document.createElement('div');
+      cell.className = 'detail-contact-cell';
 
-      var label = document.createElement('label');
+      var label = document.createElement('div');
       label.className = 'form-label';
       label.textContent = fieldDef.label;
 
-      var input = document.createElement('input');
-      input.className = 'form-input detail-edit';
-      input.setAttribute('data-field', fieldDef.key);
-      input.value = lead[fieldDef.key] || '';
+      var valueEl = document.createElement('div');
+      valueEl.className = 'detail-contact-value';
+      valueEl.textContent = lead[fieldDef.key] || '—';
+      valueEl.setAttribute('data-field', fieldDef.key);
 
-      input.addEventListener('blur', function() {
-        var fieldKey = this.getAttribute('data-field');
-        var newValue = this.value;
-        saveLeadField(lead.id, fieldKey, newValue);
+      // Click to edit
+      valueEl.addEventListener('click', function() {
+        if (valueEl.querySelector('input')) return;
+        var currentVal = lead[fieldDef.key] || '';
+        var input = document.createElement('input');
+        input.className = 'form-input detail-inline-edit';
+        input.value = currentVal;
+        valueEl.textContent = '';
+        valueEl.appendChild(input);
+        input.focus();
+
+        input.addEventListener('blur', function() {
+          var newVal = input.value;
+          valueEl.textContent = newVal || '—';
+          if (newVal !== currentVal) {
+            lead[fieldDef.key] = newVal;
+            saveLeadField(lead.id, fieldDef.key, newVal);
+          }
+        });
+
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') input.blur();
+          if (e.key === 'Escape') {
+            input.value = currentVal;
+            input.blur();
+          }
+        });
       });
 
-      fieldDiv.appendChild(label);
-      fieldDiv.appendChild(input);
-      sec1.appendChild(fieldDiv);
+      cell.appendChild(label);
+      cell.appendChild(valueEl);
+      contactGrid.appendChild(cell);
     });
+    tabSummary.appendChild(contactGrid);
 
-    content.appendChild(sec1);
+    // Score section
+    var scoreSection = document.createElement('div');
+    scoreSection.className = 'detail-section';
+    var scoreHeader = document.createElement('div');
+    scoreHeader.className = 'detail-score';
+    scoreHeader.innerHTML =
+      '<span class="detail-score-value">' + score + '</span>' +
+      '<span class="detail-score-max">/100</span> ' +
+      '<span class="score-badge score-' + escHtml(level) + '">' + escHtml(level) + '</span>';
+    scoreSection.appendChild(scoreHeader);
 
-    // Section 2: Diagnostic Summary
-    var sec2 = document.createElement('div');
-    sec2.className = 'detail-section';
-
-    var tag2 = document.createElement('div');
-    tag2.className = 'detail-section-tag';
-    tag2.textContent = IgneaI18n.t('ops.detail.diagnostic') || '// Diagnóstico';
-    sec2.appendChild(tag2);
-
-    var score = lead.total_score || 0;
-    var level = getScoreLevel(score);
-
-    var scoreEl = document.createElement('div');
-    scoreEl.className = 'detail-score';
-    scoreEl.textContent = score + ' / 100';
-    sec2.appendChild(scoreEl);
-
-    var levelEl = document.createElement('div');
-    levelEl.className = 'detail-level';
-    var levelBadge = document.createElement('span');
-    levelBadge.className = 'score-badge score-' + level;
-    levelBadge.textContent = level;
-    levelEl.appendChild(levelBadge);
-    sec2.appendChild(levelEl);
-
-    // Dimension bars
-    var scores = lead.score_breakdown || lead.scores_json || {};
-    Object.keys(DIMENSION_LABELS).forEach(function(dim) {
-      var dimScore = Number(scores[dim]) || 0;
+    var dims = lead.score_breakdown || {};
+    var dimKeys = ['customerInteraction', 'processMaturity', 'digitalPresence', 'dataUtilization', 'aiReadiness'];
+    dimKeys.forEach(function(dim) {
+      var dimScore = Number(dims[dim]) || 0;
       var dimPct = Math.round((dimScore / 20) * 100);
-
       var row = document.createElement('div');
       row.className = 'bd-row';
       row.innerHTML =
-        '<div class="bd-label">' + escHtml(DIMENSION_LABELS[dim]) + '</div>' +
+        '<div class="bd-label">' + escHtml(DIMENSION_LABELS[dim] || dim) + '</div>' +
         '<div class="bd-bar-wrap">' +
           '<div class="bd-bar" style="width:' + dimPct + '%"></div>' +
         '</div>' +
         '<div class="bd-val">' + dimScore + '/20</div>';
-      sec2.appendChild(row);
+      scoreSection.appendChild(row);
     });
+    tabSummary.appendChild(scoreSection);
 
-    // Recommendations
-    var recos = lead.recommendations || lead.recommendations_json || [];
-    if (recos.length) {
-      var recoList = document.createElement('ul');
-      recoList.className = 'detail-recos';
-      recos.forEach(function(r) {
-        var li = document.createElement('li');
-        li.textContent = IgneaI18n.t('reco.' + r.key) || r.key;
-        li.className = 'reco-' + (r.priority || 'medium');
-        recoList.appendChild(li);
-      });
-      sec2.appendChild(recoList);
-    }
+    // Pipeline section
+    var pipeSection = document.createElement('div');
+    pipeSection.className = 'detail-section';
+    var pipeTag = document.createElement('div');
+    pipeTag.className = 'detail-section-tag';
+    pipeTag.textContent = '// Pipeline';
+    pipeSection.appendChild(pipeTag);
 
-    content.appendChild(sec2);
+    var currentStage = lead.pipeline_stage || 'new';
+    var stageBadge = document.createElement('div');
+    stageBadge.className = 'detail-pipeline-info';
+    stageBadge.innerHTML = '<span class="stage-badge">' + escHtml(getStageLabel(currentStage)) + '</span>';
+    pipeSection.appendChild(stageBadge);
 
-    // Section 3: Scraper Results
-    var sec3 = document.createElement('div');
-    sec3.className = 'detail-section';
+    // Priority selector
+    var priorityRow = document.createElement('div');
+    priorityRow.className = 'detail-field-row';
+    var priorityLabel = document.createElement('label');
+    priorityLabel.className = 'form-label';
+    priorityLabel.textContent = lang === 'es' ? 'Prioridad' : 'Priority';
+    var prioritySelect = document.createElement('select');
+    prioritySelect.className = 'form-input';
+    ['hot', 'high', 'medium', 'low'].forEach(function(p) {
+      var opt = document.createElement('option');
+      opt.value = p;
+      opt.textContent = p;
+      if ((lead.priority || 'medium') === p) opt.selected = true;
+      prioritySelect.appendChild(opt);
+    });
+    prioritySelect.addEventListener('change', function() {
+      lead.priority = prioritySelect.value;
+      saveLeadField(lead.id, 'priority', prioritySelect.value);
+    });
+    priorityRow.appendChild(priorityLabel);
+    priorityRow.appendChild(prioritySelect);
+    pipeSection.appendChild(priorityRow);
 
-    var tag3 = document.createElement('div');
-    tag3.className = 'detail-section-tag';
-    tag3.textContent = IgneaI18n.t('ops.detail.scraper') || '// Datos del Scraper';
-    sec3.appendChild(tag3);
+    // Deal value
+    var dealRow = document.createElement('div');
+    dealRow.className = 'detail-field-row';
+    var dealLabel = document.createElement('label');
+    dealLabel.className = 'form-label';
+    dealLabel.textContent = lang === 'es' ? 'Valor del deal' : 'Deal value';
+    var dealInput = document.createElement('input');
+    dealInput.className = 'form-input';
+    dealInput.type = 'number';
+    dealInput.value = lead.deal_value || '';
+    dealInput.placeholder = '$0';
+    dealInput.addEventListener('blur', function() {
+      var val = dealInput.value ? Number(dealInput.value) : null;
+      lead.deal_value = val;
+      saveLeadField(lead.id, 'deal_value', val);
+    });
+    dealRow.appendChild(dealLabel);
+    dealRow.appendChild(dealInput);
+    pipeSection.appendChild(dealRow);
 
-    if (lead.scraper_data) {
-      try {
-        var scraperData = typeof lead.scraper_data === 'string'
-          ? JSON.parse(lead.scraper_data)
-          : lead.scraper_data;
+    // Days in stage
+    var daysInStage = Math.floor((Date.now() - new Date(lead.updated_at || lead.created_at).getTime()) / 86400000);
+    var daysEl = document.createElement('div');
+    daysEl.className = 'detail-days-in-stage';
+    daysEl.textContent = (lang === 'es' ? 'Días en etapa: ' : 'Days in stage: ') + daysInStage;
+    pipeSection.appendChild(daysEl);
 
-        Object.keys(scraperData).forEach(function(key) {
-          var card = document.createElement('div');
-          card.className = 'scraper-card';
-          card.innerHTML =
-            '<span class="scraper-key">' + escHtml(key) + '</span>' +
-            '<span class="scraper-val">' + escHtml(String(scraperData[key])) + '</span>';
-          sec3.appendChild(card);
-        });
-      } catch (e) {
-        var noData = document.createElement('div');
-        noData.className = 'detail-empty';
-        noData.textContent = IgneaI18n.t('ops.detail.noData') || 'Sin datos';
-        sec3.appendChild(noData);
-      }
-    } else {
-      var noScraper = document.createElement('div');
-      noScraper.className = 'detail-empty';
-      noScraper.textContent = IgneaI18n.t('ops.detail.noData') || 'Sin datos';
-      sec3.appendChild(noScraper);
-    }
+    tabSummary.appendChild(pipeSection);
 
-    content.appendChild(sec3);
-
-    // Section 4: Notes
-    var sec4 = document.createElement('div');
-    sec4.className = 'detail-section';
-
-    var tag4 = document.createElement('div');
-    tag4.className = 'detail-section-tag';
-    tag4.textContent = IgneaI18n.t('ops.detail.notes') || '// Notas';
-    sec4.appendChild(tag4);
+    // Notes textarea
+    var notesSection = document.createElement('div');
+    notesSection.className = 'detail-section';
+    var notesTag = document.createElement('div');
+    notesTag.className = 'detail-section-tag';
+    notesTag.textContent = IgneaI18n.t('ops.detail.notes') || '// Notas';
+    notesSection.appendChild(notesTag);
 
     var textarea = document.createElement('textarea');
     textarea.className = 'form-input detail-notes';
-    textarea.id = 'detailNotes';
     textarea.value = lead.notes || '';
-
     textarea.addEventListener('blur', function() {
-      saveLeadField(lead.id, 'notes', this.value);
+      saveLeadField(lead.id, 'notes', textarea.value);
     });
+    notesSection.appendChild(textarea);
+    tabSummary.appendChild(notesSection);
 
-    sec4.appendChild(textarea);
-    content.appendChild(sec4);
+    content.appendChild(tabSummary);
 
-    // Section 5: Activity Log
-    var sec5 = document.createElement('div');
-    sec5.className = 'detail-section';
+    // ── TAB 2: Answers ──
+    var tabAnswers = document.createElement('div');
+    tabAnswers.className = 'detail-tab-content';
+    tabAnswers.setAttribute('data-dtab', 'answers');
+    tabAnswers.style.display = 'none';
 
-    var tag5 = document.createElement('div');
-    tag5.className = 'detail-section-tag';
-    tag5.textContent = IgneaI18n.t('ops.detail.activity') || '// Actividad';
-    sec5.appendChild(tag5);
+    var answers = lead.diagnostic_answers || {};
+    var qLabels = QUESTION_LABELS[lang] || QUESTION_LABELS.es;
 
-    var activityLog = document.createElement('div');
-    activityLog.id = 'activityLog';
-    activityLog.textContent = '...';
-    sec5.appendChild(activityLog);
+    for (var q = 1; q <= 11; q++) {
+      var qKey = 'q' + q;
+      var answer = answers[qKey];
+      var openAnswer = answers[qKey + '_open'];
 
-    content.appendChild(sec5);
+      var block = document.createElement('div');
+      block.className = 'answer-block';
 
-    loadActivityLog(lead.id, activityLog);
+      var qText = document.createElement('div');
+      qText.className = 'answer-q';
+      qText.textContent = 'Q' + q + ': ' + (qLabels[qKey] || '');
+      block.appendChild(qText);
 
-    // Section 6: Action Buttons
-    var sec6 = document.createElement('div');
-    sec6.className = 'detail-section detail-actions';
+      if (answer !== undefined && answer !== null) {
+        if (Array.isArray(answer)) {
+          var chipsWrap = document.createElement('div');
+          chipsWrap.className = 'answer-chips';
+          answer.forEach(function(item) {
+            var chip = document.createElement('span');
+            chip.className = 'answer-chip';
+            chip.textContent = String(item);
+            chipsWrap.appendChild(chip);
+          });
+          block.appendChild(chipsWrap);
+        } else if (typeof answer === 'number') {
+          var numEl = document.createElement('div');
+          numEl.className = 'answer-choice';
+          numEl.textContent = String(answer);
+          block.appendChild(numEl);
+        } else {
+          var choiceEl = document.createElement('div');
+          choiceEl.className = 'answer-choice';
+          choiceEl.textContent = String(answer);
+          block.appendChild(choiceEl);
+        }
+      } else {
+        var noAnswer = document.createElement('div');
+        noAnswer.className = 'answer-choice answer-empty';
+        noAnswer.textContent = '—';
+        block.appendChild(noAnswer);
+      }
 
+      // Open text answer
+      if (openAnswer) {
+        var openEl = document.createElement('div');
+        openEl.className = 'answer-text';
+        openEl.textContent = '"' + String(openAnswer) + '"';
+        block.appendChild(openEl);
+      }
+
+      tabAnswers.appendChild(block);
+    }
+
+    // Copy answers button
+    var copyBtn = document.createElement('button');
+    copyBtn.className = 'btn-ghost';
+    copyBtn.style.marginTop = '16px';
+    copyBtn.textContent = lang === 'es' ? 'Copiar respuestas' : 'Copy answers';
+    copyBtn.addEventListener('click', function() {
+      var text = '';
+      for (var i = 1; i <= 11; i++) {
+        var key = 'q' + i;
+        var label = (qLabels[key] || 'Q' + i);
+        var ans = answers[key];
+        var openAns = answers[key + '_open'];
+        text += 'Q' + i + ': ' + label + '\n';
+        if (ans !== undefined && ans !== null) {
+          text += (Array.isArray(ans) ? ans.join(', ') : String(ans)) + '\n';
+        } else {
+          text += '—\n';
+        }
+        if (openAns) text += '"' + String(openAns) + '"\n';
+        text += '\n';
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() {
+          copyBtn.textContent = lang === 'es' ? 'Copiado' : 'Copied';
+          setTimeout(function() {
+            copyBtn.textContent = lang === 'es' ? 'Copiar respuestas' : 'Copy answers';
+          }, 2000);
+        });
+      }
+    });
+    tabAnswers.appendChild(copyBtn);
+
+    content.appendChild(tabAnswers);
+
+    // ── TAB 3: Actions ──
+    var tabActions = document.createElement('div');
+    tabActions.className = 'detail-tab-content';
+    tabActions.setAttribute('data-dtab', 'actions');
+    tabActions.style.display = 'none';
+
+    // Calculate price button
     var btnCalc = document.createElement('button');
-    btnCalc.className = 'btn-ghost';
-    btnCalc.textContent = IgneaI18n.t('ops.detail.goCalc') || 'Calcular Precio →';
+    btnCalc.className = 'btn-gradient';
+    btnCalc.textContent = (lang === 'es' ? 'Calcular precio' : 'Calculate price') + ' →';
     btnCalc.addEventListener('click', function() {
       closeDetail();
       switchToTab('calculator');
       document.dispatchEvent(new CustomEvent('ops:openCalculator', { detail: { lead: lead } }));
     });
+    tabActions.appendChild(btnCalc);
 
+    // Run scraper button
     var btnScraper = document.createElement('button');
     btnScraper.className = 'btn-ghost';
-    btnScraper.textContent = IgneaI18n.t('ops.detail.goScraper') || 'Ejecutar Scraper →';
+    btnScraper.style.marginTop = '8px';
+    btnScraper.textContent = (lang === 'es' ? 'Ejecutar scraper' : 'Run scraper') + ' →';
     btnScraper.addEventListener('click', function() {
       closeDetail();
       switchToTab('scraper');
       document.dispatchEvent(new CustomEvent('ops:openScraper', { detail: { lead: lead } }));
     });
+    tabActions.appendChild(btnScraper);
 
-    sec6.appendChild(btnCalc);
-    sec6.appendChild(btnScraper);
+    // Download PDF button
+    var btnPDF = document.createElement('button');
+    btnPDF.className = 'btn-ghost';
+    btnPDF.style.marginTop = '8px';
+    btnPDF.textContent = lang === 'es' ? 'Descargar PDF del diagnóstico' : 'Download diagnostic PDF';
+    btnPDF.addEventListener('click', function() {
+      generateDiagnosticPDF(lead);
+    });
+    tabActions.appendChild(btnPDF);
 
-    // Stage change buttons
-    var currentStage = lead.pipeline_stage;
-    var stageIdx = STAGE_FLOW.indexOf(currentStage);
+    // Stage change section
+    var stageSection = document.createElement('div');
+    stageSection.className = 'detail-section';
+    stageSection.style.marginTop = '24px';
+    var stageLabel = document.createElement('div');
+    stageLabel.className = 'detail-section-tag';
+    stageLabel.textContent = lang === 'es' ? '// Cambiar etapa' : '// Change stage';
+    stageSection.appendChild(stageLabel);
 
     var stageWrap = document.createElement('div');
     stageWrap.className = 'detail-stage-actions';
+    var stageIdx = STAGE_FLOW.indexOf(currentStage);
 
-    if (stageIdx > 0) {
-      var btnPrev = document.createElement('button');
-      btnPrev.className = 'btn-ghost';
-      btnPrev.textContent = '← ' + getStageLabel(STAGE_FLOW[stageIdx - 1]);
-      btnPrev.addEventListener('click', function() {
-        changeLeadStage(lead.id, STAGE_FLOW[stageIdx - 1]);
+    STAGE_FLOW.forEach(function(stage, idx) {
+      if (stage === currentStage) return;
+      var btn = document.createElement('button');
+      btn.className = 'btn-ghost btn-sm';
+      btn.textContent = getStageLabel(stage);
+      btn.addEventListener('click', function() {
+        changeLeadStage(lead.id, stage);
       });
-      stageWrap.appendChild(btnPrev);
+      stageWrap.appendChild(btn);
+    });
+    stageSection.appendChild(stageWrap);
+    tabActions.appendChild(stageSection);
+
+    // Priority change
+    var actionPrioritySection = document.createElement('div');
+    actionPrioritySection.className = 'detail-section';
+    actionPrioritySection.style.marginTop = '16px';
+    var actionPriorityLabel = document.createElement('div');
+    actionPriorityLabel.className = 'detail-section-tag';
+    actionPriorityLabel.textContent = lang === 'es' ? '// Prioridad' : '// Priority';
+    actionPrioritySection.appendChild(actionPriorityLabel);
+
+    var actionPrioritySelect = document.createElement('select');
+    actionPrioritySelect.className = 'form-input';
+    ['hot', 'high', 'medium', 'low'].forEach(function(p) {
+      var opt = document.createElement('option');
+      opt.value = p;
+      opt.textContent = p;
+      if ((lead.priority || 'medium') === p) opt.selected = true;
+      actionPrioritySelect.appendChild(opt);
+    });
+    actionPrioritySelect.addEventListener('change', function() {
+      lead.priority = actionPrioritySelect.value;
+      saveLeadField(lead.id, 'priority', actionPrioritySelect.value);
+      // Sync the summary tab priority select
+      if (prioritySelect) prioritySelect.value = actionPrioritySelect.value;
+    });
+    actionPrioritySection.appendChild(actionPrioritySelect);
+    tabActions.appendChild(actionPrioritySection);
+
+    // Activity log
+    var activitySection = document.createElement('div');
+    activitySection.className = 'detail-section';
+    activitySection.style.marginTop = '24px';
+    var activityTag = document.createElement('div');
+    activityTag.className = 'detail-section-tag';
+    activityTag.textContent = IgneaI18n.t('ops.detail.activity') || '// Actividad';
+    activitySection.appendChild(activityTag);
+
+    var activityLog = document.createElement('div');
+    activityLog.id = 'activityLog';
+    activityLog.textContent = '...';
+    activitySection.appendChild(activityLog);
+    tabActions.appendChild(activitySection);
+
+    loadActivityLog(lead.id, activityLog);
+
+    content.appendChild(tabActions);
+
+    // ── Setup tab switching ──
+    setupDetailTabs(content);
+  }
+
+  function setupDetailTabs(container) {
+    var tabs = container.querySelectorAll('.detail-tab');
+    var panels = container.querySelectorAll('.detail-tab-content');
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        var target = tab.getAttribute('data-dtab');
+        tabs.forEach(function(t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        panels.forEach(function(p) {
+          p.style.display = p.getAttribute('data-dtab') === target ? 'block' : 'none';
+        });
+      });
+    });
+  }
+
+  function generateDiagnosticPDF(lead) {
+    var jsPDF = window.jspdf && window.jspdf.jsPDF;
+    if (!jsPDF) { alert('jsPDF not loaded'); return; }
+    var doc = new jsPDF();
+    var lang = (typeof IgneaI18n !== 'undefined' && IgneaI18n.getLang) ? IgneaI18n.getLang() : 'es';
+    var y = 20;
+
+    // Header
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('IGNEA LABS', 20, y);
+    y += 8;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100);
+    doc.text(lang === 'es' ? 'Diagnóstico de Preparación Digital' : 'Digital Readiness Diagnostic', 20, y);
+
+    // Client
+    y += 16;
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.setFont('helvetica', 'bold');
+    doc.text((lead.first_name || '') + ' ' + (lead.last_name || ''), 20, y);
+    y += 7;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text(lead.company_name || '', 20, y);
+    y += 5;
+    doc.setFontSize(9);
+    doc.setTextColor(120);
+    doc.text(new Date().toLocaleDateString(lang === 'es' ? 'es-NI' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }), 20, y);
+
+    // Score
+    y += 16;
+    doc.setFontSize(36);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0);
+    doc.text(String(lead.total_score || 0), 20, y);
+    doc.setFontSize(14);
+    doc.setTextColor(100);
+    doc.text('/ 100', 55, y);
+    y += 8;
+    doc.setFontSize(11);
+    var levelMap = { critical: lang === 'es' ? 'Crítico' : 'Critical', developing: lang === 'es' ? 'En Desarrollo' : 'Developing', competent: lang === 'es' ? 'Competente' : 'Competent', advanced: lang === 'es' ? 'Avanzado' : 'Advanced' };
+    doc.text(levelMap[lead.score_level] || '', 20, y);
+
+    // Dimensions
+    y += 14;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0);
+    doc.text(lang === 'es' ? 'DESGLOSE POR DIMENSIÓN' : 'DIMENSION BREAKDOWN', 20, y);
+    y += 8;
+    var dims = lead.score_breakdown || {};
+    var dimLabels = lang === 'es'
+      ? ['Interacción con clientes', 'Madurez de procesos', 'Presencia digital', 'Uso de datos', 'Preparación IA']
+      : ['Customer interaction', 'Process maturity', 'Digital presence', 'Data utilization', 'AI readiness'];
+    var dimKeys = ['customerInteraction', 'processMaturity', 'digitalPresence', 'dataUtilization', 'aiReadiness'];
+    for (var i = 0; i < dimKeys.length; i++) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(dimLabels[i] + ': ' + (dims[dimKeys[i]] || 0) + '/20', 24, y);
+      y += 6;
     }
 
-    if (stageIdx < STAGE_FLOW.length - 1) {
-      var btnNext = document.createElement('button');
-      btnNext.className = 'btn-primary';
-      btnNext.textContent = getStageLabel(STAGE_FLOW[stageIdx + 1]) + ' →';
-      btnNext.addEventListener('click', function() {
-        changeLeadStage(lead.id, STAGE_FLOW[stageIdx + 1]);
-      });
-      stageWrap.appendChild(btnNext);
+    // Answers
+    y += 10;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text(lang === 'es' ? 'RESPUESTAS DEL DIAGNÓSTICO' : 'DIAGNOSTIC ANSWERS', 20, y);
+    y += 8;
+    var answers = lead.diagnostic_answers || {};
+    var qLabels = lang === 'es'
+      ? ['Negocio', 'Empleados', 'Tareas que consumen tiempo', 'Horas en consultas', 'Presencia digital', 'Gestión de agenda', 'Herramientas actuales', 'Familiaridad con IA', 'Cuello de botella', 'Automatización deseada', 'Ingresos mensuales']
+      : ['Business', 'Employees', 'Time-consuming tasks', 'Hours on inquiries', 'Digital presence', 'Scheduling', 'Current tools', 'AI familiarity', 'Bottleneck', 'Desired automation', 'Monthly revenue'];
+    for (var q = 1; q <= 11; q++) {
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      doc.text('Q' + q + ': ' + (qLabels[q - 1] || ''), 24, y);
+      y += 5;
+      doc.setTextColor(0);
+      var answer = answers['q' + q];
+      if (answer === undefined || answer === null) answer = '—';
+      if (typeof answer === 'object') answer = Array.isArray(answer) ? answer.join(', ') : JSON.stringify(answer);
+      var lines = doc.splitTextToSize(String(answer), 160);
+      doc.text(lines, 28, y);
+      y += lines.length * 5 + 4;
     }
 
-    sec6.appendChild(stageWrap);
-    content.appendChild(sec6);
+    // Footer
+    y += 10;
+    if (y > 260) { doc.addPage(); y = 20; }
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text('Generado por Ignea Labs — hola@ignealabs.com', 20, y);
+    doc.text(lang === 'es' ? 'Este documento es confidencial.' : 'This document is confidential.', 20, y + 4);
+
+    doc.save('Diagnostico_' + (lead.company_name || 'Lead').replace(/[^a-zA-Z0-9]/g, '_') + '_' + new Date().toISOString().slice(0, 10) + '.pdf');
   }
 
   function saveLeadField(leadId, fieldKey, value) {
@@ -656,18 +990,6 @@ var OpsLeads = (function() {
     return 'advanced';
   }
 
-  function getFilters() {
-    var search = document.getElementById('leadsSearch');
-    var stageFilter = document.getElementById('stageFilter');
-    var priorityFilter = document.getElementById('priorityFilter');
-
-    return {
-      search: search ? search.value.trim() : '',
-      stage: stageFilter ? stageFilter.value : '',
-      priority: priorityFilter ? priorityFilter.value : ''
-    };
-  }
-
   function escHtml(str) {
     return String(str)
       .replace(/&/g, '&amp;')
@@ -679,7 +1001,8 @@ var OpsLeads = (function() {
   return {
     init: init,
     openDetail: openDetail,
-    renderTable: renderTable
+    renderTable: renderTable,
+    generateDiagnosticPDF: generateDiagnosticPDF
   };
 
 })();
