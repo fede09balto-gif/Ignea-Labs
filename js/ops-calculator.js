@@ -22,6 +22,15 @@ var OpsCalculator = (function() {
     return Number(n).toLocaleString('es-NI');
   }
 
+  function formatMoney(n) {
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
+  function formatPercent(n) {
+    var prefix = n > 0 ? '+' : '';
+    return prefix + Math.round(n) + '%';
+  }
+
   function escHtml(str) {
     return String(str || '')
       .replace(/&/g, '&amp;')
@@ -193,29 +202,62 @@ var OpsCalculator = (function() {
   /* ---- Render helpers ---- */
 
   function levelLabel(level) {
-    var labels = {
+    var i18nKeys = {
+      critical:   'ops.calc.level.critical',
+      developing: 'ops.calc.level.developing',
+      competent:  'ops.calc.level.competent',
+      advanced:   'ops.calc.level.advanced'
+    };
+    var fallback = {
       critical:   'Crítico',
       developing: 'En Desarrollo',
       competent:  'Competente',
       advanced:   'Avanzado'
     };
-    return labels[level] || level;
+    if (typeof IgneaI18n !== 'undefined' && IgneaI18n.t) {
+      var translated = IgneaI18n.t(i18nKeys[level]);
+      if (translated && translated !== i18nKeys[level]) return translated;
+    }
+    return fallback[level] || level;
   }
 
   function dimLabel(key) {
-    var labels = {
+    var i18nKeys = {
+      customerInteraction: 'ops.calc.dim.customerInteraction',
+      processMaturity:     'ops.calc.dim.processMaturity',
+      digitalPresence:     'ops.calc.dim.digitalPresence',
+      dataUtilization:     'ops.calc.dim.dataUtilization',
+      aiReadiness:         'ops.calc.dim.aiReadiness'
+    };
+    var fallback = {
       customerInteraction: 'Interacción con clientes',
       processMaturity:     'Madurez de procesos',
       digitalPresence:     'Presencia digital',
       dataUtilization:     'Uso de datos',
       aiReadiness:         'Preparación IA'
     };
-    return labels[key] || key;
+    if (typeof IgneaI18n !== 'undefined' && IgneaI18n.t) {
+      var translated = IgneaI18n.t(i18nKeys[key]);
+      if (translated && translated !== i18nKeys[key]) return translated;
+    }
+    return fallback[key] || key;
+  }
+
+  function scoreColor(level) {
+    var colors = {
+      critical:   'var(--coral, #F0997B)',
+      developing: 'var(--purple, #AFA9EC)',
+      competent:  'var(--accent, #00E5BF)',
+      advanced:   'var(--accent, #00E5BF)'
+    };
+    return colors[level] || 'var(--accent, #00E5BF)';
   }
 
   function renderScoreSection(scoreResult) {
     var el = document.getElementById('calcScoreSection');
     if (!el) return;
+
+    var color = scoreColor(scoreResult.level);
 
     var dimsHtml = '';
     var dimOrder = ['customerInteraction', 'processMaturity', 'digitalPresence', 'dataUtilization', 'aiReadiness'];
@@ -228,16 +270,28 @@ var OpsCalculator = (function() {
             '<span class="calc-dim-name">' + escHtml(dimLabel(key)) + '</span>' +
             '<span class="calc-dim-val">' + val + '/20</span>' +
           '</div>' +
-          '<div class="calc-dim-bar"><div class="calc-dim-fill" style="width:' + pct + '%"></div></div>' +
+          '<div class="calc-dim-track">' +
+            '<div class="calc-dim-fill" style="width:' + pct + '%;background:' + color + '"></div>' +
+          '</div>' +
         '</div>';
     });
 
+    var t = function(k) { return (typeof IgneaI18n !== 'undefined' && IgneaI18n.t) ? IgneaI18n.t(k) : ''; };
+
     el.innerHTML =
-      '<div class="calc-total">' + scoreResult.total +
-        '<span class="calc-of"> / 100</span>' +
+      '<div class="calc-card-header">' + (t('ops.calc.card.score') || 'PUNTUACIÓN DEL PROSPECTO') + '</div>' +
+      '<div style="text-align:center;margin-bottom:16px">' +
+        '<span class="calc-score-big" style="font-size:36px;font-weight:800;color:' + color + '">' +
+          scoreResult.total +
+        '</span>' +
+        '<span class="calc-score-suffix" style="font-size:16px;color:var(--gray,#6E6E88);margin-left:2px">/100</span>' +
       '</div>' +
-      '<div class="calc-level score-badge score-' + scoreResult.level + '">' +
-        escHtml(levelLabel(scoreResult.level)) +
+      '<div style="text-align:center;margin-bottom:20px">' +
+        '<span class="calc-level-pill" style="display:inline-block;padding:4px 14px;font-size:11px;font-weight:700;' +
+          'text-transform:uppercase;letter-spacing:1.5px;border-radius:20px;' +
+          'background:' + color + ';color:var(--bg,#08080D)">' +
+          escHtml(levelLabel(scoreResult.level)) +
+        '</span>' +
       '</div>' +
       '<div class="calc-dims">' + dimsHtml + '</div>';
   }
@@ -246,23 +300,50 @@ var OpsCalculator = (function() {
     var el = document.getElementById('calcSavingsSection');
     if (!el) return;
 
+    var solutions = [
+      {
+        name: 'Bot WhatsApp',
+        desc: roi.botHoursSaved + ' hrs/semana automatizadas',
+        amount: roi.botMonthlySavings
+      },
+      {
+        name: 'Website + Chat',
+        desc: 'Presencia digital con captura de leads',
+        amount: roi.webMonthlySavings
+      },
+      {
+        name: 'Automatización',
+        desc: roi.autoHoursSaved + ' hrs/semana en procesos',
+        amount: roi.autoMonthlySavings
+      }
+    ];
+
+    var rowsHtml = '';
+    solutions.forEach(function(sol, i) {
+      rowsHtml +=
+        '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;' +
+          (i < solutions.length - 1 ? 'border-bottom:0.5px solid var(--border,#1A1A2A);' : '') + '">' +
+          '<div>' +
+            '<div style="font-size:14px;font-weight:700;color:var(--white,#EAEAF0)">' + escHtml(sol.name) + '</div>' +
+            '<div style="font-size:13px;color:var(--gray,#6E6E88);margin-top:2px">' + escHtml(sol.desc) + '</div>' +
+          '</div>' +
+          '<div style="font-size:14px;font-weight:600;color:var(--white,#EAEAF0);white-space:nowrap;margin-left:16px">' +
+            formatMoney(sol.amount) + '/mes' +
+          '</div>' +
+        '</div>';
+    });
+
+    var t = function(k) { return (typeof IgneaI18n !== 'undefined' && IgneaI18n.t) ? IgneaI18n.t(k) : ''; };
+
     el.innerHTML =
-      '<div class="calc-savings-title" data-i18n="ops.calc.savingsTitle">Desglose de Ahorro</div>' +
-      '<div class="calc-line">' +
-        '<span>Bot de WhatsApp (' + roi.botHoursSaved + ' hrs)</span>' +
-        '<span class="calc-val">$' + fmt(roi.botMonthlySavings) + '/mes</span>' +
-      '</div>' +
-      '<div class="calc-line">' +
-        '<span>Website + Chat</span>' +
-        '<span class="calc-val">$' + fmt(roi.webMonthlySavings) + '/mes</span>' +
-      '</div>' +
-      '<div class="calc-line">' +
-        '<span>Automatización (' + roi.autoHoursSaved + ' hrs)</span>' +
-        '<span class="calc-val">$' + fmt(roi.autoMonthlySavings) + '/mes</span>' +
-      '</div>' +
-      '<div class="calc-line calc-total-line">' +
-        '<span>Total Ahorro Mensual</span>' +
-        '<span class="calc-val-big">$' + fmt(roi.totalMonthlySavings) + '/mes</span>' +
+      '<div class="calc-card-header">' + (t('ops.calc.card.savings') || 'AHORRO PARA EL CLIENTE') + '</div>' +
+      rowsHtml +
+      '<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;' +
+        'margin-top:4px;border-top:2px solid var(--accent,#00E5BF)">' +
+        '<div style="font-size:14px;font-weight:700;color:var(--white,#EAEAF0)">Total Ahorro Mensual</div>' +
+        '<div style="font-size:20px;font-weight:800;color:var(--accent,#00E5BF)">' +
+          formatMoney(roi.totalMonthlySavings) + '/mes' +
+        '</div>' +
       '</div>';
   }
 
@@ -270,27 +351,48 @@ var OpsCalculator = (function() {
     var el = document.getElementById('calcPricingSection');
     if (!el) return;
 
+    var statRows = [
+      {
+        label: 'Período de recuperación',
+        value: roi.paybackMonths + ' meses',
+        color: 'var(--white,#EAEAF0)'
+      },
+      {
+        label: 'ROI a 12 meses',
+        value: formatPercent(roi.roi12),
+        color: 'var(--accent,#00E5BF)'
+      },
+      {
+        label: 'Cliente conserva',
+        value: formatMoney(roi.clientKeeps) + '/mes',
+        color: 'var(--white,#EAEAF0)'
+      }
+    ];
+
+    var statsHtml = '';
+    statRows.forEach(function(row, i) {
+      statsHtml +=
+        '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;' +
+          (i < statRows.length - 1 ? 'border-bottom:0.5px solid var(--border,#1A1A2A);' : '') + '">' +
+          '<span style="font-size:13px;color:var(--gray,#6E6E88)">' + escHtml(row.label) + '</span>' +
+          '<span style="font-size:14px;font-weight:700;color:' + row.color + '">' + escHtml(row.value) + '</span>' +
+        '</div>';
+    });
+
+    var t = function(k) { return (typeof IgneaI18n !== 'undefined' && IgneaI18n.t) ? IgneaI18n.t(k) : ''; };
+
     el.innerHTML =
-      '<div class="calc-pricing-title">Precio y Retorno</div>' +
-      '<div class="calc-line">' +
-        '<span>Precio recomendado</span>' +
-        '<span class="calc-val-big">$' + fmt(roi.recommendedPrice) + '</span>' +
+      '<div class="calc-card-header">' + (t('ops.calc.card.pricing') || 'PRECIO RECOMENDADO') + '</div>' +
+      '<div style="text-align:center;margin-bottom:8px">' +
+        '<div style="font-size:42px;font-weight:800;color:var(--accent,#00E5BF);line-height:1">' +
+          formatMoney(roi.recommendedPrice) +
+        '</div>' +
+        '<div style="font-family:var(--fm);font-size:12px;color:var(--gray,#6E6E88);margin-top:8px">' +
+          formatMoney(roi.totalMonthlySavings) + '/mes &times; 4 meses &times; ' + roi.captureRate + '%' +
+        '</div>' +
       '</div>' +
-      '<div class="calc-formula">' +
-        '($' + fmt(roi.totalMonthlySavings) + ' × 4 meses) × ' + roi.captureRate + '% captura' +
-      '</div>' +
-      '<div class="calc-line">' +
-        '<span>Período de recuperación</span>' +
-        '<span>' + roi.paybackMonths + ' meses</span>' +
-      '</div>' +
-      '<div class="calc-line">' +
-        '<span>ROI a 12 meses</span>' +
-        '<span class="calc-roi">+' + fmt(roi.roi12) + '%</span>' +
-      '</div>' +
-      '<div class="calc-line">' +
-        '<span>Cliente conserva</span>' +
-        '<span>$' + fmt(roi.clientKeeps) + '/mes en ahorros</span>' +
-      '</div>';
+      '<div style="border-top:0.5px solid var(--border,#1A1A2A);margin:16px 0"></div>' +
+      statsHtml;
   }
 
   function renderComparisonBar(roi) {
@@ -298,14 +400,36 @@ var OpsCalculator = (function() {
     if (!el) return;
 
     var value12m    = roi.totalMonthlySavings * 12;
-    var total       = roi.recommendedPrice + value12m;
-    var investPct   = total > 0 ? Math.round((roi.recommendedPrice / total) * 100) : 0;
-    var valuePct    = 100 - investPct;
+    var maxVal      = Math.max(roi.recommendedPrice, value12m, 1);
+    var investPct   = Math.max(8, Math.round((roi.recommendedPrice / maxVal) * 100));
+    var valuePct    = Math.max(8, Math.round((value12m / maxVal) * 100));
+    var ratio       = roi.recommendedPrice > 0
+      ? ((roi.totalMonthlySavings * 12) / roi.recommendedPrice).toFixed(2)
+      : '0.00';
+
+    var t = function(k) { return (typeof IgneaI18n !== 'undefined' && IgneaI18n.t) ? IgneaI18n.t(k) : ''; };
 
     el.innerHTML =
-      '<div class="comp-bar">' +
-        '<div class="comp-invest" style="width:' + investPct + '%">Inversión $' + fmt(roi.recommendedPrice) + '</div>' +
-        '<div class="comp-value"  style="width:' + valuePct  + '%">Valor 12m $' + fmt(value12m) + '</div>' +
+      '<div class="calc-card-header">' + (t('ops.calc.card.compare') || 'COMPARACIÓN') + '</div>' +
+      '<div style="margin-bottom:16px">' +
+        '<div style="display:flex;align-items:center;margin-bottom:8px">' +
+          '<div style="width:' + investPct + '%;height:28px;background:var(--coral,#F0997B);border-radius:0;' +
+            'min-width:60px;transition:width .3s ease"></div>' +
+          '<span style="font-size:13px;color:var(--gray,#6E6E88);margin-left:10px;white-space:nowrap">' +
+            'Inversión ' + formatMoney(roi.recommendedPrice) +
+          '</span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center">' +
+          '<div style="width:' + valuePct + '%;height:28px;background:var(--accent,#00E5BF);border-radius:0;' +
+            'min-width:60px;transition:width .3s ease"></div>' +
+          '<span style="font-size:13px;color:var(--gray,#6E6E88);margin-left:10px;white-space:nowrap">' +
+            'Valor a 12 meses ' + formatMoney(value12m) +
+          '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div style="text-align:center;padding:12px 0;border-top:0.5px solid var(--border,#1A1A2A)">' +
+        '<span style="font-size:13px;color:var(--gray,#6E6E88)">Por cada $1 invertido, el cliente recibe </span>' +
+        '<span style="font-size:22px;font-weight:800;color:var(--accent,#00E5BF)">$' + ratio + '</span>' +
       '</div>';
   }
 
@@ -352,7 +476,7 @@ var OpsCalculator = (function() {
       if (hoursEl) {
         hoursEl.value = answers.q4;
         var hoursValEl = document.getElementById('calcHoursVal');
-        if (hoursValEl) hoursValEl.textContent = answers.q4 + ' hrs';
+        if (hoursValEl) hoursValEl.innerHTML = answers.q4 + ' <span class="range-val-unit">hrs/semana</span>';
       }
     }
 
@@ -512,14 +636,14 @@ var OpsCalculator = (function() {
     var text =
       'Diagnóstico: ' + (company || 'Prospecto') + '\n' +
       'Puntuación: ' + score.total + '/100 (' + levelLabel(score.level) + ')\n\n' +
-      'Ahorro mensual estimado: $' + fmt(roi.totalMonthlySavings) + '/mes\n' +
-      'ROI a 12 meses: +' + fmt(roi.roi12) + '%\n' +
+      'Ahorro mensual estimado: ' + formatMoney(roi.totalMonthlySavings) + '/mes\n' +
+      'ROI a 12 meses: ' + formatPercent(roi.roi12) + '\n' +
       'Período de recuperación: ' + roi.paybackMonths + ' meses\n\n' +
       'Soluciones recomendadas:\n' +
-      '1. Bot de WhatsApp — $' + fmt(roi.botMonthlySavings) + '/mes ahorro\n' +
-      '2. Website + Chat — $' + fmt(roi.webMonthlySavings) + '/mes ahorro\n' +
-      '3. Automatización — $' + fmt(roi.autoMonthlySavings) + '/mes ahorro\n\n' +
-      'Precio recomendado: $' + fmt(roi.recommendedPrice);
+      '1. Bot de WhatsApp — ' + formatMoney(roi.botMonthlySavings) + '/mes ahorro\n' +
+      '2. Website + Chat — ' + formatMoney(roi.webMonthlySavings) + '/mes ahorro\n' +
+      '3. Automatización — ' + formatMoney(roi.autoMonthlySavings) + '/mes ahorro\n\n' +
+      'Precio recomendado: ' + formatMoney(roi.recommendedPrice);
 
     var btn = document.getElementById('calcCopyBtn');
     navigator.clipboard.writeText(text).then(function() {
@@ -556,9 +680,9 @@ var OpsCalculator = (function() {
     var hoursRange   = document.getElementById('calcHours');
     var hoursValSpan = document.getElementById('calcHoursVal');
     if (hoursRange && hoursValSpan) {
-      hoursValSpan.textContent = hoursRange.value + ' hrs';
+      hoursValSpan.innerHTML = hoursRange.value + ' <span class="range-val-unit">hrs/semana</span>';
       hoursRange.addEventListener('input', function() {
-        hoursValSpan.textContent = hoursRange.value + ' hrs';
+        hoursValSpan.innerHTML = hoursRange.value + ' <span class="range-val-unit">hrs/semana</span>';
         recalculate();
       });
     }

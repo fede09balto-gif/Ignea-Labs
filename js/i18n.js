@@ -460,15 +460,62 @@ var IgneaI18n = (function() {
       "ops.calc.payback": "Período de recuperación",
       "ops.calc.roi12": "ROI a 12 meses",
       "ops.calc.clientKeeps": "Cliente conserva",
-      "ops.calc.save": "Guardar Cálculo",
+      "ops.calc.save": "Guardar cálculo",
       "ops.calc.copy": "Copiar Resumen",
+      "ops.calc.copyWA": "Copiar resumen para WhatsApp",
       "ops.calc.pdf": "Generar Propuesta PDF",
+      "ops.calc.pdfSoon": "Generar PDF (próximamente)",
       "ops.calc.saved": "Guardado ✓",
       "ops.calc.copied": "Copiado ✓",
       "ops.calc.months": "meses",
       "ops.calc.perMonth": "/mes",
       "ops.calc.savingsPerMonth": "en ahorros",
       "ops.calc.formula": "× tasa de captura",
+
+      // Calculator: section dividers
+      "ops.calc.sec.client": "DATOS DEL CLIENTE",
+      "ops.calc.sec.operations": "OPERACIONES ACTUALES",
+      "ops.calc.sec.tech": "HERRAMIENTAS Y TECNOLOGÍA",
+      "ops.calc.sec.pricing": "PARÁMETROS DE PRECIO",
+      "ops.calc.leadHint": "Selecciona un lead para auto-rellenar los campos",
+
+      // Calculator: result card headers
+      "ops.calc.card.score": "PUNTUACIÓN DEL PROSPECTO",
+      "ops.calc.card.savings": "AHORRO PARA EL CLIENTE",
+      "ops.calc.card.pricing": "PRECIO RECOMENDADO",
+      "ops.calc.card.compare": "COMPARACIÓN",
+
+      // Calculator: dimension labels
+      "ops.calc.dim.customerInteraction": "Interacción con clientes",
+      "ops.calc.dim.processMaturity": "Madurez de procesos",
+      "ops.calc.dim.digitalPresence": "Presencia digital",
+      "ops.calc.dim.dataUtilization": "Uso de datos",
+      "ops.calc.dim.aiReadiness": "Preparación IA",
+
+      // Calculator: level labels
+      "ops.calc.level.critical": "Crítico",
+      "ops.calc.level.developing": "En Desarrollo",
+      "ops.calc.level.competent": "Competente",
+      "ops.calc.level.advanced": "Avanzado",
+
+      // Calculator: solution names
+      "ops.calc.sol.bot": "Bot WhatsApp",
+      "ops.calc.sol.botDesc": "hrs/sem automatizadas",
+      "ops.calc.sol.web": "Website + Chat",
+      "ops.calc.sol.webDesc": "Presencia digital 24/7",
+      "ops.calc.sol.auto": "Automatización",
+      "ops.calc.sol.autoDesc": "hrs de trabajo manual eliminado",
+      "ops.calc.sol.total": "AHORRO MENSUAL TOTAL",
+
+      // Calculator: pricing stats
+      "ops.calc.stat.recovery": "Recuperación",
+      "ops.calc.stat.roi12": "ROI 12 meses",
+      "ops.calc.stat.clientKeeps": "Cliente conserva",
+
+      // Calculator: comparison
+      "ops.calc.comp.invest": "Inversión",
+      "ops.calc.comp.value12": "Valor a 12 meses",
+      "ops.calc.comp.ratio": "Por cada $1 invertido, el cliente recibe",
 
       // Calculator: website options
       "ops.calc.web0": "No tiene sitio web",
@@ -979,15 +1026,55 @@ var IgneaI18n = (function() {
       "ops.calc.payback": "Payback period",
       "ops.calc.roi12": "12-month ROI",
       "ops.calc.clientKeeps": "Client keeps",
-      "ops.calc.save": "Save Calculation",
+      "ops.calc.save": "Save calculation",
       "ops.calc.copy": "Copy Summary",
+      "ops.calc.copyWA": "Copy summary for WhatsApp",
       "ops.calc.pdf": "Generate Proposal PDF",
+      "ops.calc.pdfSoon": "Generate PDF (coming soon)",
       "ops.calc.saved": "Saved ✓",
       "ops.calc.copied": "Copied ✓",
       "ops.calc.months": "months",
       "ops.calc.perMonth": "/mo",
       "ops.calc.savingsPerMonth": "in savings",
       "ops.calc.formula": "× capture rate",
+
+      "ops.calc.sec.client": "CLIENT DATA",
+      "ops.calc.sec.operations": "CURRENT OPERATIONS",
+      "ops.calc.sec.tech": "TOOLS & TECHNOLOGY",
+      "ops.calc.sec.pricing": "PRICING PARAMETERS",
+      "ops.calc.leadHint": "Select a lead to auto-fill fields",
+
+      "ops.calc.card.score": "PROSPECT SCORE",
+      "ops.calc.card.savings": "CLIENT SAVINGS",
+      "ops.calc.card.pricing": "RECOMMENDED PRICE",
+      "ops.calc.card.compare": "COMPARISON",
+
+      "ops.calc.dim.customerInteraction": "Customer interaction",
+      "ops.calc.dim.processMaturity": "Process maturity",
+      "ops.calc.dim.digitalPresence": "Digital presence",
+      "ops.calc.dim.dataUtilization": "Data utilization",
+      "ops.calc.dim.aiReadiness": "AI readiness",
+
+      "ops.calc.level.critical": "Critical",
+      "ops.calc.level.developing": "Developing",
+      "ops.calc.level.competent": "Competent",
+      "ops.calc.level.advanced": "Advanced",
+
+      "ops.calc.sol.bot": "WhatsApp Bot",
+      "ops.calc.sol.botDesc": "hrs/wk automated",
+      "ops.calc.sol.web": "Website + Chat",
+      "ops.calc.sol.webDesc": "24/7 digital presence",
+      "ops.calc.sol.auto": "Automation",
+      "ops.calc.sol.autoDesc": "hrs of manual work eliminated",
+      "ops.calc.sol.total": "TOTAL MONTHLY SAVINGS",
+
+      "ops.calc.stat.recovery": "Recovery",
+      "ops.calc.stat.roi12": "12-month ROI",
+      "ops.calc.stat.clientKeeps": "Client keeps",
+
+      "ops.calc.comp.invest": "Investment",
+      "ops.calc.comp.value12": "12-month value",
+      "ops.calc.comp.ratio": "For every $1 invested, the client receives",
 
       "ops.calc.web0": "No website",
       "ops.calc.web1": "Yes, but no clients",

@@ -915,7 +915,7 @@
 
 .calc-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 45fr 55fr;
   gap: 0;
   border: .5px solid var(--border);
   min-height: 600px;
@@ -972,10 +972,73 @@
   margin-top: 6px;
 }
 
-/* ---- Result Cards ---- */
+/* Section dividers in calc inputs */
+.calc-section-divider {
+  padding: 16px 24px 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.calc-section-divider:first-child {
+  padding-top: 20px;
+}
+
+.calc-section-label {
+  font-family: var(--fm);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.calc-section-line {
+  flex: 1;
+  height: 0.5px;
+  background: var(--border);
+}
+
+/* 2-column grid for multi-select cards */
+.mc-group.mc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .mc-group.mc-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Large range value display */
+.range-val-big {
+  font-family: var(--fm);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.range-val-unit {
+  font-size: 14px;
+  color: var(--dimgray);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+/* ---- Redesigned Result Cards ---- */
 .calc-result-card {
   padding: 24px;
   border-bottom: .5px solid var(--border);
+  background: var(--bg2);
+}
+
+.calc-result-card:last-of-type {
+  border-bottom: none;
 }
 
 .calc-result-card:last-child {
@@ -991,7 +1054,16 @@
   margin-bottom: 16px;
 }
 
-/* Score display */
+.calc-card-header {
+  font-family: var(--fm);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+/* Score card */
 .calc-score-display {
   display: flex;
   align-items: baseline;
@@ -1008,10 +1080,25 @@
   transition: color .4s;
 }
 
+.calc-score-big {
+  font-family: var(--fm);
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+  transition: color .3s;
+}
+
 .calc-score-label {
   font-family: var(--fm);
   font-size: 14px;
   color: var(--dimgray);
+}
+
+.calc-score-suffix {
+  font-family: var(--fm);
+  font-size: 14px;
+  color: var(--dimgray);
+  margin-left: 4px;
 }
 
 .calc-score-bar-wrap {
@@ -1042,6 +1129,69 @@
 .calc-score-bar.tier-medium   { background: var(--purple); }
 .calc-score-value.tier-high   { color: var(--accent); }
 .calc-score-bar.tier-high     { background: var(--accent); }
+
+.calc-level-pill {
+  display: inline-block;
+  font-family: var(--fm);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  margin: 12px 0 20px;
+}
+
+.calc-level-pill.level-critical { color: var(--coral); border: .5px solid var(--coral); background: #F0997B11; }
+.calc-level-pill.level-developing { color: var(--purple); border: .5px solid var(--purple); background: #AFA9EC11; }
+.calc-level-pill.level-competent { color: var(--accent); border: .5px solid var(--accent); background: var(--accent3); }
+.calc-level-pill.level-advanced { color: var(--accent); border: .5px solid var(--accent); background: var(--accent3); }
+
+/* Dimension bars */
+.calc-dims {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.calc-dim {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.calc-dim-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.calc-dim-name {
+  font-size: 13px;
+  color: var(--white);
+}
+
+.calc-dim-val {
+  font-family: var(--fm);
+  font-size: 13px;
+  color: var(--gray);
+}
+
+.calc-dim-track {
+  height: 4px;
+  background: var(--border);
+  width: 100%;
+}
+
+.calc-dim-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width .5s cubic-bezier(.4,0,.2,1);
+}
+
+.calc-dim-fill.fill-critical { background: var(--coral); }
+.calc-dim-fill.fill-developing { background: var(--purple); }
+.calc-dim-fill.fill-competent { background: var(--accent); }
+.calc-dim-fill.fill-advanced { background: var(--accent); }
 
 /* Savings rows */
 .calc-savings-lines {
@@ -1083,6 +1233,78 @@
 
 .calc-saving-val.accent {
   color: var(--accent);
+}
+
+/* Savings card (redesigned) */
+.calc-solution-row {
+  padding: 16px 0;
+  border-bottom: .5px solid var(--border);
+}
+
+.calc-solution-row:last-child {
+  border-bottom: none;
+}
+
+.calc-solution-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+
+.calc-solution-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.calc-solution-amount {
+  font-family: var(--fm);
+  font-size: 15px;
+  color: var(--white);
+  white-space: nowrap;
+}
+
+.calc-solution-amount .per-month {
+  color: var(--dimgray);
+  font-size: 12px;
+}
+
+.calc-solution-desc {
+  font-size: 13px;
+  color: var(--gray);
+}
+
+.calc-savings-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.calc-savings-total-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+  text-transform: uppercase;
+  font-family: var(--fm);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+}
+
+.calc-savings-total-val {
+  font-family: var(--fm);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.calc-savings-total-val .per-month {
+  color: var(--dimgray);
+  font-size: 13px;
+  font-weight: 400;
 }
 
 /* Pricing */
@@ -1135,6 +1357,68 @@
   font-weight: 700;
 }
 
+/* Pricing card (redesigned) */
+.calc-price-hero {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.calc-price-number {
+  font-family: var(--fm);
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+}
+
+.calc-price-dollar {
+  font-size: 32px;
+}
+
+.calc-price-formula {
+  font-family: var(--fm);
+  font-size: 13px;
+  color: var(--gray);
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.calc-pricing-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: .5px solid var(--border);
+  padding-top: 16px;
+}
+
+.calc-pricing-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: .5px solid var(--border);
+}
+
+.calc-pricing-stat:last-child {
+  border-bottom: none;
+}
+
+.calc-pricing-stat-label {
+  font-size: 13px;
+  color: var(--gray);
+}
+
+.calc-pricing-stat-val {
+  font-family: var(--fm);
+  font-size: 15px;
+  color: var(--white);
+  font-weight: 600;
+}
+
+.calc-pricing-stat-val.accent {
+  color: var(--accent);
+}
+
 /* Comparison bar */
 .calc-compare-wrap {
   display: flex;
@@ -1185,20 +1469,96 @@
   color: var(--white);
 }
 
+/* Comparison card (redesigned) */
+.calc-comp-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.calc-comp-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.calc-comp-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.calc-comp-item-label {
+  font-size: 13px;
+  color: var(--gray);
+}
+
+.calc-comp-item-val {
+  font-family: var(--fm);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.calc-comp-bar-track {
+  height: 8px;
+  background: var(--border);
+  width: 100%;
+}
+
+.calc-comp-bar-fill {
+  height: 100%;
+  transition: width .6s cubic-bezier(.4,0,.2,1);
+}
+
+.calc-comp-bar-fill.bar-invest { background: var(--coral); }
+.calc-comp-bar-fill.bar-value { background: var(--accent); }
+
+.calc-comp-ratio {
+  text-align: center;
+  padding: 16px 0 0;
+  border-top: .5px solid var(--border);
+}
+
+.calc-comp-ratio-text {
+  font-size: 13px;
+  color: var(--gray);
+  margin-bottom: 4px;
+}
+
+.calc-comp-ratio-number {
+  font-family: var(--fm);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
 /* Calculator action buttons */
 .calc-actions {
   padding: 24px;
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  flex-wrap: wrap;
   border-top: .5px solid var(--border);
+  background: var(--bg2);
 }
 
+.calc-actions .btn-gradient,
 .calc-actions .btn-primary,
 .calc-actions .btn-ghost {
-  padding: 10px 20px;
-  font-size: 11px;
+  padding: 12px 20px;
+  font-size: 12px;
   letter-spacing: 1px;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.calc-actions .btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* ============================================================

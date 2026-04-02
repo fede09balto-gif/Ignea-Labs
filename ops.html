@@ -263,6 +263,12 @@
         <!-- LEFT: INPUTS -->
         <div id="calcInputs" class="calc-inputs">
 
+          <!-- Section: Client Data -->
+          <div class="calc-section-divider">
+            <span class="calc-section-label" data-i18n="ops.calc.sec.client">DATOS DEL CLIENTE</span>
+            <span class="calc-section-line"></span>
+          </div>
+
           <!-- Lead Selector -->
           <div class="calc-field">
             <label class="form-label" for="calcLeadSelect" data-i18n="ops.calc.leadLabel">Lead vinculado</label>
@@ -271,6 +277,7 @@
                 <option value="" data-i18n="ops.calc.leadNone">— Sin vincular —</option>
               </select>
             </div>
+            <span class="field-hint" data-i18n="ops.calc.leadHint">Selecciona un lead para auto-rellenar los campos</span>
           </div>
 
           <!-- Industry -->
@@ -286,10 +293,16 @@
             <span class="field-hint" id="calcTeamHint" data-i18n="ops.calc.teamHint">Número de empleados</span>
           </div>
 
+          <!-- Section: Current Operations -->
+          <div class="calc-section-divider">
+            <span class="calc-section-label" data-i18n="ops.calc.sec.operations">OPERACIONES ACTUALES</span>
+            <span class="calc-section-line"></span>
+          </div>
+
           <!-- Hours Wasted -->
           <div class="calc-field">
             <label class="form-label" for="calcHours" data-i18n="ops.calc.hoursLabel">Horas desperdiciadas / semana</label>
-            <div class="range-val" id="calcHoursVal">0 hrs</div>
+            <div class="range-val-big" id="calcHoursVal">20 <span class="range-val-unit">hrs/semana</span></div>
             <div class="range-wrap">
               <input type="range" id="calcHours" class="range-input" min="0" max="80" step="5" value="20" aria-valuenow="20" aria-valuemin="0" aria-valuemax="80">
               <div class="range-labels">
@@ -301,7 +314,7 @@
           <!-- Current Methods -->
           <div class="calc-field">
             <label class="form-label" data-i18n="ops.calc.methodsLabel">Métodos actuales de gestión</label>
-            <div id="calcMethods" class="mc-group" role="group" aria-label="Métodos de gestión">
+            <div id="calcMethods" class="mc-group mc-grid" role="group" aria-label="Métodos de gestión">
               <div class="mc-opt" data-val="paper" role="checkbox" aria-checked="false" tabindex="0">
                 <span class="mc-check"></span>
                 <span class="mc-label" data-i18n="ops.calc.method.paper">Papel / cuadernos</span>
@@ -325,10 +338,16 @@
             </div>
           </div>
 
+          <!-- Section: Tools & Tech -->
+          <div class="calc-section-divider">
+            <span class="calc-section-label" data-i18n="ops.calc.sec.tech">HERRAMIENTAS Y TECNOLOGÍA</span>
+            <span class="calc-section-line"></span>
+          </div>
+
           <!-- Tech Stack -->
           <div class="calc-field">
             <label class="form-label" data-i18n="ops.calc.techLabel">Herramientas tecnológicas actuales</label>
-            <div id="calcTech" class="mc-group" role="group" aria-label="Herramientas tecnológicas">
+            <div id="calcTech" class="mc-group mc-grid" role="group" aria-label="Herramientas tecnológicas">
               <div class="mc-opt" data-val="none" role="checkbox" aria-checked="false" tabindex="0">
                 <span class="mc-check"></span>
                 <span class="mc-label" data-i18n="ops.calc.tech.none">Ninguna</span>
@@ -406,6 +425,12 @@
             </div>
           </div>
 
+          <!-- Section: Pricing Parameters -->
+          <div class="calc-section-divider">
+            <span class="calc-section-label" data-i18n="ops.calc.sec.pricing">PARÁMETROS DE PRECIO</span>
+            <span class="calc-section-line"></span>
+          </div>
+
           <!-- Monthly Revenue -->
           <div class="calc-field">
             <label class="form-label" for="calcRevenue" data-i18n="ops.calc.revenueLabel">Ingresos mensuales (USD)</label>
@@ -437,78 +462,23 @@
         <!-- RIGHT: RESULTS -->
         <div id="calcResults" class="calc-results">
 
-          <!-- Score Section -->
-          <div id="calcScoreSection" class="calc-result-card">
-            <div class="calc-result-header" data-i18n="ops.calc.score.title">Score de oportunidad</div>
-            <div class="calc-score-display">
-              <div class="calc-score-value" id="calcScoreValue">—</div>
-              <div class="calc-score-label" id="calcScoreLabel" data-i18n="ops.calc.score.label">/ 100</div>
-            </div>
-            <div class="calc-score-bar-wrap">
-              <div class="calc-score-bar" id="calcScoreBar" style="width:0%"></div>
-            </div>
-            <div class="calc-score-tier" id="calcScoreTier"></div>
-          </div>
+          <!-- Card 1: Score Overview -->
+          <div id="calcScoreSection" class="calc-result-card"></div>
 
-          <!-- Savings Section -->
-          <div id="calcSavingsSection" class="calc-result-card">
-            <div class="calc-result-header" data-i18n="ops.calc.savings.title">Ahorro proyectado</div>
-            <div class="calc-savings-lines">
-              <div class="calc-saving-row">
-                <span class="calc-saving-label" data-i18n="ops.calc.savings.hoursMonth">Horas recuperadas / mes</span>
-                <span class="calc-saving-val" id="calcSavingHours">—</span>
-              </div>
-              <div class="calc-saving-row">
-                <span class="calc-saving-label" data-i18n="ops.calc.savings.costMonth">Costo evitado / mes</span>
-                <span class="calc-saving-val accent" id="calcSavingCost">—</span>
-              </div>
-              <div class="calc-saving-row">
-                <span class="calc-saving-label" data-i18n="ops.calc.savings.costYear">Costo evitado / año</span>
-                <span class="calc-saving-val accent" id="calcSavingYear">—</span>
-              </div>
-              <div class="calc-saving-row calc-saving-row--total">
-                <span class="calc-saving-label" data-i18n="ops.calc.savings.payback">Retorno de inversión</span>
-                <span class="calc-saving-val" id="calcSavingPayback">—</span>
-              </div>
-            </div>
-          </div>
+          <!-- Card 2: Client Savings Breakdown -->
+          <div id="calcSavingsSection" class="calc-result-card"></div>
 
-          <!-- Pricing Section -->
-          <div id="calcPricingSection" class="calc-result-card">
-            <div class="calc-result-header" data-i18n="ops.calc.pricing.title">Propuesta de precio</div>
-            <div class="calc-pricing-main">
-              <div class="calc-pricing-range" id="calcPricingRange">— — —</div>
-              <div class="calc-pricing-note" id="calcPricingNote" data-i18n="ops.calc.pricing.note">Inversión única · soporte incluido</div>
-            </div>
-            <div class="calc-pricing-items" id="calcPricingItems"></div>
-          </div>
+          <!-- Card 3: Pricing -->
+          <div id="calcPricingSection" class="calc-result-card"></div>
 
-          <!-- Comparison Bar -->
-          <div id="calcComparisonBar" class="calc-result-card">
-            <div class="calc-result-header" data-i18n="ops.calc.compare.title">Inversión vs. costo de inacción</div>
-            <div class="calc-compare-wrap">
-              <div class="calc-compare-row">
-                <span class="calc-compare-label" data-i18n="ops.calc.compare.investment">Inversión Ignea Labs</span>
-                <div class="calc-compare-bar-wrap">
-                  <div class="calc-compare-bar calc-compare-bar--invest" id="calcBarInvest" style="width:0%"></div>
-                </div>
-                <span class="calc-compare-val" id="calcValInvest">—</span>
-              </div>
-              <div class="calc-compare-row">
-                <span class="calc-compare-label" data-i18n="ops.calc.compare.inaction">Costo inacción (1 año)</span>
-                <div class="calc-compare-bar-wrap">
-                  <div class="calc-compare-bar calc-compare-bar--inaction" id="calcBarInaction" style="width:0%"></div>
-                </div>
-                <span class="calc-compare-val" id="calcValInaction">—</span>
-              </div>
-            </div>
-          </div>
+          <!-- Card 4: Visual Comparison -->
+          <div id="calcComparisonBar" class="calc-result-card"></div>
 
-          <!-- Action Buttons -->
+          <!-- Card 5: Action Buttons -->
           <div class="calc-actions">
-            <button id="calcSaveBtn" class="btn-primary" data-i18n="ops.calc.save">Guardar propuesta</button>
-            <button id="calcCopyBtn" class="btn-ghost" data-i18n="ops.calc.copy">Copiar resumen</button>
-            <button id="calcPdfBtn" class="btn-ghost" disabled aria-disabled="true" data-i18n="ops.calc.pdf">Exportar PDF</button>
+            <button id="calcCopyBtn" class="btn-gradient" data-i18n="ops.calc.copyWA">Copiar resumen para WhatsApp</button>
+            <button id="calcSaveBtn" class="btn-ghost" data-i18n="ops.calc.save">Guardar cálculo</button>
+            <button id="calcPdfBtn" class="btn-ghost btn-disabled" disabled aria-disabled="true" data-i18n="ops.calc.pdfSoon">Generar PDF (próximamente)</button>
           </div>
 
         </div><!-- /calcResults -->
