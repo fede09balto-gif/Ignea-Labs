@@ -637,6 +637,170 @@ var OpsLeads = (function() {
     });
     tabActions.appendChild(btnPDF);
 
+    // ── AI: Generate Recommendations ──
+    var aiRecoSection = document.createElement('div');
+    aiRecoSection.className = 'ai-section';
+    var aiRecoHeader = document.createElement('div');
+    aiRecoHeader.className = 'ai-section-header';
+    aiRecoHeader.textContent = lang === 'es' ? '// INTELIGENCIA ARTIFICIAL' : '// ARTIFICIAL INTELLIGENCE';
+    aiRecoSection.appendChild(aiRecoHeader);
+
+    var btnRecos = document.createElement('button');
+    btnRecos.className = 'btn-gradient';
+    btnRecos.style.width = '100%';
+    btnRecos.style.marginBottom = '8px';
+    btnRecos.textContent = lang === 'es' ? 'Generar recomendaciones IA →' : 'Generate AI recommendations →';
+    var recoResultsDiv = document.createElement('div');
+
+    btnRecos.addEventListener('click', function() {
+      btnRecos.disabled = true;
+      recoResultsDiv.innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div>' +
+        (lang === 'es' ? 'Analizando diagnóstico...' : 'Analyzing diagnostic...') + '</div>';
+
+      IgneaAI.generateRecommendations(lead).then(function(data) {
+        var html = '';
+        if (data.summary) {
+          html += '<div class="ai-reco-summary">' + escHtml(data.summary) + '</div>';
+        }
+        html += '<div class="ai-reco-cards">';
+        (data.recommendations || []).forEach(function(rec) {
+          html += '<div class="ai-reco-card">' +
+            '<div class="ai-reco-card-top">' +
+              '<div class="ai-reco-title">' + escHtml(rec.title) + '</div>' +
+              '<div class="ai-reco-priority priority-' + (rec.priority || 'media') + '">' + escHtml(rec.priority || '') + '</div>' +
+            '</div>' +
+            '<div class="ai-reco-desc">' + escHtml(rec.description) + '</div>' +
+            '<div class="ai-reco-meta">' +
+              '<span class="ai-reco-stat">' + (rec.hours_recovered_weekly || 0) + ' hrs/' + (lang === 'es' ? 'semana recuperadas' : 'week recovered') + '</span>' +
+              '<span class="ai-reco-stat dim">' + (rec.implementation_weeks || 0) + ' ' + (lang === 'es' ? 'semanas impl.' : 'weeks impl.') + '</span>' +
+            '</div>' +
+          '</div>';
+        });
+        html += '</div>';
+
+        // Save button
+        html += '<button class="btn-ghost" style="margin-top:12px;width:100%" id="saveRecosBtn">' +
+          (lang === 'es' ? 'Guardar recomendaciones en lead' : 'Save recommendations to lead') + '</button>';
+
+        recoResultsDiv.innerHTML = html;
+        btnRecos.disabled = false;
+
+        var saveBtn = recoResultsDiv.querySelector('#saveRecosBtn');
+        if (saveBtn) {
+          saveBtn.addEventListener('click', function() {
+            saveLeadField(lead.id, 'recommendations', data.recommendations);
+            saveBtn.textContent = lang === 'es' ? 'Guardado ✓' : 'Saved ✓';
+            saveBtn.disabled = true;
+          });
+        }
+      }).catch(function(err) {
+        recoResultsDiv.innerHTML = '<div class="ai-error">' + escHtml(err.message) + '</div>';
+        btnRecos.disabled = false;
+      });
+    });
+
+    aiRecoSection.appendChild(btnRecos);
+    aiRecoSection.appendChild(recoResultsDiv);
+
+    // ── AI: Generate Proposal ──
+    var btnProposal = document.createElement('button');
+    btnProposal.className = 'btn-gradient';
+    btnProposal.style.width = '100%';
+    btnProposal.style.marginBottom = '8px';
+    btnProposal.textContent = lang === 'es' ? 'Generar propuesta / MOU →' : 'Generate proposal / MOU →';
+    var proposalResultsDiv = document.createElement('div');
+
+    btnProposal.addEventListener('click', function() {
+      btnProposal.disabled = true;
+      proposalResultsDiv.innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div>' +
+        (lang === 'es' ? 'Redactando propuesta personalizada...' : 'Drafting personalized proposal...') + '</div>';
+
+      // Get calculator data if available
+      var calcData = null;
+      if (typeof OpsCalculator !== 'undefined' && OpsCalculator._lastResult) {
+        calcData = OpsCalculator._lastResult;
+      }
+
+      IgneaAI.generateProposal(lead, calcData).then(function(text) {
+        var proposalText = text;
+        var previewDiv = document.createElement('div');
+        previewDiv.className = 'ai-proposal-preview';
+        previewDiv.textContent = proposalText;
+
+        var actionsDiv = document.createElement('div');
+        actionsDiv.className = 'ai-proposal-actions';
+
+        var btnPdfProp = document.createElement('button');
+        btnPdfProp.className = 'btn-gradient';
+        btnPdfProp.textContent = lang === 'es' ? 'Descargar PDF' : 'Download PDF';
+        btnPdfProp.addEventListener('click', function() {
+          IgneaAI.generateProposalPDF(proposalText, lead);
+        });
+
+        var btnCopy = document.createElement('button');
+        btnCopy.className = 'btn-ghost';
+        btnCopy.textContent = lang === 'es' ? 'Copiar texto' : 'Copy text';
+        btnCopy.addEventListener('click', function() {
+          navigator.clipboard.writeText(proposalText).then(function() {
+            btnCopy.textContent = lang === 'es' ? 'Copiado ✓' : 'Copied ✓';
+            setTimeout(function() { btnCopy.textContent = lang === 'es' ? 'Copiar texto' : 'Copy text'; }, 2000);
+          });
+        });
+
+        var btnEdit = document.createElement('button');
+        btnEdit.className = 'btn-ghost';
+        btnEdit.textContent = lang === 'es' ? 'Editar' : 'Edit';
+        btnEdit.addEventListener('click', function() {
+          // Replace preview with editable textarea
+          proposalResultsDiv.innerHTML = '';
+          var textarea = document.createElement('textarea');
+          textarea.className = 'ai-proposal-edit';
+          textarea.value = proposalText;
+          proposalResultsDiv.appendChild(textarea);
+
+          var editActions = document.createElement('div');
+          editActions.className = 'ai-proposal-actions';
+
+          var btnSaveEdit = document.createElement('button');
+          btnSaveEdit.className = 'btn-gradient';
+          btnSaveEdit.textContent = lang === 'es' ? 'Descargar PDF editado' : 'Download edited PDF';
+          btnSaveEdit.addEventListener('click', function() {
+            IgneaAI.generateProposalPDF(textarea.value, lead);
+          });
+
+          var btnCopyEdit = document.createElement('button');
+          btnCopyEdit.className = 'btn-ghost';
+          btnCopyEdit.textContent = lang === 'es' ? 'Copiar texto editado' : 'Copy edited text';
+          btnCopyEdit.addEventListener('click', function() {
+            navigator.clipboard.writeText(textarea.value).then(function() {
+              btnCopyEdit.textContent = lang === 'es' ? 'Copiado ✓' : 'Copied ✓';
+              setTimeout(function() { btnCopyEdit.textContent = lang === 'es' ? 'Copiar texto editado' : 'Copy edited text'; }, 2000);
+            });
+          });
+
+          editActions.appendChild(btnSaveEdit);
+          editActions.appendChild(btnCopyEdit);
+          proposalResultsDiv.appendChild(editActions);
+        });
+
+        actionsDiv.appendChild(btnPdfProp);
+        actionsDiv.appendChild(btnCopy);
+        actionsDiv.appendChild(btnEdit);
+
+        proposalResultsDiv.innerHTML = '';
+        proposalResultsDiv.appendChild(previewDiv);
+        proposalResultsDiv.appendChild(actionsDiv);
+        btnProposal.disabled = false;
+      }).catch(function(err) {
+        proposalResultsDiv.innerHTML = '<div class="ai-error">' + escHtml(err.message) + '</div>';
+        btnProposal.disabled = false;
+      });
+    });
+
+    aiRecoSection.appendChild(btnProposal);
+    aiRecoSection.appendChild(proposalResultsDiv);
+    tabActions.appendChild(aiRecoSection);
+
     // Stage change section
     var stageSection = document.createElement('div');
     stageSection.className = 'detail-section';

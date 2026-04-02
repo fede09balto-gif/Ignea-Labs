@@ -738,7 +738,8 @@ var OpsCalculator = (function() {
 
   return {
     init:            init,
-    prefillFromLead: prefillFromLead
+    prefillFromLead: prefillFromLead,
+    get _lastResult() { return lastResult ? lastResult.roi : null; }
   };
 
 })();
