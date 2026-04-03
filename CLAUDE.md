@@ -18,39 +18,43 @@
 
 # Design System
 
-## Colors
-- Background primary: `#08080D`
-- Background surface 1: `#0E0E16`
-- Background surface 2: `#14141E`
+## Colors (warm palette — anti-AI)
+- Background primary: `#09090F`
+- Background surface 1: `#0F0F17`
+- Background surface 2: `#15151F`
 - Accent: `#00E5BF`
-- Accent transparent: `#00E5BF22`
-- Accent subtle glow: `#00E5BF0A`
-- Text primary: `#EAEAF0`
-- Text secondary: `#6E6E88`
-- Text dim: `#3A3A50`
-- Border: `#1A1A2A`
+- Accent hover: `#00D4B0`
+- Accent transparent: `rgba(0,229,191,0.12)`
+- Accent subtle glow: `rgba(0,229,191,0.04)`
+- Text primary: `#F5F5F7` (off-white like Apple)
+- Text secondary: `#8E8E9A` (warm gray)
+- Text dim: `#4A4A5C`
+- Border: `#1E1E2E`
 - Code string color: `#F0997B` (coral)
 - Code keyword color: `#AFA9EC` (purple)
 
 ## Typography
 - Display font: `'Plus Jakarta Sans', sans-serif` (weights 400, 500, 600, 700)
 - Monospace font: `'JetBrains Mono', monospace` (weights 300, 400, 500, 700)
-- Headlines: Plus Jakarta Sans 700, letter-spacing -0.02em, line-height 1.15
-- Hero headlines: clamp(32px, 4.5vw, 56px)
-- Section tags: JetBrains Mono 11px, uppercase, letter-spacing 3px, accent color, prefixed with "//"
-- Stat values: JetBrains Mono 28px, bold, accent color
-- Stat labels: 10px, uppercase, letter-spacing 1px, dim gray
-- Body text: 15px, Plus Jakarta Sans 400, secondary gray, line-height 1.7
-- Manifesto body: 16-17px, #8E8EA0 (lighter for readability), line-height 1.8
+- h1: Plus Jakarta Sans 700, letter-spacing -0.03em, line-height 1.1
+- h2: Plus Jakarta Sans 600, letter-spacing -0.02em, line-height 1.2
+- Section tags: JetBrains Mono 11px, uppercase, letter-spacing 0.1em, accent color
+- Stat values: JetBrains Mono 28px, weight 600, white (NOT accent color)
+- Stat labels: 10px, uppercase, letter-spacing 0.1em, dim gray
+- Body text: 15px, Plus Jakarta Sans 400, secondary gray, line-height 1.65
+- Buttons: 14px, weight 600 primary / 500 secondary
 
 ## Visual Rules
-- Border radius: 0px everywhere. Sharp corners. Engineering aesthetic. Exception: brand mark circle and dots in terminal bar.
-- Borders: 0.5px solid var(--border) throughout.
-- Hover states: background shifts to accent subtle glow (#00E5BF0A).
+- Border radius: 8px on buttons, inputs, cards. 12px on cards and terminals. 6px on small elements.
+- Borders: 0.5px solid var(--border). 1px on inputs and buttons.
+- Buttons: gradient top-to-bottom on primary, inner highlight shadow, lift on hover.
+- Nav: sticky with backdrop-filter blur(12px), border reveals on scroll.
+- Inputs: use --bg (darkest) background — recessed into surface.
+- Hover states: translateY(-1px) + shadow expansion, not just color change.
 
 ## Logo
-- Text: "IGNEA" in white (#EAEAF0), ".LABS" in accent (#00E5BF)
-- Letter spacing: 3px, Weight: 800
+- Text: "IGNEA" in off-white (#F5F5F7), ".LABS" in accent (#00E5BF)
+- Letter spacing: 3px, Weight: 700
 - Logo is text-only: "IGNEA.LABS" — no mark/circle
 
 ## Interactive Elements

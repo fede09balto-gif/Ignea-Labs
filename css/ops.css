@@ -691,14 +691,14 @@
   white-space: nowrap;
 }
 
-.stage-pill--new              { background: #3A3A5022; color: var(--gray); border: .5px solid var(--dimgray); }
+.stage-pill--new              { background: #4A4A5C22; color: var(--gray); border: .5px solid var(--dimgray); }
 .stage-pill--contacted        { background: #AFA9EC22; color: var(--purple); border: .5px solid var(--purple); }
 .stage-pill--meeting_scheduled{ background: #00E5BF11; color: var(--accent); border: .5px solid var(--accent2); }
 .stage-pill--proposal_sent    { background: #00E5BF22; color: var(--accent); border: .5px solid var(--accent); }
 .stage-pill--negotiating      { background: #F0997B22; color: var(--coral); border: .5px solid var(--coral); }
 .stage-pill--closed_won       { background: #00E5BF33; color: var(--accent); border: .5px solid var(--accent); }
 .stage-pill--closed_lost      { background: #F0997B22; color: var(--coral); border: .5px solid var(--coral); opacity: .6; }
-.stage-pill--on_hold          { background: #3A3A5022; color: var(--dimgray); border: .5px solid var(--dimgray); }
+.stage-pill--on_hold          { background: #4A4A5C22; color: var(--dimgray); border: .5px solid var(--dimgray); }
 
 .priority-pill {
   display: inline-flex;
@@ -725,7 +725,7 @@
 .priority-pill--hot  .priority-pill__dot { background: var(--coral); animation: pulse 1.8s ease-in-out infinite; }
 .priority-pill--warm { background: #AFA9EC22; color: var(--purple); border: .5px solid var(--purple); }
 .priority-pill--warm .priority-pill__dot { background: var(--purple); }
-.priority-pill--cold { background: #3A3A5022; color: var(--dimgray); border: .5px solid var(--dimgray); }
+.priority-pill--cold { background: #4A4A5C22; color: var(--dimgray); border: .5px solid var(--dimgray); }
 .priority-pill--cold .priority-pill__dot { background: var(--dimgray); }
 
 /* Score badge */

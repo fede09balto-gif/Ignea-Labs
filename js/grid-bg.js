@@ -7,9 +7,9 @@
   var ctx = canvas.getContext('2d');
   var w, h;
   var cols, rows;
-  var spacing = 14;
+  var spacing = 18;
   var hexH = spacing * 1.732;
-  var dotRadius = 1.3;
+  var dotRadius = 0.9;
 
   // --- COLORS ---
   // Primary: teal glow (our accent)
@@ -18,10 +18,10 @@
   // These are VISIBLE. Not 5% opacity. Real color.
 
   var orbs = [
-    { x: 0.25, y: 0.35, vx: 0.0006, vy: 0.0004, r: 0.40, cr: 0, cg: 229, cb: 191, opacity: 0.22 },
-    { x: 0.70, y: 0.55, vx: -0.0005, vy: 0.0005, r: 0.35, cr: 0, cg: 160, cb: 140, opacity: 0.16 },
-    { x: 0.50, y: 0.75, vx: 0.0004, vy: -0.0005, r: 0.30, cr: 240, cg: 153, cb: 123, opacity: 0.10 },
-    { x: 0.80, y: 0.20, vx: -0.0003, vy: 0.0004, r: 0.25, cr: 0, cg: 200, cb: 170, opacity: 0.12 }
+    { x: 0.25, y: 0.35, vx: 0.00036, vy: 0.00024, r: 0.45, cr: 0, cg: 229, cb: 191, opacity: 0.28 },
+    { x: 0.70, y: 0.55, vx: -0.0003, vy: 0.0003, r: 0.38, cr: 0, cg: 160, cb: 140, opacity: 0.18 },
+    { x: 0.50, y: 0.75, vx: 0.00024, vy: -0.0003, r: 0.32, cr: 180, cg: 140, cb: 160, opacity: 0.12 },
+    { x: 0.80, y: 0.20, vx: -0.00018, vy: 0.00024, r: 0.28, cr: 0, cg: 200, cb: 170, opacity: 0.14 }
   ];
 
   // Mouse tracking
@@ -36,7 +36,7 @@
   document.addEventListener('mousemove', function(e) {
     mx = e.clientX; my = e.clientY;
     lastMove = Date.now();
-    mouseTarget = 0.30; // STRONG mouse glow
+    mouseTarget = 0.20;
   });
   document.addEventListener('mouseleave', function() { mouseTarget = 0; });
   document.addEventListener('touchmove', function(e) {
@@ -134,7 +134,7 @@
   }
 
   function draw() {
-    ctx.fillStyle = '#08080D';
+    ctx.fillStyle = '#09090F';
     ctx.fillRect(0, 0, w, h);
 
     computeGradients();
@@ -178,7 +178,7 @@
           ctx.fill();
         } else {
           // Base dot — dim but visible (the grid texture)
-          ctx.fillStyle = 'rgba(26, 26, 42, 0.22)';
+          ctx.fillStyle = 'rgba(30, 30, 46, 0.10)';
           ctx.beginPath();
           ctx.arc(x, y, dotRadius, 0, 6.2832);
           ctx.fill();
@@ -215,4 +215,13 @@
     running = !document.hidden;
     if (running) loop();
   });
+
+  // Nav scroll detection — adds .scrolled class for border reveal
+  var navEl = document.querySelector('nav');
+  if (navEl) {
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 10) navEl.classList.add('scrolled');
+      else navEl.classList.remove('scrolled');
+    }, { passive: true });
+  }
 })();
