@@ -20,21 +20,17 @@
 
 /* ---- HERO ---- */
 .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:120px 40px 80px;position:relative}
-.encrypt-badge{display:inline-flex;align-items:center;gap:7px;font-family:var(--fm);font-size:10px;letter-spacing:2px;color:var(--dimgray);background:var(--bg2);border:1px solid var(--border);padding:6px 14px;margin-bottom:32px;opacity:0;animation:fade-in .6s .1s forwards}
-.encrypt-badge svg{width:11px;height:11px;color:var(--accent);flex-shrink:0}
-.hero-tag{font-family:var(--fm);font-size:11px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:24px;opacity:0;animation:fade-in .6s .2s forwards}
-.hero h1{font-family:var(--ff);font-size:clamp(32px,4.5vw,56px);font-weight:700;letter-spacing:-0.02em;line-height:1.15;max-width:700px;margin-bottom:20px;opacity:0;animation:fade-in .6s .35s forwards}
-.hero h1 em{font-style:normal;color:var(--accent)}
-.hero-p{font-size:16px;color:var(--gray);max-width:540px;line-height:1.65;margin-bottom:40px;opacity:0;animation:fade-in .6s .5s forwards}
-.cta-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fade-in .6s .65s forwards}
-@keyframes fade-in{from{opacity:0}to{opacity:1}}
+.hero-tag{font-family:var(--fm);font-size:11px;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;margin-bottom:24px}
+.hero h1,.hero .hero-title{font-family:var(--ff);font-size:clamp(32px,4.5vw,56px);font-weight:700;letter-spacing:-0.03em;line-height:1.1;max-width:700px;margin-bottom:20px}
+.hero-p{font-size:16px;color:var(--gray);max-width:540px;line-height:1.65;margin-bottom:40px}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 
 /* ---- STATS ---- */
 .sec-stats{padding:40px 0 60px}
 .stats-row{display:flex;justify-content:center;align-items:center;gap:0;flex-wrap:nowrap}
 .stat{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 60px}
 .stat+.stat{border-left:1px solid var(--border)}
-.stat-val{font-family:var(--fm);font-size:28px;font-weight:700;color:var(--accent);margin-bottom:6px;line-height:1}
+.stat-val{font-family:var(--fm);font-size:28px;font-weight:600;color:var(--white);margin-bottom:6px;line-height:1}
 .stat-label{font-size:10px;color:var(--dimgray);letter-spacing:1px;text-transform:uppercase;line-height:1.5;max-width:120px}
 
 /* ---- WHAT WE DO ---- */
@@ -133,10 +129,10 @@ footer{border-top:.5px solid var(--border)}
   </a>
   <div class="nav-right">
     <ul class="nav-links">
-      <li><a href="index.html" class="active" data-i18n="nav.home">Inicio</a></li>
-      <li><a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a></li>
-      <li><a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a></li>
-      <li><a href="contact.html" data-i18n="nav.contact">Contacto</a></li>
+      <li><a href="index.html" class="nav-link active" data-i18n="nav.home">Inicio</a></li>
+      <li><a href="manifesto.html" class="nav-link" data-i18n="nav.manifesto">Nuestra Tesis</a></li>
+      <li><a href="diagnostic.html" class="nav-link" data-i18n="nav.diagnostic">Diagnóstico</a></li>
+      <li><a href="contact.html" class="nav-link" data-i18n="nav.contact">Contacto</a></li>
     </ul>
     <a href="diagnostic.html" class="btn-primary btn-nav" data-i18n-html="nav.cta">Iniciar Diagnóstico &rarr;</a>
     <button class="hamburger" id="hamburger" aria-label="Menu">
@@ -153,7 +149,7 @@ footer{border-top:.5px solid var(--border)}
 <div class="mobile-overlay" id="mobileOverlay"></div>
 <div class="mobile-menu" id="mobileMenu">
   <a href="index.html" class="active" data-i18n="nav.home">Inicio</a>
-  <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+  <a href="manifesto.html" data-i18n="nav.manifesto">Nuestra Tesis</a>
   <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
   <a href="contact.html" data-i18n="nav.contact">Contacto</a>
 </div>
@@ -162,35 +158,31 @@ footer{border-top:.5px solid var(--border)}
 
 <!-- HERO -->
 <header class="hero">
-  <div class="encrypt-badge">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-    ENCRYPTED
-  </div>
-  <div class="hero-tag" data-i18n="hero.tag">// Infraestructura de IA para Centroamérica</div>
-  <h1 data-i18n-html="hero.title">Tus operaciones funcionan por instinto. Nosotros las hacemos funcionar con <em>inteligencia.</em></h1>
-  <p class="hero-p" data-i18n="hero.sub">Encontramos el potencial dormido bajo la superficie de tu operación — las ineficiencias ocultas, los procesos manuales, los datos que nadie está usando — y lo transformamos en nuevo terreno competitivo.</p>
-  <div class="cta-row">
-    <a href="diagnostic.html" class="btn-gradient" data-i18n-btn="hero.cta1">Iniciar Diagnóstico &rarr;</a>
-    <a href="manifesto.html" class="btn-ghost-slide"><span data-i18n="hero.cta2">Leer Manifiesto</span><span class="btn-arrow">&rarr;</span></a>
+  <div class="hero-tag reveal-blur" data-i18n="hero.tag">// Infraestructura de IA para Centroamérica</div>
+  <h1 class="hero-title" data-i18n-html="hero.title"><span class="word">Tus</span> <span class="word">operaciones</span> <span class="word">funcionan</span> <span class="word">por</span> <span class="word">instinto.</span> <span class="word">Nosotros</span> <span class="word">las</span> <span class="word">hacemos</span> <span class="word">funcionar</span> <span class="word">con</span> <span class="word accent-word">inteligencia.</span></h1>
+  <p class="hero-p reveal-up reveal-delay-1" data-i18n="hero.sub">Encontramos el potencial dormido bajo la superficie de tu operación — las ineficiencias ocultas, los procesos manuales, los datos que nadie está usando — y lo transformamos en nuevo terreno competitivo.</p>
+  <div class="cta-row reveal-up reveal-delay-2">
+    <a href="diagnostic.html" class="btn-primary" data-i18n-btn="hero.cta1">Iniciar Diagnóstico &rarr;</a>
+    <a href="manifesto.html" class="btn-secondary"><span data-i18n="hero.cta2">Leer Nuestra Tesis</span> <span class="btn-arrow">&rarr;</span></a>
   </div>
 </header>
 
 <!-- STATS -->
 <section class="sec-stats">
   <div class="stats-row">
-    <div class="stat">
+    <div class="stat card-3d reveal-up reveal-delay-1">
       <div class="stat-val" id="s1">0%</div>
       <div class="stat-label" data-i18n="stats.s1">de PYMEs en LatAm sin IA</div>
     </div>
-    <div class="stat">
+    <div class="stat card-3d reveal-up reveal-delay-2">
       <div class="stat-val" id="s2">0x</div>
       <div class="stat-label" data-i18n="stats.s2">retorno promedio por dólar</div>
     </div>
-    <div class="stat">
+    <div class="stat card-3d reveal-up reveal-delay-3">
       <div class="stat-val" id="s3">0%</div>
       <div class="stat-label" data-i18n="stats.s3">reducción de costos</div>
     </div>
-    <div class="stat">
+    <div class="stat card-3d reveal-up reveal-delay-4">
       <div class="stat-val" id="s4">0</div>
       <div class="stat-label" data-i18n="stats.s4">min para diagnosticar</div>
     </div>
@@ -198,13 +190,13 @@ footer{border-top:.5px solid var(--border)}
 </section>
 
 <!-- WHAT WE DO -->
-<section class="sec-whatwedo">
+<section class="sec-whatwedo cursor-glow">
   <div class="content-wrap">
-    <div class="sec-tag" data-i18n="whatwedo.tag">// Qué hacemos</div>
+    <div class="sec-tag reveal-up" data-i18n="whatwedo.tag">// Qué hacemos</div>
     <div class="whatwedo-text">
-      <p data-i18n="whatwedo.p1">Vamos bajo la superficie de tu organización para encontrar lo que ha estado dormido.</p>
-      <p data-i18n="whatwedo.p2">Nuestro proceso comienza con un diagnóstico profundo. Mapeamos tus flujos de trabajo, identificamos cuellos de botella y señalamos dónde la inteligencia artificial genera impacto medible. Luego diseñamos y desplegamos sistemas de IA personalizados — adaptados a tu operación, tus datos, tus objetivos.</p>
-      <p data-i18n="whatwedo.p3">Trabajamos con un número reducido de socios. Esto no es un negocio de volumen. Cada empresa que tomamos recibe toda nuestra atención. El resultado no es optimización — es nuevo terreno.</p>
+      <p class="reveal-up reveal-delay-1" data-i18n="whatwedo.p1">Vamos bajo la superficie de tu organización para encontrar lo que ha estado dormido.</p>
+      <p class="reveal-up reveal-delay-2" data-i18n="whatwedo.p2">Nuestro proceso comienza con un diagnóstico profundo. Mapeamos tus flujos de trabajo, identificamos cuellos de botella y señalamos dónde la inteligencia artificial genera impacto medible. Luego diseñamos y desplegamos sistemas de IA personalizados — adaptados a tu operación, tus datos, tus objetivos.</p>
+      <p class="reveal-up reveal-delay-3" data-i18n="whatwedo.p3">Trabajamos con un número reducido de socios. Esto no es un negocio de volumen. Cada empresa que tomamos recibe toda nuestra atención. El resultado no es optimización — es nuevo terreno.</p>
     </div>
   </div>
 </section>
@@ -212,24 +204,24 @@ footer{border-top:.5px solid var(--border)}
 <!-- PROCESS -->
 <section class="sec-process">
   <div class="content-wrap">
-    <div class="sec-tag" data-i18n="process.tag">// Proceso</div>
+    <div class="sec-tag reveal-up" data-i18n="process.tag">// Proceso</div>
     <div class="process-timeline">
-      <div class="pstep">
+      <div class="pstep reveal-left reveal-delay-1">
         <div class="pstep-n">01</div>
         <div class="pstep-t" data-i18n="process.s1t">Diagnóstico</div>
         <div class="pstep-d" data-i18n="process.s1d">11 preguntas que mapean tus brechas operativas y tu preparación para IA.</div>
       </div>
-      <div class="pstep">
+      <div class="pstep reveal-right reveal-delay-2">
         <div class="pstep-n">02</div>
         <div class="pstep-t" data-i18n="process.s2t">Mapa de valor</div>
         <div class="pstep-d" data-i18n="process.s2d">Calculamos exactamente cuánto tiempo y dinero estás perdiendo.</div>
       </div>
-      <div class="pstep">
+      <div class="pstep reveal-left reveal-delay-3">
         <div class="pstep-n">03</div>
         <div class="pstep-t" data-i18n="process.s3t">Construir y desplegar</div>
         <div class="pstep-d" data-i18n="process.s3d">IA personalizada: bots de WhatsApp, automatización, flujos inteligentes.</div>
       </div>
-      <div class="pstep">
+      <div class="pstep reveal-right reveal-delay-4">
         <div class="pstep-n">04</div>
         <div class="pstep-t" data-i18n="process.s4t">Optimizar</div>
         <div class="pstep-d" data-i18n="process.s4d">Iteración continua. El sistema aprende. Tu ventaja se multiplica.</div>
@@ -241,7 +233,7 @@ footer{border-top:.5px solid var(--border)}
 <!-- TERMINAL -->
 <section class="sec-terminal">
   <div class="content-wrap">
-    <div class="term">
+    <div class="term card-3d reveal-scale">
       <div class="term-bar">
         <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
         <div class="term-title">ignea_diagnostic.sh</div>
@@ -252,10 +244,10 @@ footer{border-top:.5px solid var(--border)}
 </section>
 
 <!-- CTA -->
-<section class="sec-cta">
+<section class="sec-cta cursor-glow">
   <div class="content-wrap" style="text-align:center">
-    <div class="sec-tag" data-i18n="cta.tag">// ¿Listo?</div>
-    <h2 data-i18n="cta.headline">Descubre el potencial dormido en tu operación.</h2>
+    <div class="sec-tag reveal-blur" data-i18n="cta.tag">// ¿Listo?</div>
+    <h2 class="reveal-up" data-i18n="cta.headline">Descubre el potencial dormido en tu operación.</h2>
     <a href="diagnostic.html" class="btn-primary" data-i18n-html="cta.btn">Iniciar Diagnóstico &rarr;</a>
     <p class="cta-note" data-i18n="cta.note">Completamente encriptado. Resultados instantáneos.</p>
   </div>
@@ -273,7 +265,7 @@ footer{border-top:.5px solid var(--border)}
       </div>
       <div class="footer-nav">
         <a href="index.html" data-i18n="nav.home">Inicio</a>
-        <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+        <a href="manifesto.html" data-i18n="nav.manifesto">Nuestra Tesis</a>
         <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
         <a href="contact.html" data-i18n="nav.contact">Contacto</a>
       </div>
@@ -293,6 +285,8 @@ footer{border-top:.5px solid var(--border)}
 <script src="js/i18n.js"></script>
 <script src="js/grid-bg.js"></script>
 <script src="js/terminal.js"></script>
+<script src="js/scroll-animations.js"></script>
+<script src="js/card-tilt.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   IgneaTerminal.init();

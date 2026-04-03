@@ -12,17 +12,17 @@ var IgneaI18n = (function() {
     es: {
       // ---- NAV ----
       "nav.home": "Inicio",
-      "nav.manifesto": "Manifiesto",
+      "nav.manifesto": "Nuestra Tesis",
       "nav.diagnostic": "Diagnóstico",
       "nav.contact": "Contacto",
       "nav.cta": "Iniciar Diagnóstico &rarr;",
 
       // ---- HOMEPAGE: HERO ----
       "hero.tag": "// Infraestructura de IA para Centroamérica",
-      "hero.title": 'Tus operaciones funcionan por instinto. Nosotros las hacemos funcionar con <em>inteligencia.</em>',
+      "hero.title": '<span class="word">Tus</span> <span class="word">operaciones</span> <span class="word">funcionan</span> <span class="word">por</span> <span class="word">instinto.</span> <span class="word">Nosotros</span> <span class="word">las</span> <span class="word">hacemos</span> <span class="word">funcionar</span> <span class="word">con</span> <span class="word accent-word">inteligencia.</span>',
       "hero.sub": "Encontramos el potencial dormido bajo la superficie de tu operación — las ineficiencias ocultas, los procesos manuales, los datos que nadie está usando — y lo transformamos en nuevo terreno competitivo.",
       "hero.cta1": "Iniciar Diagnóstico &rarr;",
-      "hero.cta2": "Leer Manifiesto",
+      "hero.cta2": "Leer Nuestra Tesis",
 
       // ---- HOMEPAGE: STATS ----
       "stats.s1": "de PYMEs en LatAm sin IA",
@@ -326,7 +326,7 @@ var IgneaI18n = (function() {
       "res.cta.email": "O escríbenos directamente:",
 
       // ---- MANIFESTO ----
-      "man.tag": "// Manifiesto",
+      "man.tag": "// Nuestra Tesis",
       "man.title": 'Centroamérica se construyó sobre fuego. El próximo terreno es <em>digital.</em>',
       "man.p1": "Nicaragua es tierra de volcanes. Masaya, Momotombo, Cerro Negro — cada uno formó nuevo terreno a través del mismo proceso: presión desde abajo, calor aplicado a materia prima, nueva tierra emergiendo donde antes no había nada.",
       "man.p2": "Ignea Labs toma su nombre de ese proceso. Ígnea — nacida del fuego. La roca ígnea se forma cuando el magma atrapado bajo la superficie encuentra su camino hacia arriba y se transforma en terreno sólido. Eso es exactamente lo que hacemos.",
@@ -620,17 +620,17 @@ var IgneaI18n = (function() {
     en: {
       // ---- NAV ----
       "nav.home": "Home",
-      "nav.manifesto": "Manifesto",
+      "nav.manifesto": "Our Thesis",
       "nav.diagnostic": "Diagnostic",
       "nav.contact": "Contact",
       "nav.cta": "Start Diagnostic &rarr;",
 
       // ---- HOMEPAGE: HERO ----
       "hero.tag": "// AI infrastructure for Central America",
-      "hero.title": 'Your operations run on instinct. We make them run on <em>intelligence.</em>',
+      "hero.title": '<span class="word">Your</span> <span class="word">operations</span> <span class="word">run</span> <span class="word">on</span> <span class="word">instinct.</span> <span class="word">We</span> <span class="word">make</span> <span class="word">them</span> <span class="word">run</span> <span class="word">on</span> <span class="word accent-word">intelligence.</span>',
       "hero.sub": "We find the dormant potential beneath the surface of your operations — the hidden inefficiencies, the manual processes, the data no one is using — and transform it into competitive new ground.",
       "hero.cta1": "Begin Diagnostic &rarr;",
-      "hero.cta2": "Read Manifesto",
+      "hero.cta2": "Read Our Thesis",
 
       // ---- HOMEPAGE: STATS ----
       "stats.s1": "of LatAm SMBs lack AI",
@@ -933,7 +933,7 @@ var IgneaI18n = (function() {
       "res.cta.email": "Or write to us directly:",
 
       // ---- MANIFESTO ----
-      "man.tag": "// Manifesto",
+      "man.tag": "// Our Thesis",
       "man.title": 'Central America was built on fire. The next ground is <em>digital.</em>',
       "man.p1": "Nicaragua is a land of volcanoes. Masaya, Momotombo, Cerro Negro — each one formed new ground through the same process: pressure from below, heat applied to raw material, new terrain emerging where none existed before.",
       "man.p2": "Ignea Labs takes its name from that process. Ignea — born of fire. Igneous rock forms when trapped magma beneath the surface finds its way up and transforms into solid ground. That is exactly what we do.",
