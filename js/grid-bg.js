@@ -18,10 +18,10 @@
   // These are VISIBLE. Not 5% opacity. Real color.
 
   var orbs = [
-    { x: 0.25, y: 0.35, vx: 0.0004, vy: 0.00025, r: 0.40, cr: 0, cg: 229, cb: 191, opacity: 0.22 },
-    { x: 0.70, y: 0.55, vx: -0.0003, vy: 0.00035, r: 0.35, cr: 0, cg: 160, cb: 140, opacity: 0.16 },
-    { x: 0.50, y: 0.75, vx: 0.00025, vy: -0.0003, r: 0.30, cr: 240, cg: 153, cb: 123, opacity: 0.10 },
-    { x: 0.80, y: 0.20, vx: -0.00015, vy: 0.0002, r: 0.25, cr: 0, cg: 200, cb: 170, opacity: 0.12 }
+    { x: 0.25, y: 0.35, vx: 0.0006, vy: 0.0004, r: 0.40, cr: 0, cg: 229, cb: 191, opacity: 0.22 },
+    { x: 0.70, y: 0.55, vx: -0.0005, vy: 0.0005, r: 0.35, cr: 0, cg: 160, cb: 140, opacity: 0.16 },
+    { x: 0.50, y: 0.75, vx: 0.0004, vy: -0.0005, r: 0.30, cr: 240, cg: 153, cb: 123, opacity: 0.10 },
+    { x: 0.80, y: 0.20, vx: -0.0003, vy: 0.0004, r: 0.25, cr: 0, cg: 200, cb: 170, opacity: 0.12 }
   ];
 
   // Mouse tracking
@@ -75,18 +75,22 @@
     smy += (my - smy) * 0.1;
     mouseOpacity += (mouseTarget - mouseOpacity) * 0.06;
 
-    // Update orb positions
+    // Update orb positions — ALWAYS drift, never freeze
     for (var i = 0; i < orbs.length; i++) {
       var o = orbs[i];
-      if (!idle && mouseTarget > 0) {
-        // Pull toward mouse gently
-        o.x += ((mx / w) - o.x) * 0.008;
-        o.y += ((my / h) - o.y) * 0.008;
-      } else {
-        o.x += o.vx;
-        o.y += o.vy;
-        if (o.x < 0.05 || o.x > 0.95) o.vx *= -1;
-        if (o.y < 0.05 || o.y > 0.95) o.vy *= -1;
+
+      // Orbs ALWAYS drift
+      o.x += o.vx;
+      o.y += o.vy;
+
+      // Bounce off edges with padding
+      if (o.x < 0.08 || o.x > 0.92) o.vx *= -1;
+      if (o.y < 0.08 || o.y > 0.92) o.vy *= -1;
+
+      // ADDITIONALLY pull toward mouse when active (on top of drift)
+      if (mouseTarget > 0.01) {
+        o.x += ((mx / w) - o.x) * 0.006;
+        o.y += ((my / h) - o.y) * 0.006;
       }
     }
 

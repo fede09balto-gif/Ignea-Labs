@@ -150,6 +150,8 @@
       else if (score <= 18) dimLevel = 'competent';
       else dimLevel = 'advanced';
 
+      var insightKey = score < 12 ? 'res.stream.' + dim + '.low' : 'res.stream.' + dim + '.high';
+
       var row = document.createElement('div');
       row.className = 'dim-row';
       row.innerHTML =
@@ -157,7 +159,8 @@
           '<span class="dim-name">' + t('res.stream.' + dim) + '</span>' +
           '<span class="dim-score">' + score + ' / 25</span>' +
         '</div>' +
-        '<div class="dim-bar"><div class="dim-fill level-' + dimLevel + '" data-width="' + pct + '"></div></div>';
+        '<div class="dim-bar"><div class="dim-fill level-' + dimLevel + '" data-width="' + pct + '"></div></div>' +
+        '<div class="dim-insight">' + t(insightKey) + '</div>';
 
       container.appendChild(row);
     });
