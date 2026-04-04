@@ -11,6 +11,8 @@
 <meta property="og:image" content="/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://ignealabs.com/contact.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/shared.css">
 <link rel="stylesheet" href="css/components.css">
@@ -34,6 +36,7 @@
   .ct-section{padding:60px 0 40px}
 }
 </style>
+<script defer data-domain="ignealabs.com" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
 
@@ -137,6 +140,7 @@
       <div class="footer-brand">
         <div class="f-brand">IGNEA<span>.LABS</span></div>
         <div class="f-tag" data-i18n="footer.tag">Bajo la superficie, el potencial.</div>
+        <div style="font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;margin-top:6px" data-i18n="footer.address">San Juan, Puerto Rico</div>
       </div>
       <div class="footer-nav">
         <a href="index.html" data-i18n="nav.home">Inicio</a>
@@ -146,14 +150,16 @@
       </div>
       <div class="footer-contact"><a href="mailto:hola@ignealabs.com">hola@ignealabs.com</a></div>
     </div>
-    <div class="footer-bottom">&copy; 2026 Ignea Labs. <span data-i18n="footer.rights">Todos los derechos reservados.</span></div>
+    <div class="footer-bottom">&copy; 2026 Ignea Labs. <span data-i18n="footer.rights">Todos los derechos reservados.</span> <span style="margin-left:12px;opacity:.65" data-i18n="footer.serving">Orgullosamente sirviendo a Puerto Rico</span></div>
   </div>
 </footer>
 
 </div>
 
 <script src="js/i18n.js"></script>
+<script src="js/analytics.js"></script>
 <script src="js/grid-bg.js"></script>
+<script src="js/supabase-config.js"></script>
 <script>
 (function() {
   var hamburger = document.getElementById('hamburger');
@@ -192,6 +198,18 @@ function handleSubmit(e) {
     if (response.ok) {
       form.style.display = 'none';
       document.getElementById('successMsg').classList.add('active');
+      // Mirror to Supabase contacts table (best-effort)
+      if (typeof IgneaSupabase !== 'undefined' && IgneaSupabase.client) {
+        try {
+          IgneaSupabase.client.from('contacts').insert([{
+            name: formData.get('name') || '',
+            email: formData.get('email') || '',
+            company: formData.get('company') || '',
+            message: formData.get('message') || '',
+            source: 'contact_form'
+          }]);
+        } catch (e) { /* silent */ }
+      }
     } else {
       document.getElementById('errorMsg').classList.add('active');
       submitBtn.disabled = false;

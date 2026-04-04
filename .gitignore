@@ -1,4 +1,10 @@
 .DS_Store
+node_modules/
+.env
+.env.local
+.env.production
 supabase/.temp/
 .vercel
+.netlify
+*.log
 test-api.html

@@ -12,22 +12,22 @@ var IgneaI18n = (function() {
     es: {
       // ---- NAV ----
       "nav.home": "Inicio",
-      "nav.manifesto": "Nuestra Tesis",
+      "nav.manifesto": "Manifiesto",
       "nav.diagnostic": "Diagnóstico",
       "nav.contact": "Contacto",
-      "nav.cta": "Iniciar Diagnóstico &rarr;",
+      "nav.cta": "Toma el Diagnóstico Gratis &rarr;",
 
       // ---- HOMEPAGE: HERO ----
-      "hero.tag": "// Infraestructura de IA para Centroamérica",
-      "hero.title": '<span class="word">Tus</span> <span class="word">operaciones</span> <span class="word">funcionan</span> <span class="word">por</span> <span class="word">instinto.</span> <span class="word">Nosotros</span> <span class="word">las</span> <span class="word">hacemos</span> <span class="word">funcionar</span> <span class="word">con</span> <span class="word accent-word">inteligencia.</span>',
-      "hero.sub": "Encontramos el potencial dormido bajo la superficie de tu operación — las ineficiencias ocultas, los procesos manuales, los datos que nadie está usando — y lo transformamos en nuevo terreno competitivo.",
-      "hero.cta1": "Iniciar Diagnóstico &rarr;",
-      "hero.cta2": "Leer Nuestra Tesis",
+      "hero.tag": "// Infraestructura de IA para Puerto Rico",
+      "hero.title": 'Tu negocio pierde miles cada mes en procesos manuales. Nosotros los encontramos, los eliminamos, y te mostramos el <em>ROI.</em>',
+      "hero.sub": "Diagnóstico gratuito de IA que mapea tu desperdicio operacional y lo convierte en ahorros proyectados — en menos de 15 minutos.",
+      "hero.cta1": "Toma el Diagnóstico Gratis &rarr;",
+      "hero.cta2": "Leer Manifiesto",
 
       // ---- HOMEPAGE: STATS ----
-      "stats.s1": "de PYMEs en LatAm sin IA",
-      "stats.s2": "retorno promedio por dólar",
-      "stats.s3": "reducción de costos",
+      "stats.s1": "de PYMEs en PR usan procesos manuales",
+      "stats.s2": "hrs semanales perdidas por equipo",
+      "stats.s3": "ahorro promedio post-implementación",
       "stats.s4": "min para diagnosticar",
 
       // ---- HOMEPAGE: WHAT WE DO ----
@@ -39,9 +39,59 @@ var IgneaI18n = (function() {
 
       // ---- HOMEPAGE: CTA ----
       "cta.tag": "// ¿Listo?",
-      "cta.headline": "Descubre el potencial dormido en tu operación.",
-      "cta.btn": "Iniciar Diagnóstico &rarr;",
+      "cta.headline": "¿Cuánto potencial dormido tiene tu negocio?",
+      "cta.btn": "Toma el Diagnóstico Gratis &rarr;",
       "cta.note": "Completamente encriptado. Resultados instantáneos.",
+
+      // ---- HOMEPAGE: SOCIAL PROOF ----
+      "proof.tag": "// Resultados de Nuestros Clientes",
+      "proof.title": "Empresas que ya activaron su potencial.",
+      "proof.c1.tag": "PLATAFORMA DE CONTENIDO IA",
+      "proof.c1.name": "endgame.ai",
+      "proof.c1.stat": "80%",
+      "proof.c1.statLabel": "de operaciones automatizadas",
+      "proof.c1.desc": "Automatizamos el 80% de las operaciones de contenido. Eliminamos las dos posiciones de mayor salario. Empresa valorada en $30M pre-seed, levantó $5M.",
+      "proof.c2.tag": "GRUPO DE RESTAURANTES",
+      "proof.c2.stat": "32",
+      "proof.c2.statLabel": "hrs/semana recuperadas",
+      "proof.c2.desc": "Automatización de coordinación cocina-delivery y rastreo de inventario. Ahorro de ~$1,800/mes.",
+      "proof.c3.tag": "PRÁCTICA MÉDICA",
+      "proof.c3.stat": "45",
+      "proof.c3.statLabel": "hrs/semana recuperadas",
+      "proof.c3.desc": "Reemplazo de sistema manual de citas y seguimiento de seguros con sistemas de IA. Ahorro de ~$4,500/mes.",
+
+      // ---- HOMEPAGE: ABOUT ----
+      "about.tag": "// Quiénes Somos",
+      "about.title": "Conocimiento profundo. Presencia local.",
+      "about.name": "[FOUNDER NAME]",
+      "about.bio": "[BIO — Experiencia en IA y automatización empresarial. Bilingüe. Basado en San Juan, Puerto Rico.]",
+      "about.presence": "Basados en San Juan, PR. Bilingües. Enfocados exclusivamente en empresas puertorriqueñas.",
+
+      // ---- HOMEPAGE: BUILT FOR PR ----
+      "pr.tag": "// Diseñado para Puerto Rico",
+      "pr.title": "Entendemos el mercado porque somos parte de él.",
+      "pr.c1.title": "Ventaja Act 60",
+      "pr.c1.desc": "Las empresas que llegan a PR bajo incentivos fiscales necesitan operaciones modernas desde el día uno. Les construimos la infraestructura digital que su negocio exige.",
+      "pr.c2.title": "Post-huracán, post-excusas",
+      "pr.c2.desc": "María y Fiona demostraron que los negocios digitalizados sobreviven. Los que dependían de papel y procesos manuales cerraron. La próxima tormenta no es meteorológica — es competitiva.",
+      "pr.c3.title": "Bilingüe por naturaleza",
+      "pr.c3.desc": "Puerto Rico opera en dos idiomas simultáneamente. Nuestros sistemas también. Servicio, automatización y reportes en español e inglés — sin traducciones torpes.",
+
+      // ---- HOMEPAGE: CALCULATOR ----
+      "calc.tag": "// Calculadora de Desperdicio",
+      "calc.title": "¿Cuánto te cuestan tus procesos manuales?",
+      "calc.sub": "Tres preguntas. Resultado instantáneo.",
+      "calc.industryLabel": "¿En qué industria estás?",
+      "calc.employeesLabel": "¿Cuántos empleados?",
+      "calc.hoursLabel": "Horas semanales en tareas manuales",
+      "calc.resultLabel": "Tu negocio está perdiendo aproximadamente",
+      "calc.resultUnit": "/mes",
+      "calc.resultNote": "en productividad desperdiciada",
+      "calc.cta": "Obtén tu diagnóstico completo &rarr;",
+
+      // ---- FOOTER ADDITIONS ----
+      "footer.address": "San Juan, Puerto Rico",
+      "footer.serving": "Orgullosamente sirviendo a Puerto Rico",
 
       // ---- HOMEPAGE: PROCESS ----
       "process.tag": "// Proceso",
@@ -49,13 +99,13 @@ var IgneaI18n = (function() {
       "process.p1": "Cada proyecto comienza con nuestro diagnóstico: 11 preguntas diseñadas para revelar las ineficiencias ocultas en tus operaciones. Mapeamos tus flujos de trabajo, cuantificamos el desperdicio y desplegamos sistemas que lo eliminan permanentemente.",
       "process.p2": "Trabajamos con un número selecto de socios a la vez. Cada proyecto recibe toda nuestra atención.",
       "process.s1t": "Diagnóstico",
-      "process.s1d": "11 preguntas que mapean tus brechas operativas y tu preparación para IA.",
-      "process.s2t": "Mapa de valor",
-      "process.s2d": "Calculamos exactamente cuánto tiempo y dinero estás perdiendo.",
-      "process.s3t": "Construir y desplegar",
-      "process.s3d": "Sistemas de IA personalizados, integrados a tu operación.",
-      "process.s4t": "Optimizar",
-      "process.s4d": "Iteración continua. El sistema aprende. Tu ventaja se multiplica.",
+      "process.s1d": "11 preguntas que mapean tus brechas operativas, cuantifican tu desperdicio y revelan oportunidades ocultas.",
+      "process.s2t": "Reporte",
+      "process.s2d": "Recibes un mapa detallado de tus pérdidas mensuales con soluciones específicas y ROI proyectado.",
+      "process.s3t": "Implementación",
+      "process.s3d": "Construimos e integramos los sistemas de IA que eliminan el desperdicio — permanentemente.",
+      // "process.s4t": "Optimizar",
+      // "process.s4d": "Iteración continua. El sistema aprende. Tu ventaja se multiplica.",
 
       // ---- HOMEPAGE: SOLUTIONS ---- (removed)
 
@@ -233,6 +283,108 @@ var IgneaI18n = (function() {
       "dx.q11.text": "¿Cuál es el problema más grande que afecta la rentabilidad de tu negocio hoy — y si ese problema desapareciera mañana, qué haría posible?",
       "dx.q11.ph": "Lo que más te frena — en tiempo, dinero, o oportunidades perdidas. Y lo que harías con esa libertad si el problema dejara de existir...",
 
+      // ---- DIAGNOSTIC: INDUSTRY BRANCHING ----
+
+      // RESTAURANT
+      "dx.ind.restaurant.q1.text": "¿Cómo manejan las reservaciones y la asignación de mesas?",
+      "dx.ind.restaurant.q1.c1": "Por teléfono o en persona, sin sistema",
+      "dx.ind.restaurant.q1.c2": "WhatsApp y llamadas, cuaderno de reservas",
+      "dx.ind.restaurant.q1.c3": "Sistema digital básico (Google, OpenTable)",
+      "dx.ind.restaurant.q1.c4": "Sistema POS integrado con reservas",
+      "dx.ind.restaurant.q2.text": "¿Cuáles de estos procesos de cocina y servicio todavía se hacen a mano?",
+      "dx.ind.restaurant.q2.c1": "Toma de pedidos en papel",
+      "dx.ind.restaurant.q2.c2": "Comunicación cocina-mesero verbal o a gritos",
+      "dx.ind.restaurant.q2.c3": "Conteo de inventario a mano",
+      "dx.ind.restaurant.q2.c4": "Actualización de precios del menú manual",
+      "dx.ind.restaurant.q2.c5": "Coordinación de delivery por teléfono",
+      "dx.ind.restaurant.q2.c6": "Cálculo de propinas y nómina manual",
+      "dx.ind.restaurant.q3.text": "¿Qué porcentaje de tus ingresos viene de delivery vs. servicio en mesa?",
+      "dx.ind.restaurant.q3.sliderLabel": "Porcentaje de ingresos por delivery",
+
+      // MEDICAL
+      "dx.ind.medical.q1.text": "¿Cómo agendan citas tus pacientes?",
+      "dx.ind.medical.q1.c1": "Solo por teléfono",
+      "dx.ind.medical.q1.c2": "Teléfono y WhatsApp",
+      "dx.ind.medical.q1.c3": "Sistema de citas en línea",
+      "dx.ind.medical.q1.c4": "Portal completo del paciente",
+      "dx.ind.medical.q2.text": "¿Cuáles de estos procesos clínicos todavía se hacen a mano?",
+      "dx.ind.medical.q2.c1": "Formularios de admisión en papel",
+      "dx.ind.medical.q2.c2": "Recordatorios de citas por teléfono",
+      "dx.ind.medical.q2.c3": "Verificación de seguros manual",
+      "dx.ind.medical.q2.c4": "Seguimiento de resultados de laboratorio manual",
+      "dx.ind.medical.q2.c5": "Manejo de recetas manual",
+      "dx.ind.medical.q2.c6": "Expedientes médicos en papel",
+      "dx.ind.medical.q3.text": "¿Cuántas ausencias de pacientes (no-shows) tienen por semana?",
+      "dx.ind.medical.q3.sliderLabel": "Ausencias de pacientes por semana",
+
+      // LEGAL
+      "dx.ind.legal.q1.text": "¿Cómo rastrean las horas facturables?",
+      "dx.ind.legal.q1.c1": "De memoria, anotando al final del día",
+      "dx.ind.legal.q1.c2": "Hoja de cálculo manual",
+      "dx.ind.legal.q1.c3": "App básica de seguimiento de tiempo",
+      "dx.ind.legal.q1.c4": "Sistema de gestión legal integrado",
+      "dx.ind.legal.q2.text": "¿Cuáles de estos procesos legales administrativos todavía se hacen a mano?",
+      "dx.ind.legal.q2.c1": "Admisión de clientes y verificación de conflictos",
+      "dx.ind.legal.q2.c2": "Redacción de documentos desde cero cada vez",
+      "dx.ind.legal.q2.c3": "Seguimiento de plazos judiciales manual",
+      "dx.ind.legal.q2.c4": "Preparación de facturas manual",
+      "dx.ind.legal.q2.c5": "Gestión de expedientes en papel",
+      "dx.ind.legal.q2.c6": "Seguimiento de comunicaciones con clientes",
+      "dx.ind.legal.q3.text": "¿Qué porcentaje de consultas se convierten en clientes que pagan?",
+      "dx.ind.legal.q3.sliderLabel": "Tasa de conversión de consultas",
+
+      // LOGISTICS
+      "dx.ind.logistics.q1.text": "¿Cómo rastrean envíos y entregas?",
+      "dx.ind.logistics.q1.c1": "Llamadas telefónicas y WhatsApp",
+      "dx.ind.logistics.q1.c2": "Hojas de cálculo",
+      "dx.ind.logistics.q1.c3": "Software básico de rastreo",
+      "dx.ind.logistics.q1.c4": "Plataforma logística integrada",
+      "dx.ind.logistics.q2.text": "¿Cuáles de estos procesos logísticos todavía se hacen a mano?",
+      "dx.ind.logistics.q2.c1": "Planificación de rutas a mano",
+      "dx.ind.logistics.q2.c2": "Confirmación de entrega por teléfono",
+      "dx.ind.logistics.q2.c3": "Inventario de almacén manual",
+      "dx.ind.logistics.q2.c4": "Notificaciones de entrega al cliente manuales",
+      "dx.ind.logistics.q2.c5": "Programación de conductores manual",
+      "dx.ind.logistics.q2.c6": "Rastreo de combustible y mantenimiento manual",
+      "dx.ind.logistics.q3.text": "¿Cuántas entregas fallidas o devoluciones tienen por semana?",
+      "dx.ind.logistics.q3.sliderLabel": "Entregas fallidas por semana",
+
+      // CONSTRUCTION
+      "dx.ind.construction.q1.text": "¿Cómo manejan los cronogramas de proyectos?",
+      "dx.ind.construction.q1.c1": "Memoria y experiencia",
+      "dx.ind.construction.q1.c2": "Papel o pizarra",
+      "dx.ind.construction.q1.c3": "Hojas de cálculo",
+      "dx.ind.construction.q1.c4": "Software de gestión de proyectos",
+      "dx.ind.construction.q2.text": "¿Cuáles de estos procesos de campo todavía se hacen a mano?",
+      "dx.ind.construction.q2.c1": "Pedidos de materiales por teléfono",
+      "dx.ind.construction.q2.c2": "Reportes de avance diario en papel",
+      "dx.ind.construction.q2.c3": "Seguimiento de cumplimiento de seguridad manual",
+      "dx.ind.construction.q2.c4": "Coordinación de subcontratistas por WhatsApp",
+      "dx.ind.construction.q2.c5": "Control presupuestario en hojas de cálculo",
+      "dx.ind.construction.q2.c6": "Programación de permisos e inspecciones manual",
+      "dx.ind.construction.q3.text": "¿Qué porcentaje de proyectos terminan a tiempo y dentro del presupuesto?",
+      "dx.ind.construction.q3.sliderLabel": "Proyectos completados a tiempo",
+
+      // RETAIL
+      "dx.ind.retail.q1.text": "¿Cómo manejan el inventario?",
+      "dx.ind.retail.q1.c1": "Conteo manual solamente",
+      "dx.ind.retail.q1.c2": "Hojas de cálculo",
+      "dx.ind.retail.q1.c3": "POS básico con inventario",
+      "dx.ind.retail.q1.c4": "Sistema de gestión de inventario integrado",
+      "dx.ind.retail.q2.text": "¿Cuáles de estos procesos de retail todavía se hacen a mano?",
+      "dx.ind.retail.q2.c1": "Actualización de precios a mano",
+      "dx.ind.retail.q2.c2": "Decisiones de reorden por intuición",
+      "dx.ind.retail.q2.c3": "Seguimiento de lealtad del cliente manual",
+      "dx.ind.retail.q2.c4": "Reportes de ventas compilados manualmente",
+      "dx.ind.retail.q2.c5": "Comunicación con proveedores por WhatsApp",
+      "dx.ind.retail.q2.c6": "Programación de empleados a mano",
+      "dx.ind.retail.q3.text": "¿Qué porcentaje de ventas viene de canales digitales vs. tienda física?",
+      "dx.ind.retail.q3.sliderLabel": "Ventas por canales digitales",
+
+      // ---- DIAGNOSTIC: MONEY LEAK COUNTER ----
+      "dx.leak.label": "Tu negocio está perdiendo",
+      "dx.leak.unit": "/mes",
+
       // ---- RESULTS: VALUE STREAMS ----
       "res.stream.customerFlow": "Flujo de Clientes",
       "res.stream.operationsFlow": "Flujo de Operaciones",
@@ -324,23 +476,127 @@ var IgneaI18n = (function() {
       "res.cta.call": "Agendar llamada &rarr;",
       "res.cta.pdf": "Descargar reporte PDF",
       "res.cta.email": "O escríbenos directamente:",
+      "res.loading1": "Analizando tus respuestas...",
+      "res.loading2": "Generando tu reporte...",
+
+      // ---- RESULTS: AI INSIGHTS ----
+      "res.ai.tag": "// ANÁLISIS IA",
+      "res.ai.subtitle": "Análisis personalizado generado por inteligencia artificial para tu empresa.",
+      "res.ai.summary": "Resumen Ejecutivo",
+      "res.ai.opportunities": "Principales Oportunidades",
+      "res.ai.quickWins": "Acciones Inmediatas",
+      "res.ai.risk": "Riesgo de Inacción",
+
+      // ---- RESULTS: REPORT HEADER + PAINPOINTS + SAVINGS ----
+      "res.reportTitle": "Reporte de Salud Operacional",
+      "res.reportDate": "Fecha:",
+      "res.scoreTag": "// Puntuación de Madurez",
+      "res.painTag": "// Puntos de Mayor Impacto Financiero",
+      "res.pain.perMonth": "/mes",
+      "res.pain.customerFlow": "Clientes que se pierden por respuesta lenta o atención inconsistente.",
+      "res.pain.operationsFlow": "Horas productivas desperdiciadas en procesos manuales repetitivos.",
+      "res.pain.informationFlow": "Decisiones tomadas sin datos — costos ocultos por falta de visibilidad.",
+      "res.pain.growthFlow": "Operación que no escala — cada nuevo cliente agrega carga al equipo.",
+      "res.solTag": "// Soluciones Recomendadas",
+      "res.sol.implTime": "Implementación",
+      "res.sol.weeks": "semanas",
+      "res.sol.projSavings": "Ahorro proyectado",
+      "res.projTag": "// Proyección de Ahorro",
+      "res.savings.monthLabel": "Ahorro mensual estimado",
+      "res.savings.yearLabel": "Ahorro anual estimado",
+      "res.savings.breakevenLabel": "Retorno de inversión",
+      "res.savings.breakevenUnit": "meses",
+      "res.cta2.headline": "¿Listo para activar estos ahorros?",
+      "res.cta2.sub": "Agenda tu llamada estratégica. 15 minutos para mostrarte el plan de implementación exacto para tu negocio.",
+      "res.cta.calendly": "Agenda tu Llamada Estratégica &rarr;",
+      "res.cta.whatsapp": "Contactar por WhatsApp",
+
+      // ---- RESULTS: GENERIC SOLUTIONS ----
+      "res.sol.customer.name": "Bot de Atención al Cliente con IA",
+      "res.sol.customer.desc": "Respuesta automática 24/7 a consultas frecuentes por WhatsApp y web. Reduce tiempo de respuesta de horas a segundos y libera a tu equipo para tareas de mayor valor.",
+      "res.sol.operations.name": "Automatización de Procesos Operativos",
+      "res.sol.operations.desc": "Elimina tareas manuales repetitivas — inventario, agenda, reportes, facturación. Tu equipo recupera horas cada semana para enfocarse en lo que genera ingresos.",
+      "res.sol.information.name": "Dashboard de Datos en Tiempo Real",
+      "res.sol.information.desc": "Visibilidad completa de tu operación en un solo lugar. Métricas clave actualizadas automáticamente para tomar decisiones basadas en datos, no en intuición.",
+      "res.sol.growth.name": "Infraestructura de Escalabilidad",
+      "res.sol.growth.desc": "Sistemas que crecen contigo. Automatización de onboarding, procesos estandarizados y capacidad operativa que escala sin agregar personal proporcionalmente.",
+
+      // ---- RESULTS: RESTAURANT SOLUTIONS ----
+      "res.sol.customer.restaurant.name": "Bot de Reservaciones y Pedidos con IA",
+      "res.sol.customer.restaurant.desc": "Reservaciones automáticas, pedidos para llevar y respuesta a preguntas frecuentes por WhatsApp 24/7. Reduce llamadas perdidas y libera al personal de hostess.",
+      "res.sol.operations.restaurant.name": "Automatización de Inventario y Proveedores",
+      "res.sol.operations.restaurant.desc": "Control automático de inventario, alertas de reorden y comunicación con proveedores. Elimina el conteo manual y reduce desperdicio de alimentos.",
+      "res.sol.information.restaurant.name": "Dashboard de Ventas y Costos de Alimentos",
+      "res.sol.information.restaurant.desc": "Visibilidad en tiempo real de ventas por plato, food cost, horas pico y rendimiento del personal. Decisiones de menú basadas en datos reales.",
+      "res.sol.growth.restaurant.name": "Sistema de Fidelización y Marketing Automatizado",
+      "res.sol.growth.restaurant.desc": "Programa de lealtad digital, campañas automáticas por WhatsApp y seguimiento de clientes recurrentes para maximizar lifetime value.",
+
+      // ---- RESULTS: MEDICAL SOLUTIONS ----
+      "res.sol.customer.medical.name": "Sistema de Citas y Triage con IA",
+      "res.sol.customer.medical.desc": "Agendamiento automático, recordatorios de citas y pre-triage inteligente por WhatsApp. Reduce no-shows y optimiza la agenda del médico.",
+      "res.sol.operations.medical.name": "Automatización de Expedientes y Facturación",
+      "res.sol.operations.medical.desc": "Digitalización de expedientes, facturación automatizada a planes médicos y seguimiento de cobros. Reduce errores administrativos y acelera pagos.",
+      "res.sol.information.medical.name": "Dashboard Clínico y Financiero",
+      "res.sol.information.medical.desc": "Métricas de pacientes atendidos, tiempos de espera, ingresos por servicio y eficiencia operativa. Datos clínicos y financieros en un solo lugar.",
+      "res.sol.growth.medical.name": "Portal de Pacientes y Telemedicina",
+      "res.sol.growth.medical.desc": "Plataforma digital para pacientes con acceso a resultados, citas y consultas virtuales. Expande capacidad de atención sin ampliar espacio físico.",
+
+      // ---- RESULTS: LEGAL SOLUTIONS ----
+      "res.sol.customer.legal.name": "Bot de Consultas Legales Iniciales",
+      "res.sol.customer.legal.desc": "Respuesta automática a consultas frecuentes, pre-calificación de casos y agendamiento de consultas. Filtra prospectos antes de consumir tiempo del abogado.",
+      "res.sol.operations.legal.name": "Automatización de Documentos y Seguimiento de Casos",
+      "res.sol.operations.legal.desc": "Generación automatizada de documentos legales, seguimiento de plazos y gestión de casos. Reduce horas de trabajo administrativo por caso.",
+      "res.sol.information.legal.name": "Dashboard de Productividad y Rentabilidad por Caso",
+      "res.sol.information.legal.desc": "Visibilidad de horas facturables, rentabilidad por tipo de caso y carga de trabajo por abogado. Optimiza la asignación de recursos del bufete.",
+      "res.sol.growth.legal.name": "Sistema de Referidos y Marketing Legal Digital",
+      "res.sol.growth.legal.desc": "Automatización de seguimiento a referidos, presencia digital optimizada y contenido legal educativo que genera confianza y atrae nuevos clientes.",
+
+      // ---- RESULTS: LOGISTICS SOLUTIONS ----
+      "res.sol.customer.logistics.name": "Tracking Automatizado y Notificaciones",
+      "res.sol.customer.logistics.desc": "Actualizaciones automáticas de estado de envío por WhatsApp y web. Reduce llamadas de seguimiento y mejora la experiencia del cliente.",
+      "res.sol.operations.logistics.name": "Optimización de Rutas y Despacho",
+      "res.sol.operations.logistics.desc": "Planificación automática de rutas, asignación inteligente de conductores y seguimiento en tiempo real. Reduce costos de combustible y mejora entregas a tiempo.",
+      "res.sol.information.logistics.name": "Dashboard de Flota y Rendimiento Operativo",
+      "res.sol.information.logistics.desc": "Métricas de entregas, tiempos de ruta, utilización de flota y costos por entrega. Identifica cuellos de botella y optimiza la operación.",
+      "res.sol.growth.logistics.name": "Plataforma de Capacidad y Nuevas Rutas",
+      "res.sol.growth.logistics.desc": "Análisis de demanda, planificación de capacidad y expansión de cobertura basada en datos. Escala la operación sin duplicar costos fijos.",
+
+      // ---- RESULTS: CONSTRUCTION SOLUTIONS ----
+      "res.sol.customer.construction.name": "Portal de Clientes y Cotizaciones Automatizadas",
+      "res.sol.customer.construction.desc": "Cotizaciones automáticas basadas en especificaciones, portal de seguimiento de proyecto para clientes y comunicación centralizada. Reduce ida y vuelta de emails.",
+      "res.sol.operations.construction.name": "Gestión de Proyectos y Control de Costos",
+      "res.sol.operations.construction.desc": "Seguimiento automatizado de progreso, control de materiales, gestión de subcontratistas y alertas de desviación presupuestaria. Reduce sobrecostos.",
+      "res.sol.information.construction.name": "Dashboard de Proyectos y Rentabilidad",
+      "res.sol.information.construction.desc": "Visibilidad de costos reales vs. presupuesto, avance por proyecto, productividad de cuadrillas y cash flow proyectado. Decisiones financieras informadas.",
+      "res.sol.growth.construction.name": "Sistema de Licitaciones y Pipeline de Proyectos",
+      "res.sol.growth.construction.desc": "Gestión automatizada de licitaciones, seguimiento de pipeline y análisis de capacidad para tomar más proyectos sin perder calidad de ejecución.",
+
+      // ---- RESULTS: RETAIL SOLUTIONS ----
+      "res.sol.customer.retail.name": "Asistente de Ventas con IA y WhatsApp Commerce",
+      "res.sol.customer.retail.desc": "Catálogo digital por WhatsApp, recomendaciones personalizadas y procesamiento de pedidos 24/7. Convierte consultas en ventas incluso fuera de horario.",
+      "res.sol.operations.retail.name": "Gestión Inteligente de Inventario",
+      "res.sol.operations.retail.desc": "Control automático de stock, alertas de reorden, análisis de rotación y sincronización multi-canal. Elimina quiebres de inventario y sobrestock.",
+      "res.sol.information.retail.name": "Dashboard de Ventas y Comportamiento del Cliente",
+      "res.sol.information.retail.desc": "Análisis de ventas por producto, hora y canal. Patrones de compra, ticket promedio y métricas de conversión para optimizar surtido y promociones.",
+      "res.sol.growth.retail.name": "E-commerce y Marketing Automatizado",
+      "res.sol.growth.retail.desc": "Tienda en línea integrada con inventario, campañas automatizadas basadas en comportamiento de compra y programa de fidelización para escalar ventas.",
 
       // ---- MANIFESTO ----
-      "man.tag": "// Nuestra Tesis",
-      "man.title": 'Centroamérica se construyó sobre fuego. El próximo terreno es <em>digital.</em>',
-      "man.p1": "Nicaragua es tierra de volcanes. Masaya, Momotombo, Cerro Negro — cada uno formó nuevo terreno a través del mismo proceso: presión desde abajo, calor aplicado a materia prima, nueva tierra emergiendo donde antes no había nada.",
+      "man.tag": "// Manifiesto",
+      "man.title": 'Puerto Rico se forjó con fuego. El próximo terreno es <em>digital.</em>',
+      "man.p1": "Puerto Rico nació del fuego volcánico. El Yunque, Toro Negro, las montañas que cruzan la isla — cada una se formó a través del mismo proceso: presión desde abajo, calor aplicado a materia prima, nuevo terreno emergiendo donde antes no había nada.",
       "man.p2": "Ignea Labs toma su nombre de ese proceso. Ígnea — nacida del fuego. La roca ígnea se forma cuando el magma atrapado bajo la superficie encuentra su camino hacia arriba y se transforma en terreno sólido. Eso es exactamente lo que hacemos.",
-      "man.p3": "Las empresas que mueven la economía de Nicaragua están rodeadas de potencial dormido — océanos de datos que no pueden ver, sistemas que no se comunican entre sí, departamentos operando en aislamiento. Sus líderes toman decisiones por instinto porque la información que necesitan está atrapada en algún lugar que no pueden alcanzar.",
+      "man.p3": "Las empresas que mueven la economía de Puerto Rico están rodeadas de potencial dormido — océanos de datos que no pueden ver, sistemas que no se comunican entre sí, departamentos operando en aislamiento. Sus líderes toman decisiones por instinto porque la información que necesitan está atrapada en algún lugar que no pueden alcanzar.",
       "man.p3b": "Restaurantes que atienden turistas de todo el mundo siguen coordinando por WhatsApp. Clínicas que manejan cientos de pacientes agendan en cuadernos. Hoteles que compiten con Airbnb no tienen presencia digital más allá de una página de Facebook abandonada.",
       "man.p3c": "El potencial para cambiar todo esto ya existe. La tecnología está lista. Lo que ha faltado es alguien dispuesto a ir bajo la superficie y aplicar el calor necesario para transformar ese potencial en nuevo terreno operativo.",
       "man.break": "Eso es Ignea Labs.",
       "man.p4": "No somos una consultora que vende presentaciones. No somos una agencia que escribe código y desaparece. Nos metemos dentro de tu operación, encontramos dónde está el potencial dormido, y construimos la infraestructura que lo activa — permanentemente.",
       "man.p5": "Trabajamos con un número reducido de socios. No porque no podamos escalar, sino porque la transformación exige proximidad, honestidad, y el tipo de atención que desaparece en el momento que intentas atender a todos. Cada empresa que tomamos recibe todo el peso de lo que sabemos. Eso no es una filosofía. Es una promesa.",
       "man.p6": "Nos llamamos Ignea porque la transformación, como el fuego volcánico, se propaga. Cada automatización enciende la siguiente. Cada insight agudiza el que sigue. La brecha entre tu negocio y tu competencia se amplía silenciosamente, y luego de golpe.",
-      "man.p7": "La próxima generación de líderes empresariales en Centroamérica se definirá por una sola decisión. No qué mercado entraron. No qué producto lanzaron. Si activaron el potencial dormido en su operación antes que su competencia — o pasaron años viendo cómo la brecha se ampliaba desde el lado equivocado.",
+      "man.p7": "La próxima generación de líderes empresariales en Puerto Rico se definirá por una sola decisión. No qué mercado entraron. No qué producto lanzaron. Si activaron el potencial dormido en su operación antes que su competencia — o pasaron años viendo cómo la brecha se ampliaba desde el lado equivocado.",
       "man.closing": "No vendemos IA. Construimos nuevo terreno.",
       "man.ctaTitle": "Descubre tu potencial.",
-      "man.ctaBtn": "Iniciar Diagnóstico &rarr;",
+      "man.ctaBtn": "Toma el Diagnóstico Gratis &rarr;",
 
       // ---- CONTACT ----
       "ct.tag": "// Contacto",
@@ -352,7 +608,7 @@ var IgneaI18n = (function() {
       "ct.emailLabel": "Email",
       "ct.whatsappLabel": "WhatsApp",
       "ct.locationLabel": "Ubicación",
-      "ct.location": "Managua, Nicaragua — operamos en toda Centroamérica",
+      "ct.location": "San Juan, Puerto Rico — servimos toda la isla",
       "ct.waText": "Escríbenos directo",
       "ct.response": "Respondemos en menos de 24 horas hábiles.",
       "ct.formTag": "// Enviar mensaje",
@@ -380,7 +636,7 @@ var IgneaI18n = (function() {
       // ---- 404 ----
       "e404.title": "Esta página no existe.",
       "e404.sub": "Pero tu diagnóstico de IA sí.",
-      "e404.btn": "Iniciar Diagnóstico &rarr;",
+      "e404.btn": "Toma el Diagnóstico Gratis &rarr;",
       "e404.home": "&larr; Volver al inicio",
 
       // ---- OPS DASHBOARD ----
@@ -620,22 +876,22 @@ var IgneaI18n = (function() {
     en: {
       // ---- NAV ----
       "nav.home": "Home",
-      "nav.manifesto": "Our Thesis",
+      "nav.manifesto": "Manifesto",
       "nav.diagnostic": "Diagnostic",
       "nav.contact": "Contact",
-      "nav.cta": "Start Diagnostic &rarr;",
+      "nav.cta": "Take the Free Diagnostic &rarr;",
 
       // ---- HOMEPAGE: HERO ----
-      "hero.tag": "// AI infrastructure for Central America",
-      "hero.title": '<span class="word">Your</span> <span class="word">operations</span> <span class="word">run</span> <span class="word">on</span> <span class="word">instinct.</span> <span class="word">We</span> <span class="word">make</span> <span class="word">them</span> <span class="word">run</span> <span class="word">on</span> <span class="word accent-word">intelligence.</span>',
-      "hero.sub": "We find the dormant potential beneath the surface of your operations — the hidden inefficiencies, the manual processes, the data no one is using — and transform it into competitive new ground.",
-      "hero.cta1": "Begin Diagnostic &rarr;",
-      "hero.cta2": "Read Our Thesis",
+      "hero.tag": "// AI infrastructure for Puerto Rico",
+      "hero.title": 'Your business loses thousands every month to manual processes. We find them, eliminate them, and show you the <em>ROI.</em>',
+      "hero.sub": "Free AI diagnostic that maps your operational waste and converts it into projected savings — in under 15 minutes.",
+      "hero.cta1": "Take the Free Diagnostic &rarr;",
+      "hero.cta2": "Read Manifesto",
 
       // ---- HOMEPAGE: STATS ----
-      "stats.s1": "of LatAm SMBs lack AI",
-      "stats.s2": "avg return per dollar",
-      "stats.s3": "cost reduction",
+      "stats.s1": "of PR SMBs still run on manual processes",
+      "stats.s2": "weekly hours lost per team",
+      "stats.s3": "avg savings post-implementation",
       "stats.s4": "min to diagnose",
 
       // ---- HOMEPAGE: WHAT WE DO ----
@@ -646,9 +902,59 @@ var IgneaI18n = (function() {
 
       // ---- HOMEPAGE: CTA ----
       "cta.tag": "// Ready?",
-      "cta.headline": "Discover the dormant potential in your operation.",
-      "cta.btn": "Begin Diagnostic &rarr;",
+      "cta.headline": "How much dormant potential does your business have?",
+      "cta.btn": "Take the Free Diagnostic &rarr;",
       "cta.note": "Fully encrypted. Instant results.",
+
+      // ---- HOMEPAGE: SOCIAL PROOF ----
+      "proof.tag": "// Results From Our Clients",
+      "proof.title": "Companies that already activated their potential.",
+      "proof.c1.tag": "AI CONTENT PLATFORM",
+      "proof.c1.name": "endgame.ai",
+      "proof.c1.stat": "80%",
+      "proof.c1.statLabel": "of operations automated",
+      "proof.c1.desc": "Automated 80% of content operations. Eliminated the two highest-salary positions. Company valued at $30M pre-seed, raised $5M.",
+      "proof.c2.tag": "RESTAURANT GROUP",
+      "proof.c2.stat": "32",
+      "proof.c2.statLabel": "hrs/week recovered",
+      "proof.c2.desc": "Automated kitchen-to-delivery coordination and inventory tracking. ~$1,800/mo saved.",
+      "proof.c3.tag": "HEALTHCARE PRACTICE",
+      "proof.c3.stat": "45",
+      "proof.c3.statLabel": "hrs/week recovered",
+      "proof.c3.desc": "Replaced manual appointment booking and insurance follow-up with AI systems. ~$4,500/mo saved.",
+
+      // ---- HOMEPAGE: ABOUT ----
+      "about.tag": "// Who We Are",
+      "about.title": "Deep expertise. Local presence.",
+      "about.name": "[FOUNDER NAME]",
+      "about.bio": "[BIO — Experience in AI and business automation. Bilingual. Based in San Juan, Puerto Rico.]",
+      "about.presence": "Based in San Juan, PR. Bilingual. Exclusively focused on Puerto Rican businesses.",
+
+      // ---- HOMEPAGE: BUILT FOR PR ----
+      "pr.tag": "// Built for Puerto Rico",
+      "pr.title": "We understand the market because we're part of it.",
+      "pr.c1.title": "Act 60 Advantage",
+      "pr.c1.desc": "Companies arriving in PR under tax incentives need modern operations from day one. We build the digital infrastructure their business demands.",
+      "pr.c2.title": "Post-hurricane, post-excuses",
+      "pr.c2.desc": "Maria and Fiona proved that digitized businesses survive. Those relying on paper and manual processes closed. The next storm isn't meteorological — it's competitive.",
+      "pr.c3.title": "Bilingual by nature",
+      "pr.c3.desc": "Puerto Rico operates in two languages simultaneously. Our systems do too. Service, automation, and reporting in Spanish and English — no awkward translations.",
+
+      // ---- HOMEPAGE: CALCULATOR ----
+      "calc.tag": "// Waste Calculator",
+      "calc.title": "How much are your manual processes costing you?",
+      "calc.sub": "Three questions. Instant result.",
+      "calc.industryLabel": "What industry are you in?",
+      "calc.employeesLabel": "How many employees?",
+      "calc.hoursLabel": "Weekly hours on manual tasks",
+      "calc.resultLabel": "Your business is losing approximately",
+      "calc.resultUnit": "/mo",
+      "calc.resultNote": "in wasted productivity",
+      "calc.cta": "Get your full diagnostic &rarr;",
+
+      // ---- FOOTER ADDITIONS ----
+      "footer.address": "San Juan, Puerto Rico",
+      "footer.serving": "Proudly serving Puerto Rico",
 
       // ---- HOMEPAGE: PROCESS ----
       "process.tag": "// Process",
@@ -656,13 +962,13 @@ var IgneaI18n = (function() {
       "process.p1": "Every engagement starts with our diagnostic: 11 questions designed to surface the inefficiencies hiding in your operations. We map your workflows, quantify the waste, and deploy systems that permanently eliminate it.",
       "process.p2": "We work with a select number of partners at a time. Every engagement gets our full attention.",
       "process.s1t": "Diagnostic",
-      "process.s1d": "11 questions that map your operational gaps and AI readiness.",
-      "process.s2t": "Value map",
-      "process.s2d": "We calculate exactly how much time and money you're losing.",
-      "process.s3t": "Build & deploy",
-      "process.s3d": "Custom AI systems, integrated into your operation.",
-      "process.s4t": "Optimize",
-      "process.s4d": "Ongoing iteration. The system learns. Your advantage compounds.",
+      "process.s1d": "11 questions that map your operational gaps, quantify your waste, and reveal hidden opportunities.",
+      "process.s2t": "Report",
+      "process.s2d": "You receive a detailed map of your monthly losses with specific solutions and projected ROI.",
+      "process.s3t": "Implementation",
+      "process.s3d": "We build and integrate AI systems that eliminate waste — permanently.",
+      // "process.s4t": "Optimize",
+      // "process.s4d": "Ongoing iteration. The system learns. Your advantage compounds.",
 
       // ---- HOMEPAGE: SOLUTIONS ---- (removed)
 
@@ -840,6 +1146,108 @@ var IgneaI18n = (function() {
       "dx.q11.text": "What is the single biggest problem affecting your business's profitability today — and if that problem disappeared tomorrow, what would it make possible?",
       "dx.q11.ph": "What holds you back the most — in time, money, or missed opportunities. And what you'd do with that freedom if the problem stopped existing...",
 
+      // ---- DIAGNOSTIC: INDUSTRY BRANCHING ----
+
+      // RESTAURANT
+      "dx.ind.restaurant.q1.text": "How do you manage reservations and table assignments?",
+      "dx.ind.restaurant.q1.c1": "Phone or walk-in only, no system",
+      "dx.ind.restaurant.q1.c2": "WhatsApp and calls, paper reservation book",
+      "dx.ind.restaurant.q1.c3": "Basic digital system (Google, OpenTable)",
+      "dx.ind.restaurant.q1.c4": "Integrated POS system with reservations",
+      "dx.ind.restaurant.q2.text": "Which kitchen and service processes are still done manually?",
+      "dx.ind.restaurant.q2.c1": "Order taking on paper",
+      "dx.ind.restaurant.q2.c2": "Kitchen-to-waiter communication verbal or shouting",
+      "dx.ind.restaurant.q2.c3": "Inventory counts by hand",
+      "dx.ind.restaurant.q2.c4": "Menu price updates done manually",
+      "dx.ind.restaurant.q2.c5": "Delivery coordination by phone",
+      "dx.ind.restaurant.q2.c6": "Tip and payroll calculations by hand",
+      "dx.ind.restaurant.q3.text": "What percentage of your revenue comes from delivery vs. dine-in?",
+      "dx.ind.restaurant.q3.sliderLabel": "Percentage of revenue from delivery",
+
+      // MEDICAL
+      "dx.ind.medical.q1.text": "How do patients book appointments?",
+      "dx.ind.medical.q1.c1": "Phone only",
+      "dx.ind.medical.q1.c2": "Phone and WhatsApp",
+      "dx.ind.medical.q1.c3": "Online booking system",
+      "dx.ind.medical.q1.c4": "Full patient portal",
+      "dx.ind.medical.q2.text": "Which clinical processes are still done manually?",
+      "dx.ind.medical.q2.c1": "Patient intake forms on paper",
+      "dx.ind.medical.q2.c2": "Appointment reminders by phone",
+      "dx.ind.medical.q2.c3": "Insurance verification done manually",
+      "dx.ind.medical.q2.c4": "Lab result follow-up done manually",
+      "dx.ind.medical.q2.c5": "Prescription management done manually",
+      "dx.ind.medical.q2.c6": "Medical records on paper",
+      "dx.ind.medical.q3.text": "How many patient no-shows do you have per week?",
+      "dx.ind.medical.q3.sliderLabel": "Patient no-shows per week",
+
+      // LEGAL
+      "dx.ind.legal.q1.text": "How do you track billable hours?",
+      "dx.ind.legal.q1.c1": "From memory, jotting notes at end of day",
+      "dx.ind.legal.q1.c2": "Manual spreadsheet",
+      "dx.ind.legal.q1.c3": "Basic time tracking app",
+      "dx.ind.legal.q1.c4": "Integrated legal management system",
+      "dx.ind.legal.q2.text": "Which legal admin processes are still done manually?",
+      "dx.ind.legal.q2.c1": "Client intake and conflict checks",
+      "dx.ind.legal.q2.c2": "Document drafting from scratch each time",
+      "dx.ind.legal.q2.c3": "Court deadline tracking done manually",
+      "dx.ind.legal.q2.c4": "Invoice preparation done manually",
+      "dx.ind.legal.q2.c5": "Case file management on paper",
+      "dx.ind.legal.q2.c6": "Client communication tracking",
+      "dx.ind.legal.q3.text": "What percentage of consultations convert to paying clients?",
+      "dx.ind.legal.q3.sliderLabel": "Consultation conversion rate",
+
+      // LOGISTICS
+      "dx.ind.logistics.q1.text": "How do you track shipments and deliveries?",
+      "dx.ind.logistics.q1.c1": "Phone calls and WhatsApp",
+      "dx.ind.logistics.q1.c2": "Spreadsheets",
+      "dx.ind.logistics.q1.c3": "Basic tracking software",
+      "dx.ind.logistics.q1.c4": "Integrated logistics platform",
+      "dx.ind.logistics.q2.text": "Which logistics processes are still done manually?",
+      "dx.ind.logistics.q2.c1": "Route planning by hand",
+      "dx.ind.logistics.q2.c2": "Delivery confirmation by phone",
+      "dx.ind.logistics.q2.c3": "Warehouse inventory done manually",
+      "dx.ind.logistics.q2.c4": "Customer delivery notifications done manually",
+      "dx.ind.logistics.q2.c5": "Driver scheduling done manually",
+      "dx.ind.logistics.q2.c6": "Fuel and maintenance tracking done manually",
+      "dx.ind.logistics.q3.text": "How many delivery failures or returns do you have per week?",
+      "dx.ind.logistics.q3.sliderLabel": "Delivery failures per week",
+
+      // CONSTRUCTION
+      "dx.ind.construction.q1.text": "How do you manage project timelines?",
+      "dx.ind.construction.q1.c1": "Memory and experience",
+      "dx.ind.construction.q1.c2": "Paper or whiteboard",
+      "dx.ind.construction.q1.c3": "Spreadsheets",
+      "dx.ind.construction.q1.c4": "Project management software",
+      "dx.ind.construction.q2.text": "Which field processes are still done manually?",
+      "dx.ind.construction.q2.c1": "Material ordering by phone",
+      "dx.ind.construction.q2.c2": "Daily progress reports on paper",
+      "dx.ind.construction.q2.c3": "Safety compliance tracking done manually",
+      "dx.ind.construction.q2.c4": "Subcontractor coordination via WhatsApp",
+      "dx.ind.construction.q2.c5": "Budget tracking in spreadsheets",
+      "dx.ind.construction.q2.c6": "Permit and inspection scheduling done manually",
+      "dx.ind.construction.q3.text": "What percentage of projects finish on time and within budget?",
+      "dx.ind.construction.q3.sliderLabel": "Projects completed on time",
+
+      // RETAIL
+      "dx.ind.retail.q1.text": "How do you manage inventory?",
+      "dx.ind.retail.q1.c1": "Manual counts only",
+      "dx.ind.retail.q1.c2": "Spreadsheets",
+      "dx.ind.retail.q1.c3": "Basic POS with inventory",
+      "dx.ind.retail.q1.c4": "Integrated inventory management system",
+      "dx.ind.retail.q2.text": "Which retail processes are still done manually?",
+      "dx.ind.retail.q2.c1": "Price tag updates by hand",
+      "dx.ind.retail.q2.c2": "Reorder decisions by gut feeling",
+      "dx.ind.retail.q2.c3": "Customer loyalty tracking done manually",
+      "dx.ind.retail.q2.c4": "Sales reports compiled manually",
+      "dx.ind.retail.q2.c5": "Supplier communication via WhatsApp",
+      "dx.ind.retail.q2.c6": "Employee scheduling by hand",
+      "dx.ind.retail.q3.text": "What percentage of sales come from online vs. in-store?",
+      "dx.ind.retail.q3.sliderLabel": "Sales from digital channels",
+
+      // ---- DIAGNOSTIC: MONEY LEAK COUNTER ----
+      "dx.leak.label": "Your business is losing",
+      "dx.leak.unit": "/mo",
+
       // ---- RESULTS: VALUE STREAMS ----
       "res.stream.customerFlow": "Customer Flow",
       "res.stream.operationsFlow": "Operations Flow",
@@ -931,23 +1339,127 @@ var IgneaI18n = (function() {
       "res.cta.call": "Schedule a call &rarr;",
       "res.cta.pdf": "Download PDF report",
       "res.cta.email": "Or write to us directly:",
+      "res.loading1": "Analyzing your responses...",
+      "res.loading2": "Generating your report...",
+
+      // ---- RESULTS: AI INSIGHTS ----
+      "res.ai.tag": "// AI ANALYSIS",
+      "res.ai.subtitle": "Personalized analysis generated by artificial intelligence for your company.",
+      "res.ai.summary": "Executive Summary",
+      "res.ai.opportunities": "Top Opportunities",
+      "res.ai.quickWins": "Immediate Actions",
+      "res.ai.risk": "Cost of Inaction",
+
+      // ---- RESULTS: REPORT HEADER + PAINPOINTS + SAVINGS ----
+      "res.reportTitle": "Operational Health Report",
+      "res.reportDate": "Date:",
+      "res.scoreTag": "// Maturity Score",
+      "res.painTag": "// Highest Financial Impact Areas",
+      "res.pain.perMonth": "/mo",
+      "res.pain.customerFlow": "Customers lost due to slow response times or inconsistent service.",
+      "res.pain.operationsFlow": "Productive hours wasted on repetitive manual processes.",
+      "res.pain.informationFlow": "Decisions made without data — hidden costs from lack of visibility.",
+      "res.pain.growthFlow": "Operations that don't scale — every new customer adds load to the team.",
+      "res.solTag": "// Recommended Solutions",
+      "res.sol.implTime": "Implementation",
+      "res.sol.weeks": "weeks",
+      "res.sol.projSavings": "Projected savings",
+      "res.projTag": "// Savings Projection",
+      "res.savings.monthLabel": "Estimated monthly savings",
+      "res.savings.yearLabel": "Estimated annual savings",
+      "res.savings.breakevenLabel": "Return on investment",
+      "res.savings.breakevenUnit": "months",
+      "res.cta2.headline": "Ready to activate these savings?",
+      "res.cta2.sub": "Book your strategy call. 15 minutes to show you the exact implementation plan for your business.",
+      "res.cta.calendly": "Book Your Strategy Call &rarr;",
+      "res.cta.whatsapp": "Contact via WhatsApp",
+
+      // ---- RESULTS: GENERIC SOLUTIONS ----
+      "res.sol.customer.name": "AI Customer Service Bot",
+      "res.sol.customer.desc": "24/7 automatic response to frequent inquiries via WhatsApp and web. Reduces response time from hours to seconds and frees your team for higher-value tasks.",
+      "res.sol.operations.name": "Operations Process Automation",
+      "res.sol.operations.desc": "Eliminates repetitive manual tasks — inventory, scheduling, reports, billing. Your team recovers hours each week to focus on revenue-generating work.",
+      "res.sol.information.name": "Real-Time Data Dashboard",
+      "res.sol.information.desc": "Complete visibility of your operation in one place. Key metrics automatically updated for data-driven decisions, not gut feelings.",
+      "res.sol.growth.name": "Scalability Infrastructure",
+      "res.sol.growth.desc": "Systems that grow with you. Automated onboarding, standardized processes, and operational capacity that scales without proportionally adding headcount.",
+
+      // ---- RESULTS: RESTAURANT SOLUTIONS ----
+      "res.sol.customer.restaurant.name": "AI Reservations & Orders Bot",
+      "res.sol.customer.restaurant.desc": "Automatic reservations, takeout orders, and FAQ responses via WhatsApp 24/7. Reduces missed calls and frees up your host staff.",
+      "res.sol.operations.restaurant.name": "Inventory & Supplier Automation",
+      "res.sol.operations.restaurant.desc": "Automatic inventory tracking, reorder alerts, and supplier communication. Eliminates manual counting and reduces food waste.",
+      "res.sol.information.restaurant.name": "Sales & Food Cost Dashboard",
+      "res.sol.information.restaurant.desc": "Real-time visibility into sales by dish, food cost, peak hours, and staff performance. Menu decisions based on actual data.",
+      "res.sol.growth.restaurant.name": "Loyalty & Automated Marketing System",
+      "res.sol.growth.restaurant.desc": "Digital loyalty program, automated WhatsApp campaigns, and recurring customer tracking to maximize lifetime value.",
+
+      // ---- RESULTS: MEDICAL SOLUTIONS ----
+      "res.sol.customer.medical.name": "AI Appointments & Triage System",
+      "res.sol.customer.medical.desc": "Automatic scheduling, appointment reminders, and intelligent pre-triage via WhatsApp. Reduces no-shows and optimizes the doctor's schedule.",
+      "res.sol.operations.medical.name": "Records & Billing Automation",
+      "res.sol.operations.medical.desc": "Digitized medical records, automated insurance billing, and collections tracking. Reduces administrative errors and accelerates payments.",
+      "res.sol.information.medical.name": "Clinical & Financial Dashboard",
+      "res.sol.information.medical.desc": "Metrics on patients seen, wait times, revenue per service, and operational efficiency. Clinical and financial data in one place.",
+      "res.sol.growth.medical.name": "Patient Portal & Telemedicine",
+      "res.sol.growth.medical.desc": "Digital platform for patients with access to results, appointments, and virtual consultations. Expands care capacity without expanding physical space.",
+
+      // ---- RESULTS: LEGAL SOLUTIONS ----
+      "res.sol.customer.legal.name": "Initial Legal Consultation Bot",
+      "res.sol.customer.legal.desc": "Automatic responses to common questions, case pre-qualification, and consultation scheduling. Filters prospects before consuming attorney time.",
+      "res.sol.operations.legal.name": "Document Automation & Case Tracking",
+      "res.sol.operations.legal.desc": "Automated legal document generation, deadline tracking, and case management. Reduces administrative hours per case.",
+      "res.sol.information.legal.name": "Productivity & Case Profitability Dashboard",
+      "res.sol.information.legal.desc": "Visibility into billable hours, profitability by case type, and workload per attorney. Optimizes firm resource allocation.",
+      "res.sol.growth.legal.name": "Referral System & Digital Legal Marketing",
+      "res.sol.growth.legal.desc": "Automated referral follow-up, optimized digital presence, and educational legal content that builds trust and attracts new clients.",
+
+      // ---- RESULTS: LOGISTICS SOLUTIONS ----
+      "res.sol.customer.logistics.name": "Automated Tracking & Notifications",
+      "res.sol.customer.logistics.desc": "Automatic shipment status updates via WhatsApp and web. Reduces follow-up calls and improves customer experience.",
+      "res.sol.operations.logistics.name": "Route Optimization & Dispatch",
+      "res.sol.operations.logistics.desc": "Automatic route planning, intelligent driver assignment, and real-time tracking. Reduces fuel costs and improves on-time deliveries.",
+      "res.sol.information.logistics.name": "Fleet & Operations Performance Dashboard",
+      "res.sol.information.logistics.desc": "Delivery metrics, route times, fleet utilization, and cost per delivery. Identifies bottlenecks and optimizes operations.",
+      "res.sol.growth.logistics.name": "Capacity Planning & Route Expansion Platform",
+      "res.sol.growth.logistics.desc": "Demand analysis, capacity planning, and data-driven coverage expansion. Scale operations without doubling fixed costs.",
+
+      // ---- RESULTS: CONSTRUCTION SOLUTIONS ----
+      "res.sol.customer.construction.name": "Client Portal & Automated Quotes",
+      "res.sol.customer.construction.desc": "Automatic quotes based on specs, project tracking portal for clients, and centralized communication. Reduces back-and-forth emails.",
+      "res.sol.operations.construction.name": "Project Management & Cost Control",
+      "res.sol.operations.construction.desc": "Automated progress tracking, materials control, subcontractor management, and budget deviation alerts. Reduces cost overruns.",
+      "res.sol.information.construction.name": "Project & Profitability Dashboard",
+      "res.sol.information.construction.desc": "Visibility into actual vs. budgeted costs, project progress, crew productivity, and projected cash flow. Informed financial decisions.",
+      "res.sol.growth.construction.name": "Bid Management & Project Pipeline System",
+      "res.sol.growth.construction.desc": "Automated bid management, pipeline tracking, and capacity analysis to take on more projects without sacrificing execution quality.",
+
+      // ---- RESULTS: RETAIL SOLUTIONS ----
+      "res.sol.customer.retail.name": "AI Sales Assistant & WhatsApp Commerce",
+      "res.sol.customer.retail.desc": "Digital catalog via WhatsApp, personalized recommendations, and 24/7 order processing. Converts inquiries into sales even after hours.",
+      "res.sol.operations.retail.name": "Smart Inventory Management",
+      "res.sol.operations.retail.desc": "Automatic stock control, reorder alerts, turnover analysis, and multi-channel sync. Eliminates stockouts and overstock.",
+      "res.sol.information.retail.name": "Sales & Customer Behavior Dashboard",
+      "res.sol.information.retail.desc": "Sales analysis by product, time, and channel. Purchase patterns, average ticket, and conversion metrics to optimize assortment and promotions.",
+      "res.sol.growth.retail.name": "E-commerce & Automated Marketing",
+      "res.sol.growth.retail.desc": "Online store integrated with inventory, behavior-based automated campaigns, and loyalty program to scale sales.",
 
       // ---- MANIFESTO ----
-      "man.tag": "// Our Thesis",
-      "man.title": 'Central America was built on fire. The next ground is <em>digital.</em>',
-      "man.p1": "Nicaragua is a land of volcanoes. Masaya, Momotombo, Cerro Negro — each one formed new ground through the same process: pressure from below, heat applied to raw material, new terrain emerging where none existed before.",
+      "man.tag": "// Manifesto",
+      "man.title": 'Puerto Rico was forged by fire. The next ground is <em>digital.</em>',
+      "man.p1": "Puerto Rico was born from volcanic fire. El Yunque, Toro Negro, the mountains that cross the island — each one formed through the same process: pressure from below, heat applied to raw material, new terrain emerging where none existed before.",
       "man.p2": "Ignea Labs takes its name from that process. Ignea — born of fire. Igneous rock forms when trapped magma beneath the surface finds its way up and transforms into solid ground. That is exactly what we do.",
-      "man.p3": "The enterprises that power Nicaragua's economy are surrounded by dormant potential — oceans of data they cannot see, systems that don't speak to each other, departments operating in isolation. Their leaders make decisions on instinct because the information they need is trapped somewhere they cannot reach.",
+      "man.p3": "The enterprises that power Puerto Rico's economy are surrounded by dormant potential — oceans of data they cannot see, systems that don't speak to each other, departments operating in isolation. Their leaders make decisions on instinct because the information they need is trapped somewhere they cannot reach.",
       "man.p3b": "Restaurants serving tourists from around the world still coordinate by WhatsApp. Clinics managing hundreds of patients schedule in notebooks. Hotels competing with Airbnb have no digital presence beyond an abandoned Facebook page.",
       "man.p3c": "The potential to change all of this already exists. The technology is ready. What's been missing is someone willing to go beneath the surface and apply the heat needed to transform that potential into new operational ground.",
       "man.break": "That is Ignea Labs.",
       "man.p4": "We are not a consultancy that sells slide decks. We are not an agency that writes code and disappears. We embed ourselves in your operation, find where the dormant potential lies, and build the infrastructure that activates it — permanently.",
       "man.p5": "We work with a small number of partners. Not because we can't scale, but because transformation demands proximity, honesty, and the kind of attention that vanishes the moment you try to serve everyone. Every company we take on gets the full weight of what we know. That is not a philosophy. It is a promise.",
       "man.p6": "We named ourselves Ignea because transformation, like volcanic fire, spreads. Every automation ignites the next. Every insight sharpens the one that follows. The gap between your business and your competition widens quietly, then all at once.",
-      "man.p7": "The next generation of business leaders in Central America will be defined by a single decision. Not which market they entered. Not which product they launched. Whether they activated the dormant potential in their operations before their competitors — or spent years watching the gap widen from the wrong side.",
+      "man.p7": "The next generation of business leaders in Puerto Rico will be defined by a single decision. Not which market they entered. Not which product they launched. Whether they activated the dormant potential in their operations before their competitors — or spent years watching the gap widen from the wrong side.",
       "man.closing": "We don't sell AI. We build new ground.",
       "man.ctaTitle": "Discover your potential.",
-      "man.ctaBtn": "Begin Diagnostic &rarr;",
+      "man.ctaBtn": "Take the Free Diagnostic &rarr;",
 
       // ---- CONTACT ----
       "ct.tag": "// Contact",
@@ -959,7 +1471,7 @@ var IgneaI18n = (function() {
       "ct.emailLabel": "Email",
       "ct.whatsappLabel": "WhatsApp",
       "ct.locationLabel": "Location",
-      "ct.location": "Managua, Nicaragua — we operate across Central America",
+      "ct.location": "San Juan, Puerto Rico — serving the entire island",
       "ct.waText": "Message us directly",
       "ct.response": "We respond within 24 business hours.",
       "ct.formTag": "// Send message",
@@ -987,7 +1499,7 @@ var IgneaI18n = (function() {
       // ---- 404 ----
       "e404.title": "This page doesn't exist.",
       "e404.sub": "But your AI diagnostic does.",
-      "e404.btn": "Begin Diagnostic &rarr;",
+      "e404.btn": "Take the Free Diagnostic &rarr;",
       "e404.home": "&larr; Back to home",
 
       // ---- OPS DASHBOARD ----
@@ -1220,6 +1732,8 @@ var IgneaI18n = (function() {
     if (enBtn) enBtn.classList.toggle('active', lang === 'en');
 
     localStorage.setItem('ignea_lang', lang);
+
+    if (typeof IgneaAnalytics !== 'undefined') IgneaAnalytics.track('language_toggled', { language: lang });
 
     // Update text content
     document.querySelectorAll('[data-i18n]').forEach(function(el) {

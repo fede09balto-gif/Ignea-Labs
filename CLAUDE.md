@@ -3,7 +3,7 @@
 
 # Architecture
 
-- **Framework:** Vanilla HTML/CSS/JS (static site, no framework — keep it lightweight for slow connections in Nicaragua)
+- **Framework:** Vanilla HTML/CSS/JS (static site, no framework — keep it lightweight for spotty connections in Puerto Rico)
 - **Database:** None for MVP. Diagnostic answers stored in localStorage/sessionStorage. Future: Supabase for storing diagnostic results + contact info.
 - **APIs:** Google Fonts CDN (Plus Jakarta Sans + JetBrains Mono), Formspree (contact form submission), jsPDF (client-side PDF report generation)
 - **Auth:** None for MVP. Future: Supabase Auth for admin dashboard to view diagnostics.
@@ -18,43 +18,45 @@
 
 # Design System
 
-## Colors (warm palette — anti-AI)
-- Background primary: `#09090F`
-- Background surface 1: `#0F0F17`
-- Background surface 2: `#15151F`
+## Colors
+- Background primary: `#0A0A0F`
+- Background surface 1: `#141419`
+- Background surface 2: `#1C1C24`
 - Accent: `#00E5BF`
-- Accent hover: `#00D4B0`
-- Accent transparent: `rgba(0,229,191,0.12)`
-- Accent subtle glow: `rgba(0,229,191,0.04)`
-- Text primary: `#F5F5F7` (off-white like Apple)
-- Text secondary: `#8E8E9A` (warm gray)
-- Text dim: `#4A4A5C`
-- Border: `#1E1E2E`
-- Code string color: `#F0997B` (coral)
+- Accent transparent: `#00E5BF22`
+- Accent subtle glow: `#00E5BF0A`
+- Text primary: `rgba(255,255,255,0.9)`
+- Text secondary: `rgba(255,255,255,0.65)`
+- Text dim: `rgba(255,255,255,0.4)`
+- Body light: `rgba(255,255,255,0.7)`
+- Border: `rgba(255,255,255,0.08)`
+- Coral (money/urgency): `#E5634B`
 - Code keyword color: `#AFA9EC` (purple)
 
 ## Typography
 - Display font: `'Plus Jakarta Sans', sans-serif` (weights 400, 500, 600, 700)
 - Monospace font: `'JetBrains Mono', monospace` (weights 300, 400, 500, 700)
-- h1: Plus Jakarta Sans 700, letter-spacing -0.03em, line-height 1.1
-- h2: Plus Jakarta Sans 600, letter-spacing -0.02em, line-height 1.2
-- Section tags: JetBrains Mono 11px, uppercase, letter-spacing 0.1em, accent color
-- Stat values: JetBrains Mono 28px, weight 600, white (NOT accent color)
-- Stat labels: 10px, uppercase, letter-spacing 0.1em, dim gray
-- Body text: 15px, Plus Jakarta Sans 400, secondary gray, line-height 1.65
-- Buttons: 14px, weight 600 primary / 500 secondary
+- Base body: 18px desktop, 16px mobile. Line-height 1.6.
+- Headlines: Plus Jakarta Sans 700, letter-spacing -0.02em, line-height 1.15
+- H1: clamp(36px, 4.5vw, 56px). H2: clamp(28px, 3.5vw, 40px). H3: clamp(20px, 2.5vw, 26px).
+- Section tags: JetBrains Mono 14px, uppercase, letter-spacing 0.08em, accent color, prefixed with "//"
+- Stat values: JetBrains Mono 36px, bold, accent color
+- Stat labels: 14px, uppercase, letter-spacing 1px, text-dim
+- Labels: JetBrains Mono 13px, uppercase, letter-spacing 0.08em
+- Manifesto body: 18px, rgba(255,255,255,0.7), line-height 1.8
+- Minimum readable font size: 13px
 
 ## Visual Rules
-- Border radius: 8px on buttons, inputs, cards. 12px on cards and terminals. 6px on small elements.
-- Borders: 0.5px solid var(--border). 1px on inputs and buttons.
-- Buttons: gradient top-to-bottom on primary, inner highlight shadow, lift on hover.
-- Nav: sticky with backdrop-filter blur(12px), border reveals on scroll.
-- Inputs: use --bg (darkest) background — recessed into surface.
-- Hover states: translateY(-1px) + shadow expansion, not just color change.
+- Border radius: 0px everywhere. Sharp corners. Engineering aesthetic. Exception: dots in terminal bar.
+- Borders: 1px solid var(--border) throughout. No 0.5px borders.
+- Hover states: border-color shifts to rgba(255,255,255,0.15), or background to accent subtle glow.
+- Buttons: min-height 48px. btn-primary 18px font, btn-ghost 16px font.
+- Cards: 32px padding, 1px border, hover brightens border.
+- All tap targets: minimum 48px on mobile.
 
 ## Logo
-- Text: "IGNEA" in off-white (#F5F5F7), ".LABS" in accent (#00E5BF)
-- Letter spacing: 3px, Weight: 700
+- Text: "IGNEA" in white (#EAEAF0), ".LABS" in accent (#00E5BF)
+- Letter spacing: 3px, Weight: 800
 - Logo is text-only: "IGNEA.LABS" — no mark/circle
 
 ## Interactive Elements
@@ -69,7 +71,7 @@
 1. Read the BUILD_SPEC.md file for full page specs, copy, and scoring logic before building any new page.
 2. Every new user-facing string → add to BOTH es and en translation objects in js/i18n.js. Never hardcode text.
 3. Every page must include: shared nav, shared footer, gradient dots background (js/grid-bg.js), language toggle, responsive mobile layout.
-4. Every input element: dark surface background (#0E0E16), 0.5px border, accent border on focus, minimum 44px tap target on mobile.
+4. Every input element: dark surface background (#141419), 1px border, accent border on focus, minimum 48px tap target.
 5. Every multiple-choice option: styled as a card (dark surface, 0.5px border, accent border + subtle glow on selection). Never use native radio/checkbox styling.
 6. Every button: either btn-primary (accent bg, dark text, 700 weight, 16px/32px padding) or btn-ghost (transparent bg, border, gray text, 500 weight). No other button styles.
 7. Gradient dots background is self-initializing (IIFE in grid-bg.js). No init() call needed. Drift animation disabled on mobile (< 768px).
@@ -110,18 +112,22 @@
 
 ## CSS custom properties
 ```
---bg: #08080D
---bg2: #0E0E16
---bg3: #14141E
+--bg: #0A0A0F
+--bg2: #141419
+--bg3: #1C1C24
 --accent: #00E5BF
 --accent2: #00E5BF22
 --accent3: #00E5BF0A
---white: #EAEAF0
---gray: #6E6E88
---dimgray: #3A3A50
---border: #1A1A2A
---coral: #F0997B
+--white: rgba(255,255,255,0.9)
+--gray: rgba(255,255,255,0.65)
+--dimgray: rgba(255,255,255,0.4)
+--border: rgba(255,255,255,0.08)
+--coral: #E5634B
 --purple: #AFA9EC
+--body-light: rgba(255,255,255,0.7)
+--text-primary: rgba(255,255,255,0.9)
+--text-secondary: rgba(255,255,255,0.65)
+--text-dim: rgba(255,255,255,0.4)
 --ff: 'Plus Jakarta Sans', sans-serif
 --fm: 'JetBrains Mono', monospace
 ```
@@ -152,6 +158,7 @@ onda-ai/
 │   ├── neural-net.js
 │   ├── terminal.js
 │   ├── encrypt.js
+│   ├── analytics.js
 │   ├── diagnostic.js
 │   ├── scoring.js
 │   └── results.js
@@ -172,9 +179,9 @@ onda-ai/
 
 # Key Business Context
 
-- Company operates in NICARAGUA targeting local SMBs (restaurants, clinics, hotels, law firms).
+- Company operates in PUERTO RICO targeting local SMBs (restaurants, clinics, hotels, law firms).
 - Partner Gatun Labs (gatunlabs.com) runs the same model in Panama at $15-30K.
-- Prices are $1,500-8,000 per project, adapted for Nicaraguan purchasing power.
+- Prices are $5,000-25,000 per project, adapted for Puerto Rico market.
 - The diagnostic survey is the lead magnet and sales tool — it must feel premium, professional, and trustworthy.
 - Low scores on the diagnostic = HIGH opportunity for the client (frame positively, never judgmentally).
 - The sales pitch: "We save you X hours and $Y per month. Our solution pays for itself in Z months."

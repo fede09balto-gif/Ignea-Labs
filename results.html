@@ -10,17 +10,20 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://ignealabs.com/results.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/shared.css">
 <link rel="stylesheet" href="css/components.css">
 <style>
 /* ============================================================
-   RESULTS PAGE — Premium diagnostic report
+   RESULTS PAGE — Operational Health Report
    ============================================================ */
 
 /* LAYOUT */
-.res-page{max-width:1100px;margin:0 auto;padding:0 40px}
-.res-section{padding:80px 0;border-bottom:.5px solid var(--border)}
+.res-page{max-width:1200px;margin:0 auto;padding:0 40px}
+.res-section{padding:80px 0;border-bottom:1px solid var(--border)}
 .res-section:last-of-type{border-bottom:none}
 
 /* FADE UP ANIMATION */
@@ -33,79 +36,113 @@
 .fade-d5{animation-delay:1s}
 .fade-d6{animation-delay:1.2s}
 
-/* ---- SECTION 1: HEADER ---- */
-.res-header{text-align:center;padding-top:100px;padding-bottom:40px}
-.res-header .sec-tag{margin-bottom:24px}
-.res-client-name{font-size:24px;font-weight:600;color:var(--white);margin-bottom:4px;line-height:1.3}
-.res-company{font-size:14px;color:var(--gray);font-weight:400}
+/* ---- SECTION 1: REPORT HEADER ---- */
+.res-header{padding-top:100px;padding-bottom:40px;border-bottom:1px solid var(--border)}
+.res-report-title{font-family:var(--fm);font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:16px}
+.res-client-name{font-size:28px;font-weight:600;color:var(--white);margin-bottom:4px;line-height:1.3}
+.res-company{font-size:18px;color:var(--gray);font-weight:400;margin-bottom:4px}
+.res-date{font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:.5px}
 
 /* ---- SECTION 2: SCORE ---- */
 .score-section{text-align:center;padding-top:40px}
 .gauge-container{position:relative;max-width:280px;margin:0 auto 0}
 .gauge-number{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);text-align:center}
 .gauge-num{font-family:var(--fm);font-size:48px;font-weight:700;line-height:1}
-.gauge-of{font-family:var(--fm);font-size:13px;color:var(--dimgray);margin-top:2px}
-.level-badge{display:inline-block;font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:6px 16px;border:.5px solid var(--border);margin-top:20px}
-.level-badge.level-critical{color:#F0997B;border-color:#F0997B33}
-.level-badge.level-developing{color:#EF9F27;border-color:#EF9F2733}
-.level-badge.level-competent{color:#00E5BF;border-color:#00E5BF33}
-.level-badge.level-advanced{color:#00E5BF;border-color:#00E5BF33}
-.level-desc{font-size:15px;color:var(--gray);line-height:1.7;max-width:560px;margin:16px auto 0}
+.gauge-of{font-family:var(--fm);font-size:14px;color:var(--text-dim);margin-top:2px}
+.level-badge{display:inline-block;font-family:var(--fm);font-size:14px;letter-spacing:2px;text-transform:uppercase;padding:8px 20px;border:1px solid var(--border);margin-top:20px}
+.level-badge.level-critical{color:var(--coral);border-color:rgba(229,99,75,0.2)}
+.level-badge.level-developing{color:#EF9F27;border-color:rgba(239,159,39,0.2)}
+.level-badge.level-competent{color:var(--accent);border-color:rgba(0,229,191,0.2)}
+.level-badge.level-advanced{color:#00B89A;border-color:rgba(0,184,154,0.2)}
+.level-desc{font-size:18px;color:var(--gray);line-height:1.7;max-width:580px;margin:16px auto 0}
 
 /* ---- SECTION 3: DIMENSIONS ---- */
 .dim-list{display:flex;flex-direction:column;gap:28px}
 .dim-row{position:relative}
 .dim-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
-.dim-name{font-size:14px;font-weight:600;color:var(--white)}
-.dim-score{font-family:var(--fm);font-size:13px;color:var(--gray)}
+.dim-name{font-size:16px;font-weight:600;color:var(--white)}
+.dim-score{font-family:var(--fm);font-size:14px;color:var(--gray)}
 .dim-bar{height:4px;background:var(--border);width:100%;position:relative;overflow:hidden}
 .dim-fill{height:100%;width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
-.dim-fill.level-critical{background:#F0997B}
+.dim-fill.level-critical{background:var(--coral)}
 .dim-fill.level-developing{background:#EF9F27}
 .dim-fill.level-competent{background:var(--accent)}
 .dim-fill.level-advanced{background:var(--accent)}
-.dim-insight{font-size:13px;color:var(--gray);margin-top:8px;line-height:1.55}
+.dim-insight{font-size:15px;color:var(--gray);margin-top:8px;line-height:1.55}
 
 /* ---- SECTION 4: COST OF INACTION ---- */
-.cost-headline{font-size:clamp(20px,3vw,28px);font-weight:700;color:var(--white);margin-bottom:40px;line-height:1.2;letter-spacing:-.02em}
+.cost-headline{font-size:clamp(24px,3.5vw,32px);font-weight:700;color:var(--white);margin-bottom:40px;line-height:1.2;letter-spacing:-.02em}
 .cost-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
-.cost-card{background:var(--bg2);border:.5px solid var(--border);padding:32px;text-align:center;transition:border-color .3s}
-.cost-card:hover{border-color:var(--dimgray)}
-.cost-num{font-family:var(--fm);font-size:28px;font-weight:700;color:var(--coral);line-height:1.2;margin-bottom:8px}
-.cost-card:last-child .cost-num{font-size:32px}
-.cost-label{font-family:var(--fm);font-size:10px;color:var(--dimgray);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
-.cost-sub{font-size:13px;color:var(--gray);line-height:1.5}
+.cost-card{background:var(--bg2);border:1px solid var(--border);padding:32px;text-align:center;transition:border-color .3s}
+.cost-card:hover{border-color:rgba(255,255,255,0.15)}
+.cost-num{font-family:var(--fm);font-size:32px;font-weight:700;color:var(--coral);line-height:1.2;margin-bottom:8px}
+.cost-card:last-child .cost-num{font-size:36px}
+.cost-label{font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.cost-sub{font-size:15px;color:var(--gray);line-height:1.5}
 
-/* ---- SECTION 5: RECOMMENDATIONS ---- */
-.reco-list{display:flex;flex-direction:column;gap:16px}
-.reco-card{position:relative;display:flex;gap:24px;background:var(--bg2);border:.5px solid var(--border);border-left:2px solid var(--accent);padding:32px;overflow:hidden;transition:background .3s}
-.reco-card:hover{background:var(--accent3)}
-.reco-step{font-family:var(--fm);font-size:48px;font-weight:700;color:var(--accent2);line-height:1;flex-shrink:0;user-select:none}
-.reco-body{flex:1;min-width:0}
-.reco-title{font-size:18px;font-weight:600;color:var(--white);margin-bottom:8px}
-.reco-desc{font-size:14px;color:var(--gray);line-height:1.6;margin-bottom:16px}
-.reco-meta{display:flex;gap:28px;flex-wrap:wrap}
-.reco-meta-item{display:flex;flex-direction:column;gap:2px}
-.reco-meta-label{font-family:var(--fm);font-size:10px;color:var(--dimgray);letter-spacing:1px;text-transform:uppercase}
-.reco-meta-val{font-family:var(--fm);font-size:14px;color:var(--white);font-weight:500}
+/* ---- SECTION 5: PAINPOINT CARDS ---- */
+.pain-list{display:flex;flex-direction:column;gap:16px}
+.pain-card{display:flex;gap:20px;background:var(--bg2);border:1px solid var(--border);border-left:2px solid var(--coral);padding:28px 32px;transition:background .3s}
+.pain-card:hover{background:var(--accent3)}
+.pain-rank{font-family:var(--fm);font-size:40px;font-weight:700;color:var(--border);line-height:1;flex-shrink:0}
+.pain-body{flex:1;min-width:0}
+.pain-name{font-size:16px;font-weight:600;color:var(--white);margin-bottom:6px}
+.pain-cost{font-family:var(--fm);font-size:32px;font-weight:700;color:var(--coral);line-height:1.2}
+.pain-unit{font-size:15px;color:var(--gray);margin-left:4px}
+.pain-desc{font-size:15px;color:var(--gray);line-height:1.55;margin-top:8px}
 
-/* ---- SECTION 6: ROI ---- */
-.roi-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:.5px solid var(--border)}
-.roi-block{padding:40px 32px;text-align:center;border-right:.5px solid var(--border)}
-.roi-block:last-child{border-right:none}
-.roi-big{font-family:var(--fm);font-size:36px;font-weight:700;color:var(--accent);line-height:1.2;word-break:break-word}
-.roi-sub{font-family:var(--fm);font-size:18px;color:var(--gray);margin-top:4px}
-.roi-label{font-family:var(--fm);font-size:10px;color:var(--dimgray);letter-spacing:1px;text-transform:uppercase;margin-top:12px}
-.roi-footnote{font-size:13px;color:var(--dimgray);line-height:1.7;margin-top:32px;text-align:center;max-width:700px;margin-left:auto;margin-right:auto}
+/* ---- SECTION 6: SOLUTION CARDS ---- */
+.sol-list{display:flex;flex-direction:column;gap:16px}
+.sol-card{position:relative;display:flex;gap:24px;background:var(--bg2);border:1px solid var(--border);border-left:2px solid var(--accent);padding:32px;overflow:hidden;transition:background .3s}
+.sol-card:hover{background:var(--accent3)}
+.sol-step{font-family:var(--fm);font-size:48px;font-weight:700;color:var(--accent2);line-height:1;flex-shrink:0;user-select:none}
+.sol-body{flex:1;min-width:0}
+.sol-title{font-size:20px;font-weight:600;color:var(--white);margin-bottom:8px}
+.sol-desc{font-size:16px;color:var(--gray);line-height:1.6;margin-bottom:16px}
+.sol-meta{display:flex;gap:28px;flex-wrap:wrap}
+.sol-meta-item{display:flex;flex-direction:column;gap:2px}
+.sol-meta-label{font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase}
+.sol-meta-val{font-family:var(--fm);font-size:15px;color:var(--white);font-weight:500}
 
-/* ---- SECTION 7: CTA ---- */
+/* ---- SECTION 7: SAVINGS PROJECTION ---- */
+.savings-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--border)}
+.savings-card{padding:40px 32px;text-align:center;border-right:1px solid var(--border)}
+.savings-card:last-child{border-right:none}
+.savings-label{font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.savings-num{font-family:var(--fm);font-size:36px;font-weight:700;color:var(--accent);line-height:1.2}
+.savings-sub{font-family:var(--fm);font-size:14px;color:var(--gray);margin-top:4px}
+
+/* ---- ROI FOOTNOTE ---- */
+.roi-footnote{font-size:14px;color:var(--text-dim);line-height:1.7;margin-top:32px;text-align:center;max-width:700px;margin-left:auto;margin-right:auto}
+
+/* ---- SECTION 8: CTA ---- */
 .cta-section{text-align:center;padding-top:80px;padding-bottom:100px}
-.cta-headline{font-size:clamp(22px,3.5vw,32px);font-weight:700;color:var(--white);margin-bottom:12px;letter-spacing:-.02em}
-.cta-sub{font-size:15px;color:var(--gray);max-width:520px;margin:0 auto 32px;line-height:1.7}
+.cta-headline{font-size:clamp(26px,3.5vw,36px);font-weight:700;color:var(--white);margin-bottom:12px;letter-spacing:-.02em}
+.cta-sub{font-size:18px;color:var(--gray);max-width:540px;margin:0 auto 32px;line-height:1.7}
 .cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
-.cta-email{font-family:var(--fm);font-size:12px;color:var(--dimgray);letter-spacing:.5px}
+.cta-email{font-family:var(--fm);font-size:14px;color:var(--text-dim);letter-spacing:.5px}
 .cta-email a{color:var(--accent);text-decoration:none;transition:opacity .3s}
 .cta-email a:hover{opacity:.8}
+
+/* ---- PRINT ---- */
+@media print{
+  nav,.gradient-dots-bg,footer,.cta-section,.hamburger,.mobile-menu,.mobile-overlay,.lang-toggle,.btn-nav,.btn-ghost-slide,#pdfBtn{display:none!important}
+  .res-page{max-width:100%;padding:0 20px}
+  .res-section{padding:24px 0;break-inside:avoid}
+  body{background:#fff;color:#222}
+  .sec-tag{color:#00A88E}
+  .pain-card,.sol-card,.cost-card,.savings-card{background:#f8f8f8;border-color:#ddd}
+  .pain-cost,.cost-num{color:#d44}
+  .savings-num,.gauge-num{color:#00A88E}
+  .dim-fill.level-critical{background:#d44}
+  .dim-fill.level-developing{background:#e90}
+  .dim-fill.level-competent,.dim-fill.level-advanced{background:#00A88E}
+  .level-badge{border-color:#ccc}
+  .res-client-name,.sol-title,.pain-name,.dim-name,.cost-headline{color:#222}
+  .sol-desc,.pain-desc,.dim-insight,.cost-sub,.level-desc,.roi-footnote{color:#555}
+  .sol-meta-val,.dim-score{color:#333}
+  .fade-in{opacity:1!important;animation:none!important}
+}
 
 /* ---- RESPONSIVE ---- */
 @media(max-width:768px){
@@ -114,22 +151,26 @@
   .res-header{padding-top:60px;padding-bottom:24px}
   .cost-grid{grid-template-columns:1fr}
   .cost-card:last-child .cost-num{font-size:28px}
-  .roi-grid{grid-template-columns:1fr}
-  .roi-block{border-right:none;border-bottom:.5px solid var(--border)}
-  .roi-block:last-child{border-bottom:none}
-  .reco-card{flex-direction:column;gap:12px;padding:24px}
-  .reco-step{font-size:36px}
-  .reco-meta{flex-direction:column;gap:12px}
+  .savings-grid{grid-template-columns:1fr}
+  .savings-card{border-right:none;border-bottom:1px solid var(--border)}
+  .savings-card:last-child{border-bottom:none}
+  .pain-card{flex-direction:column;gap:12px;padding:20px}
+  .pain-rank{font-size:32px}
+  .sol-card{flex-direction:column;gap:12px;padding:24px}
+  .sol-step{font-size:36px}
+  .sol-meta{flex-direction:column;gap:12px}
   .cta-btns{flex-direction:column;width:100%;max-width:340px;margin-left:auto;margin-right:auto}
-  .cta-btns .btn-gradient,.cta-btns .btn-ghost-slide{width:100%;justify-content:center}
+  .cta-btns .btn-gradient,.cta-btns .btn-ghost-slide,.cta-btns .btn-ghost{width:100%;justify-content:center}
 }
 @media(max-width:480px){
   .gauge-num{font-size:36px}
   .res-client-name{font-size:20px}
   .cost-num{font-size:24px}
-  .roi-big{font-size:28px}
+  .savings-num{font-size:28px}
+  .pain-cost{font-size:22px}
 }
 </style>
+<script defer data-domain="ignealabs.com" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
 
@@ -166,18 +207,28 @@
 </div>
 
 <main>
-<div class="res-page">
 
-  <!-- ================================================
-       SECTION 1 + 2: HEADER & SCORE
-       ================================================ -->
+<!-- LOADING STATE -->
+<div id="resLoading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:40px">
+  <div style="width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:resSpin 1s linear infinite;margin-bottom:24px"></div>
+  <div id="loadMsg1" style="font-family:var(--fm);font-size:13px;color:var(--accent);letter-spacing:1px;opacity:0;transition:opacity .4s" data-i18n="res.loading1">Analizando tus respuestas...</div>
+  <div id="loadMsg2" style="font-family:var(--fm);font-size:13px;color:var(--gray);letter-spacing:1px;margin-top:8px;opacity:0;transition:opacity .4s" data-i18n="res.loading2">Generando tu reporte...</div>
+</div>
+<style>@keyframes resSpin{to{transform:rotate(360deg)}}</style>
+
+<div class="res-page" id="resPage" style="display:none">
+
+  <!-- SECTION 1: REPORT HEADER -->
   <div class="res-section res-header fade-in fade-d1">
-    <div class="sec-tag" data-i18n="res.tag">// Diagnóstico Completado</div>
+    <div class="res-report-title" id="resReportTitle" data-i18n="res.reportTitle">Reporte de Salud Operacional</div>
     <h1 class="res-client-name" id="resName"></h1>
     <div class="res-company" id="resCompany"></div>
+    <div class="res-date" id="resDate"></div>
   </div>
 
+  <!-- SECTION 2: MATURITY SCORE -->
   <div class="res-section score-section fade-in fade-d1">
+    <div class="sec-tag" data-i18n="res.scoreTag">// Puntuación de Madurez</div>
     <div class="gauge-container" id="gaugeContainer">
       <div id="gaugeCanvas"></div>
       <div class="gauge-number">
@@ -189,17 +240,13 @@
     <div id="levelDesc" class="level-desc"></div>
   </div>
 
-  <!-- ================================================
-       SECTION 3: DIMENSION BREAKDOWN
-       ================================================ -->
+  <!-- SECTION 3: DIMENSION BREAKDOWN -->
   <div class="res-section fade-in fade-d2">
     <div class="sec-tag" data-i18n="res.dimTag">// Desglose por Dimensión</div>
     <div class="dim-list" id="dimList"></div>
   </div>
 
-  <!-- ================================================
-       SECTION 4: COST OF INACTION
-       ================================================ -->
+  <!-- SECTION 4: COST OF INACTION -->
   <div class="res-section fade-in fade-d3">
     <div class="sec-tag" data-i18n="res.costTag">// El Costo de No Actuar</div>
     <h2 class="cost-headline" data-i18n="res.costHeadline">Lo que tus ineficiencias te cuestan cada mes</h2>
@@ -222,43 +269,55 @@
     </div>
   </div>
 
-  <!-- ================================================
-       SECTION 5: RECOMMENDATIONS
-       ================================================ -->
-  <div class="res-section fade-in fade-d4">
-    <div class="sec-tag" data-i18n="res.recoTag">// Oportunidades Identificadas</div>
-    <h2 class="cost-headline" data-i18n="res.recoTitle" style="margin-bottom:32px">Recomendaciones Prioritarias</h2>
-    <div class="reco-list" id="recoList"></div>
+  <!-- SECTION 5: TOP 3 PAINPOINTS -->
+  <div class="res-section fade-in fade-d3">
+    <div class="sec-tag" data-i18n="res.painTag">// Puntos de Mayor Impacto Financiero</div>
+    <div class="pain-list" id="painpointList"></div>
   </div>
 
-  <!-- ================================================
-       SECTION 6: ROI SUMMARY
-       ================================================ -->
+  <!-- SECTION 6: SOLUTIONS -->
+  <div class="res-section fade-in fade-d4">
+    <div class="sec-tag" data-i18n="res.solTag">// Soluciones Recomendadas</div>
+    <div class="sol-list" id="solutionList"></div>
+  </div>
+
+  <!-- SECTION 7: SAVINGS PROJECTION -->
   <div class="res-section fade-in fade-d5">
-    <div class="sec-tag" data-i18n="res.roiTag2">// Retorno Estimado</div>
-    <div class="roi-grid" id="roiGrid">
-      <div class="roi-block">
-        <div class="roi-label" data-i18n="res.roi.timeLabel">Tiempo que recuperas</div>
-        <div class="roi-big" id="roiHoursMonth">—</div>
-        <div class="roi-sub" id="roiHoursYear">—</div>
+    <div class="sec-tag" data-i18n="res.projTag">// Proyección de Ahorro</div>
+    <div class="savings-grid">
+      <div class="savings-card">
+        <div class="savings-label" data-i18n="res.savings.monthLabel">Ahorro mensual estimado</div>
+        <div class="savings-num" id="savingsMonth">—</div>
       </div>
-      <div class="roi-block">
-        <div class="roi-label" data-i18n="res.roi.valueLabel">Valor de ese tiempo</div>
-        <div class="roi-big" id="roiValueMonth">—</div>
-        <div class="roi-sub" id="roiValueYear">—</div>
+      <div class="savings-card">
+        <div class="savings-label" data-i18n="res.savings.yearLabel">Ahorro anual estimado</div>
+        <div class="savings-num" id="savingsYear">—</div>
+      </div>
+      <div class="savings-card">
+        <div class="savings-label" data-i18n="res.savings.breakevenLabel">Retorno de inversión</div>
+        <div class="savings-num" id="savingsBreakeven">—</div>
+        <div class="savings-sub" data-i18n="res.savings.breakevenUnit">meses</div>
       </div>
     </div>
     <div class="roi-footnote" data-i18n="res.roi.footnote">Estas cifras son conservadoras. El impacto real suele ser 2-3x mayor cuando se considera el crecimiento de ingresos por mejor atención al cliente.</div>
   </div>
 
-  <!-- ================================================
-       SECTION 7: CTA
-       ================================================ -->
+  <!-- SECTION 7b: AI INSIGHTS (appears async when available) -->
+  <div class="res-section fade-in" id="resAIInsights" style="display:none">
+    <div class="sec-tag" data-i18n="res.ai.tag">// ANÁLISIS IA</div>
+    <p class="sec-subtitle" style="font-size:16px;color:var(--gray);margin-bottom:24px" data-i18n="res.ai.subtitle">Análisis personalizado generado por inteligencia artificial para tu empresa.</p>
+    <div id="aiInsightsContent"></div>
+  </div>
+
+  <!-- SECTION 8: CTA -->
   <div class="cta-section fade-in fade-d6">
-    <h2 class="cta-headline" data-i18n="res.cta.headline">¿Listo para recuperar ese tiempo?</h2>
-    <p class="cta-sub" data-i18n="res.cta.sub">Agenda una llamada de 15 minutos. Te mostramos exactamente cómo implementar estas soluciones en tu negocio.</p>
+    <h2 class="cta-headline" data-i18n="res.cta2.headline">¿Listo para activar estos ahorros?</h2>
+    <p class="cta-sub" data-i18n="res.cta2.sub">Agenda tu llamada estratégica. 15 minutos para mostrarte el plan de implementación exacto para tu negocio.</p>
     <div class="cta-btns">
-      <a id="ctaWhatsApp" href="#" class="btn-gradient" data-i18n-btn="res.cta.call">Agendar llamada &rarr;</a>
+      <!-- TODO: Replace #calendly with real Calendly URL -->
+      <a id="ctaCalendly" href="#calendly" class="btn-gradient" data-i18n-btn="res.cta.calendly">Agenda tu Llamada Estratégica &rarr;</a>
+      <!-- TODO: Replace wa.me/1787XXXXXXX with real WhatsApp number -->
+      <a id="ctaWhatsApp" href="#" class="btn-ghost-slide" data-i18n-btn="res.cta.whatsapp">Contactar por WhatsApp</a>
       <button class="btn-ghost-slide" id="pdfBtn" data-i18n="res.cta.pdf">Descargar reporte PDF</button>
     </div>
     <div class="cta-email">
@@ -277,6 +336,7 @@
       <div class="footer-brand">
         <div class="f-brand">IGNEA<span>.LABS</span></div>
         <div class="f-tag" data-i18n="footer.tag">Bajo la superficie, el potencial.</div>
+        <div style="font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;margin-top:6px" data-i18n="footer.address">San Juan, Puerto Rico</div>
       </div>
       <div class="footer-nav">
         <a href="index.html" data-i18n="nav.home">Inicio</a>
@@ -286,7 +346,7 @@
       </div>
       <div class="footer-contact"><a href="mailto:hola@ignealabs.com">hola@ignealabs.com</a></div>
     </div>
-    <div class="footer-bottom">&copy; 2026 Ignea Labs. <span data-i18n="footer.rights">Todos los derechos reservados.</span></div>
+    <div class="footer-bottom">&copy; 2026 Ignea Labs. <span data-i18n="footer.rights">Todos los derechos reservados.</span> <span style="margin-left:12px;opacity:.65" data-i18n="footer.serving">Orgullosamente sirviendo a Puerto Rico</span></div>
   </div>
 </footer>
 
@@ -295,7 +355,9 @@
 <!-- SCRIPTS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="js/i18n.js"></script>
+<script src="js/analytics.js"></script>
 <script src="js/grid-bg.js"></script>
+<script src="js/supabase-config.js"></script>
 <script src="js/scoring.js"></script>
 <script src="js/results.js"></script>
 <script>

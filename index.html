@@ -3,14 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ignea Labs | Infraestructura de IA para empresas centroamericanas</title>
-<meta name="description" content="Ignea Labs transforma negocios en Centroamérica con infraestructura de inteligencia artificial. Encontramos el potencial bajo la superficie de tu operación y lo convertimos en nuevo terreno competitivo.">
-<meta property="og:title" content="Ignea Labs | Infraestructura de IA para empresas centroamericanas">
-<meta property="og:description" content="Encontramos el potencial bajo la superficie de tu operación y lo convertimos en nuevo terreno competitivo.">
+<title>Ignea Labs | Infraestructura de IA para empresas en Puerto Rico</title>
+<meta name="description" content="Tu negocio pierde miles cada mes en procesos manuales. Diagnóstico gratuito de IA que mapea tu desperdicio operacional y lo convierte en ahorros proyectados.">
+<meta property="og:title" content="Ignea Labs | Infraestructura de IA para empresas en Puerto Rico">
+<meta property="og:description" content="Diagnóstico gratuito de IA que mapea tu desperdicio operacional y lo convierte en ahorros proyectados.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://ignealabs.com/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/shared.css">
 <link rel="stylesheet" href="css/components.css">
@@ -20,25 +22,29 @@
 
 /* ---- HERO ---- */
 .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:120px 40px 80px;position:relative}
-.hero-tag{font-family:var(--fm);font-size:11px;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;margin-bottom:24px}
-.hero h1,.hero .hero-title{font-family:var(--ff);font-size:clamp(32px,4.5vw,56px);font-weight:700;letter-spacing:-0.03em;line-height:1.1;max-width:700px;margin-bottom:20px}
-.hero-p{font-size:16px;color:var(--gray);max-width:540px;line-height:1.65;margin-bottom:40px}
-.cta-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.encrypt-badge{display:inline-flex;align-items:center;gap:7px;font-family:var(--fm);font-size:13px;letter-spacing:2px;color:var(--dimgray);background:var(--bg2);border:1px solid var(--border);padding:6px 14px;margin-bottom:32px;opacity:0;animation:fade-in .6s .1s forwards}
+.encrypt-badge svg{width:13px;height:13px;color:var(--accent);flex-shrink:0}
+.hero-tag{font-family:var(--fm);font-size:14px;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;margin-bottom:24px;opacity:0;animation:fade-in .6s .2s forwards}
+.hero h1{font-family:var(--ff);font-size:clamp(36px,4.5vw,56px);font-weight:700;letter-spacing:-0.02em;line-height:1.15;max-width:720px;margin-bottom:20px;opacity:0;animation:fade-in .6s .35s forwards}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero-p{font-size:18px;color:var(--gray);max-width:560px;line-height:1.65;margin-bottom:40px;opacity:0;animation:fade-in .6s .5s forwards}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fade-in .6s .65s forwards}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
 
 /* ---- STATS ---- */
 .sec-stats{padding:40px 0 60px}
 .stats-row{display:flex;justify-content:center;align-items:center;gap:0;flex-wrap:nowrap}
 .stat{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 60px}
 .stat+.stat{border-left:1px solid var(--border)}
-.stat-val{font-family:var(--fm);font-size:28px;font-weight:600;color:var(--white);margin-bottom:6px;line-height:1}
-.stat-label{font-size:10px;color:var(--dimgray);letter-spacing:1px;text-transform:uppercase;line-height:1.5;max-width:120px}
+.stat-val{font-family:var(--fm);font-size:36px;font-weight:700;color:var(--accent);margin-bottom:6px;line-height:1}
+.stat-label{font-size:14px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;line-height:1.5;max-width:140px}
 
 /* ---- WHAT WE DO ---- */
 .sec-whatwedo{padding:100px 40px}
 .sec-whatwedo .content-wrap{max-width:680px;margin:0 auto}
 .whatwedo-text p{line-height:1.75;margin-bottom:20px}
-.whatwedo-text p:first-child{font-family:var(--ff);font-size:18px;font-weight:600;color:var(--white)}
-.whatwedo-text p:not(:first-child){font-size:15px;color:var(--gray)}
+.whatwedo-text p:first-child{font-family:var(--ff);font-size:20px;font-weight:600;color:var(--white)}
+.whatwedo-text p:not(:first-child){font-size:18px;color:var(--gray)}
 .whatwedo-text p:last-child{margin-bottom:0}
 
 /* ---- PROCESS ---- */
@@ -48,46 +54,94 @@
 .process-timeline::before{content:'';position:absolute;top:16px;left:0;right:0;height:1px;background:var(--border);z-index:0}
 .pstep{flex:1;padding-right:32px;position:relative;z-index:1}
 .pstep:last-child{padding-right:0}
-.pstep-n{font-family:var(--fm);font-size:11px;color:var(--accent);margin-bottom:16px;display:inline-block;background:var(--bg);padding-right:12px}
-.pstep-t{font-family:var(--ff);font-size:15px;font-weight:600;color:var(--white);margin-bottom:8px}
-.pstep-d{font-size:13px;color:var(--gray);line-height:1.6}
+.pstep-n{font-family:var(--fm);font-size:13px;color:var(--accent);margin-bottom:16px;display:inline-block;background:var(--bg);padding-right:12px}
+.pstep-t{font-family:var(--ff);font-size:18px;font-weight:600;color:var(--white);margin-bottom:8px}
+.pstep-d{font-size:15px;color:var(--gray);line-height:1.6}
 
 /* ---- TERMINAL SECTION ---- */
 .sec-terminal{padding:80px 40px 60px}
 .sec-terminal .content-wrap{max-width:700px;margin:0 auto}
 
 /* ---- CTA ---- */
-.sec-cta{padding:100px 40px;border-top:.5px solid var(--border)}
+.sec-cta{padding:100px 40px;border-top:1px solid var(--border)}
 .sec-cta .content-wrap{max-width:600px;margin:0 auto}
 .sec-cta h2{font-family:var(--ff);font-size:clamp(22px,3vw,34px);font-weight:700;letter-spacing:-0.01em;line-height:1.2;margin-bottom:32px;color:var(--white)}
-.cta-note{margin-top:16px;font-family:var(--fm);font-size:10px;color:var(--dimgray);letter-spacing:1.5px;text-transform:uppercase}
+.cta-note{margin-top:16px;font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1.5px;text-transform:uppercase}
 
 /* ---- FOOTER (new layout) ---- */
-footer{border-top:.5px solid var(--border)}
-.footer-inner{max-width:1100px;margin:0 auto;padding:0 40px}
+footer{border-top:1px solid var(--border)}
+.footer-inner{max-width:1200px;margin:0 auto;padding:0 40px}
 .footer-top{display:flex;justify-content:space-between;align-items:flex-start;padding:48px 0 36px;gap:40px;flex-wrap:wrap}
-.footer-brand .f-brand{font-weight:800;letter-spacing:3px;color:var(--white);font-size:14px;margin-bottom:6px}
+.footer-brand .f-brand{font-weight:800;letter-spacing:3px;color:var(--white);font-size:16px;margin-bottom:6px}
 .footer-brand .f-brand span{color:var(--accent)}
-.footer-brand .f-tag{font-size:10px;color:var(--dimgray);letter-spacing:1px}
+.footer-brand .f-tag{font-size:13px;color:var(--text-dim);letter-spacing:1px}
 .footer-nav{display:flex;gap:28px;align-items:center;flex-wrap:wrap}
-.footer-nav a{color:var(--dimgray);text-decoration:none;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:500;transition:color .3s}
+.footer-nav a{color:var(--text-dim);text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500;transition:color .3s}
 .footer-nav a:hover{color:var(--accent)}
-.footer-contact a{color:var(--dimgray);text-decoration:none;font-family:var(--fm);font-size:12px;letter-spacing:.5px;transition:color .3s}
+.footer-contact a{color:var(--text-secondary);text-decoration:none;font-family:var(--fm);font-size:14px;letter-spacing:.5px;transition:color .3s}
 .footer-contact a:hover{color:var(--accent)}
-.footer-bottom{padding:20px 0;border-top:.5px solid var(--border);font-family:var(--fm);font-size:10px;color:var(--dimgray);letter-spacing:1px}
+.footer-bottom{padding:20px 0;border-top:1px solid var(--border);font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px}
 
 /* ---- NAV: btn-nav ---- */
-.btn-nav{padding:8px 18px!important;font-size:12px!important}
+.btn-nav{padding:10px 24px!important;font-size:14px!important}
+
+/* ---- SOCIAL PROOF ---- */
+.sec-proof{padding:100px 40px;border-top:1px solid var(--border)}
+.sec-proof .content-wrap{max-width:1200px;margin:0 auto}
+.proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+.proof-card{background:var(--bg2);border:1px solid var(--border);padding:32px;transition:border-color .3s}
+.proof-card:hover{border-color:rgba(255,255,255,0.15)}
+.proof-card-tag{font-family:var(--fm);font-size:13px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;margin-bottom:16px}
+.proof-card-name{font-family:var(--fm);font-size:14px;color:var(--accent);letter-spacing:1px;margin-bottom:20px}
+.proof-card-stat{font-family:var(--fm);font-size:36px;font-weight:700;color:var(--accent);line-height:1;margin-bottom:4px}
+.proof-card-statLabel{font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+.proof-card-desc{font-size:16px;color:var(--gray);line-height:1.65}
+
+/* ---- ABOUT ---- */
+.sec-about{padding:100px 40px}
+.sec-about .content-wrap{max-width:680px;margin:0 auto}
+.about-content{margin-top:32px}
+.about-name{font-family:var(--ff);font-size:20px;font-weight:700;color:var(--white);margin-bottom:12px}
+.about-bio{font-size:18px;color:var(--gray);line-height:1.75;margin-bottom:24px}
+.about-presence{font-family:var(--fm);font-size:14px;color:var(--accent);letter-spacing:1px}
+
+/* ---- BUILT FOR PR ---- */
+.sec-builtforpr{padding:100px 40px;border-top:1px solid var(--border)}
+.sec-builtforpr .content-wrap{max-width:1200px;margin:0 auto}
+.pr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+.pr-card{background:var(--bg2);border:1px solid var(--border);padding:32px;transition:border-color .3s}
+.pr-card:hover{border-color:rgba(255,255,255,0.15)}
+.pr-card-title{font-family:var(--ff);font-size:18px;font-weight:600;color:var(--white);margin-bottom:12px}
+.pr-card-desc{font-size:16px;color:var(--gray);line-height:1.65}
+
+/* ---- CALCULATOR ---- */
+.sec-calculator{padding:100px 40px;border-top:1px solid var(--border)}
+.sec-calculator .content-wrap{max-width:640px;margin:0 auto}
+.calc-form{margin-top:40px;display:flex;flex-direction:column;gap:28px}
+.calc-field label{display:block;font-family:var(--fm);font-size:13px;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;margin-bottom:8px}
+.calc-field select{width:100%;padding:14px 18px;background:var(--bg2);border:1px solid var(--border);color:var(--white);font-family:var(--ff);font-size:16px;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;min-height:48px}
+.calc-field select:focus{border-color:var(--accent)}
+.calc-field select option{background:var(--bg2);color:var(--white)}
+.calc-cards{display:flex;gap:12px;flex-wrap:wrap}
+.calc-card{padding:14px 22px;background:var(--bg2);border:1px solid var(--border);color:var(--gray);font-family:var(--ff);font-size:16px;cursor:pointer;transition:all .2s;min-height:48px;display:flex;align-items:center}
+.calc-card:hover{border-color:rgba(255,255,255,0.15);color:var(--white)}
+.calc-card.selected{border-color:var(--accent);background:var(--accent3);color:var(--white)}
+.calc-result{margin-top:40px;padding:32px;background:var(--bg2);border:1px solid var(--border);text-align:center;opacity:0;transition:opacity .4s}
+.calc-result.visible{opacity:1}
+.calc-result-label{font-size:15px;color:var(--gray);margin-bottom:8px}
+.calc-result-value{font-family:var(--fm);font-size:42px;font-weight:700;color:var(--coral);line-height:1;margin-bottom:4px}
+.calc-result-unit{font-family:var(--fm);font-size:14px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px}
+.calc-result-note{font-size:13px;color:var(--text-dim);margin-bottom:24px}
 
 /* ---- RESPONSIVE ---- */
 @media(max-width:768px){
   .hero{padding:80px 20px 60px}
-  .hero-p{font-size:15px}
+  .hero-p{font-size:16px}
   .stats-row{flex-wrap:wrap;gap:32px}
   .stat+.stat{border-left:none}
   .stats-row{display:grid;grid-template-columns:1fr 1fr;gap:32px 0;padding:0 20px}
-  .stat{border-right:none!important;border-left:none!important;border-bottom:.5px solid var(--border);padding:0 0 32px 0}
-  .stat:nth-child(1),.stat:nth-child(2){border-bottom:.5px solid var(--border)}
+  .stat{border-right:none!important;border-left:none!important;border-bottom:1px solid var(--border);padding:0 0 32px 0}
+  .stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--border)}
   .stat:nth-child(3),.stat:nth-child(4){border-bottom:none;padding-top:32px}
   .stat:nth-child(even){border-left:1px solid var(--border)!important}
   .sec-whatwedo{padding:60px 20px}
@@ -103,17 +157,23 @@ footer{border-top:.5px solid var(--border)}
   .footer-nav{gap:20px}
   .footer-inner{padding:0 20px}
   .btn-nav{display:none}
+  .proof-grid,.pr-grid{grid-template-columns:1fr}
+  .sec-proof,.sec-about,.sec-builtforpr,.sec-calculator{padding:60px 20px}
+  .calc-cards{flex-direction:column}
 }
 @media(max-width:480px){
   .hero h1{font-size:28px}
   .cta-row{flex-direction:column;width:100%;max-width:320px}
   .stats-row{grid-template-columns:1fr 1fr}
   .whatwedo-text p:first-child{font-size:16px}
+  .calc-result-value{font-size:32px}
+  .proof-card-stat{font-size:28px}
 }
 </style>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"LocalBusiness","name":"Ignea Labs","description":"AI infrastructure for Central American SMBs","address":{"@type":"PostalAddress","addressLocality":"Managua","addressCountry":"NI"},"email":"hola@ignealabs.com"}
+{"@context":"https://schema.org","@type":"LocalBusiness","name":"Ignea Labs","description":"AI infrastructure for Puerto Rico SMBs","address":{"@type":"PostalAddress","addressLocality":"San Juan","addressRegion":"PR","postalCode":"00901","addressCountry":"US"},"email":"hola@ignealabs.com","areaServed":{"@type":"Place","name":"Puerto Rico"},"knowsLanguage":["es","en"]}
 </script>
+<script defer data-domain="ignealabs.com" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
 
@@ -129,12 +189,12 @@ footer{border-top:.5px solid var(--border)}
   </a>
   <div class="nav-right">
     <ul class="nav-links">
-      <li><a href="index.html" class="nav-link active" data-i18n="nav.home">Inicio</a></li>
-      <li><a href="manifesto.html" class="nav-link" data-i18n="nav.manifesto">Nuestra Tesis</a></li>
-      <li><a href="diagnostic.html" class="nav-link" data-i18n="nav.diagnostic">Diagnóstico</a></li>
-      <li><a href="contact.html" class="nav-link" data-i18n="nav.contact">Contacto</a></li>
+      <li><a href="index.html" class="active" data-i18n="nav.home">Inicio</a></li>
+      <li><a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a></li>
+      <li><a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a></li>
+      <li><a href="contact.html" data-i18n="nav.contact">Contacto</a></li>
     </ul>
-    <a href="diagnostic.html" class="btn-primary btn-nav" data-i18n-html="nav.cta">Iniciar Diagnóstico &rarr;</a>
+    <a href="diagnostic.html" class="btn-primary btn-nav" data-i18n-html="nav.cta">Toma el Diagnóstico Gratis &rarr;</a>
     <button class="hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -149,7 +209,7 @@ footer{border-top:.5px solid var(--border)}
 <div class="mobile-overlay" id="mobileOverlay"></div>
 <div class="mobile-menu" id="mobileMenu">
   <a href="index.html" class="active" data-i18n="nav.home">Inicio</a>
-  <a href="manifesto.html" data-i18n="nav.manifesto">Nuestra Tesis</a>
+  <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
   <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
   <a href="contact.html" data-i18n="nav.contact">Contacto</a>
 </div>
@@ -158,31 +218,35 @@ footer{border-top:.5px solid var(--border)}
 
 <!-- HERO -->
 <header class="hero">
-  <div class="hero-tag reveal-blur" data-i18n="hero.tag">// Infraestructura de IA para Centroamérica</div>
-  <h1 class="hero-title" data-i18n-html="hero.title"><span class="word">Tus</span> <span class="word">operaciones</span> <span class="word">funcionan</span> <span class="word">por</span> <span class="word">instinto.</span> <span class="word">Nosotros</span> <span class="word">las</span> <span class="word">hacemos</span> <span class="word">funcionar</span> <span class="word">con</span> <span class="word accent-word">inteligencia.</span></h1>
-  <p class="hero-p reveal-up reveal-delay-1" data-i18n="hero.sub">Encontramos el potencial dormido bajo la superficie de tu operación — las ineficiencias ocultas, los procesos manuales, los datos que nadie está usando — y lo transformamos en nuevo terreno competitivo.</p>
-  <div class="cta-row reveal-up reveal-delay-2">
-    <a href="diagnostic.html" class="btn-primary" data-i18n-btn="hero.cta1">Iniciar Diagnóstico &rarr;</a>
-    <a href="manifesto.html" class="btn-secondary"><span data-i18n="hero.cta2">Leer Nuestra Tesis</span> <span class="btn-arrow">&rarr;</span></a>
+  <div class="encrypt-badge">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    ENCRYPTED
+  </div>
+  <div class="hero-tag" data-i18n="hero.tag">// Infraestructura de IA para Puerto Rico</div>
+  <h1 data-i18n-html="hero.title">Tu negocio pierde miles cada mes en procesos manuales. Nosotros los encontramos, los eliminamos, y te mostramos el <em>ROI.</em></h1>
+  <p class="hero-p" data-i18n="hero.sub">Diagnóstico gratuito de IA que mapea tu desperdicio operacional y lo convierte en ahorros proyectados — en menos de 15 minutos.</p>
+  <div class="cta-row">
+    <a href="diagnostic.html" class="btn-gradient" data-i18n-btn="hero.cta1">Toma el Diagnóstico Gratis &rarr;</a>
+    <a href="manifesto.html" class="btn-ghost-slide"><span data-i18n="hero.cta2">Leer Manifiesto</span><span class="btn-arrow">&rarr;</span></a>
   </div>
 </header>
 
 <!-- STATS -->
 <section class="sec-stats">
   <div class="stats-row">
-    <div class="stat card-3d reveal-up reveal-delay-1">
+    <div class="stat">
       <div class="stat-val" id="s1">0%</div>
-      <div class="stat-label" data-i18n="stats.s1">de PYMEs en LatAm sin IA</div>
+      <div class="stat-label" data-i18n="stats.s1">de PYMEs en PR usan procesos manuales</div>
     </div>
-    <div class="stat card-3d reveal-up reveal-delay-2">
+    <div class="stat">
       <div class="stat-val" id="s2">0x</div>
-      <div class="stat-label" data-i18n="stats.s2">retorno promedio por dólar</div>
+      <div class="stat-label" data-i18n="stats.s2">hrs semanales perdidas por equipo</div>
     </div>
-    <div class="stat card-3d reveal-up reveal-delay-3">
+    <div class="stat">
       <div class="stat-val" id="s3">0%</div>
-      <div class="stat-label" data-i18n="stats.s3">reducción de costos</div>
+      <div class="stat-label" data-i18n="stats.s3">ahorro promedio post-implementación</div>
     </div>
-    <div class="stat card-3d reveal-up reveal-delay-4">
+    <div class="stat">
       <div class="stat-val" id="s4">0</div>
       <div class="stat-label" data-i18n="stats.s4">min para diagnosticar</div>
     </div>
@@ -190,13 +254,13 @@ footer{border-top:.5px solid var(--border)}
 </section>
 
 <!-- WHAT WE DO -->
-<section class="sec-whatwedo cursor-glow">
+<section class="sec-whatwedo">
   <div class="content-wrap">
-    <div class="sec-tag reveal-up" data-i18n="whatwedo.tag">// Qué hacemos</div>
+    <div class="sec-tag" data-i18n="whatwedo.tag">// Qué hacemos</div>
     <div class="whatwedo-text">
-      <p class="reveal-up reveal-delay-1" data-i18n="whatwedo.p1">Vamos bajo la superficie de tu organización para encontrar lo que ha estado dormido.</p>
-      <p class="reveal-up reveal-delay-2" data-i18n="whatwedo.p2">Nuestro proceso comienza con un diagnóstico profundo. Mapeamos tus flujos de trabajo, identificamos cuellos de botella y señalamos dónde la inteligencia artificial genera impacto medible. Luego diseñamos y desplegamos sistemas de IA personalizados — adaptados a tu operación, tus datos, tus objetivos.</p>
-      <p class="reveal-up reveal-delay-3" data-i18n="whatwedo.p3">Trabajamos con un número reducido de socios. Esto no es un negocio de volumen. Cada empresa que tomamos recibe toda nuestra atención. El resultado no es optimización — es nuevo terreno.</p>
+      <p data-i18n="whatwedo.p1">Vamos bajo la superficie de tu organización para encontrar lo que ha estado dormido.</p>
+      <p data-i18n="whatwedo.p2">Nuestro proceso comienza con un diagnóstico profundo. Mapeamos tus flujos de trabajo, identificamos cuellos de botella y señalamos dónde la inteligencia artificial genera impacto medible. Luego diseñamos y desplegamos sistemas de IA personalizados — adaptados a tu operación, tus datos, tus objetivos.</p>
+      <p data-i18n="whatwedo.p3">Trabajamos con un número reducido de socios. Esto no es un negocio de volumen. Cada empresa que tomamos recibe toda nuestra atención. El resultado no es optimización — es nuevo terreno.</p>
     </div>
   </div>
 </section>
@@ -204,28 +268,135 @@ footer{border-top:.5px solid var(--border)}
 <!-- PROCESS -->
 <section class="sec-process">
   <div class="content-wrap">
-    <div class="sec-tag reveal-up" data-i18n="process.tag">// Proceso</div>
+    <div class="sec-tag" data-i18n="process.tag">// Proceso</div>
     <div class="process-timeline">
-      <div class="pstep reveal-left reveal-delay-1">
+      <div class="pstep">
         <div class="pstep-n">01</div>
         <div class="pstep-t" data-i18n="process.s1t">Diagnóstico</div>
-        <div class="pstep-d" data-i18n="process.s1d">11 preguntas que mapean tus brechas operativas y tu preparación para IA.</div>
+        <div class="pstep-d" data-i18n="process.s1d">11 preguntas que mapean tus brechas operativas, cuantifican tu desperdicio y revelan oportunidades ocultas.</div>
       </div>
-      <div class="pstep reveal-right reveal-delay-2">
+      <div class="pstep">
         <div class="pstep-n">02</div>
-        <div class="pstep-t" data-i18n="process.s2t">Mapa de valor</div>
-        <div class="pstep-d" data-i18n="process.s2d">Calculamos exactamente cuánto tiempo y dinero estás perdiendo.</div>
+        <div class="pstep-t" data-i18n="process.s2t">Reporte</div>
+        <div class="pstep-d" data-i18n="process.s2d">Recibes un mapa detallado de tus pérdidas mensuales con soluciones específicas y ROI proyectado.</div>
       </div>
-      <div class="pstep reveal-left reveal-delay-3">
+      <div class="pstep">
         <div class="pstep-n">03</div>
-        <div class="pstep-t" data-i18n="process.s3t">Construir y desplegar</div>
-        <div class="pstep-d" data-i18n="process.s3d">IA personalizada: bots de WhatsApp, automatización, flujos inteligentes.</div>
+        <div class="pstep-t" data-i18n="process.s3t">Implementación</div>
+        <div class="pstep-d" data-i18n="process.s3d">Construimos e integramos los sistemas de IA que eliminan el desperdicio — permanentemente.</div>
       </div>
-      <div class="pstep reveal-right reveal-delay-4">
-        <div class="pstep-n">04</div>
-        <div class="pstep-t" data-i18n="process.s4t">Optimizar</div>
-        <div class="pstep-d" data-i18n="process.s4d">Iteración continua. El sistema aprende. Tu ventaja se multiplica.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="sec-proof fade-up">
+  <div class="content-wrap">
+    <div class="sec-tag" data-i18n="proof.tag">// Resultados de Nuestros Clientes</div>
+    <h2 style="font-size:clamp(26px,3.5vw,38px);margin-bottom:0" data-i18n="proof.title">Empresas que ya activaron su potencial.</h2>
+    <div class="proof-grid">
+      <div class="proof-card">
+        <div class="proof-card-tag" data-i18n="proof.c1.tag">PLATAFORMA DE CONTENIDO IA</div>
+        <div class="proof-card-name" data-i18n="proof.c1.name">endgame.ai</div>
+        <div class="proof-card-stat" data-i18n="proof.c1.stat">80%</div>
+        <div class="proof-card-statLabel" data-i18n="proof.c1.statLabel">de operaciones automatizadas</div>
+        <p class="proof-card-desc" data-i18n="proof.c1.desc">Automatizamos el 80% de las operaciones de contenido. Eliminamos las dos posiciones de mayor salario. Empresa valorada en $30M pre-seed, levantó $5M.</p>
       </div>
+      <div class="proof-card">
+        <div class="proof-card-tag" data-i18n="proof.c2.tag">GRUPO DE RESTAURANTES</div>
+        <div class="proof-card-stat" data-i18n="proof.c2.stat">32</div>
+        <div class="proof-card-statLabel" data-i18n="proof.c2.statLabel">hrs/semana recuperadas</div>
+        <p class="proof-card-desc" data-i18n="proof.c2.desc">Automatización de coordinación cocina-delivery y rastreo de inventario. Ahorro de ~$1,800/mes.</p>
+      </div>
+      <div class="proof-card">
+        <div class="proof-card-tag" data-i18n="proof.c3.tag">PRÁCTICA MÉDICA</div>
+        <div class="proof-card-stat" data-i18n="proof.c3.stat">45</div>
+        <div class="proof-card-statLabel" data-i18n="proof.c3.statLabel">hrs/semana recuperadas</div>
+        <p class="proof-card-desc" data-i18n="proof.c3.desc">Reemplazo de sistema manual de citas y seguimiento de seguros con sistemas de IA. Ahorro de ~$4,500/mes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="sec-about fade-up">
+  <div class="content-wrap">
+    <div class="sec-tag" data-i18n="about.tag">// Quiénes Somos</div>
+    <h2 style="font-size:clamp(26px,3.5vw,38px);margin-bottom:0" data-i18n="about.title">Conocimiento profundo. Presencia local.</h2>
+    <div class="about-content">
+      <div class="about-name" data-i18n="about.name">[FOUNDER NAME]</div>
+      <p class="about-bio" data-i18n="about.bio">[BIO — Experiencia en IA y automatización empresarial. Bilingüe. Basado en San Juan, Puerto Rico.]</p>
+      <div class="about-presence" data-i18n="about.presence">Basados en San Juan, PR. Bilingües. Enfocados exclusivamente en empresas puertorriqueñas.</div>
+    </div>
+  </div>
+</section>
+
+<!-- BUILT FOR PR -->
+<section class="sec-builtforpr fade-up">
+  <div class="content-wrap">
+    <div class="sec-tag" data-i18n="pr.tag">// Diseñado para Puerto Rico</div>
+    <h2 style="font-size:clamp(26px,3.5vw,38px);margin-bottom:0" data-i18n="pr.title">Entendemos el mercado porque somos parte de él.</h2>
+    <div class="pr-grid">
+      <div class="pr-card">
+        <div class="pr-card-title" data-i18n="pr.c1.title">Ventaja Act 60</div>
+        <p class="pr-card-desc" data-i18n="pr.c1.desc">Las empresas que llegan a PR bajo incentivos fiscales necesitan operaciones modernas desde el día uno. Les construimos la infraestructura digital que su negocio exige.</p>
+      </div>
+      <div class="pr-card">
+        <div class="pr-card-title" data-i18n="pr.c2.title">Post-huracán, post-excusas</div>
+        <p class="pr-card-desc" data-i18n="pr.c2.desc">María y Fiona demostraron que los negocios digitalizados sobreviven. Los que dependían de papel y procesos manuales cerraron. La próxima tormenta no es meteorológica — es competitiva.</p>
+      </div>
+      <div class="pr-card">
+        <div class="pr-card-title" data-i18n="pr.c3.title">Bilingüe por naturaleza</div>
+        <p class="pr-card-desc" data-i18n="pr.c3.desc">Puerto Rico opera en dos idiomas simultáneamente. Nuestros sistemas también. Servicio, automatización y reportes en español e inglés — sin traducciones torpes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CALCULATOR -->
+<section class="sec-calculator fade-up">
+  <div class="content-wrap" style="text-align:center">
+    <div class="sec-tag" data-i18n="calc.tag">// Calculadora de Desperdicio</div>
+    <h2 style="font-size:clamp(26px,3.5vw,38px);margin-bottom:8px" data-i18n="calc.title">¿Cuánto te cuestan tus procesos manuales?</h2>
+    <p style="color:var(--gray);font-size:16px" data-i18n="calc.sub">Tres preguntas. Resultado instantáneo.</p>
+    <div class="calc-form" style="text-align:left">
+      <div class="calc-field">
+        <label data-i18n="calc.industryLabel">¿En qué industria estás?</label>
+        <select id="calcIndustry">
+          <option value="restaurant" data-i18n="dx.industry.restaurant">Restaurantes y alimentación</option>
+          <option value="medical" data-i18n="dx.industry.medical">Clínica médica</option>
+          <option value="dental" data-i18n="dx.industry.dental">Clínica dental</option>
+          <option value="legal" data-i18n="dx.industry.legal">Servicios legales</option>
+          <option value="hotel" data-i18n="dx.industry.hotel">Hotelería y turismo</option>
+          <option value="retail" data-i18n="dx.industry.retail">Comercio minorista</option>
+          <option value="construction" data-i18n="dx.industry.construction">Construcción</option>
+          <option value="logistics" data-i18n="dx.industry.logistics">Logística y transporte</option>
+        </select>
+      </div>
+      <div class="calc-field">
+        <label data-i18n="calc.employeesLabel">¿Cuántos empleados?</label>
+        <div class="calc-cards" id="calcEmployees">
+          <div class="calc-card" data-val="3">1–5</div>
+          <div class="calc-card selected" data-val="8">6–15</div>
+          <div class="calc-card" data-val="25">16–50</div>
+          <div class="calc-card" data-val="75">50+</div>
+        </div>
+      </div>
+      <div class="calc-field">
+        <label data-i18n="calc.hoursLabel">Horas semanales en tareas manuales</label>
+        <div class="range-wrap">
+          <div class="range-val" id="calcHoursVal">20</div>
+          <input type="range" class="range-input" id="calcHours" min="5" max="80" value="20">
+          <div class="range-labels"><span>5 hrs</span><span>80 hrs</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="calc-result" id="calcResult">
+      <div class="calc-result-label" data-i18n="calc.resultLabel">Tu negocio está perdiendo aproximadamente</div>
+      <div class="calc-result-value" id="calcResultValue">$0</div>
+      <div class="calc-result-unit" data-i18n="calc.resultUnit">/mes</div>
+      <div class="calc-result-note" data-i18n="calc.resultNote">en productividad desperdiciada</div>
+      <a href="diagnostic.html" class="btn-primary" data-i18n-btn="calc.cta">Obtén tu diagnóstico completo &rarr;</a>
     </div>
   </div>
 </section>
@@ -233,7 +404,7 @@ footer{border-top:.5px solid var(--border)}
 <!-- TERMINAL -->
 <section class="sec-terminal">
   <div class="content-wrap">
-    <div class="term card-3d reveal-scale">
+    <div class="term">
       <div class="term-bar">
         <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
         <div class="term-title">ignea_diagnostic.sh</div>
@@ -244,11 +415,11 @@ footer{border-top:.5px solid var(--border)}
 </section>
 
 <!-- CTA -->
-<section class="sec-cta cursor-glow">
+<section class="sec-cta">
   <div class="content-wrap" style="text-align:center">
-    <div class="sec-tag reveal-blur" data-i18n="cta.tag">// ¿Listo?</div>
-    <h2 class="reveal-up" data-i18n="cta.headline">Descubre el potencial dormido en tu operación.</h2>
-    <a href="diagnostic.html" class="btn-primary" data-i18n-html="cta.btn">Iniciar Diagnóstico &rarr;</a>
+    <div class="sec-tag" data-i18n="cta.tag">// ¿Listo?</div>
+    <h2 data-i18n="cta.headline">¿Cuánto potencial dormido tiene tu negocio?</h2>
+    <a href="diagnostic.html" class="btn-primary" data-i18n-html="cta.btn">Toma el Diagnóstico Gratis &rarr;</a>
     <p class="cta-note" data-i18n="cta.note">Completamente encriptado. Resultados instantáneos.</p>
   </div>
 </section>
@@ -262,10 +433,11 @@ footer{border-top:.5px solid var(--border)}
       <div class="footer-brand">
         <div class="f-brand">IGNEA<span>.LABS</span></div>
         <div class="f-tag" data-i18n="footer.tag">Bajo la superficie, el potencial.</div>
+        <div style="font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;margin-top:6px" data-i18n="footer.address">San Juan, Puerto Rico</div>
       </div>
       <div class="footer-nav">
         <a href="index.html" data-i18n="nav.home">Inicio</a>
-        <a href="manifesto.html" data-i18n="nav.manifesto">Nuestra Tesis</a>
+        <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
         <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
         <a href="contact.html" data-i18n="nav.contact">Contacto</a>
       </div>
@@ -275,6 +447,7 @@ footer{border-top:.5px solid var(--border)}
     </div>
     <div class="footer-bottom">
       &copy; 2026 Ignea Labs. <span data-i18n="footer.rights">Todos los derechos reservados.</span>
+      <span style="margin-left:12px;opacity:.65" data-i18n="footer.serving">Orgullosamente sirviendo a Puerto Rico</span>
     </div>
   </div>
 </footer>
@@ -283,10 +456,9 @@ footer{border-top:.5px solid var(--border)}
 
 <!-- SCRIPTS -->
 <script src="js/i18n.js"></script>
+<script src="js/analytics.js"></script>
 <script src="js/grid-bg.js"></script>
 <script src="js/terminal.js"></script>
-<script src="js/scroll-animations.js"></script>
-<script src="js/card-tilt.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   IgneaTerminal.init();
@@ -303,8 +475,8 @@ document.addEventListener('DOMContentLoaded', function() {
     tick();
   }
   setTimeout(function() {
-    anim(document.getElementById('s1'), 92, '%', 1400);
-    anim(document.getElementById('s2'), 3.7, 'x', 1600);
+    anim(document.getElementById('s1'), 72, '%', 1400);
+    anim(document.getElementById('s2'), 32, '', 1600);
     anim(document.getElementById('s3'), 40, '%', 1300);
     anim(document.getElementById('s4'), 10, '', 1100);
   }, 800);
@@ -324,6 +496,67 @@ document.addEventListener('DOMContentLoaded', function() {
       menu.classList.remove('open');
       overlay.classList.remove('open');
     });
+  }
+
+  // Fade-up observer for new sections
+  var fadeBlocks = document.querySelectorAll('.fade-up');
+  if (fadeBlocks.length) {
+    var obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+    fadeBlocks.forEach(function(b) { obs.observe(b); });
+  }
+
+  // Calculator logic
+  var CALC_RATES = {
+    restaurant: 14, medical: 30, dental: 30, legal: 35,
+    hotel: 16, retail: 14, construction: 22, logistics: 18
+  };
+  var calcEmployees = 8;
+  var calcIndustry = document.getElementById('calcIndustry');
+  var calcHours = document.getElementById('calcHours');
+  var calcHoursVal = document.getElementById('calcHoursVal');
+  var calcResult = document.getElementById('calcResult');
+  var calcResultValue = document.getElementById('calcResultValue');
+
+  function updateCalc() {
+    var rate = CALC_RATES[calcIndustry.value] || 18;
+    var hours = parseInt(calcHours.value) || 20;
+    var monthly = Math.round(hours * rate * 4.33);
+    // Cap at 30% of estimated revenue
+    var estRevenue = calcEmployees * rate * 160;
+    var cap = Math.round(estRevenue * 0.3);
+    if (monthly > cap) monthly = cap;
+    // Hard cap for credibility
+    if (monthly > 8000) monthly = 8000;
+    calcResultValue.textContent = '$' + monthly.toLocaleString('en-US');
+    calcResult.classList.add('visible');
+    // Debounced analytics — fire once per 2s max
+    if (typeof IgneaAnalytics !== 'undefined' && !updateCalc._t) {
+      updateCalc._t = setTimeout(function() {
+        IgneaAnalytics.track('calculator_used', { industry: calcIndustry.value, hours: calcHours.value });
+        updateCalc._t = null;
+      }, 2000);
+    }
+  }
+
+  if (calcIndustry) {
+    calcIndustry.addEventListener('change', updateCalc);
+    calcHours.addEventListener('input', function() {
+      calcHoursVal.textContent = this.value;
+      updateCalc();
+    });
+    document.querySelectorAll('.calc-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        document.querySelectorAll('.calc-card').forEach(function(c) { c.classList.remove('selected'); });
+        this.classList.add('selected');
+        calcEmployees = parseInt(this.getAttribute('data-val')) || 8;
+        updateCalc();
+      });
+    });
+    updateCalc();
   }
 });
 </script>

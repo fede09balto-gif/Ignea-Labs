@@ -1,16 +1,20 @@
 /* ============================================================
-   IGNEA LABS — Diagnostic Survey v3.0
-   11 questions, dual-mode UX, 4 value streams.
-   Flow: Landing(0) → Info(1) → Q1-Q4(2-5) → Transition(6) →
-         Q5-Q11(7-13) → Processing(14)
+   IGNEA LABS — Diagnostic Survey v4.0
+   11 core questions + 3 industry-specific branching questions,
+   dual-mode UX, 4 value streams, real-time money leak counter.
+   Flow: Landing(0) → Info(1) → Q1-Q4(2-5) → [Ind1-Ind3(6-8)] →
+         Transition(6|9) → Q5-Q11(7-13|10-16) → Processing(14|17)
    ============================================================ */
 
 (function() {
   var currentScreen = 0;
   var totalQ = 11;
   var answers = {};
+  var industryInjected = false;
+  var selectedIndustry = '';
 
   // Screen sequence: goTo index → data-q on .q-screen
+  // Will be rebuilt dynamically when industry questions are injected
   var SEQ = [
     null,          // 0 = landing
     null,          // 1 = info
@@ -20,10 +24,144 @@
     null           // 14 = processing
   ];
 
+  var INDUSTRY_QUESTIONS = {
+    restaurant: [
+      { id: 'ind_restaurant_q1', type: 'single', textKey: 'dx.ind.restaurant.q1.text',
+        cards: [
+          { val: '0', labelKey: 'dx.ind.restaurant.q1.c1' },
+          { val: '1', labelKey: 'dx.ind.restaurant.q1.c2' },
+          { val: '2', labelKey: 'dx.ind.restaurant.q1.c3' },
+          { val: '3', labelKey: 'dx.ind.restaurant.q1.c4' }
+        ]},
+      { id: 'ind_restaurant_q2', type: 'multi', textKey: 'dx.ind.restaurant.q2.text',
+        cards: [
+          { val: 'orders_paper', labelKey: 'dx.ind.restaurant.q2.c1' },
+          { val: 'kitchen_verbal', labelKey: 'dx.ind.restaurant.q2.c2' },
+          { val: 'inventory_hand', labelKey: 'dx.ind.restaurant.q2.c3' },
+          { val: 'menu_manual', labelKey: 'dx.ind.restaurant.q2.c4' },
+          { val: 'delivery_phone', labelKey: 'dx.ind.restaurant.q2.c5' },
+          { val: 'tips_manual', labelKey: 'dx.ind.restaurant.q2.c6' }
+        ]},
+      { id: 'ind_restaurant_q3', type: 'slider', textKey: 'dx.ind.restaurant.q3.text',
+        sliderLabelKey: 'dx.ind.restaurant.q3.sliderLabel', min: 0, max: 100, step: 5, defaultVal: 30 }
+    ],
+    medical: [
+      { id: 'ind_medical_q1', type: 'single', textKey: 'dx.ind.medical.q1.text',
+        cards: [
+          { val: '0', labelKey: 'dx.ind.medical.q1.c1' },
+          { val: '1', labelKey: 'dx.ind.medical.q1.c2' },
+          { val: '2', labelKey: 'dx.ind.medical.q1.c3' },
+          { val: '3', labelKey: 'dx.ind.medical.q1.c4' }
+        ]},
+      { id: 'ind_medical_q2', type: 'multi', textKey: 'dx.ind.medical.q2.text',
+        cards: [
+          { val: 'intake_paper', labelKey: 'dx.ind.medical.q2.c1' },
+          { val: 'reminders_phone', labelKey: 'dx.ind.medical.q2.c2' },
+          { val: 'insurance_manual', labelKey: 'dx.ind.medical.q2.c3' },
+          { val: 'labs_manual', labelKey: 'dx.ind.medical.q2.c4' },
+          { val: 'prescriptions_manual', labelKey: 'dx.ind.medical.q2.c5' },
+          { val: 'records_paper', labelKey: 'dx.ind.medical.q2.c6' }
+        ]},
+      { id: 'ind_medical_q3', type: 'slider', textKey: 'dx.ind.medical.q3.text',
+        sliderLabelKey: 'dx.ind.medical.q3.sliderLabel', min: 0, max: 30, step: 1, defaultVal: 5 }
+    ],
+    legal: [
+      { id: 'ind_legal_q1', type: 'single', textKey: 'dx.ind.legal.q1.text',
+        cards: [
+          { val: '0', labelKey: 'dx.ind.legal.q1.c1' },
+          { val: '1', labelKey: 'dx.ind.legal.q1.c2' },
+          { val: '2', labelKey: 'dx.ind.legal.q1.c3' },
+          { val: '3', labelKey: 'dx.ind.legal.q1.c4' }
+        ]},
+      { id: 'ind_legal_q2', type: 'multi', textKey: 'dx.ind.legal.q2.text',
+        cards: [
+          { val: 'intake_conflicts', labelKey: 'dx.ind.legal.q2.c1' },
+          { val: 'drafting_scratch', labelKey: 'dx.ind.legal.q2.c2' },
+          { val: 'deadlines_manual', labelKey: 'dx.ind.legal.q2.c3' },
+          { val: 'invoices_manual', labelKey: 'dx.ind.legal.q2.c4' },
+          { val: 'files_paper', labelKey: 'dx.ind.legal.q2.c5' },
+          { val: 'comms_tracking', labelKey: 'dx.ind.legal.q2.c6' }
+        ]},
+      { id: 'ind_legal_q3', type: 'slider', textKey: 'dx.ind.legal.q3.text',
+        sliderLabelKey: 'dx.ind.legal.q3.sliderLabel', min: 0, max: 100, step: 5, defaultVal: 40 }
+    ],
+    logistics: [
+      { id: 'ind_logistics_q1', type: 'single', textKey: 'dx.ind.logistics.q1.text',
+        cards: [
+          { val: '0', labelKey: 'dx.ind.logistics.q1.c1' },
+          { val: '1', labelKey: 'dx.ind.logistics.q1.c2' },
+          { val: '2', labelKey: 'dx.ind.logistics.q1.c3' },
+          { val: '3', labelKey: 'dx.ind.logistics.q1.c4' }
+        ]},
+      { id: 'ind_logistics_q2', type: 'multi', textKey: 'dx.ind.logistics.q2.text',
+        cards: [
+          { val: 'routes_manual', labelKey: 'dx.ind.logistics.q2.c1' },
+          { val: 'delivery_confirm_phone', labelKey: 'dx.ind.logistics.q2.c2' },
+          { val: 'warehouse_manual', labelKey: 'dx.ind.logistics.q2.c3' },
+          { val: 'notifications_manual', labelKey: 'dx.ind.logistics.q2.c4' },
+          { val: 'driver_scheduling', labelKey: 'dx.ind.logistics.q2.c5' },
+          { val: 'fuel_manual', labelKey: 'dx.ind.logistics.q2.c6' }
+        ]},
+      { id: 'ind_logistics_q3', type: 'slider', textKey: 'dx.ind.logistics.q3.text',
+        sliderLabelKey: 'dx.ind.logistics.q3.sliderLabel', min: 0, max: 50, step: 1, defaultVal: 5 }
+    ],
+    construction: [
+      { id: 'ind_construction_q1', type: 'single', textKey: 'dx.ind.construction.q1.text',
+        cards: [
+          { val: '0', labelKey: 'dx.ind.construction.q1.c1' },
+          { val: '1', labelKey: 'dx.ind.construction.q1.c2' },
+          { val: '2', labelKey: 'dx.ind.construction.q1.c3' },
+          { val: '3', labelKey: 'dx.ind.construction.q1.c4' }
+        ]},
+      { id: 'ind_construction_q2', type: 'multi', textKey: 'dx.ind.construction.q2.text',
+        cards: [
+          { val: 'materials_phone', labelKey: 'dx.ind.construction.q2.c1' },
+          { val: 'progress_paper', labelKey: 'dx.ind.construction.q2.c2' },
+          { val: 'safety_manual', labelKey: 'dx.ind.construction.q2.c3' },
+          { val: 'subs_whatsapp', labelKey: 'dx.ind.construction.q2.c4' },
+          { val: 'budget_spreadsheet', labelKey: 'dx.ind.construction.q2.c5' },
+          { val: 'permits_manual', labelKey: 'dx.ind.construction.q2.c6' }
+        ]},
+      { id: 'ind_construction_q3', type: 'slider', textKey: 'dx.ind.construction.q3.text',
+        sliderLabelKey: 'dx.ind.construction.q3.sliderLabel', min: 0, max: 100, step: 5, defaultVal: 60 }
+    ],
+    retail: [
+      { id: 'ind_retail_q1', type: 'single', textKey: 'dx.ind.retail.q1.text',
+        cards: [
+          { val: '0', labelKey: 'dx.ind.retail.q1.c1' },
+          { val: '1', labelKey: 'dx.ind.retail.q1.c2' },
+          { val: '2', labelKey: 'dx.ind.retail.q1.c3' },
+          { val: '3', labelKey: 'dx.ind.retail.q1.c4' }
+        ]},
+      { id: 'ind_retail_q2', type: 'multi', textKey: 'dx.ind.retail.q2.text',
+        cards: [
+          { val: 'prices_manual', labelKey: 'dx.ind.retail.q2.c1' },
+          { val: 'reorder_gut', labelKey: 'dx.ind.retail.q2.c2' },
+          { val: 'loyalty_manual', labelKey: 'dx.ind.retail.q2.c3' },
+          { val: 'reports_manual', labelKey: 'dx.ind.retail.q2.c4' },
+          { val: 'supplier_whatsapp', labelKey: 'dx.ind.retail.q2.c5' },
+          { val: 'scheduling_manual', labelKey: 'dx.ind.retail.q2.c6' }
+        ]},
+      { id: 'ind_retail_q3', type: 'slider', textKey: 'dx.ind.retail.q3.text',
+        sliderLabelKey: 'dx.ind.retail.q3.sliderLabel', min: 0, max: 100, step: 5, defaultVal: 20 }
+    ]
+  };
+
+  var LEAK_RATES = {
+    restaurant: 14, medical: 30, dental: 30, legal: 35,
+    hotel: 16, retail: 14, construction: 22, logistics: 18,
+    accounting: 22, realestate: 20, agriculture: 14, education: 16, other: 18
+  };
+
+  var leakAnimFrame = null;
+  var leakCurrentVal = 0;
+
   function screenToQNum(idx) {
-    if (idx >= 2 && idx <= 5) return idx - 1;
-    if (idx >= 7 && idx <= 13) return idx - 2;
-    return 0;
+    var count = 0;
+    for (var i = 2; i <= idx; i++) {
+      if (SEQ[i] && SEQ[i] !== 'transition') count++;
+    }
+    return count;
   }
 
   var landingScreen, infoScreen, processingScreen, transitionScreen;
@@ -43,12 +181,23 @@
 
     // Landing start
     var startBtn = document.getElementById('landingStartBtn');
-    if (startBtn) startBtn.addEventListener('click', function() { goTo(1); });
+    if (startBtn) startBtn.addEventListener('click', function() {
+      if (typeof IgneaAnalytics !== 'undefined') IgneaAnalytics.track('diagnostic_started');
+      goTo(1);
+    });
 
     // Info next/prev
     var infoNext = document.getElementById('infoNextBtn');
     if (infoNext) infoNext.addEventListener('click', function() {
-      if (validateInfo()) goTo(2);
+      if (validateInfo()) {
+        var ind = (document.getElementById('dxIndustry') || {}).value || '';
+        if (typeof IgneaAnalytics !== 'undefined') {
+          IgneaAnalytics.track('diagnostic_info_completed', { industry: ind });
+          IgneaAnalytics.track('diagnostic_industry_selected', { industry: ind });
+        }
+        injectIndustryScreens(ind);
+        goTo(2);
+      }
     });
     var infoPrev = document.querySelector('#infoScreen .btn-prev');
     if (infoPrev) infoPrev.addEventListener('click', function() { goTo(0); });
@@ -116,9 +265,11 @@
     // Next buttons
     document.querySelectorAll('.q-screen .btn-next').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        if (currentScreen === 13) {
+        if (currentScreen === SEQ.length - 2) {
+          if (typeof IgneaAnalytics !== 'undefined') IgneaAnalytics.track('diagnostic_completed');
           submitDiag();
         } else {
+          if (typeof IgneaAnalytics !== 'undefined') IgneaAnalytics.track('diagnostic_q' + currentScreen + '_completed');
           goTo(currentScreen + 1);
         }
       });
@@ -133,7 +284,7 @@
 
     // Enter to advance
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && currentScreen >= 2 && currentScreen <= 13) {
+      if (e.key === 'Enter' && currentScreen >= 2 && currentScreen < SEQ.length - 1) {
         var nextBtn = document.querySelector('.q-wrap.active .btn-next');
         if (nextBtn && !nextBtn.disabled) nextBtn.click();
       }
@@ -156,6 +307,252 @@
     }
   }
 
+  /* ---- Industry branching ---- */
+
+  function injectIndustryScreens(industry) {
+    // If previously injected, remove old screens first
+    if (industryInjected) {
+      removeIndustryScreens();
+    }
+
+    // If industry not in INDUSTRY_QUESTIONS, keep original SEQ and return
+    if (!INDUSTRY_QUESTIONS[industry]) {
+      SEQ = [null, null, '1','2','3','4', 'transition', '5','6','7','8','9','10','11', null];
+      totalQ = 11;
+      industryInjected = false;
+      selectedIndustry = '';
+      return;
+    }
+
+    var indQuestions = INDUSTRY_QUESTIONS[industry];
+    var transEl = document.querySelector('.q-screen[data-q="transition"]');
+    if (!transEl) return;
+
+    var lang = typeof IgneaI18n !== 'undefined' ? IgneaI18n.getLang() : 'es';
+
+    // Build 3 industry screen elements
+    for (var qi = 0; qi < indQuestions.length; qi++) {
+      var q = indQuestions[qi];
+      var dqAttr = 'ind' + (qi + 1);
+      var screenDiv = document.createElement('div');
+      screenDiv.className = 'q-wrap q-screen';
+      screenDiv.setAttribute('data-q', dqAttr);
+
+      var counterNum = qi + 5; // Q1-Q4 are 1-4, industry starts at 5
+      var html = '<div class="q-counter">' + (counterNum < 10 ? '0' : '') + counterNum + ' / 14</div>';
+      html += '<div class="q-text" data-i18n="' + q.textKey + '">' + (typeof IgneaI18n !== 'undefined' ? IgneaI18n.t(q.textKey) : '') + '</div>';
+
+      if (q.type === 'single') {
+        html += '<div class="q-cards" data-q="' + q.id + '" data-type="single">';
+        for (var ci = 0; ci < q.cards.length; ci++) {
+          html += '<div class="q-card" data-val="' + q.cards[ci].val + '">';
+          html += '<span class="q-card-check"></span>';
+          html += '<span data-i18n="' + q.cards[ci].labelKey + '">' + (typeof IgneaI18n !== 'undefined' ? IgneaI18n.t(q.cards[ci].labelKey) : '') + '</span>';
+          html += '</div>';
+        }
+        html += '</div>';
+      } else if (q.type === 'multi') {
+        html += '<div class="q-cards" data-q="' + q.id + '" data-type="multi">';
+        for (var ci2 = 0; ci2 < q.cards.length; ci2++) {
+          html += '<div class="q-card" data-val="' + q.cards[ci2].val + '">';
+          html += '<span class="q-card-check"></span>';
+          html += '<span data-i18n="' + q.cards[ci2].labelKey + '">' + (typeof IgneaI18n !== 'undefined' ? IgneaI18n.t(q.cards[ci2].labelKey) : '') + '</span>';
+          html += '</div>';
+        }
+        html += '</div>';
+      } else if (q.type === 'slider') {
+        html += '<div class="q-slider-wrap">';
+        html += '<div class="q-slider-label" data-i18n="' + q.sliderLabelKey + '">' + (typeof IgneaI18n !== 'undefined' ? IgneaI18n.t(q.sliderLabelKey) : '') + '</div>';
+        html += '<div class="q-slider-val" id="indSliderVal">' + q.defaultVal + '</div>';
+        html += '<input type="range" class="q-slider" id="indSlider" min="' + q.min + '" max="' + q.max + '" step="' + q.step + '" value="' + q.defaultVal + '">';
+        html += '</div>';
+      }
+
+      // Nav buttons
+      html += '<div class="q-nav">';
+      html += '<button class="btn-ghost btn-prev" data-i18n-btn="q.back">' + (typeof IgneaI18n !== 'undefined' ? IgneaI18n.t('q.back') : '&larr; Anterior') + '</button>';
+      if (q.type === 'slider') {
+        html += '<button class="btn-primary btn-next" data-i18n-btn="q.next">' + (typeof IgneaI18n !== 'undefined' ? IgneaI18n.t('q.next') : 'Siguiente &rarr;') + '</button>';
+      } else {
+        html += '<button class="btn-primary btn-next" disabled data-i18n-btn="q.next">' + (typeof IgneaI18n !== 'undefined' ? IgneaI18n.t('q.next') : 'Siguiente &rarr;') + '</button>';
+      }
+      html += '</div>';
+
+      screenDiv.innerHTML = html;
+      transEl.parentNode.insertBefore(screenDiv, transEl);
+    }
+
+    // Rebuild SEQ
+    SEQ = [null, null, '1','2','3','4', 'ind1','ind2','ind3', 'transition', '5','6','7','8','9','10','11', null];
+    totalQ = 14;
+
+    // Store default slider answer
+    var sliderQ = indQuestions[2];
+    if (sliderQ && sliderQ.type === 'slider') {
+      answers[sliderQ.id] = sliderQ.defaultVal;
+    }
+
+    // Bind event handlers on new elements
+    bindIndustryHandlers(industry);
+
+    // Re-apply translations
+    if (typeof IgneaI18n !== 'undefined') {
+      IgneaI18n.setLang(IgneaI18n.getLang());
+    }
+
+    industryInjected = true;
+    selectedIndustry = industry;
+  }
+
+  function removeIndustryScreens() {
+    var indScreens = document.querySelectorAll('.q-screen[data-q="ind1"], .q-screen[data-q="ind2"], .q-screen[data-q="ind3"]');
+    for (var i = 0; i < indScreens.length; i++) {
+      indScreens[i].parentNode.removeChild(indScreens[i]);
+    }
+    // Remove industry answers
+    if (selectedIndustry && INDUSTRY_QUESTIONS[selectedIndustry]) {
+      var indQ = INDUSTRY_QUESTIONS[selectedIndustry];
+      for (var j = 0; j < indQ.length; j++) {
+        delete answers[indQ[j].id];
+      }
+    }
+    SEQ = [null, null, '1','2','3','4', 'transition', '5','6','7','8','9','10','11', null];
+    totalQ = 11;
+    industryInjected = false;
+    selectedIndustry = '';
+  }
+
+  function bindIndustryHandlers(industry) {
+    var indQuestions = INDUSTRY_QUESTIONS[industry];
+    if (!indQuestions) return;
+
+    // Bind single-select card handlers on injected screens
+    var indScreens = document.querySelectorAll('.q-screen[data-q="ind1"], .q-screen[data-q="ind2"], .q-screen[data-q="ind3"]');
+
+    indScreens.forEach(function(screen) {
+      // Single-select cards
+      screen.querySelectorAll('.q-cards[data-type="single"] .q-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var group = this.closest('.q-cards');
+          group.querySelectorAll('.q-card').forEach(function(c) { c.classList.remove('selected'); });
+          this.classList.add('selected');
+          var qKey = group.getAttribute('data-q');
+          answers[qKey] = this.getAttribute('data-val');
+          saveProgress();
+          updateNav();
+        });
+      });
+
+      // Multi-select cards
+      screen.querySelectorAll('.q-cards[data-type="multi"] .q-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          this.classList.toggle('selected');
+          var group = this.closest('.q-cards');
+          var qKey = group.getAttribute('data-q');
+          var selected = [];
+          group.querySelectorAll('.q-card.selected').forEach(function(c) {
+            selected.push(c.getAttribute('data-val'));
+          });
+          answers[qKey] = selected;
+          saveProgress();
+          updateNav();
+        });
+      });
+
+      // Next buttons
+      screen.querySelectorAll('.btn-next').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          if (typeof IgneaAnalytics !== 'undefined') IgneaAnalytics.track('diagnostic_industry_branch_completed', { industry: selectedIndustry });
+          if (currentScreen === SEQ.length - 2) {
+            submitDiag();
+          } else {
+            goTo(currentScreen + 1);
+          }
+        });
+      });
+
+      // Prev buttons
+      screen.querySelectorAll('.btn-prev').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          goTo(currentScreen - 1);
+        });
+      });
+    });
+
+    // Bind slider handler
+    var indSlider = document.getElementById('indSlider');
+    var indSliderVal = document.getElementById('indSliderVal');
+    if (indSlider) {
+      var sliderQ = indQuestions[2];
+      indSlider.addEventListener('input', function() {
+        var v = parseInt(this.value);
+        answers[sliderQ.id] = v;
+        if (indSliderVal) indSliderVal.textContent = v;
+        saveProgress();
+        updateNav();
+      });
+    }
+  }
+
+  /* ---- Money Leak Counter ---- */
+
+  function updateMoneyLeak() {
+    var el = document.getElementById('moneyLeak');
+    var valEl = document.getElementById('moneyLeakVal');
+    if (!el || !valEl) return;
+
+    var industry = (document.getElementById('dxIndustry') || {}).value || 'other';
+    var rate = LEAK_RATES[industry] || 18;
+    var hours = answers.q2_slider || 0;
+    var leak = hours * rate * 4.33;
+
+    var q3val = answers.q3_card !== undefined ? parseInt(answers.q3_card) : -1;
+    if (q3val >= 0 && q3val <= 4) leak += [0, 200, 600, 1200, 2000][q3val];
+
+    var q8val = answers.q8_card !== undefined ? parseInt(answers.q8_card) : -1;
+    if (q8val >= 0 && q8val <= 4) leak += [0, 400, 1200, 2400, 3200][q8val];
+
+    var q5cards = answers.q5_cards || [];
+    var manualCount = q5cards.filter(function(c) { return c !== 'all_automated'; }).length;
+    leak += manualCount * 300;
+
+    // 30% revenue cap
+    var size = (document.getElementById('dxSize') || {}).value || '1-5';
+    var employees = { '1-5': 3, '6-15': 10, '16-50': 30, '50+': 75 }[size] || 10;
+    var estRevenue = employees * rate * 160;
+    var cap = estRevenue * 0.3;
+    if (leak > cap) leak = cap;
+    leak = Math.round(leak);
+
+    if (leak > 0 && currentScreen >= 2 && currentScreen < SEQ.length - 1) {
+      el.classList.add('visible');
+      animateLeakValue(valEl, leak);
+    } else {
+      el.classList.remove('visible');
+    }
+  }
+
+  function animateLeakValue(el, target) {
+    if (leakAnimFrame) cancelAnimationFrame(leakAnimFrame);
+    var start = leakCurrentVal;
+    var diff = target - start;
+    if (diff === 0) return;
+    var duration = 400;
+    var startTime = null;
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = Math.min((ts - startTime) / duration, 1);
+      var eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+      var current = Math.round(start + diff * eased);
+      el.textContent = '$' + current.toLocaleString('en-US');
+      leakCurrentVal = current;
+      if (progress < 1) {
+        leakAnimFrame = requestAnimationFrame(step);
+      }
+    }
+    leakAnimFrame = requestAnimationFrame(step);
+  }
+
   /* ---- Navigation ---- */
 
   function goTo(n) {
@@ -175,15 +572,16 @@
       if (progWrap) progWrap.style.visibility = 'visible';
       if (progBar) progBar.style.width = '0%';
       if (progText) progText.textContent = '0 / ' + totalQ;
-    } else if (n === 6) {
+    } else if (SEQ[n] === 'transition') {
       if (transitionScreen) transitionScreen.classList.add('active');
       if (progWrap) progWrap.style.visibility = 'visible';
-      if (progBar) progBar.style.width = Math.round((4 / totalQ) * 100) + '%';
-      if (progText) progText.textContent = '4 / ' + totalQ;
-    } else if (n === 14) {
+      var transQNum = screenToQNum(n);
+      if (progBar) progBar.style.width = Math.round((transQNum / totalQ) * 100) + '%';
+      if (progText) progText.textContent = transQNum + ' / ' + totalQ;
+    } else if (n === SEQ.length - 1) {
       if (processingScreen) processingScreen.classList.add('active');
       if (progBar) progBar.style.width = '100%';
-    } else if (n >= 2 && n <= 13) {
+    } else if (n >= 2 && n < SEQ.length - 1) {
       var dq = SEQ[n];
       var target = document.querySelector('.q-screen[data-q="' + dq + '"]');
       if (target) target.classList.add('active');
@@ -196,6 +594,7 @@
     renderStepProgress(n);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     updateNav();
+    updateMoneyLeak();
   }
 
   function renderStepProgress(n) {
@@ -209,8 +608,8 @@
     }
 
     var qNum = screenToQNum(n);
-    if (n === 6) qNum = 4;
-    if (n === 14) qNum = totalQ;
+    if (SEQ[n] === 'transition') qNum = screenToQNum(n);
+    if (n === SEQ.length - 1) qNum = totalQ;
 
     if (qNum > 0 && qNum <= totalQ && stepEl) {
       stepEl.style.display = 'flex';
@@ -229,7 +628,7 @@
 
     if (topBar) topBar.style.width = Math.round((qNum / totalQ) * 100) + '%';
 
-    if (n === 14 && stepEl) stepEl.style.display = 'none';
+    if (n === SEQ.length - 1 && stepEl) stepEl.style.display = 'none';
   }
 
   /* ---- Validation ---- */
@@ -252,9 +651,9 @@
     var nextBtn = active.querySelector('.btn-next');
     if (!nextBtn) return;
 
-    if (currentScreen === 6) { nextBtn.disabled = false; return; }
+    if (SEQ[currentScreen] === 'transition') { nextBtn.disabled = false; return; }
 
-    if (currentScreen >= 2 && currentScreen <= 13) {
+    if (currentScreen >= 2 && currentScreen < SEQ.length - 1) {
       nextBtn.disabled = !isAnswered(currentScreen);
     }
   }
@@ -262,6 +661,18 @@
   function isAnswered(screenIdx) {
     var dq = SEQ[screenIdx];
     if (!dq || dq === 'transition') return true;
+
+    // Industry screens
+    if (dq.indexOf('ind') === 0) {
+      var qIdx = parseInt(dq.replace('ind', '')) - 1; // 0, 1, 2
+      var indQ = INDUSTRY_QUESTIONS[selectedIndustry] ? INDUSTRY_QUESTIONS[selectedIndustry][qIdx] : null;
+      if (!indQ) return true;
+      var ansKey = indQ.id;
+      if (indQ.type === 'single') return answers[ansKey] !== undefined;
+      if (indQ.type === 'multi') return answers[ansKey] && answers[ansKey].length > 0;
+      if (indQ.type === 'slider') return true; // sliders always have a value
+      return true;
+    }
 
     // Check for any content: text, cards, or card
     var textKey = 'q' + dq + '_text';
@@ -285,6 +696,7 @@
 
   function saveProgress() {
     sessionStorage.setItem('ignea_diagnostic_answers', JSON.stringify(answers));
+    updateMoneyLeak();
   }
 
   function restoreProgress() {
@@ -339,6 +751,21 @@
     }
   }
 
+  /* ---- Post-Diagnostic Edge Function Trigger ---- */
+
+  function triggerPostDiagnostic(diagnosticId) {
+    var edgeFnUrl = (typeof IgneaSupabase !== 'undefined' && IgneaSupabase.edgeFnUrl)
+      ? IgneaSupabase.edgeFnUrl : null;
+    if (!edgeFnUrl) return;
+    try {
+      fetch(edgeFnUrl + '/on-diagnostic-complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ diagnostic_id: diagnosticId })
+      });
+    } catch (e) { /* fire and forget */ }
+  }
+
   /* ---- Submit ---- */
 
   function submitDiag() {
@@ -388,31 +815,54 @@
       }));
     }
 
-    // Supabase
+    // Supabase — write to diagnostics table
     if (typeof IgneaSupabase !== 'undefined' && IgneaSupabase.client) {
       try {
         var sd = JSON.parse(sessionStorage.getItem('ignea_diagnostic_scores'));
-        IgneaSupabase.client.from('leads').insert([{
-          first_name: contact.first_name, last_name: contact.last_name,
-          email: contact.email, phone: contact.phone,
-          company_name: contact.company, position: contact.position,
-          industry: contact.industry, company_size: contact.size,
-          company_website: contact.website, company_linkedin: contact.linkedin,
-          diagnostic_answers: answers, total_score: sd.total,
-          score_breakdown: sd.streams, score_level: sd.level,
-          recommendations: sd.recommendations, roi_estimate: sd.roi,
-          pipeline_stage: 'new', priority: 'medium'
-        }]).then(function() {
-          if (typeof IgneaSheetsSync !== 'undefined') IgneaSheetsSync.sync(contact);
+        var diagLang = localStorage.getItem('ignea_lang') || 'es';
+
+        IgneaSupabase.client.from('diagnostics').insert([{
+          language: diagLang,
+          contact_name: (contact.first_name + ' ' + (contact.last_name || '')).trim(),
+          contact_email: contact.email,
+          contact_phone: contact.phone,
+          company_name: contact.company,
+          industry: contact.industry,
+          company_size: contact.size,
+          answers_json: answers,
+          scores_json: sd.streams || sd.scores,
+          total_score: sd.total,
+          level: sd.level,
+          roi_json: sd.roi
+        }]).then(function(res) {
+          // Store diagnostic ID for AI insights polling on results page
+          if (res.data && res.data[0] && res.data[0].id) {
+            sessionStorage.setItem('ignea_diagnostic_id', res.data[0].id);
+            triggerPostDiagnostic(res.data[0].id);
+          }
+          // Google Sheets sync (best-effort)
+          if (typeof IgneaSheetsSync !== 'undefined') {
+            IgneaSheetsSync.sync({
+              first_name: contact.first_name,
+              last_name: contact.last_name,
+              email: contact.email,
+              phone: contact.phone,
+              company_name: contact.company,
+              industry: contact.industry,
+              company_size: contact.size,
+              total_score: sd.total,
+              score_level: sd.level
+            });
+          }
         });
-      } catch (e) {}
+      } catch (e) { /* silent — sessionStorage is fallback */ }
     }
 
     showProcessing();
   }
 
   function showProcessing() {
-    goTo(14);
+    goTo(SEQ.length - 1);
     var msgs = document.querySelectorAll('.proc-msg');
     var delay = 0;
     msgs.forEach(function(msg) {
