@@ -127,7 +127,7 @@ All CSS custom properties match the design system exactly:
 | manifesto.html | 85 | `// Manifiesto` (sec-tag without data-i18n) | **HIGH** — won't translate to `// Manifesto` |
 | contact.html | 109 | `// Contacto` (sec-tag without data-i18n) | **HIGH** — won't translate to `// Contact` |
 | contact.html | 139 | `// Enviar mensaje` (form-tag without data-i18n) | **HIGH** — won't translate to `// Send message` |
-| contact.html | 120 | `+505 0000 0000` (WhatsApp number) | LOW — phone numbers stay same |
+| contact.html | 120 | `+1 787 000 0000` (WhatsApp number) | LOW — phone numbers stay same |
 | diagnostic.html | 111 | `0 / 11` (progress text) | LOW — dynamically updated by JS |
 | results.html | 181 | `downloadPDF()` button uses `data-i18n` not `data-i18n-btn` | ⚠ — `textContent` used instead of `innerHTML`, but no HTML entities in this string, so it works |
 
@@ -205,7 +205,7 @@ All CSS custom properties match the design system exactly:
 - **None found** ✓
 
 ### Hardcoded URLs
-- `https://wa.me/5050000000` in `contact.html:120,129` — **placeholder phone number** (0000 0000). This needs a real number before launch.
+- `https://wa.me/17870000000` in `contact.html:120,129` — **placeholder phone number** (000 0000). This needs a real number before launch.
 - `https://ignealabs.com/` canonical URLs — fine if this is the planned domain.
 
 ### Meta Tags

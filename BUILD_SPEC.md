@@ -16,7 +16,7 @@
 
 ## 1. PROJECT OVERVIEW
 
-Ignea Labs is a website + web app for an AI solutions company in Nicaragua. The site has two jobs:
+Ignea Labs is a website + web app for an AI solutions company in Puerto Rico. The site has two jobs:
 1. **Marketing**: Convince business owners they need AI (homepage, manifesto)
 2. **Conversion**: Get them to take the diagnostic and see their results (diagnostic, results)
 
@@ -43,7 +43,7 @@ Same across all pages.
 
 ```
 IGNEA.LABS                                    Inicio | Manifiesto | Diagnóstico | hola@ignealabs.com
-Cerrando la brecha de IA en Centroamérica.
+Cerrando la brecha de IA en Puerto Rico.
                                            © 2026 Ignea Labs. Todos los derechos reservados.
 ```
 
@@ -307,13 +307,13 @@ Full-width editorial layout. Long-form text with dramatic spacing. No sidebar, n
 ```
 MANIFIESTO
 
-Centroamerica construyo puentes entre dos mundos. El proximo puente es digital.
+Puerto Rico se forjó con fuego. El próximo terreno es digital.
 
-Las empresas que mueven la economia de Nicaragua estan rodeadas de oceanos de datos que no pueden ver, sistemas que no se comunican entre si, y departamentos que operan en aislamiento — mientras sus lideres toman decisiones por instinto porque la informacion que necesitan esta atrapada en algun lugar que no pueden alcanzar.
+Las empresas que mueven la economia de Puerto Rico estan rodeadas de oceanos de datos que no pueden ver, sistemas que no se comunican entre si, y departamentos que operan en aislamiento — mientras sus lideres toman decisiones por instinto porque la informacion que necesitan esta atrapada en algun lugar que no pueden alcanzar.
 
 Restaurantes que atienden turistas de todo el mundo siguen coordinando por WhatsApp. Clinicas que manejan cientos de pacientes agendan en cuadernos. Hoteles que compiten con Airbnb no tienen presencia digital mas alla de una pagina de Facebook abandonada.
 
-La inteligencia para cambiar todo esto ya existe. La tecnologia esta lista. Lo que ha faltado es alguien dispuesto a construir la conexion entre lo que la IA puede hacer y lo que los negocios centroamericanos realmente necesitan.
+La inteligencia para cambiar todo esto ya existe. La tecnologia esta lista. Lo que ha faltado es alguien dispuesto a construir la conexion entre lo que la IA puede hacer y lo que los negocios puertorriqueños realmente necesitan.
 
 Eso es Ignea.
 
@@ -323,7 +323,7 @@ Trabajamos con un numero reducido de socios. No porque no podamos escalar, sino 
 
 Nos llamamos Ignea porque la transformación, como el fuego, se propaga. Cada automatización enciende la siguiente. Cada insight agudiza el que sigue. La brecha entre tu negocio y tu competencia se amplia silenciosamente, y luego de golpe.
 
-La proxima generacion de lideres empresariales en Centroamerica se definira por una sola decision. No que mercado entraron. No que producto lanzaron. Si adoptaron IA antes que su competencia o pasaron anos viendo como la brecha se ampliaba desde el lado equivocado.
+La proxima generacion de lideres empresariales en Puerto Rico se definira por una sola decision. No que mercado entraron. No que producto lanzaron. Si adoptaron IA antes que su competencia o pasaron anos viendo como la brecha se ampliaba desde el lado equivocado.
 
 No vendemos IA. Construimos infraestructura.
 ```
@@ -333,13 +333,13 @@ No vendemos IA. Construimos infraestructura.
 ```
 MANIFESTO
 
-Central America built bridges between two worlds. The next bridge is digital.
+Puerto Rico was forged by fire. The next ground is digital.
 
-The enterprises that power Nicaragua's economy are surrounded by oceans of data they cannot see, systems that don't speak to each other, and departments operating in isolation — while their leaders make decisions on instinct because the information they need is trapped somewhere they cannot reach.
+The enterprises that power Puerto Rico's economy are surrounded by oceans of data they cannot see, systems that don't speak to each other, and departments operating in isolation — while their leaders make decisions on instinct because the information they need is trapped somewhere they cannot reach.
 
 Restaurants serving tourists from around the world still coordinate by WhatsApp. Clinics managing hundreds of patients schedule in notebooks. Hotels competing with Airbnb have no digital presence beyond an abandoned Facebook page.
 
-The intelligence to change all of this already exists. The technology is ready. What's been missing is someone willing to build the connection between what AI can do and what Central American businesses actually need.
+The intelligence to change all of this already exists. The technology is ready. What's been missing is someone willing to build the connection between what AI can do and what Puerto Rico businesses actually need.
 
 That is Ignea.
 
@@ -349,7 +349,7 @@ We work with a small number of partners. Not because we can't scale, but because
 
 We named ourselves Ignea because transformation, like fire, spreads. Every automation ignites the next. Every insight sharpens the one that follows. The gap between your business and your competition widens quietly, then all at once.
 
-The next generation of business leaders in Central America will be defined by a single decision. Not which market they entered. Not which product they launched. Whether they embraced AI before their competitors or spent years watching the gap widen from the wrong side.
+The next generation of business leaders in Puerto Rico will be defined by a single decision. Not which market they entered. Not which product they launched. Whether they embraced AI before their competitors or spent years watching the gap widen from the wrong side.
 
 We don't sell AI. We build infrastructure.
 ```

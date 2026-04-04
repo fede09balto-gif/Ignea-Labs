@@ -1,95 +1,126 @@
 -- ============================================================
--- IGNEA LABS — Supabase Database Schema
+-- IGNEA LABS — Supabase Database Schema (v2)
+-- 4 normalized tables: diagnostics, contacts, solutions, engagements
 -- Run this in the Supabase SQL Editor to set up all tables.
 -- ============================================================
 
--- Ops Users (admin/partner credentials)
-CREATE TABLE ops_users (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
-  role TEXT NOT NULL CHECK (role IN ('admin', 'partner')),
-  permissions TEXT[] DEFAULT '{"read"}',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  last_login TIMESTAMPTZ
-);
+-- Drop old tables if migrating from v1
+DROP TABLE IF EXISTS pricing_calculations CASCADE;
+DROP TABLE IF EXISTS lead_activity CASCADE;
+DROP TABLE IF EXISTS leads CASCADE;
+DROP TABLE IF EXISTS ops_users CASCADE;
+DROP TABLE IF EXISTS engagements CASCADE;
+DROP TABLE IF EXISTS diagnostics CASCADE;
+DROP TABLE IF EXISTS contacts CASCADE;
+DROP TABLE IF EXISTS solutions CASCADE;
 
--- Leads (every diagnostic submission)
-CREATE TABLE leads (
+-- ============================================================
+-- 1. DIAGNOSTICS — every diagnostic submission
+-- ============================================================
+CREATE TABLE diagnostics (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  first_name TEXT NOT NULL,
-  last_name TEXT,
-  email TEXT NOT NULL,
-  phone TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  language TEXT DEFAULT 'es' CHECK (language IN ('es', 'en')),
+  contact_name TEXT NOT NULL,
+  contact_email TEXT NOT NULL,
+  contact_phone TEXT,
+  contact_whatsapp TEXT,
   company_name TEXT NOT NULL,
-  position TEXT,
   industry TEXT,
   company_size TEXT,
-  company_website TEXT,
-  company_linkedin TEXT,
-  annual_revenue TEXT,
-  diagnostic_answers JSONB,
+  answers_json JSONB NOT NULL,
+  scores_json JSONB,
   total_score INTEGER,
-  score_breakdown JSONB,
-  score_level TEXT CHECK (score_level IN ('critical', 'developing', 'competent', 'advanced')),
-  recommendations JSONB,
-  roi_estimate JSONB,
-  pipeline_stage TEXT DEFAULT 'new' CHECK (pipeline_stage IN ('new', 'contacted', 'meeting_scheduled', 'proposal_sent', 'negotiating', 'closed_won', 'closed_lost', 'on_hold')),
-  assigned_to UUID REFERENCES ops_users(id),
-  priority TEXT DEFAULT 'medium' CHECK (priority IN ('hot', 'high', 'medium', 'low')),
-  deal_value DECIMAL(10,2),
-  scraper_data JSONB,
-  scraper_ran_at TIMESTAMPTZ,
-  notes TEXT,
+  level TEXT CHECK (level IN ('critical', 'developing', 'competent', 'advanced')),
+  roi_json JSONB,
+  ai_analysis JSONB,
+  status TEXT DEFAULT 'new' CHECK (status IN ('new', 'analyzed', 'contacted', 'closed'))
+);
+
+CREATE INDEX idx_diag_created ON diagnostics(created_at DESC);
+CREATE INDEX idx_diag_status ON diagnostics(status);
+CREATE INDEX idx_diag_email ON diagnostics(contact_email);
+
+-- ============================================================
+-- 2. CONTACTS — contact form submissions
+-- ============================================================
+CREATE TABLE contacts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  whatsapp TEXT,
+  company TEXT,
+  message TEXT,
+  source TEXT DEFAULT 'contact_form' CHECK (source IN ('contact_form', 'diagnostic', 'manual'))
+);
+
+CREATE INDEX idx_contacts_created ON contacts(created_at DESC);
+
+-- ============================================================
+-- 3. SOLUTIONS — seed data for industry-specific recommendations
+-- ============================================================
+CREATE TABLE solutions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  industry TEXT NOT NULL,
+  stream TEXT NOT NULL CHECK (stream IN ('customerFlow', 'operationsFlow', 'informationFlow', 'growthFlow')),
+  name_es TEXT NOT NULL,
+  name_en TEXT NOT NULL,
+  description_es TEXT NOT NULL,
+  description_en TEXT NOT NULL,
+  implementation_time TEXT,
+  savings_pct DECIMAL(4,2),
+  priority INTEGER DEFAULT 0,
+  active BOOLEAN DEFAULT true
+);
+
+CREATE INDEX idx_solutions_industry ON solutions(industry, stream);
+
+-- ============================================================
+-- 4. ENGAGEMENTS — CRM pipeline tracking
+-- ============================================================
+CREATE TABLE engagements (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  diagnostic_id UUID REFERENCES diagnostics(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  contacted_at TIMESTAMPTZ,
-  closed_at TIMESTAMPTZ
+  pipeline_stage TEXT DEFAULT 'new' CHECK (pipeline_stage IN ('new', 'contacted', 'meeting_scheduled', 'proposal_sent', 'negotiating', 'closed_won', 'closed_lost')),
+  assigned_to TEXT,
+  deal_value DECIMAL(10,2),
+  notes TEXT,
+  next_action TEXT,
+  next_action_date DATE
 );
 
-CREATE INDEX idx_leads_pipeline ON leads(pipeline_stage);
-CREATE INDEX idx_leads_priority ON leads(priority);
-CREATE INDEX idx_leads_created ON leads(created_at DESC);
+CREATE INDEX idx_engage_stage ON engagements(pipeline_stage);
+CREATE INDEX idx_engage_diag ON engagements(diagnostic_id);
 
--- Lead Activity Log
-CREATE TABLE lead_activity (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  lead_id UUID REFERENCES leads(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES ops_users(id),
-  action TEXT NOT NULL,
-  details TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- ============================================================
+-- ROW LEVEL SECURITY
+-- ============================================================
 
-CREATE INDEX idx_activity_lead ON lead_activity(lead_id, created_at DESC);
+-- Diagnostics: anon can INSERT (lead capture), service_role has full access
+ALTER TABLE diagnostics ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "anon_insert_diagnostics" ON diagnostics
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "service_full_diagnostics" ON diagnostics
+  FOR ALL USING (auth.role() = 'service_role');
 
--- Pricing Calculations
-CREATE TABLE pricing_calculations (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  lead_id UUID REFERENCES leads(id) ON DELETE CASCADE,
-  calculated_by UUID REFERENCES ops_users(id),
-  team_size INTEGER,
-  hours_on_inquiries INTEGER,
-  hourly_cost DECIMAL(6,2),
-  revenue_bracket TEXT,
-  monthly_savings DECIMAL(10,2),
-  recommended_price DECIMAL(10,2),
-  payback_months DECIMAL(4,1),
-  roi_12_months DECIMAL(6,2),
-  capture_rate DECIMAL(4,2) DEFAULT 0.35,
-  solutions JSONB,
-  status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'sent', 'accepted', 'rejected')),
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- Contacts: anon can INSERT (contact form), service_role has full access
+ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "anon_insert_contacts" ON contacts
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "service_full_contacts" ON contacts
+  FOR ALL USING (auth.role() = 'service_role');
 
--- Row Level Security
-ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
-ALTER TABLE lead_activity ENABLE ROW LEVEL SECURITY;
-ALTER TABLE pricing_calculations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ops_users ENABLE ROW LEVEL SECURITY;
+-- Solutions: anon can SELECT (read recommendations), service_role has full access
+ALTER TABLE solutions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "anon_read_solutions" ON solutions
+  FOR SELECT USING (true);
+CREATE POLICY "service_full_solutions" ON solutions
+  FOR ALL USING (auth.role() = 'service_role');
 
-CREATE POLICY "ops_full_access" ON leads FOR ALL USING (true);
-CREATE POLICY "ops_full_access" ON lead_activity FOR ALL USING (true);
-CREATE POLICY "ops_full_access" ON pricing_calculations FOR ALL USING (true);
-CREATE POLICY "ops_read_self" ON ops_users FOR SELECT USING (true);
+-- Engagements: service_role only (internal CRM, no public access)
+ALTER TABLE engagements ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "service_full_engagements" ON engagements
+  FOR ALL USING (auth.role() = 'service_role');

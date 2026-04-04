@@ -146,12 +146,12 @@ var IgneaScoring = (function() {
 
   function calculateROI(answers, formData) {
     var teamSizes = [3, 10, 30, 75];
-    var hourlyCosts = [1.5, 2.5, 4, 6, 10, 3];
+    var hourlyCosts = [12, 15, 22, 30, 40, 18];
 
     var sizeIdx = formData.size_index || 0;
     var revIdx = formData.revenue_index || 5;
     var teamSize = teamSizes[sizeIdx] || 10;
-    var hourlyCost = hourlyCosts[revIdx] || 3;
+    var hourlyCost = hourlyCosts[revIdx] || 18;
 
     var weeklyWasted = answers.q2_slider || 20;
     var monthlyWasted = weeklyWasted * 4;
@@ -159,8 +159,8 @@ var IgneaScoring = (function() {
 
     var q3val = answers.q3_card !== undefined ? parseInt(answers.q3_card) : 0;
     var q8val = answers.q8_card !== undefined ? parseInt(answers.q8_card) : 0;
-    var responseCost = [0, 50, 150, 300, 500][q3val] || 0;
-    var leakageCost = [0, 100, 300, 600, 800][q8val] || 0;
+    var responseCost = [0, 300, 900, 2000, 3500][q3val] || 0;
+    var leakageCost = [0, 600, 2000, 4000, 6000][q8val] || 0;
 
     var totalMonthlyCost = (monthlyWasted * hourlyCost) + responseCost + leakageCost;
     var recInvestment = Math.round(totalMonthlyCost * 4 * 0.35);

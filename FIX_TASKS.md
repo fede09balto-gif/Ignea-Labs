@@ -31,7 +31,7 @@
 
 ## 4. [HIGH] Placeholder WhatsApp number in contact page
 - **File:** `contact.html`, lines 120, 129
-- **Problem:** WhatsApp links use `+505 0000 0000` and `wa.me/5050000000` — these are placeholder numbers that won't work for real users.
+- **Problem:** WhatsApp links use `+1 787 000 0000` and `wa.me/17870000000` — these are placeholder numbers that won't work for real users.
 - **Fix:** Replace with actual Ignea Labs WhatsApp number before launch.
 - **Effort:** Quick fix (needs business info)
 

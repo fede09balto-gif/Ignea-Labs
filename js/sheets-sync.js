@@ -14,18 +14,14 @@ var IgneaSheetsSync = (function() {
 
     var row = {
       timestamp: new Date().toISOString(),
-      name: (leadData.first_name || '') + ' ' + (leadData.last_name || ''),
+      name: ((leadData.first_name || '') + ' ' + (leadData.last_name || '')).trim(),
       email: leadData.email || '',
       phone: leadData.phone || '',
       company: leadData.company_name || '',
       industry: leadData.industry || '',
       size: leadData.company_size || '',
-      website: leadData.company_website || '',
-      revenue: leadData.annual_revenue || '',
       score: leadData.total_score || '',
-      level: leadData.score_level || '',
-      stage: leadData.pipeline_stage || 'new',
-      deal_value: leadData.deal_value || ''
+      level: leadData.score_level || ''
     };
 
     try {

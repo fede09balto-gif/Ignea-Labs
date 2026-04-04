@@ -13,13 +13,13 @@ var OpsCalculator = (function() {
   /* ---- Helpers ---- */
 
   function getHourlyCost(revenueIndex) {
-    return [1.5, 2.5, 4, 6, 10, 3][revenueIndex] || 3;
+    return [12, 15, 22, 30, 40, 18][revenueIndex] || 18;
   }
 
   var teamSizes = [3, 10, 30, 75];
 
   function fmt(n) {
-    return Number(n).toLocaleString('es-NI');
+    return Number(n).toLocaleString('es-PR');
   }
 
   function formatMoney(n) {

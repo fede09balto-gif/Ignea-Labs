@@ -5,8 +5,12 @@
    ============================================================ */
 
 var IgneaSupabase = (function() {
-  var URL = 'https://uqupiesctjvosvszovuq.supabase.co/rest/v1';
-  var KEY = 'sb_publishable_wUXzJhf8mERI7m9hL4Th6g_GpWvSEMP';
+  // --- REPLACE WITH YOUR REAL SUPABASE VALUES ---
+  var PROJECT_URL = 'https://YOUR_PROJECT_ID.supabase.co';
+  var URL = PROJECT_URL + '/rest/v1';
+  var KEY = 'YOUR_ANON_KEY';  // eyJ... format from Supabase Dashboard > Settings > API
+  var EDGE_FN_URL = PROJECT_URL + '/functions/v1';
+  // -----------------------------------------------
 
   var headers = {
     'apikey': KEY,
@@ -143,6 +147,7 @@ var IgneaSupabase = (function() {
 
   return {
     client: client,
+    edgeFnUrl: EDGE_FN_URL,
     init: function() {}
   };
 })();

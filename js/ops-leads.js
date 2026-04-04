@@ -924,7 +924,7 @@ var OpsLeads = (function() {
     y += 5;
     doc.setFontSize(9);
     doc.setTextColor(120);
-    doc.text(new Date().toLocaleDateString(lang === 'es' ? 'es-NI' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }), 20, y);
+    doc.text(new Date().toLocaleDateString(lang === 'es' ? 'es-PR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }), 20, y);
 
     // Score
     y += 16;

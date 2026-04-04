@@ -57,7 +57,7 @@ var OpsScraper = (function() {
     if (nameEl) nameEl.value = lead.company_name || '';
 
     var locEl = document.getElementById('scraperLocation');
-    if (locEl) locEl.value = lead.location || lead.city || 'Managua, Nicaragua';
+    if (locEl) locEl.value = lead.location || lead.city || 'San Juan, Puerto Rico';
 
     var selEl = document.getElementById('scraperLeadSelect');
     if (selEl) selEl.value = lead.id;

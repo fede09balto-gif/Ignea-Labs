@@ -189,24 +189,15 @@
 
   // Animation
   var running = true;
-  var frame = 0;
 
   function loop() {
     if (!running) return;
-
-    // Mobile: skip every other frame
-    frame++;
-    if (w < 768 && frame % 2 !== 0) {
-      requestAnimationFrame(loop);
-      return;
-    }
-
     draw();
     requestAnimationFrame(loop);
   }
 
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    draw();
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || w < 768) {
+    draw(); // Single static frame — no drift on mobile
   } else {
     loop();
   }
