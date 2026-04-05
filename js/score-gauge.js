@@ -17,9 +17,9 @@ function createScoreGauge(container, score, max) {
   } else if (score <= 50) {
     colors = ['#F0997B', '#EF9F27'];
   } else if (score <= 75) {
-    colors = ['#5DCAA5', '#00E5BF'];
+    colors = ['#F07A3A', '#E5531A'];
   } else {
-    colors = ['#00E5BF', '#00B89A'];
+    colors = ['#E5531A', '#CC3A0D'];
   }
 
   var gradId = 'gauge-grad-' + Math.random().toString(36).substr(2, 6);

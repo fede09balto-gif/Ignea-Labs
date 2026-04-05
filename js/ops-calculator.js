@@ -247,10 +247,10 @@ var OpsCalculator = (function() {
     var colors = {
       critical:   'var(--coral, #F0997B)',
       developing: 'var(--purple, #AFA9EC)',
-      competent:  'var(--accent, #00E5BF)',
-      advanced:   'var(--accent, #00E5BF)'
+      competent:  'var(--accent, #E5531A)',
+      advanced:   'var(--accent, #E5531A)'
     };
-    return colors[level] || 'var(--accent, #00E5BF)';
+    return colors[level] || 'var(--accent, #E5531A)';
   }
 
   function renderScoreSection(scoreResult) {
@@ -339,9 +339,9 @@ var OpsCalculator = (function() {
       '<div class="calc-card-header">' + (t('ops.calc.card.savings') || 'AHORRO PARA EL CLIENTE') + '</div>' +
       rowsHtml +
       '<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;' +
-        'margin-top:4px;border-top:2px solid var(--accent,#00E5BF)">' +
+        'margin-top:4px;border-top:2px solid var(--accent,#E5531A)">' +
         '<div style="font-size:14px;font-weight:700;color:var(--white,#EAEAF0)">Total Ahorro Mensual</div>' +
-        '<div style="font-size:20px;font-weight:800;color:var(--accent,#00E5BF)">' +
+        '<div style="font-size:20px;font-weight:800;color:var(--accent,#E5531A)">' +
           formatMoney(roi.totalMonthlySavings) + '/mes' +
         '</div>' +
       '</div>';
@@ -360,7 +360,7 @@ var OpsCalculator = (function() {
       {
         label: 'ROI a 12 meses',
         value: formatPercent(roi.roi12),
-        color: 'var(--accent,#00E5BF)'
+        color: 'var(--accent,#E5531A)'
       },
       {
         label: 'Cliente conserva',
@@ -384,7 +384,7 @@ var OpsCalculator = (function() {
     el.innerHTML =
       '<div class="calc-card-header">' + (t('ops.calc.card.pricing') || 'PRECIO RECOMENDADO') + '</div>' +
       '<div style="text-align:center;margin-bottom:8px">' +
-        '<div style="font-size:42px;font-weight:800;color:var(--accent,#00E5BF);line-height:1">' +
+        '<div style="font-size:42px;font-weight:800;color:var(--accent,#E5531A);line-height:1">' +
           formatMoney(roi.recommendedPrice) +
         '</div>' +
         '<div style="font-family:var(--fm);font-size:12px;color:var(--gray,#6E6E88);margin-top:8px">' +
@@ -420,7 +420,7 @@ var OpsCalculator = (function() {
           '</span>' +
         '</div>' +
         '<div style="display:flex;align-items:center">' +
-          '<div style="width:' + valuePct + '%;height:28px;background:var(--accent,#00E5BF);border-radius:0;' +
+          '<div style="width:' + valuePct + '%;height:28px;background:var(--accent,#E5531A);border-radius:0;' +
             'min-width:60px;transition:width .3s ease"></div>' +
           '<span style="font-size:13px;color:var(--gray,#6E6E88);margin-left:10px;white-space:nowrap">' +
             'Valor a 12 meses ' + formatMoney(value12m) +
@@ -429,7 +429,7 @@ var OpsCalculator = (function() {
       '</div>' +
       '<div style="text-align:center;padding:12px 0;border-top:0.5px solid var(--border,#1A1A2A)">' +
         '<span style="font-size:13px;color:var(--gray,#6E6E88)">Por cada $1 invertido, el cliente recibe </span>' +
-        '<span style="font-size:22px;font-weight:800;color:var(--accent,#00E5BF)">$' + ratio + '</span>' +
+        '<span style="font-size:22px;font-weight:800;color:var(--accent,#E5531A)">$' + ratio + '</span>' +
       '</div>';
   }
 

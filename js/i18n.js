@@ -19,8 +19,8 @@ var IgneaI18n = (function() {
 
       // ---- HOMEPAGE: HERO ----
       "hero.tag": "// Infraestructura de IA para Puerto Rico",
-      "hero.title": 'Tu negocio pierde miles cada mes en procesos manuales. Nosotros los encontramos, los eliminamos, y te mostramos el <em>ROI.</em>',
-      "hero.sub": "Diagnóstico gratuito de IA que mapea tu desperdicio operacional y lo convierte en ahorros proyectados — en menos de 15 minutos.",
+      "hero.title": 'Tu negocio pierde <em class=\"red\">dinero</em> cada mes.<br>Encontramos las brechas, las cerramos,<br>y te mostramos el <em>ROI.</em>',
+      "hero.sub": "Toma un diagnóstico gratis.<br>Analizamos las operaciones de tu negocio, completamos un informe de consultoría, y construimos software que le ahorra a tu empresa tiempo, energía y dinero.",
       "hero.cta1": "Toma el Diagnóstico Gratis &rarr;",
       "hero.cta2": "Leer Manifiesto",
 
@@ -883,8 +883,8 @@ var IgneaI18n = (function() {
 
       // ---- HOMEPAGE: HERO ----
       "hero.tag": "// AI infrastructure for Puerto Rico",
-      "hero.title": 'Your business loses thousands every month to manual processes. We find them, eliminate them, and show you the <em>ROI.</em>',
-      "hero.sub": "Free AI diagnostic that maps your operational waste and converts it into projected savings — in under 15 minutes.",
+      "hero.title": 'Your business loses <em class=\"red\">money</em> every month.<br>We find the gaps, fill them,<br>and show you the <em>ROI.</em>',
+      "hero.sub": "Take a free diagnostic.<br>We analyze your business operations, complete a consulting report, and build software that saves your business wasted time, energy, and money.",
       "hero.cta1": "Take the Free Diagnostic &rarr;",
       "hero.cta2": "Read Manifesto",
 

@@ -22,9 +22,9 @@
 - Background primary: `#0A0A0F`
 - Background surface 1: `#141419`
 - Background surface 2: `#1C1C24`
-- Accent: `#00E5BF`
-- Accent transparent: `#00E5BF22`
-- Accent subtle glow: `#00E5BF0A`
+- Accent: `#E5531A` (fiery orange-red)
+- Accent transparent: `#E5531A22`
+- Accent subtle glow: `#E5531A0A`
 - Text primary: `rgba(255,255,255,0.9)`
 - Text secondary: `rgba(255,255,255,0.65)`
 - Text dim: `rgba(255,255,255,0.4)`
@@ -55,7 +55,7 @@
 - All tap targets: minimum 48px on mobile.
 
 ## Logo
-- Text: "IGNEA" in white (#EAEAF0), ".LABS" in accent (#00E5BF)
+- Text: "IGNEA" in white (#EAEAF0), ".LABS" in accent (#E5531A)
 - Letter spacing: 3px, Weight: 800
 - Logo is text-only: "IGNEA.LABS" — no mark/circle
 
@@ -115,9 +115,9 @@
 --bg: #0A0A0F
 --bg2: #141419
 --bg3: #1C1C24
---accent: #00E5BF
---accent2: #00E5BF22
---accent3: #00E5BF0A
+--accent: #E5531A
+--accent2: #E5531A22
+--accent3: #E5531A0A
 --white: rgba(255,255,255,0.9)
 --gray: rgba(255,255,255,0.65)
 --dimgray: rgba(255,255,255,0.4)

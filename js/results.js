@@ -241,8 +241,8 @@
     var colors;
     if (score <= 25) colors = ['#F0997B', '#E85D30'];
     else if (score <= 50) colors = ['#EF9F27', '#F0997B'];
-    else if (score <= 75) colors = ['#5DCAA5', '#00E5BF'];
-    else colors = ['#00E5BF', '#00B89A'];
+    else if (score <= 75) colors = ['#F07A3A', '#E5531A'];
+    else colors = ['#E5531A', '#CC3A0D'];
 
     var radius = 45;
     var circumference = 2 * Math.PI * radius;

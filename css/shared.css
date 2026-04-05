@@ -9,9 +9,9 @@
   --bg:#0A0A0F;
   --bg2:#141419;
   --bg3:#1C1C24;
-  --accent:#00E5BF;
-  --accent2:#00E5BF22;
-  --accent3:#00E5BF0A;
+  --accent:#E5531A;
+  --accent2:#E5531A22;
+  --accent3:#E5531A0A;
   --white:rgba(255,255,255,0.9);
   --gray:rgba(255,255,255,0.65);
   --dimgray:rgba(255,255,255,0.4);
@@ -174,9 +174,9 @@ footer{border-top:1px solid var(--border);padding:80px 40px}
 /* ---- GRADIENT BORDER BUTTON ---- */
 @property --gradient-angle{syntax:'<angle>';initial-value:0deg;inherits:false}
 .btn-gradient{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:16px 32px;font-family:var(--ff);font-weight:600;font-size:18px;color:var(--bg);background:var(--accent);border:none;cursor:pointer;overflow:hidden;z-index:1;text-decoration:none;transition:all .2s ease;min-height:48px}
-.btn-gradient::before{content:'';position:absolute;inset:0;background:linear-gradient(var(--gradient-angle,0deg),#00E5BF,#00B89A,#00E5BF,#5DCAA5);z-index:-1;animation:rotateGradient 4s linear infinite}
+.btn-gradient::before{content:'';position:absolute;inset:0;background:linear-gradient(var(--gradient-angle,0deg),#E5531A,#CC3A0D,#E5531A,#F07A3A);z-index:-1;animation:rotateGradient 4s linear infinite}
 @keyframes rotateGradient{0%{--gradient-angle:0deg}100%{--gradient-angle:360deg}}
-@supports not (background:paint(something)){.btn-gradient::before{background:linear-gradient(135deg,#00E5BF,#00B89A,#5DCAA5)}}
+@supports not (background:paint(something)){.btn-gradient::before{background:linear-gradient(135deg,#E5531A,#CC3A0D,#F07A3A)}}
 .btn-gradient:hover{filter:brightness(1.1);transform:translateY(-1px)}
 .btn-gradient:disabled{opacity:.3;cursor:not-allowed;transform:none;filter:none}
 

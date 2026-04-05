@@ -385,10 +385,10 @@
   transition: all .2s;
 }
 
-.pipe-count--closed_won  { background: #00E5BF22; color: var(--accent); }
+.pipe-count--closed_won  { background: #E5531A22; color: var(--accent); }
 .pipe-count--closed_lost { background: #F0997B22; color: var(--coral); }
 .pipe-count--negotiating { background: #AFA9EC22; color: var(--purple); }
-.pipe-count--meeting_scheduled { background: #00E5BF11; color: var(--accent); }
+.pipe-count--meeting_scheduled { background: #E5531A11; color: var(--accent); }
 
 .pipe-col-body {
   flex: 1;
@@ -693,10 +693,10 @@
 
 .stage-pill--new              { background: #4A4A5C22; color: var(--gray); border: .5px solid var(--dimgray); }
 .stage-pill--contacted        { background: #AFA9EC22; color: var(--purple); border: .5px solid var(--purple); }
-.stage-pill--meeting_scheduled{ background: #00E5BF11; color: var(--accent); border: .5px solid var(--accent2); }
-.stage-pill--proposal_sent    { background: #00E5BF22; color: var(--accent); border: .5px solid var(--accent); }
+.stage-pill--meeting_scheduled{ background: #E5531A11; color: var(--accent); border: .5px solid var(--accent2); }
+.stage-pill--proposal_sent    { background: #E5531A22; color: var(--accent); border: .5px solid var(--accent); }
 .stage-pill--negotiating      { background: #F0997B22; color: var(--coral); border: .5px solid var(--coral); }
-.stage-pill--closed_won       { background: #00E5BF33; color: var(--accent); border: .5px solid var(--accent); }
+.stage-pill--closed_won       { background: #E5531A33; color: var(--accent); border: .5px solid var(--accent); }
 .stage-pill--closed_lost      { background: #F0997B22; color: var(--coral); border: .5px solid var(--coral); opacity: .6; }
 .stage-pill--on_hold          { background: #4A4A5C22; color: var(--dimgray); border: .5px solid var(--dimgray); }
 
@@ -738,7 +738,7 @@
   border-radius: 4px;
 }
 
-.score-badge--high   { background: #00E5BF22; color: var(--accent); }
+.score-badge--high   { background: #E5531A22; color: var(--accent); }
 .score-badge--medium { background: #AFA9EC22; color: var(--purple); }
 .score-badge--low    { background: #F0997B22; color: var(--coral); }
 

@@ -53,8 +53,8 @@
 
 .score-level-badge.critical   { color: var(--coral); border-color: rgba(229,99,75,0.2); }
 .score-level-badge.developing { color: #EF9F27; border-color: rgba(239,159,39,0.2); }
-.score-level-badge.competent  { color: var(--accent); border-color: rgba(0,229,191,0.2); }
-.score-level-badge.advanced   { color: #00B89A; border-color: rgba(0,184,154,0.2); }
+.score-level-badge.competent  { color: var(--accent); border-color: rgba(229,83,26,0.2); }
+.score-level-badge.advanced   { color: #F07A3A; border-color: rgba(240,122,58,0.2); }
 
 /* ============================================
    2. DIMENSION PROGRESS BARS
