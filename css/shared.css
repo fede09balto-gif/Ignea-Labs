@@ -49,9 +49,14 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 
 /* ---- NAVIGATION ---- */
 nav{display:flex;justify-content:space-between;align-items:center;padding:18px 40px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(10,10,12,0.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+/* Logo — ONE definition, used everywhere */
+.logo{text-decoration:none;display:inline-flex;align-items:baseline;font-family:var(--ff);font-weight:700;font-size:18px;letter-spacing:0.12em}
+.logo-name{color:var(--white)}
+.logo-suffix{color:#00E5BF}
+/* Legacy compat */
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-.brand-name{font-family:var(--fs);font-weight:400;font-size:1.2rem;letter-spacing:0.02em;color:var(--white)}
-.brand-name span,.brand-accent{color:var(--accent)}
+.brand-name{font-family:var(--ff);font-weight:700;font-size:18px;letter-spacing:0.12em;color:var(--white)}
+.brand-name span,.brand-accent{color:#00E5BF}
 
 .nav-right{display:flex;align-items:center;gap:28px}
 .nav-links{display:flex;gap:28px;list-style:none;align-items:center}
