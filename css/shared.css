@@ -282,7 +282,7 @@ footer{border-top:1px solid var(--border);padding:80px 40px}
 
 /* ============================================================
    IGNEA LABS — Growth UI Additions
-   Stats row, marquee, industry tabs, manifesto quote,
+   Stats row, marquee, industry tabs, thesis quote,
    WhatsApp float, demo banner, Calendly section
    ============================================================ */
 
@@ -314,7 +314,7 @@ footer{border-top:1px solid var(--border);padding:80px 40px}
 .marquee-inner:hover{animation-play-state:paused}
 @keyframes marqueeScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .marquee-card{display:flex;flex-direction:column;gap:4px;background:var(--bg2);border:1px solid var(--border);padding:16px 24px;white-space:nowrap;min-width:220px}
-.mq-industry{font-size:13px;color:var(--gray)}
+.mq-industry{font-family:var(--fm);font-size:13px;color:var(--dimgray);text-transform:uppercase;letter-spacing:0.08em}
 .mq-result{font-size:16px;font-weight:600;color:var(--white)}
 
 /* ---- INDUSTRY TABS ---- */
@@ -332,7 +332,7 @@ footer{border-top:1px solid var(--border);padding:80px 40px}
 .ind-roi p{color:var(--white);font-weight:500}
 @media(max-width:768px){.ind-grid{grid-template-columns:1fr}}
 
-/* ---- MANIFESTO QUOTE ---- */
+/* ---- THESIS QUOTE ---- */
 .sec-mq{padding:80px 0;text-align:center}
 .mq-body{max-width:600px;margin:0 auto}
 .mq-l1{font-family:var(--fs);font-size:clamp(36px,5vw,64px);font-weight:400;color:var(--dimgray);line-height:1.1;margin:0}
