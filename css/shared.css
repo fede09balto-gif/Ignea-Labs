@@ -52,11 +52,11 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:18px 4
 /* Logo — ONE definition, used everywhere */
 .logo{text-decoration:none;display:inline-flex;align-items:baseline;font-family:var(--ff);font-weight:700;font-size:18px;letter-spacing:0.12em}
 .logo-name{color:var(--white)}
-.logo-suffix{color:#00E5BF}
+.logo-suffix{color:var(--accent)}
 /* Legacy compat */
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
 .brand-name{font-family:var(--ff);font-weight:700;font-size:18px;letter-spacing:0.12em;color:var(--white)}
-.brand-name span,.brand-accent{color:#00E5BF}
+.brand-name span,.brand-accent{color:var(--accent)}
 
 .nav-right{display:flex;align-items:center;gap:28px}
 .nav-links{display:flex;gap:28px;list-style:none;align-items:center}
