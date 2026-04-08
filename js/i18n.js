@@ -12,7 +12,7 @@ var IgneaI18n = (function() {
     es: {
       // ---- NAV ----
       "nav.home": "Inicio",
-      "nav.manifesto": "Manifiesto",
+      "nav.manifesto": "Nuestra Tesis",
       "nav.diagnostic": "Diagnóstico",
       "nav.start": "Empieza Aquí",
       "nav.contact": "Contacto",
@@ -24,7 +24,7 @@ var IgneaI18n = (function() {
       "hero.headline2pre": "negocio puede",
       "hero.headline2suf": "con IA.",
       "hero.cta1": "Agenda tu Llamada Gratis &rarr;",
-      "hero.cta2": "Leer Manifiesto",
+      "hero.cta2": "Leer Nuestra Tesis",
 
       // ---- HOMEPAGE: STATS ----
       "stats.s1": "de PYMEs en PR usan procesos manuales",
@@ -78,7 +78,7 @@ var IgneaI18n = (function() {
       // ---- HOMEPAGE: MANIFESTO QUOTE ----
       "mq.line1": "No vendemos IA.",
       "mq.line2": "Construimos infraestructura.",
-      "mq.link": "Leer el Manifiesto \u2192",
+      "mq.link": "Leer Nuestra Tesis \u2192",
 
       // ---- CONTACT: CALENDLY ----
       "ct.cal.title": "Habla con nosotros directamente",
@@ -704,7 +704,7 @@ var IgneaI18n = (function() {
       "res.sol.growth.retail.desc": "Tienda en línea integrada con inventario, campañas automatizadas basadas en comportamiento de compra y programa de fidelización para escalar ventas.",
 
       // ---- MANIFESTO ----
-      "man.tag": "// Manifiesto",
+      "man.tag": "// Nuestra Tesis",
       "man.title": 'Puerto Rico se forjó con fuego. El próximo terreno es <em>digital.</em>',
       "man.p1": "Puerto Rico nació del fuego volcánico. El Yunque, Toro Negro, las montañas que cruzan la isla — cada una se formó a través del mismo proceso: presión desde abajo, calor aplicado a materia prima, nuevo terreno emergiendo donde antes no había nada.",
       "man.p2": "Ignea Labs toma su nombre de ese proceso. Ígnea — nacida del fuego. La roca ígnea se forma cuando el magma atrapado bajo la superficie encuentra su camino hacia arriba y se transforma en terreno sólido. Eso es exactamente lo que hacemos.",
@@ -998,7 +998,7 @@ var IgneaI18n = (function() {
     en: {
       // ---- NAV ----
       "nav.home": "Home",
-      "nav.manifesto": "Manifesto",
+      "nav.manifesto": "Our Thesis",
       "nav.diagnostic": "Diagnostic",
       "nav.start": "Start Here",
       "nav.contact": "Contact",
@@ -1073,7 +1073,7 @@ var IgneaI18n = (function() {
       "hero.headline2pre": "business can",
       "hero.headline2suf": "with AI.",
       "hero.cta1": "Book Your Free Call &rarr;",
-      "hero.cta2": "Read Manifesto",
+      "hero.cta2": "Read Our Thesis",
 
       // ---- HOMEPAGE: STATS ----
       "stats.s1": "of PR SMBs still run on manual processes",
@@ -1127,7 +1127,7 @@ var IgneaI18n = (function() {
       // ---- HOMEPAGE: MANIFESTO QUOTE ----
       "mq.line1": "We don't sell AI.",
       "mq.line2": "We build infrastructure.",
-      "mq.link": "Read the Manifesto \u2192",
+      "mq.link": "Read Our Thesis \u2192",
 
       // ---- CONTACT: CALENDLY ----
       "ct.cal.title": "Talk to us directly",
@@ -1689,7 +1689,7 @@ var IgneaI18n = (function() {
       "res.sol.growth.retail.desc": "Online store integrated with inventory, behavior-based automated campaigns, and loyalty program to scale sales.",
 
       // ---- MANIFESTO ----
-      "man.tag": "// Manifesto",
+      "man.tag": "// Our Thesis",
       "man.title": 'Puerto Rico was forged by fire. The next ground is <em>digital.</em>',
       "man.p1": "Puerto Rico was born from volcanic fire. El Yunque, Toro Negro, the mountains that cross the island — each one formed through the same process: pressure from below, heat applied to raw material, new terrain emerging where none existed before.",
       "man.p2": "Ignea Labs takes its name from that process. Ignea — born of fire. Igneous rock forms when trapped magma beneath the surface finds its way up and transforms into solid ground. That is exactly what we do.",

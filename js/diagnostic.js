@@ -205,7 +205,9 @@
     var step = currentScreen;
     var pct = Math.round((step / TOTAL_STEPS) * 100);
     progBar.style.width = pct + '%';
-    progText.textContent = step + ' / ' + TOTAL_STEPS;
+    var padded = step < 10 ? '0' + step : '' + step;
+    var totalPadded = TOTAL_STEPS < 10 ? '0' + TOTAL_STEPS : '' + TOTAL_STEPS;
+    progText.textContent = padded + ' / ' + totalPadded;
   }
 
   function updateNav() {
