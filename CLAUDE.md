@@ -22,7 +22,7 @@ Logo: "IGNEA" white + ".LABS" in var(--accent). No teal. Border-radius: 0px ever
 | contact.html | Partial | Formspree ID is placeholder |
 | 404.html | Working | |
 | ops.html | Partial | CRM/calculator/scraper — Supabase + Claude API placeholders |
-| admin.html | Partial | Separate admin UI — may consolidate with ops |
+| admin.html | REMOVED | Consolidated into ops.html |
 | demo.html | Inconsistent | Old logo classes |
 
 # Pre-edit Rules
