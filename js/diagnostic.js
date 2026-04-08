@@ -361,4 +361,148 @@
     goTo(6);
   }
 
+  // ---- VOICE INPUT (Web Speech API) ----
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  function initVoiceInputs() {
+    if (!SpeechRecognition) return;
+
+    document.querySelectorAll('.voice-wrap').forEach(function(wrap) {
+      var field = wrap.querySelector('textarea, input[type="text"]');
+      if (!field) return;
+
+      // Build mic SVG (sharp terminals)
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'mic-btn';
+      btn.setAttribute('aria-label', 'Voice input');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+        '<path d="M12 2v0a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>' +
+        '<path d="M19 10v1a7 7 0 0 1-14 0v-1"/>' +
+        '<line x1="12" y1="18" x2="12" y2="22"/>' +
+        '<line x1="8" y1="22" x2="16" y2="22"/>' +
+        '</svg>' +
+        '<span class="mic-waveform">' +
+          '<span class="mic-wave-bar"></span>' +
+          '<span class="mic-wave-bar"></span>' +
+          '<span class="mic-wave-bar"></span>' +
+        '</span>';
+
+      var timer = document.createElement('span');
+      timer.className = 'mic-timer';
+      timer.textContent = '00:00';
+
+      var errorEl = document.createElement('div');
+      errorEl.className = 'voice-error';
+
+      wrap.appendChild(btn);
+      wrap.appendChild(timer);
+      wrap.insertAdjacentElement('afterend', errorEl);
+
+      var recognition = null;
+      var timerInterval = null;
+      var startTime = 0;
+
+      function getLang() {
+        var lang = localStorage.getItem('ignea_lang') || 'es';
+        return lang === 'en' ? 'en-US' : 'es-MX';
+      }
+
+      function t(key) {
+        if (typeof IgneaI18n !== 'undefined' && IgneaI18n.t) return IgneaI18n.t(key);
+        return key;
+      }
+
+      function setIdle() {
+        btn.classList.remove('recording', 'processing');
+        timer.textContent = '00:00';
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+
+      function setRecording() {
+        btn.classList.add('recording');
+        btn.classList.remove('processing');
+        errorEl.classList.remove('visible');
+        errorEl.textContent = '';
+        startTime = Date.now();
+        timerInterval = setInterval(function() {
+          var elapsed = Math.floor((Date.now() - startTime) / 1000);
+          var m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+          var s = String(elapsed % 60).padStart(2, '0');
+          timer.textContent = m + ':' + s;
+        }, 250);
+      }
+
+      function setProcessing() {
+        btn.classList.remove('recording');
+        btn.classList.add('processing');
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+
+      function showError(key) {
+        errorEl.textContent = t(key);
+        errorEl.classList.add('visible');
+        setTimeout(function() { errorEl.classList.remove('visible'); }, 4000);
+      }
+
+      btn.addEventListener('click', function() {
+        // If already recording, stop
+        if (recognition) {
+          recognition.stop();
+          return;
+        }
+
+        recognition = new SpeechRecognition();
+        recognition.lang = getLang();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+
+        var finalTranscript = field.value;
+
+        recognition.onstart = function() {
+          setRecording();
+        };
+
+        recognition.onresult = function(event) {
+          var interim = '';
+          for (var i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+              finalTranscript += (finalTranscript ? ' ' : '') + event.results[i][0].transcript;
+            } else {
+              interim += event.results[i][0].transcript;
+            }
+          }
+          field.value = finalTranscript + (interim ? ' ' + interim : '');
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+
+        recognition.onspeechend = function() {
+          setProcessing();
+        };
+
+        recognition.onend = function() {
+          setIdle();
+          recognition = null;
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+
+        recognition.onerror = function(event) {
+          setIdle();
+          recognition = null;
+          if (event.error === 'not-allowed') {
+            showError('voice_permission_denied');
+          } else if (event.error !== 'aborted' && event.error !== 'no-speech') {
+            showError('voice_error');
+          }
+        };
+
+        recognition.start();
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initVoiceInputs);
+
 })();

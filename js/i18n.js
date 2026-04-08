@@ -1015,6 +1015,13 @@ var IgneaI18n = (function() {
       "ops.dx.websitePh": "https://tusitio.com",
       "ops.dx.linkedin": "LinkedIn de la empresa (opcional)",
       "ops.dx.linkedinPh": "linkedin.com/company/tunegocio",
+
+      // ---- VOICE INPUT ----
+      "voice_recording": "Grabando...",
+      "voice_transcribing": "Transcribiendo...",
+      "voice_unsupported": "Tu navegador no soporta entrada de voz",
+      "voice_error": "Error de voz. Intenta de nuevo.",
+      "voice_permission_denied": "Permiso de micrófono denegado",
     },
 
     en: {
@@ -2001,6 +2008,13 @@ var IgneaI18n = (function() {
       "ops.dx.websitePh": "https://yoursite.com",
       "ops.dx.linkedin": "Company LinkedIn (optional)",
       "ops.dx.linkedinPh": "linkedin.com/company/yourbusiness",
+
+      // ---- VOICE INPUT ----
+      "voice_recording": "Recording...",
+      "voice_transcribing": "Transcribing...",
+      "voice_unsupported": "Your browser doesn't support voice input",
+      "voice_error": "Voice error. Try again.",
+      "voice_permission_denied": "Microphone permission denied",
     }
   };
 
