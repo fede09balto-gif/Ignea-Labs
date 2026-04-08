@@ -509,59 +509,124 @@ var OpsLeads = (function() {
     tabAnswers.style.display = 'none';
 
     var answers = lead.diagnostic_answers || {};
-    var qLabels = QUESTION_LABELS[lang] || QUESTION_LABELS.es;
 
-    for (var q = 1; q <= 11; q++) {
-      var qKey = 'q' + q;
-      var answer = answers[qKey];
-      var openAnswer = answers[qKey + '_open'];
+    // Detect format: new intake (q4_headache etc.) vs old diagnostic (q1-q11)
+    var isIntakeFormat = answers.q4_headache !== undefined || answers.q5_timeleaks !== undefined;
 
-      var block = document.createElement('div');
-      block.className = 'answer-block';
+    if (isIntakeFormat) {
+      var INTAKE_QUESTIONS = lang === 'es' ? [
+        { key: 'q4_headache',   label: 'Problema operativo principal' },
+        { key: 'q5_timeleaks',  label: 'Dónde pierden más tiempo' },
+        { key: 'q6_tools',      label: 'Herramientas actuales' },
+        { key: 'q7_tried',      label: 'Intentos previos de resolver el problema' },
+        { key: 'q9_wildcard',   label: 'Contexto adicional' }
+      ] : [
+        { key: 'q4_headache',   label: 'Biggest operational headache' },
+        { key: 'q5_timeleaks',  label: 'Where the team loses time' },
+        { key: 'q6_tools',      label: 'Current tools' },
+        { key: 'q7_tried',      label: 'Previous attempts to solve the problem' },
+        { key: 'q9_wildcard',   label: 'Additional context' }
+      ];
 
-      var qText = document.createElement('div');
-      qText.className = 'answer-q';
-      qText.textContent = 'Q' + q + ': ' + (qLabels[qKey] || '');
-      block.appendChild(qText);
+      INTAKE_QUESTIONS.forEach(function(qDef, idx) {
+        var val = answers[qDef.key];
+        var block = document.createElement('div');
+        block.className = 'answer-block';
 
-      if (answer !== undefined && answer !== null) {
-        if (Array.isArray(answer)) {
+        var qText = document.createElement('div');
+        qText.className = 'answer-q';
+        qText.textContent = (idx + 1) + '. ' + qDef.label;
+        block.appendChild(qText);
+
+        if (Array.isArray(val) && val.length) {
           var chipsWrap = document.createElement('div');
           chipsWrap.className = 'answer-chips';
-          answer.forEach(function(item) {
+          val.forEach(function(item) {
             var chip = document.createElement('span');
             chip.className = 'answer-chip';
             chip.textContent = String(item);
             chipsWrap.appendChild(chip);
           });
           block.appendChild(chipsWrap);
-        } else if (typeof answer === 'number') {
-          var numEl = document.createElement('div');
-          numEl.className = 'answer-choice';
-          numEl.textContent = String(answer);
-          block.appendChild(numEl);
+        } else if (val && typeof val === 'string' && val.trim()) {
+          var ansEl = document.createElement('div');
+          ansEl.className = 'answer-text';
+          ansEl.textContent = val;
+          // Collapsible if long
+          if (val.length > 200) {
+            ansEl.style.maxHeight = '80px';
+            ansEl.style.overflow = 'hidden';
+            ansEl.style.cursor = 'pointer';
+            ansEl.title = lang === 'es' ? 'Clic para expandir' : 'Click to expand';
+            ansEl.addEventListener('click', function() {
+              if (ansEl.style.maxHeight) {
+                ansEl.style.maxHeight = '';
+                ansEl.style.overflow = '';
+              } else {
+                ansEl.style.maxHeight = '80px';
+                ansEl.style.overflow = 'hidden';
+              }
+            });
+          }
+          block.appendChild(ansEl);
         } else {
-          var choiceEl = document.createElement('div');
-          choiceEl.className = 'answer-choice';
-          choiceEl.textContent = String(answer);
-          block.appendChild(choiceEl);
+          var empty = document.createElement('div');
+          empty.className = 'answer-choice answer-empty';
+          empty.textContent = '—';
+          block.appendChild(empty);
         }
-      } else {
-        var noAnswer = document.createElement('div');
-        noAnswer.className = 'answer-choice answer-empty';
-        noAnswer.textContent = '—';
-        block.appendChild(noAnswer);
-      }
 
-      // Open text answer
-      if (openAnswer) {
-        var openEl = document.createElement('div');
-        openEl.className = 'answer-text';
-        openEl.textContent = '"' + String(openAnswer) + '"';
-        block.appendChild(openEl);
-      }
+        tabAnswers.appendChild(block);
+      });
+    } else {
+      // Legacy q1-q11 format
+      var qLabels = QUESTION_LABELS[lang] || QUESTION_LABELS.es;
+      for (var q = 1; q <= 11; q++) {
+        var qKey = 'q' + q;
+        var answer = answers[qKey];
+        var openAnswer = answers[qKey + '_open'];
 
-      tabAnswers.appendChild(block);
+        var block = document.createElement('div');
+        block.className = 'answer-block';
+
+        var qText = document.createElement('div');
+        qText.className = 'answer-q';
+        qText.textContent = 'Q' + q + ': ' + (qLabels[qKey] || '');
+        block.appendChild(qText);
+
+        if (answer !== undefined && answer !== null) {
+          if (Array.isArray(answer)) {
+            var chipsWrap = document.createElement('div');
+            chipsWrap.className = 'answer-chips';
+            answer.forEach(function(item) {
+              var chip = document.createElement('span');
+              chip.className = 'answer-chip';
+              chip.textContent = String(item);
+              chipsWrap.appendChild(chip);
+            });
+            block.appendChild(chipsWrap);
+          } else {
+            var choiceEl = document.createElement('div');
+            choiceEl.className = 'answer-choice';
+            choiceEl.textContent = String(answer);
+            block.appendChild(choiceEl);
+          }
+        } else {
+          var noAnswer = document.createElement('div');
+          noAnswer.className = 'answer-choice answer-empty';
+          noAnswer.textContent = '—';
+          block.appendChild(noAnswer);
+        }
+
+        if (openAnswer) {
+          var openEl = document.createElement('div');
+          openEl.className = 'answer-text';
+          openEl.textContent = '"' + String(openAnswer) + '"';
+          block.appendChild(openEl);
+        }
+
+        tabAnswers.appendChild(block);
+      }
     }
 
     // Copy answers button
@@ -571,6 +636,16 @@ var OpsLeads = (function() {
     copyBtn.textContent = lang === 'es' ? 'Copiar respuestas' : 'Copy answers';
     copyBtn.addEventListener('click', function() {
       var text = '';
+      if (isIntakeFormat) {
+        var copyQs = lang === 'es'
+          ? { q4_headache: 'Problema principal', q5_timeleaks: 'Pérdidas de tiempo', q6_tools: 'Herramientas', q7_tried: 'Intentos previos', q9_wildcard: 'Contexto adicional' }
+          : { q4_headache: 'Main problem', q5_timeleaks: 'Time sinks', q6_tools: 'Tools', q7_tried: 'Previous attempts', q9_wildcard: 'Additional context' };
+        Object.keys(copyQs).forEach(function(k) {
+          var v = answers[k];
+          text += copyQs[k] + ': ' + (Array.isArray(v) ? v.join(', ') : (v || '—')) + '\n\n';
+        });
+      } else {
+      var qLabels = QUESTION_LABELS[lang] || QUESTION_LABELS.es;
       for (var i = 1; i <= 11; i++) {
         var key = 'q' + i;
         var label = (qLabels[key] || 'Q' + i);
@@ -585,6 +660,7 @@ var OpsLeads = (function() {
         if (openAns) text += '"' + String(openAns) + '"\n';
         text += '\n';
       }
+      } // end else (legacy format)
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(function() {
           copyBtn.textContent = lang === 'es' ? 'Copiado' : 'Copied';
@@ -1016,6 +1092,20 @@ var OpsLeads = (function() {
         if (lead) {
           lead[fieldKey] = value;
           lead.updated_at = now;
+        }
+
+        // Persist local submissions back to localStorage
+        if (lead && lead._local) {
+          try {
+            var subs = JSON.parse(localStorage.getItem('ignea_submissions') || '[]');
+            var sub = subs.find(function(s) { return s.id === leadId; });
+            if (sub) {
+              if (fieldKey === 'pipeline_stage') sub.pipeline_stage = value;
+              else if (fieldKey === 'notes') sub.notes = value;
+              else sub[fieldKey] = value;
+              localStorage.setItem('ignea_submissions', JSON.stringify(subs));
+            }
+          } catch(e) {}
         }
 
         var user = OpsAuth.getUser();

@@ -20,20 +20,66 @@ var OpsDashboard = (function() {
 
   var CLOSED_STAGES = ['closed_won', 'closed_lost'];
 
+  function getLocalSubmissions() {
+    try {
+      var subs = JSON.parse(localStorage.getItem('ignea_submissions') || '[]');
+      return subs.map(function(s) {
+        return {
+          id: s.id,
+          created_at: s.timestamp,
+          updated_at: s.timestamp,
+          first_name: s.name,
+          last_name: '',
+          email: s.email,
+          phone: s.phone,
+          company_name: s.company,
+          industry: s.industry,
+          company_size: s.company_size,
+          pipeline_stage: s.pipeline_stage || s.status || 'new',
+          priority: 'medium',
+          total_score: 0,
+          deal_value: null,
+          notes: '',
+          diagnostic_answers: s.answers || {},
+          source: 'intake_form',
+          _local: true
+        };
+      });
+    } catch(e) { return []; }
+  }
+
   function init() {
     (async function() {
+      var supabaseLeads = [];
       try {
         var result = await IgneaSupabase.client
           .from('leads')
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (result.error) throw result.error;
+        if (!result.error) {
+          supabaseLeads = result.data || [];
+        }
+      } catch (e) {}
 
-        allLeads = result.data || [];
-      } catch (e) {
-        allLeads = [];
-      }
+      // Merge: Supabase leads + localStorage submissions (dedup by email)
+      var localSubs = getLocalSubmissions();
+      var seenEmails = {};
+      supabaseLeads.forEach(function(l) { if (l.email) seenEmails[l.email.toLowerCase()] = true; });
+
+      var merged = supabaseLeads.slice();
+      localSubs.forEach(function(s) {
+        if (s.email && seenEmails[s.email.toLowerCase()]) return;
+        merged.push(s);
+        if (s.email) seenEmails[s.email.toLowerCase()] = true;
+      });
+
+      // Sort by created_at descending
+      merged.sort(function(a, b) {
+        return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+      });
+
+      allLeads = merged;
       renderPipeline();
       renderStats();
     })();

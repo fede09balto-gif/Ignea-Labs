@@ -329,13 +329,35 @@
       source: 'intake_form'
     };
 
-    // Save to Supabase
-    if (typeof IgneaSupabase !== 'undefined') {
-      IgneaSupabase.client.from('leads').insert(payload).then(function(result) {
-        if (result.error) {
-          console.error('Supabase insert error:', result.error);
-        }
+    // Save to localStorage for ops pipeline
+    try {
+      var submissions = JSON.parse(localStorage.getItem('ignea_submissions') || '[]');
+      submissions.push({
+        id: 'sub_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8),
+        timestamp: payload.created_at,
+        name: formData.first_name,
+        email: formData.email,
+        phone: formData.phone,
+        company: formData.company_name,
+        industry: formData.industry,
+        company_size: formData.company_size,
+        answers: {
+          q4_headache: answers.q4_headache || '',
+          q5_timeleaks: answers.q5_timeleaks || [],
+          q6_tools: answers.q6_tools || [],
+          q7_tried: answers.q7_tried || '',
+          q9_wildcard: answers.q9_wildcard || ''
+        },
+        status: 'new',
+        pipeline_stage: 'new',
+        language: payload.language
       });
+      localStorage.setItem('ignea_submissions', JSON.stringify(submissions));
+    } catch(e) {}
+
+    // Save to Supabase (best-effort)
+    if (typeof IgneaSupabase !== 'undefined') {
+      IgneaSupabase.client.from('leads').insert(payload).then(function() {});
     }
 
     // Mirror to Google Sheets

@@ -8,13 +8,13 @@
   var CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
   function getApiKey() {
-    return window.CLAUDE_API_KEY || 'PLACEHOLDER_CLAUDE_API_KEY';
+    return window.CLAUDE_API_KEY || localStorage.getItem('ignea_ops_claude_key') || '';
   }
 
   async function callClaude(systemPrompt, userMessage) {
     var key = getApiKey();
-    if (!key || key === 'PLACEHOLDER_CLAUDE_API_KEY') {
-      throw new Error('Claude API key not configured. Set window.CLAUDE_API_KEY in ops.html.');
+    if (!key) {
+      throw new Error('Claude API key not configured. Click "API Key" in the ops nav to set it.');
     }
 
     var response = await fetch('https://api.anthropic.com/v1/messages', {
