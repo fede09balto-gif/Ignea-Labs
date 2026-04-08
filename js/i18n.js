@@ -1017,6 +1017,7 @@ var IgneaI18n = (function() {
       "ops.dx.linkedinPh": "linkedin.com/company/tunegocio",
 
       // ---- VOICE INPUT ----
+      "voice_cta": "Graba tu respuesta",
       "voice_recording": "Grabando...",
       "voice_transcribing": "Transcribiendo...",
       "voice_unsupported": "Tu navegador no soporta entrada de voz",
@@ -2010,6 +2011,7 @@ var IgneaI18n = (function() {
       "ops.dx.linkedinPh": "linkedin.com/company/yourbusiness",
 
       // ---- VOICE INPUT ----
+      "voice_cta": "Record your answer",
       "voice_recording": "Recording...",
       "voice_transcribing": "Transcribing...",
       "voice_unsupported": "Your browser doesn't support voice input",

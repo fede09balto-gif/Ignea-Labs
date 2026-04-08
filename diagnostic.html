@@ -52,9 +52,9 @@
 .q-textarea.q-optional{min-height:80px}
 .q-textarea.q-required{min-height:120px}
 
-/* CARDS SECTION LABELS */
-.q-cards-label,.q-text-label{font-family:var(--fm);font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);opacity:.7;margin:28px 0 14px;display:flex;align-items:center;gap:14px}
-.q-cards-label::before,.q-text-label::before{content:'';flex:1;height:1px;background:var(--border)}
+/* CARDS SECTION LABELS — sub-questions styled like main q-text */
+.q-cards-label,.q-text-label{font-family:var(--ff);font-size:clamp(20px,3vw,28px);font-weight:700;color:var(--white);line-height:1.35;letter-spacing:-.02em;margin:36px 0 16px;display:block;text-align:left}
+.q-cards-label::before,.q-text-label::before{display:none}
 
 /* QUESTION CARDS */
 .q-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}

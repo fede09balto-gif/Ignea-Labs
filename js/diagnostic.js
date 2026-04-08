@@ -371,7 +371,10 @@
       var field = wrap.querySelector('textarea, input[type="text"]');
       if (!field) return;
 
-      // Build mic SVG (sharp terminals)
+      // Build mic row below the field
+      var micRow = document.createElement('div');
+      micRow.className = 'mic-row';
+
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'mic-btn';
@@ -382,6 +385,7 @@
         '<line x1="12" y1="18" x2="12" y2="22"/>' +
         '<line x1="8" y1="22" x2="16" y2="22"/>' +
         '</svg>' +
+        '<span class="mic-btn-label"></span>' +
         '<span class="mic-waveform">' +
           '<span class="mic-wave-bar"></span>' +
           '<span class="mic-wave-bar"></span>' +
@@ -395,9 +399,12 @@
       var errorEl = document.createElement('div');
       errorEl.className = 'voice-error';
 
-      wrap.appendChild(btn);
-      wrap.appendChild(timer);
+      micRow.appendChild(btn);
+      micRow.appendChild(timer);
+      wrap.appendChild(micRow);
       wrap.insertAdjacentElement('afterend', errorEl);
+
+      var labelEl = btn.querySelector('.mic-btn-label');
 
       var recognition = null;
       var timerInterval = null;
@@ -413,16 +420,22 @@
         return key;
       }
 
+      function updateLabel() {
+        if (labelEl) labelEl.textContent = t('voice_cta');
+      }
+
       function setIdle() {
         btn.classList.remove('recording', 'processing');
         timer.textContent = '00:00';
         clearInterval(timerInterval);
         timerInterval = null;
+        updateLabel();
       }
 
       function setRecording() {
         btn.classList.add('recording');
         btn.classList.remove('processing');
+        if (labelEl) labelEl.textContent = t('voice_recording');
         errorEl.classList.remove('visible');
         errorEl.textContent = '';
         startTime = Date.now();
@@ -447,8 +460,14 @@
         setTimeout(function() { errorEl.classList.remove('visible'); }, 4000);
       }
 
+      // Set initial label
+      updateLabel();
+
+      // Update label on language change
+      document.addEventListener('langchange', updateLabel);
+
       btn.addEventListener('click', function() {
-        // If already recording, stop
+        // Toggle: if recording, stop
         if (recognition) {
           recognition.stop();
           return;
@@ -456,7 +475,7 @@
 
         recognition = new SpeechRecognition();
         recognition.lang = getLang();
-        recognition.continuous = false;
+        recognition.continuous = true;
         recognition.interimResults = true;
 
         var finalTranscript = field.value;
@@ -476,10 +495,6 @@
           }
           field.value = finalTranscript + (interim ? ' ' + interim : '');
           field.dispatchEvent(new Event('input', { bubbles: true }));
-        };
-
-        recognition.onspeechend = function() {
-          setProcessing();
         };
 
         recognition.onend = function() {

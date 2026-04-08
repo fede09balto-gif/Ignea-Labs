@@ -246,27 +246,30 @@ footer{border-top:1px solid var(--border);padding:80px 40px}
 
 /* ---- VOICE INPUT ---- */
 .voice-wrap{position:relative}
-.voice-wrap .q-textarea,.voice-wrap .form-input,.voice-wrap .text-input{padding-right:44px}
-.mic-btn{position:absolute;right:1px;top:1px;width:44px;height:44px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.mic-btn svg{width:18px;height:18px;stroke:#3A3A50;stroke-width:1.5;stroke-linecap:square;fill:none;transition:stroke .2s}
-.mic-btn:hover svg{stroke:var(--gray)}
+.mic-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:16px;min-height:48px}
+.mic-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:none;border:none;cursor:pointer;padding:10px 16px;min-height:48px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:opacity .2s}
+.mic-btn:hover{opacity:.8}
+.mic-btn svg{width:28px;height:28px;stroke:#3A3A50;stroke-width:1.5;stroke-linecap:square;fill:none;transition:stroke .2s;flex-shrink:0}
+.mic-btn-label{font-family:var(--fm);font-size:13px;color:var(--dimgray);letter-spacing:.5px;transition:color .2s;white-space:nowrap}
 .mic-btn.recording svg{stroke:var(--accent)}
+.mic-btn.recording .mic-btn-label{color:var(--accent)}
 .mic-btn.recording{animation:micPulse 1s ease infinite}
 @keyframes micPulse{0%,100%{box-shadow:0 0 0 0 var(--accent2);transform:scale(1)}50%{box-shadow:0 0 0 4px var(--accent2);transform:scale(1.05)}}
 .mic-btn.processing svg{display:none}
-.mic-waveform{display:none;align-items:flex-end;gap:2px;height:16px}
+.mic-btn.processing .mic-btn-label{display:none}
+.mic-waveform{display:none;align-items:flex-end;gap:2px;height:18px}
 .mic-btn.processing .mic-waveform{display:flex}
 .mic-wave-bar{width:2px;background:var(--accent);animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-direction:alternate}
 .mic-wave-bar:nth-child(1){animation:waveBar1 .4s infinite alternate;height:8px}
-.mic-wave-bar:nth-child(2){animation:waveBar2 .55s infinite alternate;height:12px}
+.mic-wave-bar:nth-child(2){animation:waveBar2 .55s infinite alternate;height:14px}
 .mic-wave-bar:nth-child(3){animation:waveBar3 .35s infinite alternate;height:10px}
-@keyframes waveBar1{0%{height:8px}100%{height:16px}}
-@keyframes waveBar2{0%{height:12px}100%{height:8px}}
-@keyframes waveBar3{0%{height:10px}100%{height:16px}}
-.mic-timer{font-family:var(--fm);font-size:11px;color:var(--dimgray);position:absolute;right:48px;top:14px;display:none;letter-spacing:.5px}
+@keyframes waveBar1{0%{height:8px}100%{height:18px}}
+@keyframes waveBar2{0%{height:14px}100%{height:8px}}
+@keyframes waveBar3{0%{height:10px}100%{height:18px}}
+.mic-timer{font-family:var(--fm);font-size:11px;color:var(--dimgray);letter-spacing:.5px;display:none}
 .mic-btn.recording~.mic-timer{display:block}
 .mic-btn.processing~.mic-timer{display:none}
-.voice-error{font-size:13px;color:var(--coral);margin-top:6px;display:none}
+.voice-error{font-size:13px;color:var(--coral);margin-top:6px;display:none;text-align:center}
 .voice-error.visible{display:block}
 
 /* ---- ANIMATIONS ---- */
