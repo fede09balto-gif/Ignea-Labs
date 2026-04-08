@@ -329,6 +329,7 @@ var OpsLeads = (function() {
     tabNav.innerHTML =
       '<button class="detail-tab active" data-dtab="summary">' + (lang === 'es' ? 'Resumen' : 'Summary') + '</button>' +
       '<button class="detail-tab" data-dtab="answers">' + (lang === 'es' ? 'Respuestas' : 'Answers') + '</button>' +
+      '<button class="detail-tab" data-dtab="ai">' + (lang === 'es' ? 'Análisis IA' : 'AI Analysis') + '</button>' +
       '<button class="detail-tab" data-dtab="actions">' + (lang === 'es' ? 'Acciones' : 'Actions') + '</button>';
     content.appendChild(tabNav);
 
@@ -673,6 +674,174 @@ var OpsLeads = (function() {
     tabAnswers.appendChild(copyBtn);
 
     content.appendChild(tabAnswers);
+
+    // ── TAB: AI ANALYSIS ──
+    var tabAI = document.createElement('div');
+    tabAI.className = 'detail-tab-content';
+    tabAI.setAttribute('data-dtab', 'ai');
+    tabAI.style.display = 'none';
+
+    // Toggle buttons
+    var aiToggleRow = document.createElement('div');
+    aiToggleRow.className = 'ai-toggle-row';
+    var btnSummaryMode = document.createElement('button');
+    btnSummaryMode.className = 'btn-ghost btn-sm ai-mode-btn active';
+    btnSummaryMode.textContent = lang === 'es' ? 'Resumen rápido' : 'Quick Summary';
+    var btnDeepMode = document.createElement('button');
+    btnDeepMode.className = 'btn-ghost btn-sm ai-mode-btn';
+    btnDeepMode.textContent = lang === 'es' ? 'Análisis profundo' : 'Deep Analysis';
+    aiToggleRow.appendChild(btnSummaryMode);
+    aiToggleRow.appendChild(btnDeepMode);
+    tabAI.appendChild(aiToggleRow);
+
+    var aiResultContainer = document.createElement('div');
+    aiResultContainer.className = 'ai-result-container';
+    tabAI.appendChild(aiResultContainer);
+
+    var currentAIMode = 'summary';
+
+    function renderSummaryResult(data) {
+      var h = '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// RESUMEN EJECUTIVO' : '// EXECUTIVE SUMMARY') + '</div>' +
+        '<p class="ai-card-body">' + escHtml(data.overview) + '</p>' +
+      '</div>';
+
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// PUNTOS DE DOLOR' : '// PAIN POINTS') + '</div>' +
+        '<ul class="ai-card-list">';
+      (data.pain_points || []).forEach(function(p) { h += '<li>' + escHtml(p) + '</li>'; });
+      h += '</ul></div>';
+
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// PRIMER PROYECTO RECOMENDADO' : '// RECOMMENDED FIRST PROJECT') + '</div>' +
+        '<p class="ai-card-body ai-card-highlight">' + escHtml(data.recommended_project) + '</p>' +
+      '</div>';
+
+      h += '<div class="ai-card-row">' +
+        '<div class="ai-card ai-card-half">' +
+          '<div class="ai-card-tag">' + (lang === 'es' ? '// AHORRO MENSUAL' : '// MONTHLY SAVINGS') + '</div>' +
+          '<div class="ai-card-stat">$' + (data.monthly_savings_min || 0).toLocaleString() + ' – $' + (data.monthly_savings_max || 0).toLocaleString() + '</div>' +
+        '</div>' +
+        '<div class="ai-card ai-card-half">' +
+          '<div class="ai-card-tag">' + (lang === 'es' ? '// PRECIO SUGERIDO' : '// SUGGESTED PRICE') + '</div>' +
+          '<div class="ai-card-stat">$' + (data.suggested_price_min || 0).toLocaleString() + ' – $' + (data.suggested_price_max || 0).toLocaleString() + '</div>' +
+        '</div>' +
+      '</div>';
+
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// PREGUNTAS PARA LA LLAMADA' : '// DISCOVERY CALL QUESTIONS') + '</div>' +
+        '<ol class="ai-card-list">';
+      (data.discovery_questions || []).forEach(function(q) { h += '<li>' + escHtml(q) + '</li>'; });
+      h += '</ol></div>';
+
+      return h;
+    }
+
+    function renderDeepResult(data) {
+      var h = '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// EVALUACIÓN DEL NEGOCIO' : '// BUSINESS ASSESSMENT') + '</div>' +
+        '<p class="ai-card-body">' + escHtml(data.assessment).replace(/\n/g, '<br>') + '</p>' +
+      '</div>';
+
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// SOLUCIONES — RANKED POR ROI' : '// SOLUTIONS — RANKED BY ROI') + '</div>';
+      (data.solutions || []).forEach(function(sol, idx) {
+        h += '<div class="ai-sol-card">' +
+          '<div class="ai-sol-rank">' + (idx + 1) + '</div>' +
+          '<div class="ai-sol-body">' +
+            '<div class="ai-sol-name">' + escHtml(sol.name) + '</div>' +
+            '<div class="ai-sol-desc">' + escHtml(sol.description) + '</div>' +
+            '<div class="ai-sol-meta">' +
+              '<span>' + (sol.build_hours || '?') + 'h build</span>' +
+              '<span>$' + (sol.monthly_savings || 0).toLocaleString() + '/mo saved</span>' +
+              '<span>$' + (sol.suggested_price || 0).toLocaleString() + '</span>' +
+              '<span>ROI: ' + (sol.roi_months || '?') + ' mo</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      });
+      h += '</div>';
+
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// ANÁLISIS COMPETITIVO' : '// COMPETITIVE ANALYSIS') + '</div>' +
+        '<p class="ai-card-body">' + escHtml(data.competitive_analysis || '').replace(/\n/g, '<br>') + '</p>' +
+      '</div>';
+
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// GUIÓN DE DESCUBRIMIENTO' : '// DISCOVERY SCRIPT') + '</div>' +
+        '<ol class="ai-card-list">';
+      (data.discovery_script || []).forEach(function(q) { h += '<li>' + escHtml(q) + '</li>'; });
+      h += '</ol></div>';
+
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// PUNTOS DE PROPUESTA' : '// PROPOSAL TALKING POINTS') + '</div>' +
+        '<ul class="ai-card-list">';
+      (data.proposal_talking_points || []).forEach(function(p) { h += '<li>' + escHtml(p) + '</li>'; });
+      h += '</ul></div>';
+
+      if (data.red_flags && data.red_flags.length) {
+        h += '<div class="ai-card ai-card-warn">' +
+          '<div class="ai-card-tag">' + (lang === 'es' ? '// BANDERAS ROJAS' : '// RED FLAGS') + '</div>' +
+          '<ul class="ai-card-list">';
+        data.red_flags.forEach(function(f) { h += '<li>' + escHtml(f) + '</li>'; });
+        h += '</ul></div>';
+      }
+
+      return h;
+    }
+
+    function runAIMode(mode) {
+      currentAIMode = mode;
+      btnSummaryMode.classList.toggle('active', mode === 'summary');
+      btnDeepMode.classList.toggle('active', mode === 'deep_analysis');
+
+      aiResultContainer.innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div>' +
+        (lang === 'es' ? 'Analizando...' : 'Analyzing...') + '</div>';
+
+      var promise;
+      if (mode === 'summary') {
+        promise = IgneaAI.generateSummary(lead);
+      } else {
+        // For deep analysis, try to get scraper data
+        var scraperData = lead.scraper_data || null;
+        promise = IgneaAI.generateDeepAnalysis(lead, scraperData);
+      }
+
+      promise.then(function(data) {
+        var html = mode === 'summary' ? renderSummaryResult(data) : renderDeepResult(data);
+
+        // Copy all button
+        html += '<button class="btn-ghost ai-copy-all" style="width:100%;margin-top:12px">' +
+          (lang === 'es' ? 'Copiar todo al portapapeles' : 'Copy all to clipboard') + '</button>';
+
+        aiResultContainer.innerHTML = html;
+
+        var copyAllBtn = aiResultContainer.querySelector('.ai-copy-all');
+        if (copyAllBtn) {
+          copyAllBtn.addEventListener('click', function() {
+            var text = aiResultContainer.innerText;
+            navigator.clipboard.writeText(text).then(function() {
+              copyAllBtn.textContent = lang === 'es' ? 'Copiado ✓' : 'Copied ✓';
+              setTimeout(function() {
+                copyAllBtn.textContent = lang === 'es' ? 'Copiar todo al portapapeles' : 'Copy all to clipboard';
+              }, 2000);
+            });
+          });
+        }
+
+        // Auto-fill calculator
+        if (mode === 'summary' || mode === 'deep_analysis') {
+          document.dispatchEvent(new CustomEvent('ops:autoFillCalc', { detail: { lead: lead, ai: data } }));
+        }
+      }).catch(function(err) {
+        aiResultContainer.innerHTML = '<div class="ai-error">' + escHtml(err.message) + '</div>';
+      });
+    }
+
+    btnSummaryMode.addEventListener('click', function() { runAIMode('summary'); });
+    btnDeepMode.addEventListener('click', function() { runAIMode('deep_analysis'); });
+
+    content.appendChild(tabAI);
 
     // ── TAB 3: Actions ──
     var tabActions = document.createElement('div');

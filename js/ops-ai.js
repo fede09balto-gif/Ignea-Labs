@@ -50,32 +50,147 @@
     parts.push('Company: ' + (lead.company_name || 'Unknown'));
     parts.push('Industry: ' + (lead.industry || 'Unknown'));
     parts.push('Team size: ' + (lead.company_size || 'Unknown'));
-    parts.push('Score: ' + (lead.total_score || 0) + '/100 (' + (lead.score_level || 'unknown') + ')');
 
-    if (lead.score_breakdown) {
-      parts.push('\nDimension scores:');
-      var dims = lead.score_breakdown;
-      var keys = ['customerInteraction', 'processMaturity', 'digitalPresence', 'dataUtilization', 'aiReadiness'];
-      keys.forEach(function(k) {
-        if (dims[k] !== undefined) parts.push('- ' + k + ': ' + dims[k] + '/20');
-      });
-    }
+    var answers = lead.diagnostic_answers || {};
+    var isIntake = answers.q4_headache !== undefined || answers.q5_timeleaks !== undefined;
 
-    if (lead.diagnostic_answers) {
+    if (isIntake) {
+      parts.push('\nIntake answers:');
+      if (answers.q4_headache) parts.push('Biggest operational headache: ' + answers.q4_headache);
+      if (answers.q5_timeleaks) parts.push('Where team loses time: ' + (Array.isArray(answers.q5_timeleaks) ? answers.q5_timeleaks.join(', ') : answers.q5_timeleaks));
+      if (answers.q6_tools) parts.push('Current tools: ' + (Array.isArray(answers.q6_tools) ? answers.q6_tools.join(', ') : answers.q6_tools));
+      if (answers.q7_tried) parts.push('Previous attempts to solve: ' + answers.q7_tried);
+      if (answers.q9_wildcard) parts.push('Additional context: ' + answers.q9_wildcard);
+    } else {
+      parts.push('Score: ' + (lead.total_score || 0) + '/100 (' + (lead.score_level || 'unknown') + ')');
+      if (lead.score_breakdown) {
+        parts.push('\nDimension scores:');
+        var dims = lead.score_breakdown;
+        ['customerInteraction', 'processMaturity', 'digitalPresence', 'dataUtilization', 'aiReadiness'].forEach(function(k) {
+          if (dims[k] !== undefined) parts.push('- ' + k + ': ' + dims[k] + '/20');
+        });
+      }
       parts.push('\nDiagnostic answers:');
-      var answers = lead.diagnostic_answers;
       for (var q = 1; q <= 11; q++) {
         var val = answers['q' + q];
         if (val !== undefined && val !== null) {
-          var display = typeof val === 'object' ? JSON.stringify(val) : String(val);
-          parts.push('Q' + q + ': ' + display);
+          parts.push('Q' + q + ': ' + (typeof val === 'object' ? JSON.stringify(val) : String(val)));
         }
       }
     }
 
     if (lead.company_website) parts.push('\nWebsite: ' + lead.company_website);
-
     return parts.join('\n');
+  }
+
+  /* ---- Cache helpers ---- */
+
+  function getCached(leadId, type) {
+    try {
+      var cache = JSON.parse(localStorage.getItem('ignea_ai_cache') || '{}');
+      return cache[leadId + '_' + type] || null;
+    } catch(e) { return null; }
+  }
+
+  function setCache(leadId, type, data) {
+    try {
+      var cache = JSON.parse(localStorage.getItem('ignea_ai_cache') || '{}');
+      cache[leadId + '_' + type] = { data: data, ts: Date.now() };
+      localStorage.setItem('ignea_ai_cache', JSON.stringify(cache));
+    } catch(e) {}
+  }
+
+  /* ================================================
+     SUMMARY MODE — quick 1-call analysis
+     ================================================ */
+
+  async function generateSummary(lead) {
+    var cached = getCached(lead.id, 'summary');
+    if (cached) return cached.data;
+
+    var systemPrompt = 'You are a senior AI consultant at Ignea Labs analyzing a business lead. Respond ONLY in valid JSON.\n\n' +
+      'Analyze the intake data and return this exact structure:\n' +
+      '{\n' +
+      '  "overview": "3-sentence business overview",\n' +
+      '  "pain_points": ["pain 1", "pain 2", "pain 3"],\n' +
+      '  "recommended_project": "One-liner description of the best first project",\n' +
+      '  "monthly_savings_min": 800,\n' +
+      '  "monthly_savings_max": 2500,\n' +
+      '  "suggested_price_min": 2000,\n' +
+      '  "suggested_price_max": 5000,\n' +
+      '  "discovery_questions": ["question 1", "question 2", "question 3"]\n' +
+      '}\n\n' +
+      'Rules:\n' +
+      '- Be specific to THIS business — no generic advice\n' +
+      '- Savings and prices in USD, realistic for Latin American SMBs\n' +
+      '- Discovery questions should probe deeper into their specific pain points\n' +
+      '- Respond in the same language as the lead\'s answers';
+
+    var userMessage = buildDiagnosticContext(lead);
+    var result = await callClaude(systemPrompt, userMessage);
+    var cleaned = result.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    var parsed = JSON.parse(cleaned);
+    setCache(lead.id, 'summary', parsed);
+    return parsed;
+  }
+
+  /* ================================================
+     DEEP ANALYSIS MODE — comprehensive multi-call
+     ================================================ */
+
+  async function generateDeepAnalysis(lead, scraperData) {
+    var cached = getCached(lead.id, 'deep_analysis');
+    if (cached) return cached.data;
+
+    var context = buildDiagnosticContext(lead);
+
+    if (scraperData && !scraperData.error) {
+      context += '\n\nWebsite analysis:\n';
+      var w = scraperData.website || {};
+      if (w.title) context += '- Title: ' + w.title + '\n';
+      if (w.description) context += '- Description: ' + w.description + '\n';
+      context += '- Has analytics: ' + (w.hasAnalytics ? 'yes' : 'no') + '\n';
+      context += '- Has WhatsApp: ' + (w.hasWhatsAppWidget ? 'yes' : 'no') + '\n';
+      context += '- Has booking system: ' + (w.hasBooking ? 'yes' : 'no') + '\n';
+      context += '- Has live chat: ' + (w.hasLiveChat ? 'yes' : 'no') + '\n';
+      context += '- SSL: ' + (w.isSSL ? 'yes' : 'no') + '\n';
+      context += '- Mobile-friendly: ' + (w.hasViewportMeta ? 'yes' : 'no') + '\n';
+      var social = scraperData.social || [];
+      var foundSocial = social.filter(function(s) { return s.found; }).map(function(s) { return s.platform; });
+      if (foundSocial.length) context += '- Social media: ' + foundSocial.join(', ') + '\n';
+    }
+
+    var systemPrompt = 'You are a senior AI consultant at Ignea Labs performing a comprehensive business analysis. Respond ONLY in valid JSON.\n\n' +
+      'Return this exact structure:\n' +
+      '{\n' +
+      '  "assessment": "Full business assessment: current state, gaps, opportunities (3-4 paragraphs)",\n' +
+      '  "solutions": [\n' +
+      '    {\n' +
+      '      "name": "Solution name",\n' +
+      '      "description": "What we build",\n' +
+      '      "build_hours": 40,\n' +
+      '      "monthly_savings": 1200,\n' +
+      '      "suggested_price": 3500,\n' +
+      '      "roi_months": 2.9\n' +
+      '    }\n' +
+      '  ],\n' +
+      '  "competitive_analysis": "What similar businesses in their market are doing digitally (2-3 paragraphs)",\n' +
+      '  "discovery_script": ["question 1", "question 2", "... 8-10 questions"],\n' +
+      '  "proposal_talking_points": ["point 1", "point 2", "point 3", "point 4"],\n' +
+      '  "red_flags": ["potential objection or risk 1", "potential objection or risk 2"]\n' +
+      '}\n\n' +
+      'Rules:\n' +
+      '- List ALL solutions we could build, ranked by ROI — not just top 3\n' +
+      '- Prices in USD, realistic for Latin American SMBs ($1,500-$8,000 range per project)\n' +
+      '- Frame proposal points using the client\'s own words from their answers\n' +
+      '- Discovery questions should be tailored to their specific answers, not generic\n' +
+      '- Respond in the same language as the lead\'s answers';
+
+    var result = await callClaude(systemPrompt, context);
+    var cleaned = result.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    var parsed = JSON.parse(cleaned);
+    setCache(lead.id, 'deep_analysis', parsed);
+    return parsed;
   }
 
   /* ================================================
@@ -219,6 +334,8 @@
     generateRecommendations: generateRecommendations,
     generateProposal: generateProposal,
     generateProposalPDF: generateProposalPDF,
+    generateSummary: generateSummary,
+    generateDeepAnalysis: generateDeepAnalysis,
     callClaude: callClaude
   };
 })();
