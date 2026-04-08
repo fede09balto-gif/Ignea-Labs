@@ -13,7 +13,7 @@
 <link rel="canonical" href="https://ignealabs.com/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<!-- fonts loaded via shared.css @import -->
 <link rel="stylesheet" href="css/shared.css">
 <link rel="stylesheet" href="css/components.css">
 <style>
@@ -21,14 +21,45 @@
 .gradient-dots-bg{display:none}
 
 /* ---- HERO ---- */
-.hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:80px 40px 60px;position:relative}
-.hero-tag{font-family:var(--fm);font-size:14px;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;margin-bottom:24px;opacity:0;animation:fade-in .6s .2s forwards}
-.hero h1{font-family:var(--ff);font-size:clamp(36px,4.5vw,56px);font-weight:700;letter-spacing:-0.02em;line-height:1.15;max-width:1100px;margin-bottom:20px;opacity:0;animation:fade-in .6s .35s forwards}
-.hero h1 em{font-style:normal;color:var(--accent)}
-.hero h1 em.red{color:var(--coral)}
-.hero-p{font-size:18px;color:var(--gray);max-width:560px;line-height:1.65;margin-bottom:40px;opacity:0;animation:fade-in .6s .5s forwards}
-.cta-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fade-in .6s .65s forwards}
-@keyframes fade-in{from{opacity:0}to{opacity:1}}
+.hero{display:flex;flex-direction:column;align-items:flex-start;padding:8rem 2.5rem 5rem;position:relative;max-width:960px;margin:0 auto}
+.eyebrow{font-family:var(--ff);font-size:0.8rem;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:2rem;opacity:0;animation:fadeUp .6s ease forwards .1s}
+.headline{font-family:var(--fs);font-size:clamp(3rem,7vw,5.2rem);line-height:1.12;font-weight:400;color:var(--white);margin-bottom:0;opacity:0;animation:fadeUp .7s ease forwards .25s}
+.headline-row{display:block}
+.rotating-word-wrap{display:inline-block;position:relative;vertical-align:bottom}
+.rotating-line{white-space:nowrap}
+.rotating-word{display:inline-block;color:var(--accent);font-style:italic;position:relative;white-space:nowrap}
+.rotating-word::after{content:'';position:absolute;bottom:6px;left:0;right:0;height:2px;background:var(--accent);opacity:0.35;border-radius:2px}
+@keyframes wordIn{0%{opacity:0;transform:translateY(14px) skewX(-2deg)}100%{opacity:1;transform:translateY(0) skewX(0deg)}}
+@keyframes wordOut{0%{opacity:1;transform:translateY(0) skewX(0deg)}100%{opacity:0;transform:translateY(-14px) skewX(2deg)}}
+.word-in{animation:wordIn .38s cubic-bezier(.22,.68,0,1.2) forwards}
+.word-out{animation:wordOut .3s cubic-bezier(.4,0,.6,1) forwards}
+
+/* ---- WE / YOU BLOCK ---- */
+.we-you-block{display:flex;align-items:center;gap:0;margin-top:3rem;opacity:0;animation:fadeUp .7s ease forwards .5s;width:100%;position:relative}
+.we-col{flex-shrink:0;border-right:1px solid var(--border);padding-right:2.5rem}
+.you-col{position:absolute;top:50%;transform:translateY(-50%)}
+.we-outcome,.you-outcome{font-family:var(--fs);font-style:italic;font-size:clamp(1.6rem,3.2vw,2.4rem);line-height:1.2;margin:0;white-space:nowrap}
+.we-static,.you-static{color:var(--gray)}
+.we-cycling{color:var(--white)}
+.you-accent{color:var(--accent)}
+@keyframes tickerIn{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes tickerOut{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-10px)}}
+.ticker-in{animation:tickerIn .3s cubic-bezier(.22,.68,0,1.1) forwards}
+.ticker-out{animation:tickerOut .25s ease-in forwards}
+@media(max-width:640px){.we-you-block{grid-template-columns:1fr;gap:2rem}.we-col{border-right:none;border-bottom:1px solid var(--border);padding-right:0;padding-bottom:1.5rem}.you-col{padding-left:0}}
+
+.hero-divider{width:100%;height:1px;background:var(--border);margin:3rem 0;opacity:0;animation:fadeUp .6s ease forwards .7s}
+.cta-row{display:flex;gap:1rem;flex-wrap:wrap;justify-content:flex-start;opacity:0;animation:fadeUp .7s ease forwards .85s;width:100%}
+
+/* New CTA button styles */
+.cta-primary{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.4rem;background:var(--accent);color:#0b0f14;font-family:var(--ff);font-size:1rem;font-weight:500;cursor:pointer;text-decoration:none;transition:opacity .2s,transform .15s;min-height:48px;border:none}
+.cta-primary:hover{opacity:.88;transform:translateY(-1px)}
+.cta-secondary{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.4rem;background:transparent;color:var(--gray);font-family:var(--ff);font-size:1rem;font-weight:400;border:1px solid var(--border);cursor:pointer;text-decoration:none;transition:border-color .2s,background .2s,color .2s;min-height:48px}
+.cta-secondary:hover{border-color:rgba(245,244,242,0.2);background:var(--bg2);color:var(--white)}
+.cta-secondary .arrow{transition:transform .2s;display:inline-block}
+.cta-secondary:hover .arrow{transform:translateX(2px)}
+
+@keyframes fadeUp{0%{opacity:0;transform:translateY(18px)}100%{opacity:1;transform:translateY(0)}}
 
 
 /* ---- WHAT WE DO ---- */
@@ -158,6 +189,7 @@ footer{border-top:1px solid var(--border)}
 </head>
 <body>
 
+<div class="glow"></div>
 <!-- GRADIENT DOTS BACKGROUND -->
 <div class="gradient-dots-bg" id="gradientBg"></div>
 
@@ -166,16 +198,16 @@ footer{border-top:1px solid var(--border)}
 <!-- NAV -->
 <nav>
   <a href="index.html" class="brand">
-    <span class="brand-name">IGNEA<span class="brand-accent" style="color:var(--accent)">.LABS</span></span>
+    <span class="brand-name">Ignea<span class="brand-accent" style="color:var(--accent)">.</span></span>
   </a>
   <div class="nav-right">
     <ul class="nav-links">
       <li><a href="index.html" class="active" data-i18n="nav.home">Inicio</a></li>
       <li><a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a></li>
-      <li><a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a></li>
+      <li><a href="diagnostic.html" data-i18n="nav.start">Empieza Aquí</a></li>
       <li><a href="contact.html" data-i18n="nav.contact">Contacto</a></li>
     </ul>
-    <a href="diagnostic.html" class="btn-primary btn-nav" data-i18n-html="nav.cta">Toma el Diagnóstico Gratis &rarr;</a>
+    <a href="diagnostic.html" class="btn-primary btn-nav" data-i18n-html="nav.cta">Agenda tu Llamada &rarr;</a>
     <button class="hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -191,7 +223,7 @@ footer{border-top:1px solid var(--border)}
 <div class="mobile-menu" id="mobileMenu">
   <a href="index.html" class="active" data-i18n="nav.home">Inicio</a>
   <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
-  <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
+  <a href="diagnostic.html" data-i18n="nav.start">Empieza Aquí</a>
   <a href="contact.html" data-i18n="nav.contact">Contacto</a>
 </div>
 
@@ -199,15 +231,43 @@ footer{border-top:1px solid var(--border)}
 
 <!-- HERO -->
 <header class="hero">
-  <div class="hero-tag" data-i18n="hero.tag">// Infraestructura de IA para Puerto Rico</div>
-  <h1 data-i18n-html="hero.title">Tu negocio pierde <em class="red">dinero</em> cada mes.<br>Encontramos las brechas, las cerramos,<br>y te mostramos el <em>ROI.</em></h1>
-  <p class="hero-p" data-i18n-html="hero.sub">Toma un diagnóstico gratis.<br>Analizamos las operaciones de tu negocio, completamos un informe de consultoría, y construimos software que le ahorra a tu empresa tiempo, energía y dinero.</p>
+  <h1 class="headline">
+    <span class="headline-row"><span data-i18n="hero.headline1">We identify how your</span> <span data-i18n="hero.headline2pre">business can</span></span>
+    <span class="headline-row rotating-line"><span class="rotating-word" id="rotatingWord">save money</span></span>
+    <span class="headline-row"><span data-i18n="hero.headline2suf">with AI.</span></span>
+  </h1>
+
+
+  <div class="hero-divider"></div>
+
   <div class="cta-row">
-    <a href="diagnostic.html" class="btn-gradient" data-i18n-btn="hero.cta1">Toma el Diagnóstico Gratis &rarr;</a>
-    <a href="manifesto.html" class="btn-ghost-slide"><span data-i18n="hero.cta2">Leer Manifiesto</span><span class="btn-arrow">&rarr;</span></a>
+    <a href="diagnostic.html" class="cta-primary" data-i18n-btn="hero.cta1">Agenda tu Llamada Gratis &rarr;</a>
+    <a href="demo.html" class="cta-secondary"><span data-i18n="hero.cta.secondary">Ver reporte de muestra →</span></a>
+    <a href="manifesto.html" class="cta-secondary"><span data-i18n="hero.cta2">Read Manifesto</span><span class="arrow">&nbsp;&rarr;</span></a>
   </div>
 </header>
 
+<!-- STATS -->
+
+<!-- MARQUEE -->
+<section class="sec-marquee">
+  <div class="marquee-track">
+    <div class="marquee-inner">
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r1.ind">🍽 Restaurante · Bayamón</span><span class="mq-result" data-i18n="mq.r1.res">22 hrs/semana recuperadas</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r2.ind">🏥 Clínica · San Juan</span><span class="mq-result" data-i18n="mq.r2.res">60% menos no-shows</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r3.ind">⚖️ Firma Legal · Ponce</span><span class="mq-result" data-i18n="mq.r3.res">$1,840/mes recuperados</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r4.ind">🏨 Hotel · Condado</span><span class="mq-result" data-i18n="mq.r4.res">28% aumento en ocupación</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r5.ind">🛍 Retail · Caguas</span><span class="mq-result" data-i18n="mq.r5.res">Inventario 100% automatizado</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r6.ind">🏗 Construcción · Guaynabo</span><span class="mq-result" data-i18n="mq.r6.res">32 hrs/semana recuperadas</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r1.ind">🍽 Restaurante · Bayamón</span><span class="mq-result" data-i18n="mq.r1.res">22 hrs/semana recuperadas</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r2.ind">🏥 Clínica · San Juan</span><span class="mq-result" data-i18n="mq.r2.res">60% menos no-shows</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r3.ind">⚖️ Firma Legal · Ponce</span><span class="mq-result" data-i18n="mq.r3.res">$1,840/mes recuperados</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r4.ind">🏨 Hotel · Condado</span><span class="mq-result" data-i18n="mq.r4.res">28% aumento en ocupación</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r5.ind">🛍 Retail · Caguas</span><span class="mq-result" data-i18n="mq.r5.res">Inventario 100% automatizado</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r6.ind">🏗 Construcción · Guaynabo</span><span class="mq-result" data-i18n="mq.r6.res">32 hrs/semana recuperadas</span></div>
+    </div>
+  </div>
+</section>
 
 <!-- WHAT WE DO -->
 <section class="sec-whatwedo">
@@ -247,6 +307,48 @@ footer{border-top:1px solid var(--border)}
 
 
 
+
+<!-- INDUSTRY TABS -->
+<section class="sec-industry content-wrap fade-up">
+  <div class="sec-tag" data-i18n="ind.tag">// Para tu industria</div>
+  <h2 style="font-size:clamp(24px,3vw,36px);margin-bottom:0" data-i18n="ind.title">Lo que construimos para ti</h2>
+  <div class="ind-tabs">
+    <button class="ind-tab active" data-tab="rest" data-i18n="ind.rest.label">Restaurante</button>
+    <button class="ind-tab" data-tab="clinic" data-i18n="ind.clinic.label">Clínica</button>
+    <button class="ind-tab" data-tab="hotel" data-i18n="ind.hotel.label">Hotel</button>
+    <button class="ind-tab" data-tab="law" data-i18n="ind.law.label">Firma Legal</button>
+  </div>
+  <div class="ind-panels">
+    <div class="ind-panel active" data-panel="rest">
+      <div class="ind-grid">
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.rest.pain">Coordinación por WhatsApp, reservas a mano, inventario en papel.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.rest.solution">Bot de WhatsApp para reservas y pedidos + alertas de inventario + rastreo automático de no-shows.</p></div>
+        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.rest.roi">Recupera 18–25 hrs/semana. ROI típico: 2.1 meses.</p></div>
+      </div>
+    </div>
+    <div class="ind-panel" data-panel="clinic">
+      <div class="ind-grid">
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.clinic.pain">Citas por teléfono, recordatorios manuales, expedientes en papel.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.clinic.solution">Agendamiento automático 24/7 + recordatorios por WhatsApp + resumen de notas por IA.</p></div>
+        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.clinic.roi">Reduce no-shows 60%. ROI típico: 1.8 meses.</p></div>
+      </div>
+    </div>
+    <div class="ind-panel" data-panel="hotel">
+      <div class="ind-grid">
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.hotel.pain">Reservas manuales, check-in en papel, comunicación desorganizada con huéspedes.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.hotel.solution">Motor de reservas integrado + mensajería automatizada a huéspedes + sincronización de canales.</p></div>
+        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.hotel.roi">Aumenta ocupación 15–30%. ROI típico: 2.4 meses.</p></div>
+      </div>
+    </div>
+    <div class="ind-panel" data-panel="law">
+      <div class="ind-grid">
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.law.pain">Facturación manual, seguimiento de tiempo en Excel, intake de clientes por correo.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.law.solution">Intake automatizado de clientes + rastreo de horas con IA + facturación y recordatorios automáticos.</p></div>
+        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.law.roi">Captura 8–12 hrs/semana en facturación perdida. ROI: 1.5 meses.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- CALCULATOR -->
 <section class="sec-calculator fade-up">
@@ -291,7 +393,7 @@ footer{border-top:1px solid var(--border)}
       <div class="calc-result-value" id="calcResultValue">$0</div>
       <div class="calc-result-unit" data-i18n="calc.resultUnit">/mes</div>
       <div class="calc-result-note" data-i18n="calc.resultNote">en productividad desperdiciada</div>
-      <a href="diagnostic.html" class="btn-primary" data-i18n-btn="calc.cta">Obtén tu diagnóstico completo &rarr;</a>
+      <a href="diagnostic.html" class="btn-primary" data-i18n-btn="calc.cta">Agenda tu Llamada Gratis &rarr;</a>
     </div>
   </div>
 </section>
@@ -309,12 +411,21 @@ footer{border-top:1px solid var(--border)}
   </div>
 </section>
 
+<!-- MANIFESTO QUOTE -->
+<section class="sec-mq content-wrap fade-up">
+  <div class="mq-body">
+    <p class="mq-l1" data-i18n="mq.line1">No vendemos IA.</p>
+    <p class="mq-l2" data-i18n="mq.line2">Construimos infraestructura.</p>
+    <a href="manifesto.html" class="mq-link" data-i18n="mq.link">Leer el Manifiesto →</a>
+  </div>
+</section>
+
 <!-- CTA -->
 <section class="sec-cta">
   <div class="content-wrap" style="text-align:center">
     <div class="sec-tag" data-i18n="cta.tag">// ¿Listo?</div>
     <h2 data-i18n="cta.headline">¿Cuánto potencial dormido tiene tu negocio?</h2>
-    <a href="diagnostic.html" class="btn-primary" data-i18n-html="cta.btn">Toma el Diagnóstico Gratis &rarr;</a>
+    <a href="diagnostic.html" class="btn-primary" data-i18n-html="cta.btn">Agenda tu Llamada Gratis &rarr;</a>
     <p class="cta-note" data-i18n="cta.note">Completamente encriptado. Resultados instantáneos.</p>
   </div>
 </section>
@@ -326,14 +437,14 @@ footer{border-top:1px solid var(--border)}
   <div class="footer-inner content-wrap">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="f-brand">IGNEA<span>.LABS</span></div>
+        <div class="f-brand" style="font-family:var(--fs);font-weight:400;letter-spacing:0.02em">Ignea<span>.</span></div>
         <div class="f-tag" data-i18n="footer.tag">Bajo la superficie, el potencial.</div>
         <div style="font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;margin-top:6px" data-i18n="footer.address">San Juan, Puerto Rico</div>
       </div>
       <div class="footer-nav">
         <a href="index.html" data-i18n="nav.home">Inicio</a>
         <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
-        <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
+        <a href="diagnostic.html" data-i18n="nav.start">Empieza Aquí</a>
         <a href="contact.html" data-i18n="nav.contact">Contacto</a>
       </div>
       <div class="footer-contact">
@@ -351,6 +462,95 @@ footer{border-top:1px solid var(--border)}
 
 <!-- SCRIPTS -->
 <script src="js/i18n.js"></script>
+<script>
+// Hero rotating words
+var heroLangData = {
+  es: {
+    words:   ['ahorrar dinero', 'crecer', 'optimizarse'],
+    weWords: ['el software', 'los empleados IA', 'los anuncios', 'las herramientas', 'los agentes'],
+    youWords:['tiempo', 'energía', 'dinero']
+  },
+  en: {
+    words:   ['save money', 'grow', 'lean out'],
+    weWords: ['software', 'AI employees', 'ads', 'finance tools', 'research agents'],
+    youWords:['time', 'energy', 'money']
+  }
+};
+var heroWordIdx = 0, weIdx = 0, youIdx = 0;
+var wordEl    = document.getElementById('rotatingWord');
+var weCycling = document.getElementById('weCycling');
+var youAccent = document.getElementById('youAccent');
+var weColEl   = document.querySelector('.we-col');
+
+function heroCurrentLang() { return localStorage.getItem('ignea_lang') || 'es'; }
+
+// Lock .we-col to its widest word so it NEVER reflows during cycling
+if (weColEl && weCycling) {
+  var allWeWords = heroLangData.en.weWords.concat(heroLangData.es.weWords);
+  var maxWeWidth = 0;
+  allWeWords.forEach(function(w) {
+    weCycling.textContent = w;
+    maxWeWidth = Math.max(maxWeWidth, weColEl.getBoundingClientRect().width);
+  });
+  weColEl.style.minWidth = maxWeWidth + 'px';
+  weCycling.textContent = heroLangData[heroCurrentLang()].weWords[0];
+  // Pin .you-col left edge at a fixed position — 64px gap after the locked we-col
+  var youColEl = document.querySelector('.you-col');
+  if (youColEl) { youColEl.style.left = (maxWeWidth + 64) + 'px'; }
+}
+
+function swap(el, nextText, cls) {
+  if (!el) return;
+  el.classList.add('ticker-out');
+  setTimeout(function() {
+    el.textContent = nextText;
+    el.classList.remove('ticker-out');
+    el.classList.add(cls || 'ticker-in');
+    setTimeout(function() { el.classList.remove('ticker-in'); }, 400);
+  }, 250);
+}
+
+function heroSwapWord() {
+  if (!wordEl) return;
+  var words = heroLangData[heroCurrentLang()].words;
+  wordEl.classList.remove('word-in');
+  wordEl.classList.add('word-out');
+  setTimeout(function() {
+    heroWordIdx = (heroWordIdx + 1) % words.length;
+    wordEl.textContent = words[heroWordIdx];
+    wordEl.classList.remove('word-out');
+    wordEl.classList.add('word-in');
+  }, 300);
+}
+
+function heroSwapWe() {
+  var d = heroLangData[heroCurrentLang()];
+  weIdx = (weIdx + 1) % d.weWords.length;
+  swap(weCycling, d.weWords[weIdx]);
+}
+
+function heroSwapYou() {
+  var d = heroLangData[heroCurrentLang()];
+  youIdx = (youIdx + 1) % d.youWords.length;
+  swap(youAccent, d.youWords[youIdx]);
+}
+
+setInterval(heroSwapWord, 1800);
+setTimeout(function() { setInterval(heroSwapWe,  2000); }, 600);
+setTimeout(function() { setInterval(heroSwapYou, 2000); }, 1300);
+
+var _origSetLang = window.setLang;
+window.setLang = function(lang) {
+  if (_origSetLang) _origSetLang(lang);
+  setTimeout(function() {
+    var d = heroLangData[heroCurrentLang()];
+    heroWordIdx = 0; weIdx = 0; youIdx = 0;
+    if (wordEl)    wordEl.textContent    = d.words[0];
+    if (weCycling) weCycling.textContent = d.weWords[0];
+    if (youAccent) youAccent.textContent = d.youWords[0];
+  }, 50);
+};
+</script>
 <script src="js/analytics.js"></script>
 <script src="js/grid-bg.js"></script>
 <script src="js/terminal.js"></script>
@@ -370,9 +570,9 @@ document.addEventListener('DOMContentLoaded', function() {
     tick();
   }
   setTimeout(function() {
-    anim(document.getElementById('s1'), 72, '%', 1400);
+    anim(document.getElementById('s1'), 72, '', 1400);
     anim(document.getElementById('s2'), 32, '', 1600);
-    anim(document.getElementById('s3'), 40, '%', 1300);
+    anim(document.getElementById('s3'), 40, '', 1300);
     anim(document.getElementById('s4'), 10, '', 1100);
   }, 800);
 
@@ -455,5 +655,23 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
+<script>
+// Industry tabs
+document.querySelectorAll('.ind-tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    var target = tab.dataset.tab;
+    document.querySelectorAll('.ind-tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.ind-panel').forEach(function(p) { p.classList.remove('active'); });
+    tab.classList.add('active');
+    var panel = document.querySelector('.ind-panel[data-panel="' + target + '"]');
+    if (panel) panel.classList.add('active');
+  });
+});
+</script>
+
+<!-- WHATSAPP FLOAT -->
+<a href="https://wa.me/19493736407" target="_blank" rel="noopener" class="wa-float" aria-label="WhatsApp">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
 </body>
 </html>

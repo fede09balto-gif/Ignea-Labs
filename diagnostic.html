@@ -3,30 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diagnóstico de IA | Ignea Labs</title>
-<meta name="description" content="Descubre el potencial dormido en tu negocio. 11 preguntas, resultados instantáneos, completamente encriptado.">
-<meta property="og:title" content="Diagnóstico de IA | Ignea Labs">
-<meta property="og:description" content="Descubre el potencial dormido en tu negocio. 11 preguntas, resultados instantáneos, completamente encriptado.">
+<title>Empieza Aquí | Ignea Labs</title>
+<meta name="description" content="Cuéntanos sobre tu negocio en 3 minutos. Preparamos todo para una llamada que vale la pena.">
+<meta property="og:title" content="Empieza Aquí | Ignea Labs">
+<meta property="og:description" content="Cuéntanos sobre tu negocio en 3 minutos. Preparamos todo para una llamada que vale la pena.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://ignealabs.com/diagnostic.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/shared.css">
 <link rel="stylesheet" href="css/components.css">
 <style>
 /* PROGRESS */
-.progress-wrap{max-width:680px;margin:0 auto;padding:20px 40px 0}
+.progress-wrap{max-width:none;padding:20px 60px 0}
 .progress-bar{height:2px;background:var(--border);position:relative;margin-bottom:8px}
 .progress-fill{height:100%;background:var(--accent);transition:width .4s ease;width:0%}
 .progress-text{font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;text-align:right}
 
 /* Q-WRAP */
-.q-wrap{display:none;max-width:680px;margin:0 auto;padding:40px;opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
+.q-wrap{display:none;max-width:none;padding:32px 60px 90px;opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
 .q-wrap.active{display:block;opacity:1;transform:translateY(0)}
-
 
 /* LANDING */
 .dx-landing{text-align:center;padding-top:40px;padding-bottom:40px}
@@ -38,80 +36,74 @@
 /* INFO */
 .info-screen h2{font-size:26px;font-weight:700;margin-bottom:8px}
 .info-sub{font-size:15px;color:var(--gray);margin-bottom:28px;line-height:1.6}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px}
 .info-full{grid-column:1 / -1}
 .info-confidential{font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;margin-top:12px;text-align:center}
 
 /* QUESTION SCREENS */
-.q-counter{font-family:var(--fm);font-size:14px;color:var(--text-dim);letter-spacing:1px;margin-bottom:16px}
-.q-text{font-size:clamp(22px,3.5vw,32px);font-weight:600;color:var(--white);line-height:1.3;margin-bottom:28px;letter-spacing:-.02em}
+.q-counter{font-family:var(--fm);font-size:12px;color:var(--accent);letter-spacing:2.5px;margin-bottom:20px;text-transform:uppercase}
+.q-text{font-size:clamp(20px,3vw,28px);font-weight:700;color:var(--white);line-height:1.35;margin-bottom:36px;letter-spacing:-.02em}
 
 /* QUESTION TEXTAREA */
+.q-textarea-label{font-family:var(--fm);font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);margin-bottom:8px}
 .q-textarea{width:100%;min-height:120px;padding:16px;background:var(--bg2);border:1px solid var(--border);color:var(--white);font-family:var(--ff);font-size:16px;line-height:1.6;resize:vertical;transition:border-color .2s}
 .q-textarea:focus{border-color:var(--accent);outline:none}
 .q-textarea::placeholder{color:var(--text-dim);font-size:14px;line-height:1.5}
 .q-textarea.q-optional{min-height:80px}
-.q-textarea.q-required{min-height:160px}
+.q-textarea.q-required{min-height:120px}
 
 /* CARDS SECTION LABELS */
-.q-cards-label{font-family:var(--fm);font-size:13px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim);margin:24px 0 12px}
-.q-text-label{font-family:var(--fm);font-size:13px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim);margin:24px 0 12px}
+.q-cards-label,.q-text-label{font-family:var(--fm);font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-dim);margin:28px 0 14px;display:flex;align-items:center;gap:14px}
+.q-cards-label::before,.q-text-label::before{content:'';flex:1;height:1px;background:var(--border)}
 
 /* QUESTION CARDS */
 .q-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
-.q-card{display:flex;align-items:center;gap:12px;padding:16px 20px;background:var(--bg2);border:1px solid var(--border);color:var(--gray);font-family:var(--ff);font-size:16px;cursor:pointer;transition:all .2s;min-height:48px;user-select:none}
+.q-card{display:flex;align-items:center;gap:14px;padding:18px 20px;background:var(--bg2);border:1px solid var(--border);color:var(--gray);font-family:var(--ff);font-size:16px;cursor:pointer;transition:all .2s;min-height:56px;user-select:none}
 .q-card:hover{border-color:rgba(255,255,255,0.15);color:var(--white)}
 .q-card.selected{border-color:var(--accent);background:var(--accent3);color:var(--white)}
 .q-card .q-card-check{width:18px;height:18px;border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--accent);transition:all .2s}
 .q-card.selected .q-card-check{border-color:var(--accent);background:var(--accent2)}
-.q-card.selected .q-card-check::after{content:'✓'}
+.q-card.selected .q-card-check::after{content:'\2713'}
 
 /* ENCOURAGE LINE */
-.q-encourage{font-size:14px;color:var(--text-dim);text-align:center;margin-top:24px;font-style:italic}
-
-/* TIME SLIDER */
-.q-slider-wrap{margin:24px 0;text-align:center}
-.q-slider-val{font-family:var(--fm);font-size:32px;font-weight:700;color:var(--accent);margin-bottom:4px}
-.q-slider-fte{font-family:var(--fm);font-size:14px;color:var(--gray);margin-top:8px}
-.q-slider-label{font-size:15px;color:var(--gray);margin-bottom:12px}
-.q-slider{width:100%;margin:12px 0;accent-color:var(--accent)}
-
-/* PHASE TRANSITION */
-.q-transition{text-align:center;padding-top:60px}
-.q-transition .q-text{color:var(--gray);font-size:18px;font-weight:500}
+.q-encourage{font-size:13px;color:var(--text-dim);text-align:center;margin-top:20px;font-style:italic;letter-spacing:.3px}
 
 /* NAV */
 .q-nav{display:flex;gap:12px;justify-content:space-between;align-items:center;margin-top:32px}
+.q-screen .q-nav,.info-screen .q-nav{display:none}
 
-/* PROCESSING */
-.processing-screen{text-align:center;padding-top:80px;padding-bottom:80px}
-.proc-msg{font-family:var(--fm);font-size:14px;color:var(--text-dim);letter-spacing:1px;margin-bottom:16px;opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
-.proc-msg.visible{opacity:1;transform:translateY(0);color:var(--accent)}
-.proc-spinner{width:32px;height:32px;border:2px solid var(--border);border-top:2px solid var(--accent);animation:spin 1s linear infinite;margin:0 auto 32px}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* FIXED BOTTOM NAV BAR */
+.q-nav-fixed{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(10,10,12,0.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:14px 60px;display:none}
+.q-nav-fixed-inner{max-width:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
 
-/* MONEY LEAK COUNTER */
-.money-leak{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--coral);padding:16px 20px;z-index:100;opacity:0;transition:opacity .4s ease;pointer-events:none}
-.money-leak.visible{opacity:1}
-.money-leak-label{font-family:var(--fm);font-size:13px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim)}
-.money-leak-value{font-family:var(--fm);font-size:32px;font-weight:700;color:var(--coral)}
-.money-leak-unit{font-family:var(--fm);font-size:14px;color:var(--gray)}
+/* SUCCESS SCREEN */
+.success-screen{text-align:center;padding-top:60px;padding-bottom:60px}
+.success-screen h2{font-size:clamp(24px,3vw,34px);font-weight:800;margin-bottom:16px}
+.success-sub{font-size:16px;color:var(--gray);max-width:480px;margin:0 auto 32px;line-height:1.7}
+.success-check{width:64px;height:64px;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:28px;color:var(--accent)}
+.success-next{margin-top:40px;padding:32px;background:var(--bg2);border:1px solid var(--border);max-width:480px;margin-left:auto;margin-right:auto;text-align:left}
+.success-next h3{font-size:16px;font-weight:700;margin-bottom:12px;color:var(--white)}
+.success-next p{font-size:14px;color:var(--gray);line-height:1.6;margin-bottom:8px}
+.success-next a{color:var(--accent);text-decoration:none}
+.success-next a:hover{text-decoration:underline}
 
-@media(max-width:768px){
-  .q-wrap{padding:28px 20px}
+/* WIDE CARDS for cards-only screens */
+.q-screen:not(.q-screen--dual).active .q-cards{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+
+@media(max-width:900px){
+  .q-wrap{padding:24px 20px 90px}
   .progress-wrap{padding:16px 20px 0}
+  .q-nav-fixed{padding:12px 20px}
+}
+@media(max-width:768px){
   .dx-landing{padding-top:40px;padding-bottom:40px}
   .dx-landing-stats{flex-direction:column;align-items:center;gap:8px}
   .info-grid{grid-template-columns:1fr}
   .info-full{grid-column:1}
   .q-cards{grid-template-columns:1fr}
-  .money-leak{bottom:0;left:0;right:0;display:flex;align-items:center;gap:8px;padding:10px 16px;border-left:none;border-right:none;border-bottom:none}
-  .money-leak-value{font-size:24px}
 }
 @media(max-width:480px){
   .dx-landing h1{font-size:24px}
-  .q-nav{flex-direction:column}
-  .q-nav .btn-ghost,.q-nav .btn-primary{width:100%;justify-content:center}
 }
 </style>
 <script defer data-domain="ignealabs.com" src="https://plausible.io/js/script.js"></script>
@@ -131,11 +123,11 @@
   <div class="nav-right">
     <ul class="nav-links">
       <li><a href="index.html" data-i18n="nav.home">Inicio</a></li>
-      <li><a href="manifesto.html" data-i18n="nav.manifesto">Nuestra Tesis</a></li>
-      <li><a href="diagnostic.html" class="active" data-i18n="nav.diagnostic">Diagnóstico</a></li>
+      <li><a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a></li>
+      <li><a href="diagnostic.html" class="active" data-i18n="nav.start">Empieza Aquí</a></li>
       <li><a href="contact.html" data-i18n="nav.contact">Contacto</a></li>
     </ul>
-    <a href="diagnostic.html" class="btn-primary btn-nav" data-i18n-html="nav.cta">Iniciar Diagnóstico &rarr;</a>
+    <a href="diagnostic.html" class="btn-primary btn-nav" data-i18n-html="nav.cta">Agenda tu Llamada &rarr;</a>
     <button class="hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -150,8 +142,8 @@
 <div class="mobile-overlay" id="mobileOverlay"></div>
 <div class="mobile-menu" id="mobileMenu">
   <a href="index.html" data-i18n="nav.home">Inicio</a>
-  <a href="manifesto.html" data-i18n="nav.manifesto">Nuestra Tesis</a>
-  <a href="diagnostic.html" class="active" data-i18n="nav.diagnostic">Diagnóstico</a>
+  <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+  <a href="diagnostic.html" class="active" data-i18n="nav.start">Empieza Aquí</a>
   <a href="contact.html" data-i18n="nav.contact">Contacto</a>
 </div>
 
@@ -160,82 +152,68 @@
 <!-- PROGRESS BAR (hidden on landing) -->
 <div class="progress-wrap" id="progressWrap" style="visibility:hidden">
   <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
-  <div class="progress-text" id="progText">0 / 11</div>
+  <div class="progress-text" id="progText">0 / 5</div>
 </div>
-<div class="diagnostic-progress step-progress" id="stepProgress"></div>
 
 <!-- ============================================ -->
-<!-- SCREEN 0: LANDING PAGE -->
+<!-- SCREEN 0: LANDING -->
 <!-- ============================================ -->
 <div class="q-wrap dx-landing active" id="landingScreen">
-  <h1 data-i18n="dx.landing.headline">Descubre cuánto potencial tiene tu negocio bajo la superficie.</h1>
-  <p class="dx-landing-sub" data-i18n="dx.landing.sub">Once preguntas. Cada una diseñada para revelar lo que importa — las ineficiencias ocultas a simple vista, los sistemas que deberían funcionar mejor, y las oportunidades que tu competencia aún no ha encontrado.</p>
+  <h1 data-i18n="intake.landing.headline">Cuéntanos sobre tu negocio. Preparamos todo para una llamada que vale la pena.</h1>
+  <p class="dx-landing-sub" data-i18n="intake.landing.sub">9 preguntas. 3 minutos. Cero compromiso. Nos da lo que necesitamos para llegar a la llamada listos — sin hacerte perder tiempo repitiendo lo básico.</p>
   <div class="dx-landing-stats">
-    <span data-i18n="diag.c1">11 preguntas</span>
-    <span data-i18n="diag.c2">10–15 min</span>
-    <span data-i18n="diag.c3">Resultados inmediatos</span>
+    <span data-i18n="intake.landing.s1">9 preguntas</span>
+    <span data-i18n="intake.landing.s2">3 minutos</span>
+    <span data-i18n="intake.landing.s3">100% confidencial</span>
   </div>
-  <button class="btn-gradient" id="landingStartBtn" data-i18n-btn="dx.landing.cta">Comenzar Diagnóstico &rarr;</button>
-  <p class="dx-landing-note" data-i18n="dx.landing.note">Tus respuestas quedan entre nosotros. Mientras más honesto seas, más preciso será tu diagnóstico.</p>
+  <button class="btn-gradient" id="landingStartBtn" data-i18n-btn="intake.landing.cta">Empezar &rarr;</button>
+  <p class="dx-landing-note" data-i18n="intake.landing.note">No es un examen. No hay puntuación. Solo queremos entender tu situación antes de hablar.</p>
 </div>
 
 <!-- ============================================ -->
-<!-- SCREEN 1: INFO COLLECTION (Antes de comenzar) -->
+<!-- SCREEN 1: CONTACT INFO (Q1 + Q2 + Q3) -->
 <!-- ============================================ -->
 <div class="q-wrap info-screen" id="infoScreen">
-  <h2 data-i18n="dx.before.title">Antes de comenzar</h2>
-  <p class="info-sub" data-i18n="dx.before.sub">Esta información se utiliza exclusivamente para personalizar tus resultados. Tus datos están encriptados de extremo a extremo.</p>
+  <h2 data-i18n="intake.info.title">Sobre ti y tu empresa</h2>
+  <p class="info-sub" data-i18n="intake.info.sub">Para saber con quién hablamos y preparar la llamada.</p>
 
   <div class="info-grid">
-    <!-- Row 1 -->
     <div class="info-field">
-      <label class="form-label" for="dxFirstName" data-i18n="dx.field.firstName">Nombre</label>
+      <label class="form-label" for="dxFirstName" data-i18n="intake.field.name">Nombre</label>
       <input type="text" class="form-input" id="dxFirstName" required autocomplete="given-name">
     </div>
     <div class="info-field">
-      <label class="form-label" for="dxLastName" data-i18n="dx.field.lastName">Apellido</label>
-      <input type="text" class="form-input" id="dxLastName" autocomplete="family-name">
-    </div>
-    <!-- Row 2 -->
-    <div class="info-field">
-      <label class="form-label" for="dxEmail" data-i18n="dx.field.email">Email</label>
+      <label class="form-label" for="dxEmail" data-i18n="intake.field.email">Email</label>
       <input type="email" class="form-input" id="dxEmail" required autocomplete="email">
     </div>
     <div class="info-field">
-      <label class="form-label" for="dxPhone" data-i18n="dx.field.phone">Teléfono</label>
-      <input type="tel" class="form-input" id="dxPhone" autocomplete="tel">
-    </div>
-    <!-- Row 3 -->
-    <div class="info-field">
-      <label class="form-label" for="dxCompany" data-i18n="dx.field.company">Empresa</label>
+      <label class="form-label" for="dxCompany" data-i18n="intake.field.company">Empresa</label>
       <input type="text" class="form-input" id="dxCompany" required autocomplete="organization">
     </div>
     <div class="info-field">
-      <label class="form-label" for="dxPosition" data-i18n="dx.field.position">Cargo</label>
-      <input type="text" class="form-input" id="dxPosition" autocomplete="organization-title">
+      <label class="form-label" for="dxPhone" data-i18n="intake.field.phone">WhatsApp o teléfono</label>
+      <input type="tel" class="form-input" id="dxPhone" autocomplete="tel">
     </div>
-    <!-- Row 4 -->
     <div class="info-field">
-      <label class="form-label" for="dxIndustry" data-i18n="dx.field.industry">Industria</label>
+      <label class="form-label" for="dxIndustry" data-i18n="intake.field.industry">Industria</label>
       <select class="form-select" id="dxIndustry" data-custom>
         <option value="">—</option>
-        <option value="hotel" data-i18n="dx.industry.hotel">Hotelería y turismo</option>
-        <option value="restaurant" data-i18n="dx.industry.restaurant">Restaurantes y alimentación</option>
-        <option value="medical" data-i18n="dx.industry.medical">Clínica médica</option>
-        <option value="dental" data-i18n="dx.industry.dental">Clínica dental</option>
-        <option value="legal" data-i18n="dx.industry.legal">Servicios legales</option>
-        <option value="accounting" data-i18n="dx.industry.accounting">Contabilidad y finanzas</option>
-        <option value="realestate" data-i18n="dx.industry.realestate">Bienes raíces</option>
-        <option value="retail" data-i18n="dx.industry.retail">Comercio minorista</option>
-        <option value="agriculture" data-i18n="dx.industry.agriculture">Agricultura y exportación</option>
-        <option value="education" data-i18n="dx.industry.education">Educación</option>
-        <option value="construction" data-i18n="dx.industry.construction">Construcción</option>
-        <option value="logistics" data-i18n="dx.industry.logistics">Logística y transporte</option>
-        <option value="other" data-i18n="dx.industry.other">Otro</option>
+        <option value="restaurant" data-i18n="intake.ind.restaurant">Restaurante / alimentación</option>
+        <option value="medical" data-i18n="intake.ind.medical">Clínica médica o dental</option>
+        <option value="legal" data-i18n="intake.ind.legal">Servicios legales</option>
+        <option value="hotel" data-i18n="intake.ind.hotel">Hotelería y turismo</option>
+        <option value="retail" data-i18n="intake.ind.retail">Comercio / retail</option>
+        <option value="construction" data-i18n="intake.ind.construction">Construcción</option>
+        <option value="logistics" data-i18n="intake.ind.logistics">Logística y transporte</option>
+        <option value="accounting" data-i18n="intake.ind.accounting">Contabilidad y finanzas</option>
+        <option value="realestate" data-i18n="intake.ind.realestate">Bienes raíces</option>
+        <option value="education" data-i18n="intake.ind.education">Educación</option>
+        <option value="agriculture" data-i18n="intake.ind.agriculture">Agricultura</option>
+        <option value="other" data-i18n="intake.ind.other">Otro</option>
       </select>
     </div>
     <div class="info-field">
-      <label class="form-label" for="dxSize" data-i18n="dx.field.size">Tamaño</label>
+      <label class="form-label" for="dxSize" data-i18n="intake.field.size">Tamaño del equipo</label>
       <select class="form-select" id="dxSize" data-custom>
         <option value="">—</option>
         <option value="1-5">1–5</option>
@@ -244,56 +222,23 @@
         <option value="50+">50+</option>
       </select>
     </div>
-    <!-- Row 5 -->
-    <div class="info-field">
-      <label class="form-label" for="dxWebsite" data-i18n="dx.field.website">Sitio web</label>
-      <input type="url" class="form-input" id="dxWebsite" placeholder="https://" autocomplete="url">
-    </div>
-    <div class="info-field">
-      <label class="form-label" for="dxRevenue" data-i18n="dx.field.revenue">Ingresos mensuales</label>
-      <select class="form-select" id="dxRevenue" data-custom>
-        <option value="">—</option>
-        <option value="0" data-i18n="dx.rev.o1">Menos de $2,000</option>
-        <option value="1" data-i18n="dx.rev.o2">$2,000 – $5,000</option>
-        <option value="2" data-i18n="dx.rev.o3">$5,000 – $15,000</option>
-        <option value="3" data-i18n="dx.rev.o4">$15,000 – $50,000</option>
-        <option value="4" data-i18n="dx.rev.o5">Más de $50,000</option>
-        <option value="5" data-i18n="dx.rev.o6">Prefiero no decir</option>
-      </select>
-    </div>
-    <!-- Row 6 -->
-    <div class="info-field info-full">
-      <label class="form-label" for="dxLinkedin" data-i18n="dx.field.linkedin">LinkedIn</label>
-      <input type="text" class="form-input" id="dxLinkedin" placeholder="linkedin.com/company/..." autocomplete="off">
-    </div>
   </div>
 
   <div class="q-nav">
     <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
-    <button class="btn-primary" id="infoNextBtn" disabled data-i18n-btn="dx.before.continue">Continuar &rarr;</button>
+    <button class="btn-primary" id="infoNextBtn" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
   </div>
-  <p class="info-confidential" data-i18n="dx.before.confidential">Tus respuestas son confidenciales.</p>
+  <p class="info-confidential" data-i18n="intake.info.confidential">Tus datos son confidenciales. Solo los usa nuestro equipo para preparar tu llamada.</p>
 </div>
 
 <!-- ============================================ -->
-<!-- Q1 — HOW CUSTOMERS FIND YOU (Phase 1: text first) -->
+<!-- SCREEN 2: Q4 — BIGGEST HEADACHE -->
 <!-- ============================================ -->
 <div class="q-wrap q-screen" data-q="1">
-  <div class="q-counter">01 / 11</div>
-  <div class="q-text" data-i18n="dx.q1.text">¿Cómo te encuentran tus clientes y cómo te contactan por primera vez?</div>
-  <textarea class="q-textarea" data-q="q1_text" data-i18n-placeholder="dx.q1.ph" placeholder="Por ejemplo: nos buscan en Instagram, nos escriben por WhatsApp, llegan de boca en boca, nos llaman por teléfono... cuéntanos el camino típico desde que alguien se entera de tu negocio hasta que te habla por primera vez."></textarea>
-  <div class="q-cards-label" data-i18n="dx.fastpath">O selecciona rápidamente:</div>
-  <div class="q-cards" data-q="q1_cards" data-type="multi">
-    <div class="q-card" data-val="whatsapp"><span class="q-card-check"></span><span data-i18n="dx.q1.c1">WhatsApp</span></div>
-    <div class="q-card" data-val="phone"><span class="q-card-check"></span><span data-i18n="dx.q1.c2">Llamada telefónica</span></div>
-    <div class="q-card" data-val="walkin"><span class="q-card-check"></span><span data-i18n="dx.q1.c3">Visita en persona</span></div>
-    <div class="q-card" data-val="social"><span class="q-card-check"></span><span data-i18n="dx.q1.c4">Redes sociales (Instagram, Facebook)</span></div>
-    <div class="q-card" data-val="website"><span class="q-card-check"></span><span data-i18n="dx.q1.c5">Sitio web</span></div>
-    <div class="q-card" data-val="google"><span class="q-card-check"></span><span data-i18n="dx.q1.c6">Google / búsqueda en internet</span></div>
-    <div class="q-card" data-val="referral"><span class="q-card-check"></span><span data-i18n="dx.q1.c7">Referido / boca en boca</span></div>
-    <div class="q-card" data-val="email"><span class="q-card-check"></span><span data-i18n="dx.q1.c8">Email</span></div>
-  </div>
-  <div class="q-encourage" data-i18n="dx.encourage">✦ Mientras más nos cuentes, más preciso será tu diagnóstico.</div>
+  <div class="q-counter">01 / 05</div>
+  <div class="q-text" data-i18n="intake.q4.text">En una o dos oraciones: ¿cuál es el problema operativo más grande de tu negocio ahora mismo?</div>
+  <div class="q-textarea-label" data-i18n="intake.q4.label">Sé directo — no hay respuesta incorrecta</div>
+  <textarea class="q-textarea q-required" data-q="q4_headache" data-i18n-placeholder="intake.q4.ph" placeholder="Ejemplo: Perdemos clientes porque nadie responde WhatsApp a tiempo. O: Tengo 3 personas haciendo trabajo que debería ser automático. O: No sé cuáles de mis servicios son rentables."></textarea>
   <div class="q-nav">
     <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
     <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
@@ -301,30 +246,34 @@
 </div>
 
 <!-- ============================================ -->
-<!-- Q2 — WHAT EATS YOUR TEAM'S TIME (Phase 1: text first + slider) -->
+<!-- SCREEN 3: Q5 — TIME LEAKS + Q6 — TOOLS -->
 <!-- ============================================ -->
 <div class="q-wrap q-screen" data-q="2">
-  <div class="q-counter">02 / 11</div>
-  <div class="q-text" data-i18n="dx.q2.text">¿Qué tareas le quitan más tiempo a tu equipo cada semana — el trabajo repetitivo que nunca se siente terminado?</div>
-  <textarea class="q-textarea" data-q="q2_text" data-i18n-placeholder="dx.q2.ph" placeholder="Por ejemplo: responder las mismas preguntas por WhatsApp, confirmar citas, actualizar inventario, hacer cotizaciones, pasar datos de un lugar a otro... Si puedes, estima cuántas horas por semana se van en cada cosa."></textarea>
-  <div class="q-cards-label" data-i18n="dx.fastpath">O selecciona rápidamente:</div>
-  <div class="q-cards" data-q="q2_cards" data-type="multi">
-    <div class="q-card" data-val="whatsapp_repeat"><span class="q-card-check"></span><span data-i18n="dx.q2.c1">Responder las mismas preguntas por WhatsApp</span></div>
-    <div class="q-card" data-val="scheduling"><span class="q-card-check"></span><span data-i18n="dx.q2.c2">Agendar o confirmar citas</span></div>
-    <div class="q-card" data-val="followup"><span class="q-card-check"></span><span data-i18n="dx.q2.c3">Dar seguimiento a clientes que no respondieron</span></div>
-    <div class="q-card" data-val="inventory"><span class="q-card-check"></span><span data-i18n="dx.q2.c4">Actualizar inventario o stock</span></div>
-    <div class="q-card" data-val="invoicing"><span class="q-card-check"></span><span data-i18n="dx.q2.c5">Crear facturas o cotizaciones</span></div>
-    <div class="q-card" data-val="data_transfer"><span class="q-card-check"></span><span data-i18n="dx.q2.c6">Pasar datos de un lugar a otro</span></div>
-    <div class="q-card" data-val="reports"><span class="q-card-check"></span><span data-i18n="dx.q2.c7">Hacer reportes</span></div>
-    <div class="q-card" data-val="logistics"><span class="q-card-check"></span><span data-i18n="dx.q2.c8">Coordinar entregas o logística</span></div>
+  <div class="q-counter">02 / 05</div>
+  <div class="q-text" data-i18n="intake.q5.text">¿Dónde pierde más tiempo tu equipo cada semana?</div>
+  <div class="q-cards" data-q="q5_timeleaks" data-type="multi">
+    <div class="q-card" data-val="same_questions"><span class="q-card-check"></span><span data-i18n="intake.q5.c1">Respondiendo las mismas preguntas</span></div>
+    <div class="q-card" data-val="scheduling"><span class="q-card-check"></span><span data-i18n="intake.q5.c2">Agendando o confirmando citas</span></div>
+    <div class="q-card" data-val="followups"><span class="q-card-check"></span><span data-i18n="intake.q5.c3">Dando seguimiento a clientes</span></div>
+    <div class="q-card" data-val="data_entry"><span class="q-card-check"></span><span data-i18n="intake.q5.c4">Pasando datos de un lugar a otro</span></div>
+    <div class="q-card" data-val="invoicing"><span class="q-card-check"></span><span data-i18n="intake.q5.c5">Cotizaciones o facturas</span></div>
+    <div class="q-card" data-val="coordination"><span class="q-card-check"></span><span data-i18n="intake.q5.c6">Coordinando al equipo</span></div>
+    <div class="q-card" data-val="reports"><span class="q-card-check"></span><span data-i18n="intake.q5.c7">Haciendo reportes</span></div>
+    <div class="q-card" data-val="other"><span class="q-card-check"></span><span data-i18n="intake.q5.c8">Otra cosa</span></div>
   </div>
-  <div class="q-slider-wrap">
-    <div class="q-slider-label" data-i18n="dx.q2.sliderLabel">Estimación: ¿cuántas horas por semana pierde tu equipo en estas tareas?</div>
-    <div class="q-slider-val" id="q2SliderVal">20 hrs/semana</div>
-    <input type="range" class="q-slider" id="q2Slider" min="0" max="100" step="5" value="20">
-    <div class="q-slider-fte" id="q2Fte" data-i18n-template="dx.q2.fte">0.5 empleados de tiempo completo dedicados a trabajo repetitivo</div>
+
+  <div class="q-cards-label" data-i18n="intake.q6.label">¿Qué herramientas usan hoy?</div>
+  <div class="q-cards" data-q="q6_tools" data-type="multi">
+    <div class="q-card" data-val="whatsapp"><span class="q-card-check"></span><span>WhatsApp</span></div>
+    <div class="q-card" data-val="excel"><span class="q-card-check"></span><span>Excel / Google Sheets</span></div>
+    <div class="q-card" data-val="accounting"><span class="q-card-check"></span><span data-i18n="intake.q6.c3">Software de contabilidad</span></div>
+    <div class="q-card" data-val="pos"><span class="q-card-check"></span><span data-i18n="intake.q6.c4">Punto de venta / POS</span></div>
+    <div class="q-card" data-val="crm"><span class="q-card-check"></span><span>CRM</span></div>
+    <div class="q-card" data-val="booking"><span class="q-card-check"></span><span data-i18n="intake.q6.c6">Sistema de citas / reservas</span></div>
+    <div class="q-card" data-val="paper"><span class="q-card-check"></span><span data-i18n="intake.q6.c7">Papel / cuadernos</span></div>
+    <div class="q-card" data-val="social"><span class="q-card-check"></span><span data-i18n="intake.q6.c8">Redes sociales para vender</span></div>
   </div>
-  <div class="q-encourage" data-i18n="dx.encourage">✦ Mientras más nos cuentes, más preciso será tu diagnóstico.</div>
+
   <div class="q-nav">
     <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
     <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
@@ -332,21 +281,13 @@
 </div>
 
 <!-- ============================================ -->
-<!-- Q3 — HOW CUSTOMER CONVERSATIONS WORK (Phase 1: text first) -->
+<!-- SCREEN 4: Q7 — TRIED BEFORE? + Q8 — BUDGET SIGNAL -->
 <!-- ============================================ -->
 <div class="q-wrap q-screen" data-q="3">
-  <div class="q-counter">03 / 11</div>
-  <div class="q-text" data-i18n="dx.q3.text">Cuando un cliente te escribe o te llama — ¿quién le responde, por dónde, y cuánto se tarda?</div>
-  <textarea class="q-textarea" data-q="q3_text" data-i18n-placeholder="dx.q3.ph" placeholder="Cuéntanos quién se encarga de responder, si es siempre la misma persona, qué pasa cuando nadie está disponible, si se pierden mensajes, y si alguien atiende de noche o en fin de semana."></textarea>
-  <div class="q-cards-label" data-i18n="dx.fastpath">O selecciona rápidamente:</div>
-  <div class="q-cards" data-q="q3_card" data-type="single">
-    <div class="q-card" data-val="0"><span class="q-card-check"></span><span data-i18n="dx.q3.c1">Respondemos en menos de 5 minutos</span></div>
-    <div class="q-card" data-val="1"><span class="q-card-check"></span><span data-i18n="dx.q3.c2">Respondemos en menos de 1 hora</span></div>
-    <div class="q-card" data-val="2"><span class="q-card-check"></span><span data-i18n="dx.q3.c3">A veces tardamos unas horas</span></div>
-    <div class="q-card" data-val="3"><span class="q-card-check"></span><span data-i18n="dx.q3.c4">Usualmente respondemos al día siguiente</span></div>
-    <div class="q-card" data-val="4"><span class="q-card-check"></span><span data-i18n="dx.q3.c5">Honestamente, a veces se nos pasan mensajes</span></div>
-  </div>
-  <div class="q-encourage" data-i18n="dx.encourage">✦ Mientras más nos cuentes, más preciso será tu diagnóstico.</div>
+  <div class="q-counter">03 / 05</div>
+  <div class="q-text" data-i18n="intake.q7.text">¿Has intentado resolver este problema antes? ¿Qué pasó?</div>
+  <textarea class="q-textarea q-optional" data-q="q7_tried" data-i18n-placeholder="intake.q7.ph" placeholder="Si contrataste a alguien, probaste un software, o lo intentaste internamente — cuéntanos qué pasó. Si no has intentado nada, déjalo en blanco."></textarea>
+
   <div class="q-nav">
     <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
     <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
@@ -354,209 +295,43 @@
 </div>
 
 <!-- ============================================ -->
-<!-- Q4 — FROM ORDER TO DELIVERY (Phase 1: text first) -->
+<!-- SCREEN 5: Q9 — WILDCARD (optional) -->
 <!-- ============================================ -->
 <div class="q-wrap q-screen" data-q="4">
-  <div class="q-counter">04 / 11</div>
-  <div class="q-text" data-i18n="dx.q4.text">Desde que un cliente hace un pedido o solicita un servicio hasta que se completa — ¿cómo funciona ese proceso paso a paso?</div>
-  <textarea class="q-textarea" data-q="q4_text" data-i18n-placeholder="dx.q4.ph" placeholder="Describe el recorrido: quién recibe el pedido, cómo se pasa al siguiente paso, qué sistemas o herramientas usan, dónde se atasca o se retrasa, y cuánto tarda todo el ciclo normalmente."></textarea>
-  <div class="q-cards-label" data-i18n="dx.fastpath">O selecciona rápidamente:</div>
-  <div class="q-cards" data-q="q4_card" data-type="single">
-    <div class="q-card" data-val="0"><span class="q-card-check"></span><span data-i18n="dx.q4.c1">Una persona hace todo, de memoria o en papel</span></div>
-    <div class="q-card" data-val="1"><span class="q-card-check"></span><span data-i18n="dx.q4.c2">Varias personas, coordinadas por WhatsApp o llamadas</span></div>
-    <div class="q-card" data-val="2"><span class="q-card-check"></span><span data-i18n="dx.q4.c3">Varias personas, con Excel o hojas compartidas</span></div>
-    <div class="q-card" data-val="3"><span class="q-card-check"></span><span data-i18n="dx.q4.c4">Tenemos un sistema o software que organiza el flujo</span></div>
-  </div>
-  <div class="q-encourage" data-i18n="dx.encourage">✦ Mientras más nos cuentes, más preciso será tu diagnóstico.</div>
+  <div class="q-counter">04 / 05</div>
+  <div class="q-text" data-i18n="intake.q9.text">¿Algo más que quieras que sepa antes de la llamada?</div>
+  <textarea class="q-textarea q-optional" data-q="q9_wildcard" data-i18n-placeholder="intake.q9.ph" placeholder="Opcional. Cualquier contexto que nos ayude a preparar mejor: plazos, frustraciones, lo que sea."></textarea>
   <div class="q-nav">
     <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
-    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
+    <button class="btn-primary btn-next" data-i18n-btn="intake.submit">Enviar y Agendar Llamada &rarr;</button>
   </div>
 </div>
 
 <!-- ============================================ -->
-<!-- TRANSITION SCREEN -->
+<!-- SCREEN 6: SUCCESS -->
 <!-- ============================================ -->
-<div class="q-wrap q-screen q-transition" data-q="transition">
-  <div class="q-text" data-i18n="dx.transition.text">Gracias — ahora unas preguntas específicas para calcular tu puntuación.</div>
-  <div class="q-nav" style="justify-content:center">
-    <button class="btn-primary btn-next" data-i18n-btn="dx.transition.continue">Continuar &rarr;</button>
-  </div>
-</div>
+<div class="q-wrap success-screen" id="successScreen">
+  <div class="success-check">&#10003;</div>
+  <h2 data-i18n="intake.success.title">Listo. Ya tenemos lo que necesitamos.</h2>
+  <p class="success-sub" data-i18n="intake.success.sub">Vamos a revisar tus respuestas y preparar todo para que la llamada sea lo más útil posible para ti. Nada de ventas genéricas — llegamos con ideas específicas para tu negocio.</p>
 
-<!-- ============================================ -->
-<!-- Q5 — WHERE MONEY IS HANDLED MANUALLY (Phase 2: cards first) -->
-<!-- ============================================ -->
-<div class="q-wrap q-screen" data-q="5">
-  <div class="q-counter">05 / 11</div>
-  <div class="q-text" data-i18n="dx.q5.text">En tu negocio, ¿cuáles de estos procesos de dinero todavía se hacen a mano?</div>
-  <div class="q-cards" data-q="q5_cards" data-type="multi">
-    <div class="q-card" data-val="quotes_manual"><span class="q-card-check"></span><span data-i18n="dx.q5.c1">Cotizaciones se hacen en Word, papel o WhatsApp</span></div>
-    <div class="q-card" data-val="invoices_manual"><span class="q-card-check"></span><span data-i18n="dx.q5.c2">Facturas se crean a mano</span></div>
-    <div class="q-card" data-val="collections_manual"><span class="q-card-check"></span><span data-i18n="dx.q5.c3">Cobros se rastrean en cuaderno o Excel</span></div>
-    <div class="q-card" data-val="supplier_whatsapp"><span class="q-card-check"></span><span data-i18n="dx.q5.c4">Pagos a proveedores se coordinan por WhatsApp</span></div>
-    <div class="q-card" data-val="no_debt_tracking"><span class="q-card-check"></span><span data-i18n="dx.q5.c5">No hay forma fácil de saber quién nos debe dinero</span></div>
-    <div class="q-card" data-val="all_automated"><span class="q-card-check"></span><span data-i18n="dx.q5.c6">Ya todo está en un sistema automatizado</span></div>
+  <div class="success-next">
+    <h3 data-i18n="intake.success.next.title">Siguiente paso</h3>
+    <p data-i18n="intake.success.next.p1">Agenda tu llamada de descubrimiento. 30 minutos. Sin compromiso.</p>
+    <p><a href="https://calendly.com/ignealabs/discovery" target="_blank" rel="noopener" data-i18n-html="intake.success.next.cta">Agendar llamada &rarr;</a></p>
+    <p style="margin-top:16px;font-size:13px;color:var(--text-dim)" data-i18n="intake.success.next.alt">¿Prefieres WhatsApp? Escríbenos a <a href="https://wa.me/17875551234" style="color:var(--accent)">+1 (787) 555-1234</a></p>
   </div>
-  <div class="q-text-label" data-i18n="dx.depthpath">¿Quieres agregar más detalle?</div>
-  <textarea class="q-textarea q-optional" data-q="q5_text" data-i18n-placeholder="dx.q5.ph" placeholder="Cada punto donde se escribe un número, se negocia un precio, o se procesa un pago — y cuánto de eso es manual vs. automático..."></textarea>
-  <div class="q-encourage" data-i18n="dx.encourage">✦ Mientras más nos cuentes, más preciso será tu diagnóstico.</div>
-  <div class="q-nav">
-    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
-    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
-  </div>
-</div>
-
-<!-- ============================================ -->
-<!-- Q6 — EXISTING SYSTEMS (Phase 2: cards first) -->
-<!-- ============================================ -->
-<div class="q-wrap q-screen" data-q="6">
-  <div class="q-counter">06 / 11</div>
-  <div class="q-text" data-i18n="dx.q6.text">¿Qué sistemas, software o herramientas ya tiene tu negocio — aunque no los uses bien o estén desactualizados?</div>
-  <div class="q-cards" data-q="q6_cards" data-type="multi">
-    <div class="q-card" data-val="paper"><span class="q-card-check"></span><span data-i18n="dx.q6.c1">Cuadernos o papel</span></div>
-    <div class="q-card" data-val="whatsapp_work"><span class="q-card-check"></span><span data-i18n="dx.q6.c2">WhatsApp para coordinar trabajo</span></div>
-    <div class="q-card" data-val="excel"><span class="q-card-check"></span><span data-i18n="dx.q6.c3">Excel o Google Sheets</span></div>
-    <div class="q-card" data-val="social_selling"><span class="q-card-check"></span><span data-i18n="dx.q6.c4">Redes sociales para vender</span></div>
-    <div class="q-card" data-val="accounting"><span class="q-card-check"></span><span data-i18n="dx.q6.c5">Software de contabilidad</span></div>
-    <div class="q-card" data-val="pos"><span class="q-card-check"></span><span data-i18n="dx.q6.c6">Sistema de punto de venta / POS</span></div>
-    <div class="q-card" data-val="crm"><span class="q-card-check"></span><span data-i18n="dx.q6.c7">CRM o sistema de ventas</span></div>
-    <div class="q-card" data-val="inventory_sys"><span class="q-card-check"></span><span data-i18n="dx.q6.c8">Sistema de inventario</span></div>
-    <div class="q-card" data-val="booking"><span class="q-card-check"></span><span data-i18n="dx.q6.c9">Software de reservas o citas</span></div>
-    <div class="q-card" data-val="website_form"><span class="q-card-check"></span><span data-i18n="dx.q6.c10">Sitio web con formulario de contacto</span></div>
-    <div class="q-card" data-val="unused_system"><span class="q-card-check"></span><span data-i18n="dx.q6.c11">Sistema que pagamos pero no usamos</span></div>
-    <div class="q-card" data-val="connected_systems"><span class="q-card-check"></span><span data-i18n="dx.q6.c12">Varios sistemas que sí se conectan entre sí</span></div>
-  </div>
-  <div class="q-text-label" data-i18n="dx.depthpath">¿Quieres agregar más detalle?</div>
-  <textarea class="q-textarea q-optional" data-q="q6_text" data-i18n-placeholder="dx.q6.ph" placeholder="Tu tecnología actual, honestamente — qué usas, qué quisieras usar, qué pagas sin aprovechar, y qué tan bien se conecta todo. Incluye nombres específicos si los recuerdas..."></textarea>
-  <div class="q-encourage" data-i18n="dx.encourage">✦ Mientras más nos cuentes, más preciso será tu diagnóstico.</div>
-  <div class="q-nav">
-    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
-    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
-  </div>
-</div>
-
-<!-- ============================================ -->
-<!-- Q7 — HOW THEY MAKE DECISIONS (Phase 2: cards first) -->
-<!-- ============================================ -->
-<div class="q-wrap q-screen" data-q="7">
-  <div class="q-counter">07 / 11</div>
-  <div class="q-text" data-i18n="dx.q7.text">Cuando necesitas tomar una decisión importante sobre tu negocio, ¿de dónde sacas la información?</div>
-  <div class="q-cards" data-q="q7_card" data-type="single">
-    <div class="q-card" data-val="0"><span class="q-card-check"></span><span data-i18n="dx.q7.c1">Intuición y experiencia</span></div>
-    <div class="q-card" data-val="1"><span class="q-card-check"></span><span data-i18n="dx.q7.c2">Le pregunto a mi equipo o mi contador</span></div>
-    <div class="q-card" data-val="2"><span class="q-card-check"></span><span data-i18n="dx.q7.c3">Reviso hojas de cálculo o registros</span></div>
-    <div class="q-card" data-val="3"><span class="q-card-check"></span><span data-i18n="dx.q7.c4">Tengo reportes que consulto regularmente</span></div>
-    <div class="q-card" data-val="4"><span class="q-card-check"></span><span data-i18n="dx.q7.c5">Tengo dashboards con datos en tiempo real</span></div>
-  </div>
-  <div class="q-text-label" data-i18n="dx.depthpath">¿Quieres agregar más detalle?</div>
-  <textarea class="q-textarea q-optional" data-q="q7_text" data-i18n-placeholder="dx.q7.ph" placeholder="Los momentos donde tu equipo trabaja con información diferente — o sin información. Las decisiones que tomas a ciegas..."></textarea>
-  <div class="q-encourage" data-i18n="dx.encourage">✦ Mientras más nos cuentes, más preciso será tu diagnóstico.</div>
-  <div class="q-nav">
-    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
-    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
-  </div>
-</div>
-
-<!-- ============================================ -->
-<!-- Q8 — HOW OFTEN THEY LOSE BUSINESS (Phase 2: cards first) -->
-<!-- ============================================ -->
-<div class="q-wrap q-screen" data-q="8">
-  <div class="q-counter">08 / 11</div>
-  <div class="q-text" data-i18n="dx.q8.text">¿Con qué frecuencia pierdes clientes o ventas por no responder a tiempo, no dar seguimiento, o no tener la información lista?</div>
-  <div class="q-cards" data-q="q8_card" data-type="single">
-    <div class="q-card" data-val="0"><span class="q-card-check"></span><span data-i18n="dx.q8.c1">Casi nunca — lo tenemos bajo control</span></div>
-    <div class="q-card" data-val="1"><span class="q-card-check"></span><span data-i18n="dx.q8.c2">Rara vez</span></div>
-    <div class="q-card" data-val="2"><span class="q-card-check"></span><span data-i18n="dx.q8.c3">A veces</span></div>
-    <div class="q-card" data-val="3"><span class="q-card-check"></span><span data-i18n="dx.q8.c4">Con frecuencia</span></div>
-    <div class="q-card" data-val="4"><span class="q-card-check"></span><span data-i18n="dx.q8.c5">No sé — no tenemos forma de medirlo</span></div>
-  </div>
-  <div class="q-text-label" data-i18n="dx.depthpath">¿Quieres agregar más detalle?</div>
-  <textarea class="q-textarea q-optional" data-q="q8_text" data-i18n-placeholder="dx.q8.ph" placeholder="Piensa en las ventas que se cayeron, los clientes que dejaron de escribir, las oportunidades que no pudiste aprovechar — y por qué..."></textarea>
-  <div class="q-encourage" data-i18n="dx.encourage">✦ Mientras más nos cuentes, más preciso será tu diagnóstico.</div>
-  <div class="q-nav">
-    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
-    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
-  </div>
-</div>
-
-<!-- ============================================ -->
-<!-- Q9 — CAN THEY HANDLE GROWTH (Phase 2: cards first) -->
-<!-- ============================================ -->
-<div class="q-wrap q-screen" data-q="9">
-  <div class="q-counter">09 / 11</div>
-  <div class="q-text" data-i18n="dx.q9.text">Si mañana tuvieras el doble de clientes, ¿qué pasaría con tu operación?</div>
-  <div class="q-cards" data-q="q9_card" data-type="single">
-    <div class="q-card" data-val="0"><span class="q-card-check"></span><span data-i18n="dx.q9.c1">Colapsaríamos — no hay forma</span></div>
-    <div class="q-card" data-val="1"><span class="q-card-check"></span><span data-i18n="dx.q9.c2">Tendríamos que contratar mucha gente rápido</span></div>
-    <div class="q-card" data-val="2"><span class="q-card-check"></span><span data-i18n="dx.q9.c3">Lo podríamos manejar con algo de esfuerzo extra</span></div>
-    <div class="q-card" data-val="3"><span class="q-card-check"></span><span data-i18n="dx.q9.c4">Estamos preparados para crecer</span></div>
-  </div>
-  <div class="q-text-label" data-i18n="dx.depthpath">¿Quieres agregar más detalle?</div>
-  <textarea class="q-textarea q-optional" data-q="q9_text" data-i18n-placeholder="dx.q9.ph" placeholder="¿Qué se rompería primero — la atención al cliente, la logística, la capacidad de tu equipo? ¿Y qué tendrías que hacer para no colapsar?"></textarea>
-  <div class="q-encourage" data-i18n="dx.encourage">✦ Mientras más nos cuentes, más preciso será tu diagnóstico.</div>
-  <div class="q-nav">
-    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
-    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
-  </div>
-</div>
-
-<!-- ============================================ -->
-<!-- Q10 — WHAT COULD A SYSTEM DO (Phase 2: cards first) -->
-<!-- ============================================ -->
-<div class="q-wrap q-screen" data-q="10">
-  <div class="q-counter">10 / 11</div>
-  <div class="q-text" data-i18n="dx.q10.text">De todo lo que hace tu equipo, ¿qué podría hacer un sistema confiable y rápido sin necesitar el criterio de una persona?</div>
-  <div class="q-cards" data-q="q10_cards" data-type="multi">
-    <div class="q-card" data-val="faq_answers"><span class="q-card-check"></span><span data-i18n="dx.q10.c1">Responder preguntas frecuentes de clientes</span></div>
-    <div class="q-card" data-val="scheduling"><span class="q-card-check"></span><span data-i18n="dx.q10.c2">Agendar citas o reservaciones</span></div>
-    <div class="q-card" data-val="reminders"><span class="q-card-check"></span><span data-i18n="dx.q10.c3">Enviar recordatorios y seguimientos</span></div>
-    <div class="q-card" data-val="quotes"><span class="q-card-check"></span><span data-i18n="dx.q10.c4">Generar cotizaciones estándar</span></div>
-    <div class="q-card" data-val="inventory_auto"><span class="q-card-check"></span><span data-i18n="dx.q10.c5">Actualizar inventario automáticamente</span></div>
-    <div class="q-card" data-val="task_assign"><span class="q-card-check"></span><span data-i18n="dx.q10.c6">Organizar y asignar tareas al equipo</span></div>
-    <div class="q-card" data-val="nothing"><span class="q-card-check"></span><span data-i18n="dx.q10.c7">Nada — todo requiere a una persona</span></div>
-  </div>
-  <div class="q-text-label" data-i18n="dx.depthpath">¿Quieres agregar más detalle?</div>
-  <textarea class="q-textarea q-optional" data-q="q10_text" data-i18n-placeholder="dx.q10.ph" placeholder="Piensa en las tareas que son puramente mecánicas vs. las que necesitan experiencia, intuición o habilidad para relacionarse con personas..."></textarea>
-  <div class="q-encourage" data-i18n="dx.encourage">✦ Mientras más nos cuentes, más preciso será tu diagnóstico.</div>
-  <div class="q-nav">
-    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
-    <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
-  </div>
-</div>
-
-<!-- ============================================ -->
-<!-- Q11 — THE UNLOCK QUESTION (text only) -->
-<!-- ============================================ -->
-<div class="q-wrap q-screen" data-q="11">
-  <div class="q-counter">11 / 11</div>
-  <div class="q-text" data-i18n="dx.q11.text">¿Cuál es el problema más grande que afecta la rentabilidad de tu negocio hoy — y si ese problema desapareciera mañana, qué haría posible?</div>
-  <textarea class="q-textarea q-required" data-q="q11_text" data-i18n-placeholder="dx.q11.ph" placeholder="Lo que más te frena — en tiempo, dinero, o oportunidades perdidas. Y lo que harías con esa libertad si el problema dejara de existir..."></textarea>
-  <div class="q-encourage" data-i18n="dx.encourage">✦ Mientras más nos cuentes, más preciso será tu diagnóstico.</div>
-  <div class="q-nav">
-    <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
-    <button class="btn-primary btn-next" disabled data-i18n-btn="q.submit">Completar Diagnóstico &rarr;</button>
-  </div>
-</div>
-
-<!-- ============================================ -->
-<!-- PROCESSING SCREEN -->
-<!-- ============================================ -->
-<div class="q-wrap processing-screen" id="processingScreen">
-  <div class="proc-spinner"></div>
-  <div class="proc-msg" data-i18n="dx.processing1">Procesando tu diagnóstico...</div>
-  <div class="proc-msg" data-i18n="dx.processing2">Calculando tu puntuación...</div>
-  <div class="proc-msg" data-i18n="dx.processing3">Generando recomendaciones...</div>
-</div>
-
-<!-- MONEY LEAK COUNTER -->
-<div class="money-leak" id="moneyLeak">
-  <div class="money-leak-label" data-i18n="dx.leak.label">Tu negocio está perdiendo</div>
-  <div class="money-leak-value" id="moneyLeakVal">$0</div>
-  <div class="money-leak-unit" data-i18n="dx.leak.unit">/mes</div>
 </div>
 
 </main>
+
+<!-- FIXED NAV BAR -->
+<div class="q-nav-fixed" id="qNavFixed">
+  <div class="q-nav-fixed-inner">
+    <button class="btn-ghost" id="fixedPrevBtn">&larr; Anterior</button>
+    <button class="btn-primary" id="fixedNextBtn" disabled>Siguiente &rarr;</button>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer>
@@ -569,8 +344,8 @@
       </div>
       <div class="footer-nav">
         <a href="index.html" data-i18n="nav.home">Inicio</a>
-        <a href="manifesto.html" data-i18n="nav.manifesto">Nuestra Tesis</a>
-        <a href="diagnostic.html" data-i18n="nav.diagnostic">Diagnóstico</a>
+        <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+        <a href="diagnostic.html" data-i18n="nav.start">Empieza Aquí</a>
         <a href="contact.html" data-i18n="nav.contact">Contacto</a>
       </div>
       <div class="footer-contact">
@@ -589,35 +364,49 @@
 <script src="js/i18n.js"></script>
 <script src="js/analytics.js"></script>
 <script src="js/grid-bg.js"></script>
-<script src="js/scoring.js"></script>
 <script src="js/custom-select.js"></script>
 <script src="js/diagnostic.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/sheets-sync.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+// syncFixedNav — defined globally so diagnostic.js can call it
+window.syncFixedNav = function() {
+  var active = document.querySelector('.q-wrap.active');
+  var nav = document.getElementById('qNavFixed');
+  var prevBtn = document.getElementById('fixedPrevBtn');
+  var nextBtn = document.getElementById('fixedNextBtn');
+  if (!nav || !prevBtn || !nextBtn || !active) return;
 
-  // Init custom selects
-  if (typeof initAllCustomSelects === 'function') initAllCustomSelects();
+  var isLanding = active.id === 'landingScreen';
+  var isSuccess = active.id === 'successScreen';
+  if (isLanding || isSuccess) { nav.style.display = 'none'; return; }
 
-  // Hamburger menu
-  var ham = document.getElementById('hamburger');
-  var menu = document.getElementById('mobileMenu');
-  var overlay = document.getElementById('mobileOverlay');
-  if (ham) {
-    ham.addEventListener('click', function() {
-      ham.classList.toggle('open');
-      menu.classList.toggle('open');
-      overlay.classList.toggle('open');
-    });
-    overlay.addEventListener('click', function() {
-      ham.classList.remove('open');
-      menu.classList.remove('open');
-      overlay.classList.remove('open');
-    });
+  nav.style.display = 'block';
+
+  var srcNext = active.id === 'infoScreen'
+    ? document.getElementById('infoNextBtn')
+    : active.querySelector('.btn-next');
+  var srcPrev = active.querySelector('.btn-prev');
+
+  nextBtn.disabled = srcNext ? srcNext.disabled : true;
+  prevBtn.style.visibility = srcPrev ? 'visible' : 'hidden';
+
+  var lang = (localStorage.getItem('ignea_lang') || 'es');
+  var isInfo = active.id === 'infoScreen';
+  var isSubmit = active.querySelector('[data-i18n-btn="intake.submit"]');
+  if (isSubmit) {
+    nextBtn.innerHTML = lang === 'es' ? 'Enviar y Agendar Llamada &rarr;' : 'Submit &amp; Book Call &rarr;';
+  } else if (isInfo) {
+    nextBtn.innerHTML = lang === 'es' ? 'Siguiente &rarr;' : 'Next &rarr;';
+  } else {
+    nextBtn.innerHTML = lang === 'es' ? 'Siguiente &rarr;' : 'Next &rarr;';
   }
+  prevBtn.innerHTML = lang === 'es' ? '&larr; Anterior' : '&larr; Back';
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof initAllCustomSelects === 'function') initAllCustomSelects();
 });
 </script>
-<script src="js/scroll-animations.js"></script>
 </body>
 </html>

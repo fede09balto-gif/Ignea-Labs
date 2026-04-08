@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/ops", "destination": "/ops.html" },
+    { "source": "/demo", "destination": "/demo.html" },
     { "source": "/(.*)", "destination": "/404.html" }
   ],
   "headers": [

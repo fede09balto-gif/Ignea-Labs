@@ -3,14 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resultados del Diagnóstico | Ignea Labs</title>
-<meta name="description" content="Tu puntuación de preparación digital y recomendaciones personalizadas de Ignea Labs.">
-<meta property="og:title" content="Resultados del Diagnóstico | Ignea Labs">
-<meta property="og:description" content="Tu puntuación de preparación digital y recomendaciones personalizadas de Ignea Labs.">
+<title>Reporte de Muestra | Ignea Labs</title>
+<meta name="description" content="Ejemplo de diagnóstico de IA de Ignea Labs para un restaurante en Puerto Rico.">
+<meta property="og:title" content="Reporte de Muestra | Ignea Labs">
+<meta property="og:description" content="Ejemplo de diagnóstico de IA de Ignea Labs para un restaurante en Puerto Rico.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="canonical" href="https://ignealabs.com/results.html">
+<link rel="canonical" href="https://ignealabs.com/demo">
+<script>
+(function() {
+  var answers = {
+    contact: {
+      firstName: "Carlos", lastName: "Rodríguez",
+      email: "carlos@casaverdebayamon.com",
+      company: "Casa Verde Restaurant",
+      industry: "restaurant", size: "6-15",
+      revenue: "10k-30k", position: "Dueño"
+    },
+    answers: {
+      q1: "Instagram y recomendaciones de amigos",
+      q2: "Coordinar reservaciones y tomar pedidos por WhatsApp",
+      q3: "Respondemos en 2-4 horas, a veces más",
+      q4: "Todo manual — papel y llamadas telefónicas",
+      q5: "Contamos inventario a mano cada noche",
+      q6: "WhatsApp, Excel, papel",
+      q7: "Mi memoria y el Excel del mes pasado",
+      q8: "Clientes que no aparecen a sus reservaciones",
+      q9: "No podríamos manejarlo — necesitaríamos más personal",
+      q10: "Reservaciones, confirmaciones, inventario básico",
+      q11: "Perdemos tiempo en cosas que una computadora podría hacer"
+    }
+  };
+  var scores = {
+    total: 38,
+    level: "developing",
+    dimensions: [
+      { key: "customerInteraction", score: 32, insight: "Comunicación principalmente por WhatsApp sin automatización" },
+      { key: "processMaturity", score: 28, insight: "Procesos manuales dominan todas las operaciones" },
+      { key: "digitalPresence", score: 45, insight: "Instagram activo pero sin integración operacional" },
+      { key: "dataUtilization", score: 30, insight: "Sin métricas sistemáticas de negocio" },
+      { key: "aiReadiness", score: 55, insight: "Procesos claramente automatizables identificados" }
+    ],
+    costHours: 24,
+    costMonth: 1840,
+    costYear: 22080,
+    painpoints: [
+      { key: "operationsFlow", monthlyCost: 820 },
+      { key: "customerFlow", monthlyCost: 640 },
+      { key: "growthFlow", monthlyCost: 380 }
+    ],
+    solutions: ["customer", "operations", "information"],
+    savingsMonth: 1480,
+    savingsYear: 17760,
+    savingsBreakeven: 2.1
+  };
+  sessionStorage.setItem('ignea_diagnostic_answers', JSON.stringify(answers));
+  sessionStorage.setItem('ignea_diagnostic_scores', JSON.stringify(scores));
+  sessionStorage.setItem('ignea_diagnostic_id', 'demo');
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -173,6 +225,10 @@
 <script defer data-domain="ignealabs.com" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
+
+<div class="demo-banner">
+  <span>📋 </span><span data-i18n="demo.banner">Este es un reporte de muestra — basado en datos reales de un restaurante en Puerto Rico. </span><a href="diagnostic.html" data-i18n="demo.banner.cta">Toma tu diagnóstico gratis →</a>
+</div>
 
 <div class="gradient-dots-bg" id="gradientBg"></div>
 
