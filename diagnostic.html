@@ -149,7 +149,7 @@
 
 <main>
 
-<!-- PROGRESS BAR (hidden on landing) -->
+<!-- PROGRESS BAR (hidden on landing and hook) -->
 <div class="progress-wrap" id="progressWrap" style="visibility:hidden">
   <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
   <div class="progress-text" id="progText">0 / 5</div>
@@ -160,9 +160,9 @@
 <!-- ============================================ -->
 <div class="q-wrap dx-landing active" id="landingScreen">
   <h1 data-i18n="intake.landing.headline">Cuéntanos sobre tu negocio. Preparamos todo para una llamada que vale la pena.</h1>
-  <p class="dx-landing-sub" data-i18n="intake.landing.sub">9 preguntas. 3 minutos. Cero compromiso. Nos da lo que necesitamos para llegar a la llamada listos — sin hacerte perder tiempo repitiendo lo básico.</p>
+  <p class="dx-landing-sub" data-i18n="intake.landing.sub">5 preguntas. 3 minutos. Cero compromiso. Nos da lo que necesitamos para llegar a la llamada listos — sin hacerte perder tiempo repitiendo lo básico.</p>
   <div class="dx-landing-stats">
-    <span data-i18n="intake.landing.s1">9 preguntas</span>
+    <span data-i18n="intake.landing.s1">5 preguntas</span>
     <span data-i18n="intake.landing.s2">3 minutos</span>
     <span data-i18n="intake.landing.s3">100% confidencial</span>
   </div>
@@ -171,7 +171,7 @@
 </div>
 
 <!-- ============================================ -->
-<!-- SCREEN 1: CONTACT INFO (Q1 + Q2 + Q3) -->
+<!-- SCREEN 1: CONTACT INFO (expanded) -->
 <!-- ============================================ -->
 <div class="q-wrap info-screen" id="infoScreen">
   <h2 data-i18n="intake.info.title">Sobre ti y tu empresa</h2>
@@ -192,7 +192,15 @@
     </div>
     <div class="info-field">
       <label class="form-label" for="dxPhone" data-i18n="intake.field.phone">WhatsApp o teléfono</label>
-      <input type="tel" class="form-input" id="dxPhone" autocomplete="tel">
+      <input type="tel" class="form-input" id="dxPhone" required autocomplete="tel">
+    </div>
+    <div class="info-field">
+      <label class="form-label" for="dxWebsite" data-i18n="intake.field.website">Sitio web (opcional)</label>
+      <input type="url" class="form-input" id="dxWebsite" placeholder="https://tuempresa.com">
+    </div>
+    <div class="info-field">
+      <label class="form-label" for="dxLinkedin" data-i18n="intake.field.linkedin">LinkedIn (opcional)</label>
+      <input type="text" class="form-input" id="dxLinkedin" placeholder="linkedin.com/in/tu-perfil">
     </div>
     <div class="info-field">
       <label class="form-label" for="dxIndustry" data-i18n="intake.field.industry">Industria</label>
@@ -222,6 +230,18 @@
         <option value="50+">50+</option>
       </select>
     </div>
+    <div class="info-field">
+      <label class="form-label" for="dxRevenue" data-i18n="intake.field.revenue">Ingresos mensuales (opcional)</label>
+      <select class="form-select" id="dxRevenue" data-custom>
+        <option value="">—</option>
+        <option value="under2k" data-i18n="intake.rev.under2k">Menos de $2,000</option>
+        <option value="2k-5k" data-i18n="intake.rev.2k5k">$2,000 - $5,000</option>
+        <option value="5k-15k" data-i18n="intake.rev.5k15k">$5,000 - $15,000</option>
+        <option value="15k-50k" data-i18n="intake.rev.15k50k">$15,000 - $50,000</option>
+        <option value="over50k" data-i18n="intake.rev.over50k">Más de $50,000</option>
+        <option value="prefer_not" data-i18n="intake.rev.prefer_not">Prefiero no decir</option>
+      </select>
+    </div>
   </div>
 
   <div class="q-nav">
@@ -232,14 +252,13 @@
 </div>
 
 <!-- ============================================ -->
-<!-- SCREEN 2: Q4 — BIGGEST HEADACHE -->
+<!-- SCREEN 2: Q2 — BUSINESS DESCRIPTION -->
 <!-- ============================================ -->
 <div class="q-wrap q-screen" data-q="1">
-  <div class="q-counter">01 / 05</div>
-  <div class="q-text" data-i18n="intake.q4.text">En una o dos oraciones: ¿cuál es el problema operativo más grande de tu negocio ahora mismo?</div>
-  <div class="q-textarea-label" data-i18n="intake.q4.label">Sé directo — no hay respuesta incorrecta</div>
+  <div class="q-counter">02 / 05</div>
+  <div class="q-text" data-i18n="intake.q2.text">Cuéntanos sobre tu negocio — ¿qué hacen y qué sistemas o herramientas usan actualmente para operar?</div>
   <div class="voice-wrap">
-    <textarea class="q-textarea q-required" data-q="q4_headache" data-i18n-placeholder="intake.q4.ph" placeholder="Ejemplo: Perdemos clientes porque nadie responde WhatsApp a tiempo. O: Tengo 3 personas haciendo trabajo que debería ser automático. O: No sé cuáles de mis servicios son rentables."></textarea>
+    <textarea class="q-textarea q-required" data-q="q2_business" data-i18n-placeholder="intake.q2.ph" placeholder="Ej: Somos un hotel boutique de 12 habitaciones. Usamos un cuaderno para reservas, WhatsApp para coordinar con el equipo, y Excel para contabilidad..."></textarea>
   </div>
   <div class="q-nav">
     <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
@@ -248,10 +267,10 @@
 </div>
 
 <!-- ============================================ -->
-<!-- SCREEN 3: Q5 — TIME LEAKS + Q6 — TOOLS -->
+<!-- SCREEN 3: Q3 — TIME SINKS + TOOLS -->
 <!-- ============================================ -->
-<div class="q-wrap q-screen" data-q="2">
-  <div class="q-counter">02 / 05</div>
+<div class="q-wrap q-screen q-screen--dual" data-q="2">
+  <div class="q-counter">03 / 05</div>
   <div class="q-text" data-i18n="intake.q5.text">¿Dónde pierde más tiempo tu equipo cada semana?</div>
   <div class="q-cards" data-q="q5_timeleaks" data-type="multi">
     <div class="q-card" data-val="same_questions"><span class="q-card-check"></span><span data-i18n="intake.q5.c1">Respondiendo las mismas preguntas</span></div>
@@ -283,15 +302,15 @@
 </div>
 
 <!-- ============================================ -->
-<!-- SCREEN 4: Q7 — TRIED BEFORE? + Q8 — BUDGET SIGNAL -->
+<!-- SCREEN 4: Q4 — BIGGEST HEADACHE -->
 <!-- ============================================ -->
 <div class="q-wrap q-screen" data-q="3">
-  <div class="q-counter">03 / 05</div>
-  <div class="q-text" data-i18n="intake.q7.text">¿Has intentado resolver este problema antes? ¿Qué pasó?</div>
+  <div class="q-counter">04 / 05</div>
+  <div class="q-text" data-i18n="intake.q4.text">En una o dos oraciones: ¿cuál es el problema operativo más grande de tu negocio ahora mismo?</div>
+  <div class="q-textarea-label" data-i18n="intake.q4.label">Sé directo — no hay respuesta incorrecta</div>
   <div class="voice-wrap">
-    <textarea class="q-textarea q-optional" data-q="q7_tried" data-i18n-placeholder="intake.q7.ph" placeholder="Si contrataste a alguien, probaste un software, o lo intentaste internamente — cuéntanos qué pasó. Si no has intentado nada, déjalo en blanco."></textarea>
+    <textarea class="q-textarea q-required" data-q="q4_headache" data-i18n-placeholder="intake.q4.ph" placeholder="Ejemplo: Perdemos clientes porque nadie responde WhatsApp a tiempo. O: Tengo 3 personas haciendo trabajo que debería ser automático. O: No sé cuáles de mis servicios son rentables."></textarea>
   </div>
-
   <div class="q-nav">
     <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
     <button class="btn-primary btn-next" disabled data-i18n-btn="q.next">Siguiente &rarr;</button>
@@ -299,13 +318,13 @@
 </div>
 
 <!-- ============================================ -->
-<!-- SCREEN 5: Q9 — WILDCARD (optional) -->
+<!-- SCREEN 5: Q5 — TRIED BEFORE -->
 <!-- ============================================ -->
 <div class="q-wrap q-screen" data-q="4">
-  <div class="q-counter">04 / 05</div>
-  <div class="q-text" data-i18n="intake.q9.text">¿Algo más que quieras que sepa antes de la llamada?</div>
+  <div class="q-counter">05 / 05</div>
+  <div class="q-text" data-i18n="intake.q7.text">¿Has intentado resolver este problema antes? ¿Qué pasó?</div>
   <div class="voice-wrap">
-    <textarea class="q-textarea q-optional" data-q="q9_wildcard" data-i18n-placeholder="intake.q9.ph" placeholder="Opcional. Cualquier contexto que nos ayude a preparar mejor: plazos, frustraciones, lo que sea."></textarea>
+    <textarea class="q-textarea q-optional" data-q="q7_tried" data-i18n-placeholder="intake.q7.ph" placeholder="Si contrataste a alguien, probaste un software, o lo intentaste internamente — cuéntanos qué pasó. Si no has intentado nada, déjalo en blanco."></textarea>
   </div>
   <div class="q-nav">
     <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
@@ -314,20 +333,9 @@
 </div>
 
 <!-- ============================================ -->
-<!-- SCREEN 6: SUCCESS -->
+<!-- SCREEN 6: HOOK (built dynamically by JS) -->
 <!-- ============================================ -->
-<div class="q-wrap success-screen" id="successScreen">
-  <div class="success-check">&#10003;</div>
-  <h2 data-i18n="intake.success.title">Listo. Ya tenemos lo que necesitamos.</h2>
-  <p class="success-sub" data-i18n="intake.success.sub">Vamos a revisar tus respuestas y preparar todo para que la llamada sea lo más útil posible para ti. Nada de ventas genéricas — llegamos con ideas específicas para tu negocio.</p>
-
-  <div class="success-next">
-    <h3 data-i18n="intake.success.next.title">Siguiente paso</h3>
-    <p data-i18n="intake.success.next.p1">Agenda tu llamada de descubrimiento. 30 minutos. Sin compromiso.</p>
-    <p><a href="https://calendly.com/ignealabs/discovery" target="_blank" rel="noopener" data-i18n-html="intake.success.next.cta">Agendar llamada &rarr;</a></p>
-    <p style="margin-top:16px;font-size:13px;color:var(--text-dim)" data-i18n="intake.success.next.alt">¿Prefieres WhatsApp? Escríbenos a <a href="https://wa.me/17875551234" style="color:var(--accent)">+1 (787) 555-1234</a></p>
-  </div>
-</div>
+<div class="q-wrap hook-screen" id="hookScreen"></div>
 
 </main>
 
@@ -384,8 +392,8 @@ window.syncFixedNav = function() {
   if (!nav || !prevBtn || !nextBtn || !active) return;
 
   var isLanding = active.id === 'landingScreen';
-  var isSuccess = active.id === 'successScreen';
-  if (isLanding || isSuccess) { nav.style.display = 'none'; return; }
+  var isHook = active.id === 'hookScreen';
+  if (isLanding || isHook) { nav.style.display = 'none'; return; }
 
   nav.style.display = 'block';
 
