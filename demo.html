@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reporte de Muestra | Ignea Labs</title>
-<meta name="description" content="Ejemplo de diagnóstico de IA de Ignea Labs para un restaurante en Centroamérica.">
+<meta name="description" content="Ejemplo de diagnóstico de IA de Ignea Labs para un restaurantes en Latinoamérica.">
 <meta property="og:title" content="Reporte de Muestra | Ignea Labs">
-<meta property="og:description" content="Ejemplo de diagnóstico de IA de Ignea Labs para un restaurante en Centroamérica.">
+<meta property="og:description" content="Ejemplo de diagnóstico de IA de Ignea Labs para un restaurantes en Latinoamérica.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -15,14 +15,14 @@
 (function() {
   var answers = {
     contact: {
-      firstName: "Carlos", lastName: "Rodríguez",
-      email: "carlos@casaverdebayamon.com",
-      company: "Casa Verde Restaurant",
+      firstName: "", lastName: "",
+      email: "",
+      company: "Restaurante — Latinoamérica",
       industry: "restaurant", size: "6-15",
-      revenue: "10k-30k", position: "Dueño"
+      revenue: "5k-15k", position: ""
     },
     answers: {
-      q1: "Instagram y recomendaciones de amigos",
+      q1: "Instagram y recomendaciones de boca en boca",
       q2: "Coordinar reservaciones y tomar pedidos por WhatsApp",
       q3: "Respondemos en 2-4 horas, a veces más",
       q4: "Todo manual — papel y llamadas telefónicas",
@@ -36,27 +36,39 @@
     }
   };
   var scores = {
-    total: 38,
+    total: 28,
     level: "developing",
     dimensions: [
-      { key: "customerInteraction", score: 32, insight: "Comunicación principalmente por WhatsApp sin automatización" },
-      { key: "processMaturity", score: 28, insight: "Procesos manuales dominan todas las operaciones" },
-      { key: "digitalPresence", score: 45, insight: "Instagram activo pero sin integración operacional" },
-      { key: "dataUtilization", score: 30, insight: "Sin métricas sistemáticas de negocio" },
-      { key: "aiReadiness", score: 55, insight: "Procesos claramente automatizables identificados" }
+      { key: "customerFlow", score: 8, insight: "Consultas manejadas manualmente por WhatsApp y teléfono. Sin capacidad de respuesta fuera de horario. Estimado 30+ consultas perdidas por semana." },
+      { key: "operationsFlow", score: 5, insight: "Reservaciones, inventario y horarios se manejan en papel y de memoria. Sin sistema centralizado. Alta tasa de errores en horas pico." },
+      { key: "informationFlow", score: 3, insight: "Sin rastreo de ventas por plato. Precios del menú basados en intuición, no en análisis de costo de alimentos. Sin visibilidad de horas pico ni rendimiento del personal." },
+      { key: "growthFlow", score: 12, insight: "Presencia activa en redes sociales genera algo de tráfico. Sin seguimiento automatizado ni recolección de reseñas. Crecimiento limitado por capacidad manual." }
     ],
-    costHours: 24,
-    costMonth: 1840,
-    costYear: 22080,
+    streams: {
+      customerFlow: 8,
+      operationsFlow: 5,
+      informationFlow: 3,
+      growthFlow: 12
+    },
+    roi: {
+      weeklyWastedHours: 32,
+      hourlyCost: 20,
+      totalMonthlyCost: 2540,
+      annualCost: 30480
+    },
+    costHours: 32,
+    costMonth: 2540,
+    costYear: 30480,
     painpoints: [
-      { key: "operationsFlow", monthlyCost: 820 },
-      { key: "customerFlow", monthlyCost: 640 },
-      { key: "growthFlow", monthlyCost: 380 }
+      { key: "customerFlow", monthlyCost: 720, insight: "Ingresos perdidos por consultas sin respuesta, no-shows y tiempos de respuesta lentos." },
+      { key: "operationsFlow", monthlyCost: 960, insight: "Horas de personal desperdiciadas en agenda manual, conteo de inventario y coordinación." },
+      { key: "informationFlow", monthlyCost: 540, insight: "Erosión de márgenes por costos de alimentos sin rastrear, sobre-dotación de personal en horas lentas y precios de menú incorrectos." },
+      { key: "growthFlow", monthlyCost: 320, insight: "Costo de adquisición elevado por marketing manual y cero retención automatizada." }
     ],
     solutions: ["customer", "operations", "information"],
-    savingsMonth: 1480,
-    savingsYear: 17760,
-    savingsBreakeven: 2.1
+    savingsMonth: 2640,
+    savingsYear: 31680,
+    savingsBreakeven: 1.9
   };
   sessionStorage.setItem('ignea_diagnostic_answers', JSON.stringify(answers));
   sessionStorage.setItem('ignea_diagnostic_scores', JSON.stringify(scores));
@@ -227,7 +239,7 @@
 <body>
 
 <div class="demo-banner">
-  <span>📋 </span><span data-i18n="demo.banner">Este es un reporte de muestra — basado en datos reales de un restaurante en Centroamérica.</span><a href="diagnostic.html" data-i18n="demo.banner.cta">Toma tu diagnóstico gratis →</a>
+  <span>📋 </span><span data-i18n="demo.banner">Este es un reporte de muestra — basado en datos agregados de operaciones de restaurantes en Latinoamérica.</span><a href="diagnostic.html" data-i18n="demo.banner.cta">Toma tu diagnóstico gratis →</a>
 </div>
 
 <div class="gradient-dots-bg" id="gradientBg"></div>

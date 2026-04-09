@@ -108,7 +108,7 @@ var IgneaI18n = (function() {
       "ct.or": "\u2014 o escríbenos \u2014",
 
       // ---- DEMO REPORT ----
-      "demo.banner": "Este es un reporte de muestra \u2014 basado en datos reales de un restaurante en Centroamérica.",
+      "demo.banner": "Reporte de muestra \u2014 basado en datos agregados de operaciones de restaurantes en Latinoamérica.",
       "demo.banner.cta": "Toma tu diagnóstico gratis \u2192",
 
       // ---- HOMEPAGE: WHAT WE DO ----
@@ -1215,7 +1215,7 @@ var IgneaI18n = (function() {
       "ct.or": "\u2014 or send a message \u2014",
 
       // ---- DEMO REPORT ----
-      "demo.banner": "This is a sample report \u2014 based on real data from a restaurant in Central America.",
+      "demo.banner": "Sample report \u2014 based on aggregated data from restaurant operations across Latin America.",
       "demo.banner.cta": "Take your free diagnostic \u2192",
 
       // ---- HOMEPAGE: WHAT WE DO ----
