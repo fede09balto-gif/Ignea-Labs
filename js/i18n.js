@@ -115,6 +115,8 @@ var IgneaI18n = (function() {
       "whatwedo.tag": "// Qué hacemos",
       "whatwedo.p1": "Vamos bajo la superficie de tu organización para encontrar lo que ha estado dormido.",
       "whatwedo.p2": "Nuestro proceso comienza con un diagnóstico profundo. Mapeamos tus flujos de trabajo, identificamos cuellos de botella y señalamos dónde la inteligencia artificial genera impacto medible. Luego diseñamos y desplegamos sistemas de IA personalizados — adaptados a tu operación, tus datos, tus objetivos.",
+      "whatwedo.fractional.heading": "Somos ingenieros fraccionarios.",
+      "whatwedo.fractional.body": "No colocamos ingenieros en tu nómina. Construimos infraestructura de IA que se integra permanentemente en tu operación — sistemas a la medida que funcionan como un equipo técnico completo, sin el costo fijo. Tu negocio obtiene la experiencia, la automatización y el retorno sin la carga de nómina.",
       "whatwedo.p3": "Trabajamos con un número reducido de socios. Esto no es un negocio de volumen. Cada empresa que tomamos recibe toda nuestra atención. El resultado no es optimización — es nuevo terreno.",
 
 
@@ -753,6 +755,9 @@ var IgneaI18n = (function() {
       "man.p6": "Nos llamamos Ignea porque la transformación, como el fuego volcánico, se propaga. Cada automatización enciende la siguiente. Cada insight agudiza el que sigue. La brecha entre tu negocio y tu competencia se amplía silenciosamente, y luego de golpe.",
       "man.p7": "La próxima generación de líderes empresariales en América Latina se definirá por una sola decisión. No qué mercado entraron. No qué producto lanzaron. Si activaron el potencial dormido en su operación antes que su competencia — o pasaron años viendo cómo la brecha se ampliaba desde el lado equivocado.",
       "man.closing": "No vendemos IA. Construimos nuevo terreno.",
+      "man.model.tag": "// Nuestro Modelo",
+      "man.model.heading": "Somos Ingenieros Fraccionarios",
+      "man.model.body": "Ignea Labs es un equipo de ingeniería fraccionario especializado en infraestructura de IA para empresas en Latinoamérica. No somos consultoría tradicional. Nos integramos como tu columna vertebral técnica — diseñando, construyendo y manteniendo sistemas de IA a la medida que generan retorno medible. No vendemos software genérico. Somos tu equipo técnico — sin nómina. Construimos infraestructura de IA que se integra permanentemente en tu operación, escalable conforme creces.",
       "man.ctaTitle": "Descubre tu potencial.",
       "man.ctaBtn": "Agenda tu Llamada Gratis &rarr;",
 
@@ -1222,6 +1227,8 @@ var IgneaI18n = (function() {
       "whatwedo.tag": "// What We Do",
       "whatwedo.p1": "We go beneath the surface of your organization to find what's been dormant.",
       "whatwedo.p2": "Our process begins with a deep diagnostic. We map your workflows, identify bottlenecks, and pinpoint where artificial intelligence delivers measurable impact. Then we design and deploy custom AI systems — tailored to your operations, your data, your objectives.",
+      "whatwedo.fractional.heading": "We are fractional engineers.",
+      "whatwedo.fractional.body": "We don't place engineers on your payroll. Instead, we embed AI systems into your operations — custom-built infrastructure that works like a full-time technical team, but without the overhead. Your business gets the expertise, automation, and ROI without the fixed costs.",
       "whatwedo.p3": "We work with a small number of partners. This is not a volume business. Every engagement gets our full attention. The result isn't optimization — it's new ground.",
 
       // ---- HOMEPAGE: CTA ----
@@ -1782,6 +1789,9 @@ var IgneaI18n = (function() {
       "man.p6": "We named ourselves Ignea because transformation, like volcanic fire, spreads. Every automation ignites the next. Every insight sharpens the one that follows. The gap between your business and your competition widens quietly, then all at once.",
       "man.p7": "The next generation of business leaders in Latin America will be defined by a single decision. Not which market they entered. Not which product they launched. Whether they activated the dormant potential in their operations before their competitors — or spent years watching the gap widen from the wrong side.",
       "man.closing": "We don't sell AI. We build new ground.",
+      "man.model.tag": "// Our Model",
+      "man.model.heading": "We Are Fractional Engineers",
+      "man.model.body": "Ignea Labs is a fractional engineering team specializing in AI infrastructure for Latin American businesses. Rather than traditional consulting, we embed ourselves as your technical backbone — designing, building, and maintaining custom AI systems that generate measurable ROI. We don't sell generic software. We are your technical team — without the payroll. We build AI infrastructure that integrates permanently into your operation, scaling as you grow.",
       "man.ctaTitle": "Discover your potential.",
       "man.ctaBtn": "Book Your Free Call &rarr;",
 
