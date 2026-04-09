@@ -370,7 +370,7 @@
         '<p class="hook-sub">' + subTemplate + '</p>' +
         '<p class="hook-hours">' + hoursText + '</p>' +
         '<div class="hook-cards">' + cardsHtml + '</div>' +
-        '<a href="https://calendly.com/ignealabs/discovery" target="_blank" rel="noopener" class="btn-primary hook-cta">' + ctaText + '</a>' +
+        '<a href="https://calendly.com/ignealabs/strategy-call" target="_blank" rel="noopener" class="btn-primary hook-cta">' + ctaText + '</a>' +
         '<p class="hook-note">' + ctaNote + '</p>' +
       '</div>';
 

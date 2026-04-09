@@ -474,7 +474,7 @@
           ? 'Hola, completé el diagnóstico de Ignea Labs. Mi puntuación fue ' + score + '/100. Me gustaría agendar una llamada estratégica.'
           : 'Hi, I completed the Ignea Labs diagnostic. My score was ' + score + '/100. I\'d like to book a strategy call.'
       );
-      waLink.href = 'https://wa.me/1787XXXXXXX?text=' + msg;
+      waLink.href = 'https://wa.me/19493736407?text=' + msg;
       waLink.setAttribute('target', '_blank');
       waLink.setAttribute('rel', 'noopener');
       waLink.addEventListener('click', function() {
