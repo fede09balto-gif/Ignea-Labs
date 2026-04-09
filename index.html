@@ -143,7 +143,12 @@ footer{border-top:1px solid var(--border)}
 .calc-result-label{font-size:15px;color:var(--gray);margin-bottom:8px}
 .calc-result-value{font-family:var(--fm);font-size:42px;font-weight:700;color:var(--coral);line-height:1;margin-bottom:4px}
 .calc-result-unit{font-family:var(--fm);font-size:14px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px}
-.calc-result-note{font-size:13px;color:var(--text-dim);margin-bottom:24px}
+.calc-result-note{font-size:13px;color:var(--text-dim);margin-bottom:16px}
+.calc-breakdown{text-align:left;margin:16px 0 12px;border-top:1px solid var(--border);padding-top:12px}
+.calc-breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.calc-breakdown-label{font-family:var(--fm);font-size:12px;color:var(--dimgray);letter-spacing:.3px}
+.calc-breakdown-val{font-family:var(--fm);font-size:14px;color:var(--white);font-weight:500;white-space:nowrap}
+.calc-breakdown-note{font-family:var(--fm);font-size:11px;color:var(--dimgray);text-align:left;line-height:1.5;margin-top:8px}
 
 /* ---- RESPONSIVE ---- */
 @media(max-width:768px){
@@ -183,7 +188,7 @@ footer{border-top:1px solid var(--border)}
 }
 </style>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"LocalBusiness","name":"Ignea Labs","description":"AI infrastructure for Latin American SMBs","address":{"@type":"PostalAddress","addressLocality":"Managua","addressCountry":"NI"},"email":"hola@ignealabs.com","areaServed":{"@type":"Place","name":"Latin America"},"knowsLanguage":["es","en"]}
+{"@context":"https://schema.org","@type":"LocalBusiness","name":"Ignea Labs","description":"AI infrastructure for Latin American SMBs","email":"hola@ignealabs.com","areaServed":{"@type":"Place","name":"Latin America"},"knowsLanguage":["es","en"]}
 </script>
 <script defer data-domain="ignealabs.com" src="https://plausible.io/js/script.js"></script>
 </head>
@@ -436,7 +441,22 @@ footer{border-top:1px solid var(--border)}
       <div class="calc-result-value" id="calcResultValue">$0</div>
       <div class="calc-result-unit" data-i18n="calc.resultUnit">/mes</div>
       <div class="calc-result-note" data-i18n="calc.resultNote">en productividad desperdiciada</div>
-      <a href="diagnostic.html" class="btn-primary" data-i18n-btn="calc.cta">Agenda tu Llamada Gratis &rarr;</a>
+      <div class="calc-breakdown" id="calcBreakdown">
+        <div class="calc-breakdown-row">
+          <span class="calc-breakdown-label" data-i18n="calc.bd.manual">Horas manuales × costo/hora estimado</span>
+          <span class="calc-breakdown-val" id="calcBdManual">$0</span>
+        </div>
+        <div class="calc-breakdown-row">
+          <span class="calc-breakdown-label" data-i18n="calc.bd.lost">Oportunidades perdidas (clientes no atendidos)</span>
+          <span class="calc-breakdown-val" id="calcBdLost">$0</span>
+        </div>
+        <div class="calc-breakdown-row">
+          <span class="calc-breakdown-label" data-i18n="calc.bd.errors">Costo de errores y retrabajo</span>
+          <span class="calc-breakdown-val" id="calcBdErrors">$0</span>
+        </div>
+      </div>
+      <div class="calc-breakdown-note" id="calcBdNote"></div>
+      <a href="diagnostic.html" class="btn-primary" style="margin-top:24px" data-i18n-btn="calc.cta">Agenda tu Llamada Gratis &rarr;</a>
     </div>
   </div>
 </section>
@@ -482,7 +502,6 @@ footer{border-top:1px solid var(--border)}
       <div class="footer-brand">
         <span class="logo"><span class="logo-name">ignea</span><span class="logo-suffix">.labs</span></span>
         <div class="f-tag" data-i18n="footer.tag">Bajo la superficie, el potencial.</div>
-        <div style="font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;margin-top:6px" data-i18n="footer.address">Managua, Nicaragua</div>
       </div>
       <div class="footer-nav">
         <a href="index.html" data-i18n="nav.home">Inicio</a>
@@ -652,6 +671,7 @@ document.addEventListener('DOMContentLoaded', function() {
     restaurant: 14, medical: 30, dental: 30, legal: 35,
     hotel: 16, retail: 14, construction: 22, logistics: 18
   };
+  var TEAM_HOURLY = { 3: 3, 8: 5, 25: 7, 75: 10 };
   var calcEmployees = 8;
   var calcIndustry = document.getElementById('calcIndustry');
   var calcHours = document.getElementById('calcHours');
@@ -662,16 +682,42 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateCalc() {
     var rate = CALC_RATES[calcIndustry.value] || 18;
     var hours = parseInt(calcHours.value) || 20;
-    var monthly = Math.round(hours * rate * 4.33);
+    var teamRate = TEAM_HOURLY[calcEmployees] || 5;
+
+    // Breakdown components
+    var manualCost = Math.round(hours * teamRate * 4.33);
+    var lostOpps = Math.round(hours * 0.3 * teamRate * 1.5 * 4.33);
+    var errorCost = Math.round(hours * 0.15 * teamRate * 4.33);
+    var monthly = manualCost + lostOpps + errorCost;
+
     // Cap at 30% of estimated revenue
     var estRevenue = calcEmployees * rate * 160;
     var cap = Math.round(estRevenue * 0.3);
-    if (monthly > cap) monthly = cap;
-    // Hard cap for credibility
-    if (monthly > 8000) monthly = 8000;
+    if (monthly > cap) { var ratio = cap / monthly; manualCost = Math.round(manualCost * ratio); lostOpps = Math.round(lostOpps * ratio); errorCost = Math.round(errorCost * ratio); monthly = cap; }
+    if (monthly > 8000) { var r2 = 8000 / monthly; manualCost = Math.round(manualCost * r2); lostOpps = Math.round(lostOpps * r2); errorCost = Math.round(errorCost * r2); monthly = 8000; }
+
     calcResultValue.textContent = '$' + monthly.toLocaleString('en-US');
     calcResult.classList.add('visible');
-    // Debounced analytics — fire once per 2s max
+
+    // Update breakdown
+    var bdManual = document.getElementById('calcBdManual');
+    var bdLost = document.getElementById('calcBdLost');
+    var bdErrors = document.getElementById('calcBdErrors');
+    var bdNote = document.getElementById('calcBdNote');
+    if (bdManual) bdManual.textContent = '$' + manualCost.toLocaleString('en-US');
+    if (bdLost) bdLost.textContent = '$' + lostOpps.toLocaleString('en-US');
+    if (bdErrors) bdErrors.textContent = '$' + errorCost.toLocaleString('en-US');
+
+    if (bdNote) {
+      var lang = localStorage.getItem('ignea_lang') || 'es';
+      var sizeLabel = calcEmployees <= 5 ? '1-5' : calcEmployees <= 15 ? '6-15' : calcEmployees <= 50 ? '16-50' : '50+';
+      var indLabel = calcIndustry.options[calcIndustry.selectedIndex].textContent;
+      bdNote.textContent = lang === 'es'
+        ? 'Basado en el costo promedio de mano de obra para equipos de ' + sizeLabel + ' empleados en ' + indLabel.toLowerCase() + '.'
+        : 'Based on average labor cost for teams of ' + sizeLabel + ' employees in ' + indLabel.toLowerCase() + '.';
+    }
+
+    // Debounced analytics
     if (typeof IgneaAnalytics !== 'undefined' && !updateCalc._t) {
       updateCalc._t = setTimeout(function() {
         IgneaAnalytics.track('calculator_used', { industry: calcIndustry.value, hours: calcHours.value });

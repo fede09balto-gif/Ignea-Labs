@@ -147,8 +147,8 @@ var IgneaI18n = (function() {
       "about.tag": "// Quiénes Somos",
       "about.title": "Conocimiento profundo. Presencia local.",
       "about.name": "[FOUNDER NAME]",
-      "about.bio": "[BIO — Experiencia en IA y automatización empresarial. Bilingüe. Basado en Managua, Nicaragua.]",
-      "about.presence": "Basados en Managua, NI. Bilingües. Enfocados en empresas de América Latina.",
+      "about.bio": "[BIO — Experiencia en IA y automatización empresarial. Bilingüe. Basado en Latinoamérica.]",
+      "about.presence": "Bilingües. Enfocados en empresas de América Latina.",
 
       // ---- HOMEPAGE: BUILT FOR LATAM ----
       "pr.tag": "// Diseñado para América Latina",
@@ -170,10 +170,13 @@ var IgneaI18n = (function() {
       "calc.resultLabel": "Tu negocio está perdiendo aproximadamente",
       "calc.resultUnit": "/mes",
       "calc.resultNote": "en productividad desperdiciada",
+      "calc.bd.manual": "Horas manuales × costo/hora estimado",
+      "calc.bd.lost": "Oportunidades perdidas (clientes no atendidos)",
+      "calc.bd.errors": "Costo de errores y retrabajo",
       "calc.cta": "Agenda tu Llamada Gratis &rarr;",
 
       // ---- FOOTER ADDITIONS ----
-      "footer.address": "Managua, Nicaragua",
+      "footer.address": "",
       "footer.serving": "Sirviendo a América Latina",
 
       // ---- HOMEPAGE: PROCESS ----
@@ -771,7 +774,7 @@ var IgneaI18n = (function() {
       "ct.emailLabel": "Email",
       "ct.whatsappLabel": "WhatsApp",
       "ct.locationLabel": "Ubicación",
-      "ct.location": "Managua, Nicaragua — servimos toda América Latina",
+      "ct.location": "Servimos toda América Latina",
       "ct.waText": "Escríbenos directo",
       "ct.response": "Respondemos en menos de 24 horas hábiles.",
       "ct.formTag": "// Enviar mensaje",
@@ -1258,8 +1261,8 @@ var IgneaI18n = (function() {
       "about.tag": "// Who We Are",
       "about.title": "Deep expertise. Local presence.",
       "about.name": "[FOUNDER NAME]",
-      "about.bio": "[BIO — Experience in AI and business automation. Bilingual. Based in Managua, Nicaragua.]",
-      "about.presence": "Based in Managua, NI. Bilingual. Focused on Latin American businesses.",
+      "about.bio": "[BIO — Experience in AI and business automation. Bilingual. Based in Latin America.]",
+      "about.presence": "Bilingual. Focused on Latin American businesses.",
 
       // ---- HOMEPAGE: BUILT FOR LATAM ----
       "pr.tag": "// Built for Latin America",
@@ -1281,10 +1284,13 @@ var IgneaI18n = (function() {
       "calc.resultLabel": "Your business is losing approximately",
       "calc.resultUnit": "/mo",
       "calc.resultNote": "in wasted productivity",
+      "calc.bd.manual": "Manual hours × estimated hourly cost",
+      "calc.bd.lost": "Lost opportunities (unserved clients)",
+      "calc.bd.errors": "Cost of errors and rework",
       "calc.cta": "Book Your Free Call &rarr;",
 
       // ---- FOOTER ADDITIONS ----
-      "footer.address": "Managua, Nicaragua",
+      "footer.address": "",
       "footer.serving": "Serving Latin America",
 
       // ---- HOMEPAGE: PROCESS ----
@@ -1805,7 +1811,7 @@ var IgneaI18n = (function() {
       "ct.emailLabel": "Email",
       "ct.whatsappLabel": "WhatsApp",
       "ct.locationLabel": "Location",
-      "ct.location": "Managua, Nicaragua — serving all of Latin America",
+      "ct.location": "Serving all of Latin America",
       "ct.waText": "Message us directly",
       "ct.response": "We respond within 24 business hours.",
       "ct.formTag": "// Send message",
