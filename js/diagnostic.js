@@ -489,44 +489,43 @@
       var field = wrap.querySelector('textarea, input[type="text"]');
       if (!field) return;
 
-      // Build mic row below the field
-      var micRow = document.createElement('div');
-      micRow.className = 'mic-row';
-
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'mic-btn';
-      btn.setAttribute('aria-label', 'Voice input');
-      btn.innerHTML = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
-        '<path d="M12 2v0a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>' +
-        '<path d="M19 10v1a7 7 0 0 1-14 0v-1"/>' +
-        '<line x1="12" y1="18" x2="12" y2="22"/>' +
-        '<line x1="8" y1="22" x2="16" y2="22"/>' +
+      // Build voice card below the field
+      var card = document.createElement('div');
+      card.className = 'mic-card';
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.innerHTML =
+        '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+          '<path d="M12 2v0a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>' +
+          '<path d="M19 10v1a7 7 0 0 1-14 0v-1"/>' +
+          '<line x1="12" y1="18" x2="12" y2="22"/>' +
+          '<line x1="8" y1="22" x2="16" y2="22"/>' +
         '</svg>' +
-        '<span class="mic-btn-label"></span>' +
+        '<div class="mic-card-text">' +
+          '<div class="mic-card-title"></div>' +
+          '<div class="mic-card-sub"></div>' +
+        '</div>' +
+        '<span class="mic-timer">00:00</span>' +
         '<span class="mic-waveform">' +
           '<span class="mic-wave-bar"></span>' +
           '<span class="mic-wave-bar"></span>' +
           '<span class="mic-wave-bar"></span>' +
         '</span>';
 
-      var timer = document.createElement('span');
-      timer.className = 'mic-timer';
-      timer.textContent = '00:00';
-
       var errorEl = document.createElement('div');
       errorEl.className = 'voice-error';
 
-      micRow.appendChild(btn);
-      micRow.appendChild(timer);
-      wrap.appendChild(micRow);
+      wrap.appendChild(card);
       wrap.insertAdjacentElement('afterend', errorEl);
 
-      var labelEl = btn.querySelector('.mic-btn-label');
+      var titleEl = card.querySelector('.mic-card-title');
+      var subEl = card.querySelector('.mic-card-sub');
+      var timerEl = card.querySelector('.mic-timer');
 
       var recognition = null;
       var timerInterval = null;
       var startTime = 0;
+      var doneTimeout = null;
 
       function getLang() {
         var lang = localStorage.getItem('ignea_lang') || 'es';
@@ -538,22 +537,34 @@
         return key;
       }
 
-      function updateLabel() {
-        if (labelEl) labelEl.textContent = t('voice_cta');
+      function setIdleLabel() {
+        if (titleEl) titleEl.textContent = t('voice_cta_title');
+        if (subEl) subEl.textContent = t('voice_cta_subtitle');
       }
 
       function setIdle() {
-        btn.classList.remove('recording', 'processing');
-        timer.textContent = '00:00';
+        card.classList.remove('recording', 'processing');
+        timerEl.textContent = '00:00';
         clearInterval(timerInterval);
         timerInterval = null;
-        updateLabel();
+        setIdleLabel();
+      }
+
+      function setDone() {
+        card.classList.remove('recording', 'processing');
+        clearInterval(timerInterval);
+        timerInterval = null;
+        if (titleEl) titleEl.textContent = t('voice_cta_title');
+        if (subEl) subEl.textContent = t('voice_done');
+        clearTimeout(doneTimeout);
+        doneTimeout = setTimeout(setIdleLabel, 3000);
       }
 
       function setRecording() {
-        btn.classList.add('recording');
-        btn.classList.remove('processing');
-        if (labelEl) labelEl.textContent = t('voice_recording');
+        card.classList.add('recording');
+        card.classList.remove('processing');
+        if (titleEl) titleEl.textContent = t('voice_cta_title');
+        if (subEl) subEl.textContent = t('voice_listening');
         errorEl.classList.remove('visible');
         errorEl.textContent = '';
         startTime = Date.now();
@@ -561,13 +572,13 @@
           var elapsed = Math.floor((Date.now() - startTime) / 1000);
           var m = String(Math.floor(elapsed / 60)).padStart(2, '0');
           var s = String(elapsed % 60).padStart(2, '0');
-          timer.textContent = m + ':' + s;
+          timerEl.textContent = m + ':' + s;
         }, 250);
       }
 
       function setProcessing() {
-        btn.classList.remove('recording');
-        btn.classList.add('processing');
+        card.classList.remove('recording');
+        card.classList.add('processing');
         clearInterval(timerInterval);
         timerInterval = null;
       }
@@ -578,13 +589,11 @@
         setTimeout(function() { errorEl.classList.remove('visible'); }, 4000);
       }
 
-      // Set initial label
-      updateLabel();
+      // Set initial labels
+      setIdleLabel();
+      document.addEventListener('langchange', setIdleLabel);
 
-      // Update label on language change
-      document.addEventListener('langchange', updateLabel);
-
-      btn.addEventListener('click', function() {
+      function handleClick() {
         // Toggle: if recording, stop
         if (recognition) {
           recognition.stop();
@@ -616,9 +625,9 @@
         };
 
         recognition.onend = function() {
-          setIdle();
           recognition = null;
           field.dispatchEvent(new Event('input', { bubbles: true }));
+          setDone();
         };
 
         recognition.onerror = function(event) {
@@ -632,6 +641,11 @@
         };
 
         recognition.start();
+      }
+
+      card.addEventListener('click', handleClick);
+      card.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(); }
       });
     });
   }

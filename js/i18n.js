@@ -1040,6 +1040,10 @@ var IgneaI18n = (function() {
 
       // ---- VOICE INPUT ----
       "voice_cta": "Graba tu respuesta",
+      "voice_cta_title": "Habla tu respuesta",
+      "voice_cta_subtitle": "Más rápido que escribir. Entre más compartas, mejor trabajamos para ti.",
+      "voice_listening": "Escuchando... toca para detener",
+      "voice_done": "¡Listo! Puedes editar el texto arriba.",
       "voice_recording": "Grabando...",
       "voice_transcribing": "Transcribiendo...",
       "voice_unsupported": "Tu navegador no soporta entrada de voz",
@@ -2056,6 +2060,10 @@ var IgneaI18n = (function() {
 
       // ---- VOICE INPUT ----
       "voice_cta": "Record your answer",
+      "voice_cta_title": "Speak your answer",
+      "voice_cta_subtitle": "Faster than typing. The more you share, the better we work for you.",
+      "voice_listening": "Listening... tap to stop",
+      "voice_done": "Done! You can edit the text above.",
       "voice_recording": "Recording...",
       "voice_transcribing": "Transcribing...",
       "voice_unsupported": "Your browser doesn't support voice input",
