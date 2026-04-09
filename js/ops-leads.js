@@ -33,16 +33,14 @@ var OpsLeads = (function() {
 
   var CONTACT_FIELDS = [
     { key: 'first_name',        label: 'Nombre' },
-    { key: 'last_name',         label: 'Apellido' },
     { key: 'email',             label: 'Email' },
-    { key: 'phone',             label: 'Teléfono' },
+    { key: 'phone',             label: 'WhatsApp / Teléfono' },
     { key: 'company_name',      label: 'Empresa' },
-    { key: 'position',          label: 'Cargo' },
     { key: 'industry',          label: 'Industria' },
     { key: 'company_size',      label: 'Tamaño empresa' },
     { key: 'company_website',   label: 'Sitio web' },
     { key: 'company_linkedin',  label: 'LinkedIn' },
-    { key: 'annual_revenue',    label: 'Ingresos anuales' }
+    { key: 'revenue',           label: 'Ingresos mensuales' }
   ];
 
   var DIMENSION_LABELS = {
@@ -512,21 +510,53 @@ var OpsLeads = (function() {
     var answers = lead.diagnostic_answers || {};
 
     // Detect format: new intake (q4_headache etc.) vs old diagnostic (q1-q11)
-    var isIntakeFormat = answers.q4_headache !== undefined || answers.q5_timeleaks !== undefined;
+    var isIntakeFormat = answers.q4_headache !== undefined || answers.q5_timeleaks !== undefined || answers.q2_business !== undefined;
 
     if (isIntakeFormat) {
+      // Show quick stats if available
+      if (lead.opportunityCount || lead.estimatedHoursLost) {
+        var statsBlock = document.createElement('div');
+        statsBlock.className = 'answer-block';
+        statsBlock.innerHTML =
+          '<div class="answer-q">' + (lang === 'es' ? 'Resumen rápido' : 'Quick stats') + '</div>' +
+          '<div class="answer-chips">' +
+            '<span class="answer-chip">' + (lead.opportunityCount || 0) + ' ' + (lang === 'es' ? 'oportunidades' : 'opportunities') + '</span>' +
+            '<span class="answer-chip">' + (lead.estimatedHoursLost || 0) + ' hrs/' + (lang === 'es' ? 'semana perdidas' : 'week lost') + '</span>' +
+          '</div>';
+        tabAnswers.appendChild(statsBlock);
+      }
+
+      // Show scores if available
+      if (lead.score_breakdown) {
+        var sb = lead.score_breakdown;
+        var dimNames = lang === 'es'
+          ? { customerFlow: 'Flujo de Clientes', operationsFlow: 'Flujo de Operaciones', informationFlow: 'Flujo de Información', growthFlow: 'Flujo de Crecimiento' }
+          : { customerFlow: 'Customer Flow', operationsFlow: 'Operations Flow', informationFlow: 'Information Flow', growthFlow: 'Growth Flow' };
+        var scoreBlock = document.createElement('div');
+        scoreBlock.className = 'answer-block';
+        var scoreHtml = '<div class="answer-q">' + (lang === 'es' ? 'Puntuación: ' : 'Score: ') + (lead.total_score || 0) + '/100</div>';
+        ['customerFlow', 'operationsFlow', 'informationFlow', 'growthFlow'].forEach(function(dim) {
+          var val = sb[dim] || 0;
+          var pct = Math.round((val / 25) * 100);
+          scoreHtml += '<div style="margin:6px 0"><div style="display:flex;justify-content:space-between;font-size:13px;color:var(--gray);margin-bottom:3px"><span>' + (dimNames[dim] || dim) + '</span><span style="font-family:var(--fm)">' + val + '/25</span></div>' +
+            '<div style="height:4px;background:var(--border);width:100%"><div style="height:100%;width:' + pct + '%;background:var(--accent);transition:width .5s"></div></div></div>';
+        });
+        scoreBlock.innerHTML = scoreHtml;
+        tabAnswers.appendChild(scoreBlock);
+      }
+
       var INTAKE_QUESTIONS = lang === 'es' ? [
-        { key: 'q4_headache',   label: 'Problema operativo principal' },
-        { key: 'q5_timeleaks',  label: 'Dónde pierden más tiempo' },
-        { key: 'q6_tools',      label: 'Herramientas actuales' },
-        { key: 'q7_tried',      label: 'Intentos previos de resolver el problema' },
-        { key: 'q9_wildcard',   label: 'Contexto adicional' }
+        { key: 'q2_business',    label: 'Sobre su negocio' },
+        { key: 'q5_timeleaks',   label: 'Dónde pierden más tiempo' },
+        { key: 'q6_tools',       label: 'Herramientas actuales' },
+        { key: 'q4_headache',    label: 'Problema operativo principal' },
+        { key: 'q7_tried',       label: 'Intentos previos de resolver el problema' }
       ] : [
-        { key: 'q4_headache',   label: 'Biggest operational headache' },
-        { key: 'q5_timeleaks',  label: 'Where the team loses time' },
-        { key: 'q6_tools',      label: 'Current tools' },
-        { key: 'q7_tried',      label: 'Previous attempts to solve the problem' },
-        { key: 'q9_wildcard',   label: 'Additional context' }
+        { key: 'q2_business',    label: 'About their business' },
+        { key: 'q5_timeleaks',   label: 'Where the team loses time' },
+        { key: 'q6_tools',       label: 'Current tools' },
+        { key: 'q4_headache',    label: 'Biggest operational headache' },
+        { key: 'q7_tried',       label: 'Previous attempts to solve the problem' }
       ];
 
       INTAKE_QUESTIONS.forEach(function(qDef, idx) {
@@ -639,8 +669,8 @@ var OpsLeads = (function() {
       var text = '';
       if (isIntakeFormat) {
         var copyQs = lang === 'es'
-          ? { q4_headache: 'Problema principal', q5_timeleaks: 'Pérdidas de tiempo', q6_tools: 'Herramientas', q7_tried: 'Intentos previos', q9_wildcard: 'Contexto adicional' }
-          : { q4_headache: 'Main problem', q5_timeleaks: 'Time sinks', q6_tools: 'Tools', q7_tried: 'Previous attempts', q9_wildcard: 'Additional context' };
+          ? { q2_business: 'Sobre su negocio', q5_timeleaks: 'Pérdidas de tiempo', q6_tools: 'Herramientas', q4_headache: 'Problema principal', q7_tried: 'Intentos previos' }
+          : { q2_business: 'About their business', q5_timeleaks: 'Time sinks', q6_tools: 'Tools', q4_headache: 'Main problem', q7_tried: 'Previous attempts' };
         Object.keys(copyQs).forEach(function(k) {
           var v = answers[k];
           text += copyQs[k] + ': ' + (Array.isArray(v) ? v.join(', ') : (v || '—')) + '\n\n';

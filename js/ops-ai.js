@@ -52,15 +52,18 @@
     parts.push('Team size: ' + (lead.company_size || 'Unknown'));
 
     var answers = lead.diagnostic_answers || {};
-    var isIntake = answers.q4_headache !== undefined || answers.q5_timeleaks !== undefined;
+    var isIntake = answers.q4_headache !== undefined || answers.q5_timeleaks !== undefined || answers.q2_business !== undefined;
 
     if (isIntake) {
       parts.push('\nIntake answers:');
+      if (answers.q2_business) parts.push('About their business: ' + answers.q2_business);
       if (answers.q4_headache) parts.push('Biggest operational headache: ' + answers.q4_headache);
       if (answers.q5_timeleaks) parts.push('Where team loses time: ' + (Array.isArray(answers.q5_timeleaks) ? answers.q5_timeleaks.join(', ') : answers.q5_timeleaks));
       if (answers.q6_tools) parts.push('Current tools: ' + (Array.isArray(answers.q6_tools) ? answers.q6_tools.join(', ') : answers.q6_tools));
       if (answers.q7_tried) parts.push('Previous attempts to solve: ' + answers.q7_tried);
-      if (answers.q9_wildcard) parts.push('Additional context: ' + answers.q9_wildcard);
+      if (lead.opportunityCount) parts.push('Opportunities identified: ' + lead.opportunityCount);
+      if (lead.estimatedHoursLost) parts.push('Estimated hours lost/week: ' + lead.estimatedHoursLost);
+      if (lead.revenue) parts.push('Monthly revenue range: ' + lead.revenue);
     } else {
       parts.push('Score: ' + (lead.total_score || 0) + '/100 (' + (lead.score_level || 'unknown') + ')');
       if (lead.score_breakdown) {
