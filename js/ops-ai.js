@@ -11,11 +11,20 @@
     return window.CLAUDE_API_KEY || localStorage.getItem('ignea_ops_claude_key') || '';
   }
 
-  async function callClaude(systemPrompt, userMessage) {
+  async function callClaude(systemPrompt, userMessage, opts) {
     var key = getApiKey();
     if (!key) {
       throw new Error('Claude API key not configured. Click "API Key" in the ops nav to set it.');
     }
+    opts = opts || {};
+
+    var body = {
+      model: CLAUDE_MODEL,
+      max_tokens: opts.max_tokens || 4000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }]
+    };
+    if (opts.temperature !== undefined) body.temperature = opts.temperature;
 
     var response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -25,12 +34,7 @@
         'anthropic-version': '2023-06-01',
         'anthropic-dangerous-direct-browser-access': 'true'
       },
-      body: JSON.stringify({
-        model: CLAUDE_MODEL,
-        max_tokens: 4000,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userMessage }]
-      })
+      body: JSON.stringify(body)
     });
 
     if (!response.ok) {
@@ -111,26 +115,34 @@
     var cached = getCached(lead.id, 'summary');
     if (cached) return cached.data;
 
-    var systemPrompt = 'You are a senior AI consultant at Ignea Labs analyzing a business lead. Respond ONLY in valid JSON.\n\n' +
-      'Analyze the intake data and return this exact structure:\n' +
+    var systemPrompt =
+      'You are a senior business analyst at a top-tier consulting firm preparing a pre-call brief. You are direct, precise, and never pad your analysis.\n\n' +
+      'INPUT: Diagnostic intake form from a Latin American SMB.\n\n' +
+      'OUTPUT: Respond ONLY in valid JSON, in the same language as the input (Spanish if Spanish, English if English).\n\n' +
+      'Return this exact structure:\n' +
       '{\n' +
-      '  "overview": "3-sentence business overview",\n' +
-      '  "pain_points": ["pain 1", "pain 2", "pain 3"],\n' +
-      '  "recommended_project": "One-liner description of the best first project",\n' +
-      '  "monthly_savings_min": 800,\n' +
-      '  "monthly_savings_max": 2500,\n' +
-      '  "suggested_price_min": 2000,\n' +
-      '  "suggested_price_max": 5000,\n' +
-      '  "discovery_questions": ["question 1", "question 2", "question 3"]\n' +
+      '  "overview": "2-3 sentences. What the business does, their core operational bottleneck, and the estimated scale of the problem. No fluff.",\n' +
+      '  "pain_points": ["Each bullet with a SPECIFIC metric from their answers. Not \\"they waste time on WhatsApp\\" but \\"Staff spends ~3hrs/day on 30-50 repetitive WhatsApp messages, displacing in-person service.\\""],\n' +
+      '  "recommended_project": "One project only. Name it, describe what it does in one sentence, and explain why THIS one goes first.",\n' +
+      '  "savings_calculation": "Show your math step by step. Example: 3 hrs/day x 6 days/week x 4 weeks = 72 hrs/month. At estimated $3-4/hr = $216-$288/month in direct labor. Plus revenue recovery: $200-400/month. Total: $416-$688/month. Never give a savings number without showing the calculation.",\n' +
+      '  "monthly_savings_min": 0,\n' +
+      '  "monthly_savings_max": 0,\n' +
+      '  "price_calculation": "Formula: (monthly savings x 4 months) x 30% capture rate. Show the formula with actual numbers.",\n' +
+      '  "suggested_price_min": 0,\n' +
+      '  "suggested_price_max": 0,\n' +
+      '  "discovery_questions": ["Questions that QUANTIFY the problem. Not \\"how do you feel about technology\\" but \\"How many reservation requests came in after 10pm last month, and what was the average party size?\\""],\n' +
+      '  "unknowns": "What you DON\'T know from the intake alone that matters for the proposal."\n' +
       '}\n\n' +
-      'Rules:\n' +
-      '- Be specific to THIS business — no generic advice\n' +
-      '- Savings and prices in USD, realistic for Latin American SMBs\n' +
-      '- Discovery questions should probe deeper into their specific pain points\n' +
-      '- Respond in the same language as the lead\'s answers';
+      'RULES:\n' +
+      '- Never hallucinate competitor names or market data. If you don\'t know, say "requires research."\n' +
+      '- Never list more than 4 solutions in a summary. Less is more.\n' +
+      '- Every dollar figure must have a calculation behind it.\n' +
+      '- Be honest about what you DON\'T know from the intake alone.\n' +
+      '- Frame the opportunity positively but never exaggerate.\n' +
+      '- Maximum 3 pain points, maximum 3 discovery questions.';
 
     var userMessage = buildDiagnosticContext(lead);
-    var result = await callClaude(systemPrompt, userMessage);
+    var result = await callClaude(systemPrompt, userMessage, { max_tokens: 2000, temperature: 0 });
     var cleaned = result.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     var parsed = JSON.parse(cleaned);
     setCache(lead.id, 'summary', parsed);
@@ -146,8 +158,10 @@
     if (cached) return cached.data;
 
     var context = buildDiagnosticContext(lead);
+    var hasWebsiteData = false;
 
     if (scraperData && !scraperData.error) {
+      hasWebsiteData = true;
       context += '\n\nWebsite analysis:\n';
       var w = scraperData.website || {};
       if (w.title) context += '- Title: ' + w.title + '\n';
@@ -163,33 +177,53 @@
       if (foundSocial.length) context += '- Social media: ' + foundSocial.join(', ') + '\n';
     }
 
-    var systemPrompt = 'You are a senior AI consultant at Ignea Labs performing a comprehensive business analysis. Respond ONLY in valid JSON.\n\n' +
+    var systemPrompt =
+      'You are a managing consultant preparing a comprehensive pre-engagement analysis. Your output will be used internally to prepare a client proposal and discovery call. Be rigorous.\n\n' +
+      'INPUT: Diagnostic intake form' + (hasWebsiteData ? ' + website analysis' : '') + ' from a Latin American SMB.\n\n' +
+      'OUTPUT: Respond ONLY in valid JSON, in the same language as the input.\n\n' +
       'Return this exact structure:\n' +
       '{\n' +
-      '  "assessment": "Full business assessment: current state, gaps, opportunities (3-4 paragraphs)",\n' +
+      '  "assessment": "3-4 paragraphs. Current state of operations, what is working, what is broken, and the ROOT CAUSE (not symptoms). Reference specific details from their intake answers.",\n' +
       '  "solutions": [\n' +
       '    {\n' +
-      '      "name": "Solution name",\n' +
-      '      "description": "What we build",\n' +
+      '      "phase": 1,\n' +
+      '      "name": "Phase name",\n' +
+      '      "weeks": "1-4",\n' +
+      '      "description": "What it does (2 sentences)",\n' +
       '      "build_hours": 40,\n' +
+      '      "build_hours_breakdown": "20h for component A + 15h for component B + 5h testing",\n' +
       '      "monthly_savings": 1200,\n' +
+      '      "savings_calculation": "Show calculation from their specific numbers. Example: 3 hrs/day x 6 days x 4 wks = 72 hrs/mo x $4/hr = $288 labor + $400 revenue recovery = $688/mo",\n' +
       '      "suggested_price": 3500,\n' +
-      '      "roi_months": 2.9\n' +
+      '      "price_formula": "savings x 4 months x 30% = price",\n' +
+      '      "why_this_order": "Why this phase comes at this position in the sequence"\n' +
       '    }\n' +
       '  ],\n' +
-      '  "competitive_analysis": "What similar businesses in their market are doing digitally (2-3 paragraphs)",\n' +
-      '  "discovery_script": ["question 1", "question 2", "... 8-10 questions"],\n' +
-      '  "proposal_talking_points": ["point 1", "point 2", "point 3", "point 4"],\n' +
-      '  "red_flags": ["potential objection or risk 1", "potential objection or risk 2"]\n' +
+      '  "competitive_analysis": "' + (hasWebsiteData ? 'Analysis based on website data provided.' : 'Competitive analysis requires additional research — website scraping recommended before the call.') + '",\n' +
+      '  "discovery_script": {\n' +
+      '    "quantify": ["3-4 questions to get specific numbers about their problem"],\n' +
+      '    "validate": ["2-3 questions to validate your savings estimates"],\n' +
+      '    "close": ["2-3 questions about budget, timeline, decision process"]\n' +
+      '  },\n' +
+      '  "proposal_talking_points": ["5-6 points that use THE CLIENT\'S OWN WORDS from their intake. Mirror their language. Example: They said \\"lost a 15-person reservation\\" → \\"With our system, that 15-person reservation at 11pm would have been auto-confirmed.\\""],\n' +
+      '  "red_flags": [\n' +
+      '    {\n' +
+      '      "objection": "What they will push back on",\n' +
+      '      "response": "Prepared response referencing their specific history"\n' +
+      '    }\n' +
+      '  ]\n' +
       '}\n\n' +
-      'Rules:\n' +
-      '- List ALL solutions we could build, ranked by ROI — not just top 3\n' +
-      '- Prices in USD, realistic for Latin American SMBs ($1,500-$8,000 range per project)\n' +
-      '- Frame proposal points using the client\'s own words from their answers\n' +
-      '- Discovery questions should be tailored to their specific answers, not generic\n' +
-      '- Respond in the same language as the lead\'s answers';
+      'RULES:\n' +
+      '- Every savings number needs a calculation. No "$1,200/mo saved" without showing how.\n' +
+      '- Build hours must be realistic. WhatsApp chatbot with menu = 20-30h. Full POS replacement = 60-80h. Simple dashboard = 15-25h.\n' +
+      '- Never list more than 3 phases. Bundle related work into single phases.\n' +
+      '- Never hallucinate competitor names or market data. If you need website analysis or competitive research, say so.\n' +
+      '- Pricing formula: (monthly savings x 3-4 months) x 25-35% capture rate.\n' +
+      '- All build timelines minimum 3 weeks, maximum 10 weeks.\n' +
+      '- Be direct about risks and what could go wrong.\n' +
+      '- Proposal talking points must quote or closely mirror the client\'s actual words from the intake.';
 
-    var result = await callClaude(systemPrompt, context);
+    var result = await callClaude(systemPrompt, context, { max_tokens: 4000, temperature: 0 });
     var cleaned = result.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     var parsed = JSON.parse(cleaned);
     setCache(lead.id, 'deep_analysis', parsed);
@@ -256,7 +290,19 @@
 
   function generateProposalPDF(proposalText, lead) {
     var jsPDF = window.jspdf && window.jspdf.jsPDF;
-    if (!jsPDF) { alert('jsPDF not loaded'); return; }
+    if (!jsPDF) {
+      // Try loading dynamically as fallback
+      var script = document.createElement('script');
+      script.src = 'https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js';
+      script.onload = function() {
+        jsPDF = window.jspdf && window.jspdf.jsPDF;
+        if (jsPDF) generateProposalPDF(proposalText, lead);
+        else alert('Could not load PDF library. Check your connection.');
+      };
+      script.onerror = function() { alert('Could not load PDF library. Check your connection.'); };
+      document.head.appendChild(script);
+      return;
+    }
 
     var doc = new jsPDF();
     var lang = localStorage.getItem('ignea_lang') || 'es';

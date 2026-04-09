@@ -747,22 +747,37 @@ var OpsLeads = (function() {
         '<p class="ai-card-body ai-card-highlight">' + escHtml(data.recommended_project) + '</p>' +
       '</div>';
 
-      h += '<div class="ai-card-row">' +
-        '<div class="ai-card ai-card-half">' +
-          '<div class="ai-card-tag">' + (lang === 'es' ? '// AHORRO MENSUAL' : '// MONTHLY SAVINGS') + '</div>' +
-          '<div class="ai-card-stat">$' + (data.monthly_savings_min || 0).toLocaleString() + ' – $' + (data.monthly_savings_max || 0).toLocaleString() + '</div>' +
-        '</div>' +
-        '<div class="ai-card ai-card-half">' +
-          '<div class="ai-card-tag">' + (lang === 'es' ? '// PRECIO SUGERIDO' : '// SUGGESTED PRICE') + '</div>' +
-          '<div class="ai-card-stat">$' + (data.suggested_price_min || 0).toLocaleString() + ' – $' + (data.suggested_price_max || 0).toLocaleString() + '</div>' +
-        '</div>' +
-      '</div>';
+      // Savings with calculation
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// AHORRO ESTIMADO' : '// ESTIMATED SAVINGS') + '</div>' +
+        '<div class="ai-card-stat">$' + (data.monthly_savings_min || 0).toLocaleString() + ' – $' + (data.monthly_savings_max || 0).toLocaleString() + '/mo</div>';
+      if (data.savings_calculation) {
+        h += '<p class="ai-card-body" style="margin-top:8px;font-family:var(--fm);font-size:13px;white-space:pre-line">' + escHtml(data.savings_calculation) + '</p>';
+      }
+      h += '</div>';
+
+      // Price with formula
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// PRECIO SUGERIDO' : '// SUGGESTED PRICE') + '</div>' +
+        '<div class="ai-card-stat">$' + (data.suggested_price_min || 0).toLocaleString() + ' – $' + (data.suggested_price_max || 0).toLocaleString() + '</div>';
+      if (data.price_calculation) {
+        h += '<p class="ai-card-body" style="margin-top:8px;font-family:var(--fm);font-size:13px">' + escHtml(data.price_calculation) + '</p>';
+      }
+      h += '</div>';
 
       h += '<div class="ai-card">' +
         '<div class="ai-card-tag">' + (lang === 'es' ? '// PREGUNTAS PARA LA LLAMADA' : '// DISCOVERY CALL QUESTIONS') + '</div>' +
         '<ol class="ai-card-list">';
       (data.discovery_questions || []).forEach(function(q) { h += '<li>' + escHtml(q) + '</li>'; });
       h += '</ol></div>';
+
+      // Unknowns
+      if (data.unknowns) {
+        h += '<div class="ai-card" style="border-color:rgba(239,159,39,0.2)">' +
+          '<div class="ai-card-tag" style="color:#EF9F27">' + (lang === 'es' ? '// LO QUE NO SABEMOS' : '// WHAT WE DON\'T KNOW') + '</div>' +
+          '<p class="ai-card-body">' + escHtml(data.unknowns) + '</p>' +
+        '</div>';
+      }
 
       return h;
     }
@@ -774,18 +789,28 @@ var OpsLeads = (function() {
       '</div>';
 
       h += '<div class="ai-card">' +
-        '<div class="ai-card-tag">' + (lang === 'es' ? '// SOLUCIONES — RANKED POR ROI' : '// SOLUTIONS — RANKED BY ROI') + '</div>';
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// SOLUCIONES — ROADMAP POR FASES' : '// SOLUTIONS — PHASED ROADMAP') + '</div>';
       (data.solutions || []).forEach(function(sol, idx) {
+        var phaseLabel = sol.phase ? (lang === 'es' ? 'FASE ' : 'PHASE ') + sol.phase : '' + (idx + 1);
+        var weeksLabel = sol.weeks ? ' (' + (lang === 'es' ? 'semanas ' : 'weeks ') + sol.weeks + ')' : '';
         h += '<div class="ai-sol-card">' +
-          '<div class="ai-sol-rank">' + (idx + 1) + '</div>' +
+          '<div class="ai-sol-rank">' + phaseLabel + '</div>' +
           '<div class="ai-sol-body">' +
-            '<div class="ai-sol-name">' + escHtml(sol.name) + '</div>' +
-            '<div class="ai-sol-desc">' + escHtml(sol.description) + '</div>' +
-            '<div class="ai-sol-meta">' +
+            '<div class="ai-sol-name">' + escHtml(sol.name) + weeksLabel + '</div>' +
+            '<div class="ai-sol-desc">' + escHtml(sol.description) + '</div>';
+        if (sol.build_hours_breakdown) {
+          h += '<div style="font-family:var(--fm);font-size:12px;color:var(--dimgray);margin:4px 0">' + escHtml(sol.build_hours_breakdown) + '</div>';
+        }
+        if (sol.savings_calculation) {
+          h += '<div style="font-family:var(--fm);font-size:12px;color:var(--gray);margin:4px 0;white-space:pre-line">' + escHtml(sol.savings_calculation) + '</div>';
+        }
+        if (sol.why_this_order) {
+          h += '<div style="font-size:13px;color:var(--dimgray);font-style:italic;margin:4px 0">' + escHtml(sol.why_this_order) + '</div>';
+        }
+        h += '<div class="ai-sol-meta">' +
               '<span>' + (sol.build_hours || '?') + 'h build</span>' +
               '<span>$' + (sol.monthly_savings || 0).toLocaleString() + '/mo saved</span>' +
               '<span>$' + (sol.suggested_price || 0).toLocaleString() + '</span>' +
-              '<span>ROI: ' + (sol.roi_months || '?') + ' mo</span>' +
             '</div>' +
           '</div>' +
         '</div>';
@@ -797,11 +822,33 @@ var OpsLeads = (function() {
         '<p class="ai-card-body">' + escHtml(data.competitive_analysis || '').replace(/\n/g, '<br>') + '</p>' +
       '</div>';
 
+      // Discovery script — handle both array and structured object formats
       h += '<div class="ai-card">' +
-        '<div class="ai-card-tag">' + (lang === 'es' ? '// GUIÓN DE DESCUBRIMIENTO' : '// DISCOVERY SCRIPT') + '</div>' +
-        '<ol class="ai-card-list">';
-      (data.discovery_script || []).forEach(function(q) { h += '<li>' + escHtml(q) + '</li>'; });
-      h += '</ol></div>';
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// GUIÓN DE DESCUBRIMIENTO' : '// DISCOVERY SCRIPT') + '</div>';
+      var ds = data.discovery_script;
+      if (ds && typeof ds === 'object' && !Array.isArray(ds)) {
+        // Structured format: { quantify: [], validate: [], close: [] }
+        if (ds.quantify && ds.quantify.length) {
+          h += '<div style="font-family:var(--fm);font-size:11px;color:var(--accent);letter-spacing:1px;margin:12px 0 6px">' + (lang === 'es' ? 'CUANTIFICAR' : 'QUANTIFY') + '</div><ol class="ai-card-list">';
+          ds.quantify.forEach(function(q) { h += '<li>' + escHtml(q) + '</li>'; });
+          h += '</ol>';
+        }
+        if (ds.validate && ds.validate.length) {
+          h += '<div style="font-family:var(--fm);font-size:11px;color:var(--accent);letter-spacing:1px;margin:12px 0 6px">' + (lang === 'es' ? 'VALIDAR' : 'VALIDATE') + '</div><ol class="ai-card-list">';
+          ds.validate.forEach(function(q) { h += '<li>' + escHtml(q) + '</li>'; });
+          h += '</ol>';
+        }
+        if (ds.close && ds.close.length) {
+          h += '<div style="font-family:var(--fm);font-size:11px;color:var(--accent);letter-spacing:1px;margin:12px 0 6px">' + (lang === 'es' ? 'CERRAR' : 'CLOSE') + '</div><ol class="ai-card-list">';
+          ds.close.forEach(function(q) { h += '<li>' + escHtml(q) + '</li>'; });
+          h += '</ol>';
+        }
+      } else if (Array.isArray(ds)) {
+        h += '<ol class="ai-card-list">';
+        ds.forEach(function(q) { h += '<li>' + escHtml(q) + '</li>'; });
+        h += '</ol>';
+      }
+      h += '</div>';
 
       h += '<div class="ai-card">' +
         '<div class="ai-card-tag">' + (lang === 'es' ? '// PUNTOS DE PROPUESTA' : '// PROPOSAL TALKING POINTS') + '</div>' +
@@ -811,10 +858,16 @@ var OpsLeads = (function() {
 
       if (data.red_flags && data.red_flags.length) {
         h += '<div class="ai-card ai-card-warn">' +
-          '<div class="ai-card-tag">' + (lang === 'es' ? '// BANDERAS ROJAS' : '// RED FLAGS') + '</div>' +
-          '<ul class="ai-card-list">';
-        data.red_flags.forEach(function(f) { h += '<li>' + escHtml(f) + '</li>'; });
-        h += '</ul></div>';
+          '<div class="ai-card-tag">' + (lang === 'es' ? '// BANDERAS ROJAS / OBJECIONES' : '// RED FLAGS / OBJECTIONS') + '</div>';
+        data.red_flags.forEach(function(f) {
+          if (typeof f === 'object' && f.objection) {
+            h += '<div style="margin:10px 0"><div style="font-weight:600;color:var(--coral);font-size:14px;margin-bottom:4px">' + escHtml(f.objection) + '</div>' +
+              '<div style="font-size:13px;color:var(--gray);line-height:1.5">' + escHtml(f.response) + '</div></div>';
+          } else {
+            h += '<div style="margin:6px 0;font-size:14px;color:var(--gray)">' + escHtml(typeof f === 'string' ? f : JSON.stringify(f)) + '</div>';
+          }
+        });
+        h += '</div>';
       }
 
       return h;
