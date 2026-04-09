@@ -310,13 +310,19 @@
     var pageWidth = 170;
     var y = 20;
 
-    // Header
+    // Header — match logo: "ignea" serif + red dot + "labs" sans
     doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text('IGNEA LABS', margin, y);
+    doc.setFont('times', 'normal');
+    doc.setTextColor(234, 234, 240);
+    doc.text('ignea', margin, y);
+    var dotX = margin + doc.getTextWidth('ignea') + 2;
+    doc.setFillColor(232, 53, 42);
+    doc.circle(dotX + 2, y - 4, 2, 'F');
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(142, 142, 158);
+    doc.text('labs', dotX + 6, y);
     y += 6;
     doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
     doc.setTextColor(120);
     doc.text(lang === 'es' ? 'Infraestructura de IA para empresas en América Latina' : 'AI Infrastructure for Latin American Businesses', margin, y);
     doc.text('hola@ignealabs.com', margin, y + 4);
@@ -369,7 +375,7 @@
     y += 8;
     doc.setFontSize(8);
     doc.setTextColor(150);
-    doc.text('Ignea Labs — hola@ignealabs.com — ignealabs.com', margin, y);
+    doc.text('ignea.labs — hola@ignealabs.com — ignealabs.com', margin, y);
     var confText = lang === 'es'
       ? 'Este documento es confidencial y fue preparado exclusivamente para ' + (lead.company_name || 'el cliente') + '.'
       : 'This document is confidential and was prepared exclusively for ' + (lead.company_name || 'the client') + '.';

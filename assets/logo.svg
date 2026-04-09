@@ -1,6 +1,8 @@
-<svg width="400" height="60" viewBox="0 0 400 60" xmlns="http://www.w3.org/2000/svg">
+<svg width="400" height="80" viewBox="0 0 400 80" xmlns="http://www.w3.org/2000/svg">
 <style>@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=DM+Sans:wght@400&amp;display=swap');</style>
-<text x="0" y="42" font-family="DM Serif Display, serif" font-size="48" fill="#EAEAF0" letter-spacing="5">ignea</text>
-<circle cx="168" cy="26" r="6" fill="#e8352a"/>
-<text x="184" y="42" font-family="DM Sans, sans-serif" font-size="48" fill="#9999a8" letter-spacing="2" font-weight="400">labs</text>
+<g transform="translate(200, 48)">
+<text x="-15" y="0" font-family="DM Serif Display, serif" font-size="44" fill="#EAEAF0" text-anchor="end" letter-spacing="3">ignea</text>
+<circle cx="-3" cy="-14" r="5" fill="#e8352a"/>
+<text x="10" y="0" font-family="DM Sans, sans-serif" font-size="44" fill="#8E8E9E" font-weight="400" text-anchor="start" letter-spacing="2">labs</text>
+</g>
 </svg>
