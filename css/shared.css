@@ -50,8 +50,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* ---- NAVIGATION ---- */
 nav{display:flex;justify-content:space-between;align-items:center;padding:18px 40px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(10,10,12,0.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-.brand-name{font-family:var(--fs);font-weight:400;font-size:1.2rem;letter-spacing:0.02em;color:var(--white)}
-.brand-name span,.brand-accent{color:var(--accent)}
+.brand-name{font-family:var(--ff);font-weight:800;font-size:1.1rem;letter-spacing:0.15em;color:#EAEAF0;text-transform:uppercase}
+.brand-name span,.brand-accent{color:var(--accent);font-weight:800}
 
 .nav-right{display:flex;align-items:center;gap:28px}
 .nav-links{display:flex;gap:28px;list-style:none;align-items:center}
@@ -160,7 +160,7 @@ textarea.form-input,textarea.text-input{min-height:120px;resize:vertical;line-he
 footer{border-top:1px solid var(--border);padding:80px 40px}
 /* Legacy footer classes */
 .f-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px;align-items:start}
-.f-brand{font-family:var(--ff);font-weight:700;letter-spacing:3px;color:var(--white);font-size:18px;margin-bottom:8px}
+.f-brand{font-family:var(--ff);font-weight:800;letter-spacing:0.15em;color:#EAEAF0;font-size:18px;margin-bottom:8px;text-transform:uppercase}
 .f-brand span{color:var(--accent)}
 .f-tag,.f-tagline{font-family:var(--ff);font-size:14px;color:var(--text-secondary);line-height:1.6}
 .f-col-center{display:flex;flex-direction:column;gap:12px}
