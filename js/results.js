@@ -474,7 +474,7 @@
           ? 'Hola, completé el diagnóstico de Ignea Labs. Mi puntuación fue ' + score + '/100. Me gustaría agendar una llamada estratégica.'
           : 'Hi, I completed the Ignea Labs diagnostic. My score was ' + score + '/100. I\'d like to book a strategy call.'
       );
-      waLink.href = 'https://wa.me/1787XXXXXXX?text=' + msg;
+      waLink.href = 'https://wa.me/19493736407?text=' + msg;
       waLink.setAttribute('target', '_blank');
       waLink.setAttribute('rel', 'noopener');
       waLink.addEventListener('click', function() {
@@ -530,168 +530,341 @@
     if (!jsPDF) return;
 
     var doc = new jsPDF();
-    var y = 20;
+    var M = 20; // margin
+    var PW = 170; // page width (210 - 2*20)
+    var y = 0;
     var score = scoreData.total || 0;
     var level = scoreData.level || 'developing';
     var scores = scoreData.scores || scoreData.streams || {};
     var fullName = (contact.first_name || '') + (contact.last_name ? ' ' + contact.last_name : '');
+    var company = contact.company || '';
     var isES = lang() === 'es';
-
-    /* ---- PAGE 1: HEADER + SCORE + DIMENSIONS ---- */
-
-    // Brand
-    doc.setFontSize(20);
-    doc.setTextColor(0, 229, 191);
-    doc.text('IGNEA.LABS', 20, y);
-    y += 8;
-
-    // Report title
-    doc.setFontSize(14);
-    doc.setTextColor(110, 110, 136);
-    doc.text(t('res.reportTitle'), 20, y);
-    y += 10;
-
-    // Client info
-    doc.setFontSize(12);
-    doc.setTextColor(60, 60, 60);
-    doc.text((contact.company || '') + (fullName ? ' — ' + fullName : ''), 20, y);
-    y += 6;
-
-    // Date
     var now = new Date();
-    var dateStr = now.toLocaleDateString(isES ? 'es-PR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    doc.setFontSize(10);
-    doc.setTextColor(110, 110, 136);
-    doc.text(t('res.reportDate') + ' ' + dateStr, 20, y);
-    y += 4;
+    var dateStr = now.toLocaleDateString(isES ? 'es-LA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    // Separator line
-    doc.setDrawColor(200, 200, 200);
-    doc.line(20, y, 190, y);
-    y += 12;
-
-    // Score
-    doc.setFontSize(36);
-    doc.setTextColor(0, 229, 191);
-    doc.text(score + '/100', 20, y);
-    doc.setFontSize(12);
-    doc.setTextColor(110, 110, 136);
-    doc.text(t('res.level.' + level), 80, y);
-    y += 14;
-
-    // Dimensions
-    doc.setFontSize(11);
-    doc.setTextColor(60, 60, 60);
-    doc.text(isES ? 'Desglose por Dimensión' : 'Dimension Breakdown', 20, y);
-    y += 8;
-
-    var dims = ['customerFlow', 'operationsFlow', 'informationFlow', 'growthFlow'];
-    dims.forEach(function(dim) {
-      doc.setFontSize(10);
-      doc.setTextColor(110, 110, 136);
-      doc.text(t('res.stream.' + dim), 24, y);
-      var dimScore = scores[dim] || 0;
-      doc.setTextColor(0, 229, 191);
-      doc.text(dimScore + '/25', 170, y);
-      // Draw bar
-      var barWidth = 80;
-      var barX = 80;
-      doc.setDrawColor(220, 220, 220);
-      doc.rect(barX, y - 3, barWidth, 3);
-      doc.setFillColor(0, 229, 191);
-      doc.rect(barX, y - 3, barWidth * (dimScore / 25), 3, 'F');
-      y += 8;
-    });
-    y += 6;
-
-    // Cost of inaction
-    doc.setFontSize(11);
-    doc.setTextColor(60, 60, 60);
-    doc.text(isES ? 'Costo de No Actuar' : 'Cost of Inaction', 20, y);
-    y += 8;
-    doc.setFontSize(10);
-    doc.setTextColor(110, 110, 136);
-    doc.text((isES ? 'Tiempo perdido: ' : 'Time wasted: ') + (scoreData._wastedHoursWeek || 0) + ' hrs/' + (isES ? 'semana' : 'week'), 24, y);
-    y += 6;
-    doc.text((isES ? 'Costo mensual: $' : 'Monthly cost: $') + fmt(scoreData._monthlyCost || 0), 24, y);
-    y += 6;
-    doc.text((isES ? 'Costo anual: $' : 'Annual cost: $') + fmt(scoreData._annualCost || 0), 24, y);
-    y += 12;
-
-    // Top 3 Painpoints
-    doc.setFontSize(11);
-    doc.setTextColor(60, 60, 60);
-    doc.text(isES ? 'Puntos de Mayor Impacto Financiero' : 'Highest Financial Impact Areas', 20, y);
-    y += 8;
-
-    top3Data.forEach(function(item, i) {
-      doc.setFontSize(10);
-      doc.setTextColor(0, 229, 191);
-      doc.text('0' + (i + 1) + '. ' + t('res.stream.' + item.stream), 24, y);
-      doc.setTextColor(240, 153, 123);
-      doc.text('$' + fmt(item.cost) + (isES ? '/mes' : '/mo'), 140, y);
-      y += 5;
+    // Helpers
+    function sectionHeader(label) {
+      if (y > 250) { doc.addPage(); y = M; }
+      y += 16;
+      doc.setFont('courier', 'normal');
       doc.setFontSize(9);
-      doc.setTextColor(110, 110, 136);
-      var descLines = doc.splitTextToSize(t('res.pain.' + item.stream), 155);
-      doc.text(descLines, 28, y);
-      y += descLines.length * 4 + 4;
-    });
-    y += 4;
-
-    // Solutions
-    if (y > 220) { doc.addPage(); y = 20; }
-    doc.setFontSize(11);
-    doc.setTextColor(60, 60, 60);
-    doc.text(isES ? 'Soluciones Recomendadas' : 'Recommended Solutions', 20, y);
-    y += 8;
-
-    top3Data.forEach(function(item, i) {
-      if (y > 250) { doc.addPage(); y = 20; }
-      var sol = item.solution;
-      if (!sol) return;
-      doc.setFontSize(10);
-      doc.setTextColor(0, 229, 191);
-      doc.text('0' + (i + 1) + '. ' + t(sol.nameKey), 24, y);
-      y += 5;
-      doc.setFontSize(9);
-      doc.setTextColor(110, 110, 136);
-      var solLines = doc.splitTextToSize(t(sol.descKey), 155);
-      doc.text(solLines, 28, y);
-      y += solLines.length * 4 + 2;
-      doc.text((isES ? 'Implementación: ' : 'Implementation: ') + sol.time + ' ' + t('res.sol.weeks'), 28, y);
-      doc.text((isES ? 'Ahorro proyectado: $' : 'Projected savings: $') + fmt(item.projectedSavings || 0) + (isES ? '/mes' : '/mo'), 100, y);
-      y += 8;
-    });
-    y += 4;
-
-    // Savings summary
-    if (y > 240) { doc.addPage(); y = 20; }
-    doc.setFontSize(11);
-    doc.setTextColor(60, 60, 60);
-    doc.text(isES ? 'Proyección de Ahorro' : 'Savings Projection', 20, y);
-    y += 10;
-    doc.setFontSize(14);
-    doc.setTextColor(0, 229, 191);
-    doc.text((isES ? 'Ahorro mensual: $' : 'Monthly savings: $') + fmt(scoreData._totalMonthlySavings || 0), 24, y);
-    y += 8;
-    doc.text((isES ? 'Ahorro anual: $' : 'Annual savings: $') + fmt(scoreData._totalAnnualSavings || 0), 24, y);
-    y += 8;
-    doc.setFontSize(12);
-    doc.setTextColor(110, 110, 136);
-    doc.text((isES ? 'Retorno de inversión: ' : 'ROI: ') + (scoreData._breakeven || 0) + ' ' + t('res.savings.breakevenUnit'), 24, y);
-    y += 14;
-
-    // Footer on every page
-    var pageCount = doc.internal.getNumberOfPages();
-    for (var p = 1; p <= pageCount; p++) {
-      doc.setPage(p);
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text('IGNEA.LABS — hola@ignealabs.com — ignealabs.com — San Juan, Puerto Rico', 20, 285);
+      doc.setTextColor(232, 53, 42);
+      doc.text(label.toUpperCase(), M, y);
+      y += 3;
+      doc.setDrawColor(232, 53, 42);
+      doc.line(M, y, M + 40, y);
+      y += 10;
     }
 
-    var pdfName = (contact.company || contact.first_name || 'reporte').replace(/\s+/g, '-').toLowerCase();
+    function addFooters() {
+      var pc = doc.internal.getNumberOfPages();
+      for (var p = 1; p <= pc; p++) {
+        doc.setPage(p);
+        doc.setDrawColor(224, 224, 224);
+        doc.line(M, 280, M + PW, 280);
+        doc.setFont('courier', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(153, 153, 153);
+        doc.text('ignea.labs', M, 286);
+        doc.text(p + ' / ' + pc, 105, 286, { align: 'center' });
+        doc.text('ignealabs.com', M + PW, 286, { align: 'right' });
+      }
+    }
+
+    /* ======== PAGE 1: COVER ======== */
+    y = 40;
+    // Logo text
+    doc.setFont('times', 'normal');
+    doc.setFontSize(18);
+    doc.setTextColor(26, 26, 26);
+    doc.text('ignea', M, y);
+    var dotX = M + doc.getTextWidth('ignea') + 2;
+    doc.setFillColor(232, 53, 42);
+    doc.circle(dotX + 2, y - 4, 2, 'F');
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(142, 142, 158);
+    doc.text('labs', dotX + 6, y);
+    y += 4;
+    // Red rule
+    doc.setDrawColor(232, 53, 42);
+    doc.line(M, y, M + PW, y);
+    y += 40;
+
+    // Title
+    doc.setFont('times', 'normal');
+    doc.setFontSize(28);
+    doc.setTextColor(26, 26, 26);
+    doc.text(isES ? 'Reporte de Salud Operacional' : 'Operational Health Report', M, y);
+    y += 14;
+
+    // Company
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(18);
+    doc.setTextColor(107, 107, 107);
+    doc.text(company || fullName || '', M, y);
+    y += 10;
+
+    // Date
+    doc.setFontSize(11);
+    doc.text(dateStr, M, y);
+
+    // Confidential footer
+    doc.setFont('courier', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(153, 153, 153);
+    var confText = isES
+      ? 'CONFIDENCIAL — Preparado exclusivamente para ' + (company || fullName || 'el cliente')
+      : 'CONFIDENTIAL — Prepared exclusively for ' + (company || fullName || 'the client');
+    doc.text(confText, 105, 260, { align: 'center' });
+
+    /* ======== PAGE 2: EXECUTIVE SUMMARY + SCORE ======== */
+    doc.addPage();
+    y = M;
+
+    sectionHeader(isES ? 'RESUMEN EJECUTIVO' : 'EXECUTIVE SUMMARY');
+
+    // Score
+    doc.setFont('times', 'normal');
+    doc.setFontSize(48);
+    doc.setTextColor(232, 53, 42);
+    doc.text(score + '/100', M, y + 12);
+
+    // Level badge
+    doc.setFont('courier', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(232, 53, 42);
+    var levelText = t('res.level.' + level).toUpperCase();
+    var badgeX = M + 80;
+    var badgeW = doc.getTextWidth(levelText) + 12;
+    doc.setDrawColor(232, 53, 42);
+    doc.rect(badgeX, y, badgeW, 8);
+    doc.text(levelText, badgeX + 6, y + 6);
+    y += 24;
+
+    // Summary text
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(26, 26, 26);
+    var summaryText = isES
+      ? 'Este reporte analiza la madurez operacional de ' + (company || 'su empresa') + ' a través de 4 dimensiones clave. Una puntuación de ' + score + '/100 indica ' + (score < 30 ? 'oportunidades significativas de mejora' : score < 60 ? 'una operación con brechas importantes por cerrar' : 'una base operativa sólida con espacio de optimización') + '.'
+      : 'This report analyzes the operational maturity of ' + (company || 'your business') + ' across 4 key dimensions. A score of ' + score + '/100 indicates ' + (score < 30 ? 'significant improvement opportunities' : score < 60 ? 'an operation with important gaps to close' : 'a solid operational foundation with room for optimization') + '.';
+    var sumLines = doc.splitTextToSize(summaryText, PW);
+    doc.text(sumLines, M, y);
+    y += sumLines.length * 5 + 12;
+
+    // Dimension breakdown
+    sectionHeader(isES ? 'DESGLOSE POR DIMENSIÓN' : 'DIMENSION BREAKDOWN');
+
+    var dims = ['customerFlow', 'operationsFlow', 'informationFlow', 'growthFlow'];
+    var dimInsights = {
+      customerFlow: { es: 'Flujo de interacción con clientes', en: 'Customer interaction flow' },
+      operationsFlow: { es: 'Madurez de procesos operativos', en: 'Operational process maturity' },
+      informationFlow: { es: 'Uso de datos e información', en: 'Data and information usage' },
+      growthFlow: { es: 'Capacidad de crecimiento digital', en: 'Digital growth capacity' }
+    };
+
+    dims.forEach(function(dim) {
+      var dimScore = scores[dim] || 0;
+      var pct = dimScore / 25;
+      // Name
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(26, 26, 26);
+      doc.text(t('res.stream.' + dim), M, y);
+      // Score
+      doc.setFont('courier', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(232, 53, 42);
+      doc.text(dimScore + '/25', M + PW, y, { align: 'right' });
+      y += 4;
+      // Bar
+      doc.setFillColor(224, 224, 224);
+      doc.rect(M, y, PW, 2.5, 'F');
+      doc.setFillColor(232, 53, 42);
+      doc.rect(M, y, PW * pct, 2.5, 'F');
+      y += 5;
+      // Insight
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(107, 107, 107);
+      var insightKey = dimScore < 12 ? 'res.stream.' + dim + '.low' : 'res.stream.' + dim + '.high';
+      var insightText = t(insightKey) || (dimInsights[dim] ? dimInsights[dim][isES ? 'es' : 'en'] : '');
+      var insLines = doc.splitTextToSize(insightText, PW);
+      doc.text(insLines, M, y + 3);
+      y += insLines.length * 4 + 10;
+    });
+
+    /* ======== PAGE 3: COST OF INACTION ======== */
+    doc.addPage();
+    y = M;
+
+    sectionHeader(isES ? 'EL COSTO DE NO ACTUAR' : 'THE COST OF INACTION');
+
+    // Three metric cards
+    var metrics = [
+      { label: isES ? 'HORAS PERDIDAS/SEMANA' : 'HOURS LOST/WEEK', value: (scoreData._wastedHoursWeek || 0) + '' },
+      { label: isES ? 'COSTO MENSUAL' : 'MONTHLY COST', value: '$' + fmt(scoreData._monthlyCost || 0) },
+      { label: isES ? 'COSTO ANUAL' : 'ANNUAL COST', value: '$' + fmt(scoreData._annualCost || 0) }
+    ];
+    var cardW = PW / 3;
+    metrics.forEach(function(m, i) {
+      var cx = M + (i * cardW) + (cardW / 2);
+      doc.setFont('times', 'normal');
+      doc.setFontSize(24);
+      doc.setTextColor(232, 53, 42);
+      doc.text(m.value, cx, y, { align: 'center' });
+      doc.setFont('courier', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(107, 107, 107);
+      doc.text(m.label, cx, y + 6, { align: 'center' });
+    });
+    y += 20;
+
+    // Painpoints
+    doc.setDrawColor(224, 224, 224);
+    doc.line(M, y, M + PW, y);
+    y += 8;
+
+    top3Data.forEach(function(item, i) {
+      if (y > 260) { doc.addPage(); y = M; }
+      // Alternating bg
+      if (i % 2 === 1) {
+        doc.setFillColor(245, 245, 245);
+        doc.rect(M, y - 4, PW, 18, 'F');
+      }
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(26, 26, 26);
+      doc.text(t('res.stream.' + item.stream), M + 2, y);
+      doc.setFont('courier', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(232, 53, 42);
+      doc.text('$' + fmt(item.cost) + (isES ? '/mes' : '/mo'), M + PW, y, { align: 'right' });
+      y += 5;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(107, 107, 107);
+      var painLines = doc.splitTextToSize(t('res.pain.' + item.stream), PW - 4);
+      doc.text(painLines, M + 2, y);
+      y += painLines.length * 4 + 8;
+    });
+
+    /* ======== PAGE 4: SOLUTIONS ======== */
+    doc.addPage();
+    y = M;
+
+    sectionHeader(isES ? 'SOLUCIONES RECOMENDADAS' : 'RECOMMENDED SOLUTIONS');
+
+    top3Data.forEach(function(item, i) {
+      if (y > 240) { doc.addPage(); y = M; }
+      var sol = item.solution;
+      if (!sol) return;
+
+      // Step number watermark
+      doc.setFont('courier', 'normal');
+      doc.setFontSize(24);
+      doc.setTextColor(224, 224, 224);
+      doc.text('0' + (i + 1), M, y + 6);
+
+      // Title
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(26, 26, 26);
+      doc.text(t(sol.nameKey), M + 16, y);
+      y += 6;
+
+      // Description
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(107, 107, 107);
+      var solLines = doc.splitTextToSize(t(sol.descKey), PW - 16);
+      doc.text(solLines, M + 16, y);
+      y += solLines.length * 4.5 + 4;
+
+      // Metric boxes
+      doc.setFont('courier', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(153, 153, 153);
+      doc.text(isES ? 'IMPLEMENTACIÓN' : 'IMPLEMENTATION', M + 16, y);
+      doc.text(isES ? 'AHORRO PROYECTADO' : 'PROJECTED SAVINGS', M + 80, y);
+      y += 5;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(26, 26, 26);
+      doc.text(sol.time + ' ' + t('res.sol.weeks'), M + 16, y);
+      doc.setTextColor(232, 53, 42);
+      doc.text('$' + fmt(item.projectedSavings || 0) + (isES ? '/mes' : '/mo'), M + 80, y);
+      y += 6;
+
+      // Separator
+      doc.setDrawColor(224, 224, 224);
+      doc.line(M, y, M + PW, y);
+      y += 8;
+    });
+
+    // Savings summary
+    y += 8;
+    doc.setFont('times', 'normal');
+    doc.setFontSize(18);
+    doc.setTextColor(232, 53, 42);
+    doc.text((isES ? 'Ahorro mensual estimado: $' : 'Estimated monthly savings: $') + fmt(scoreData._totalMonthlySavings || 0), M, y);
+    y += 8;
+    doc.text((isES ? 'Ahorro anual estimado: $' : 'Estimated annual savings: $') + fmt(scoreData._totalAnnualSavings || 0), M, y);
+    y += 8;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(107, 107, 107);
+    doc.text((isES ? 'Retorno de inversión estimado: ' : 'Estimated ROI: ') + (scoreData._breakeven || 0) + ' ' + t('res.savings.breakevenUnit'), M, y);
+
+    /* ======== PAGE 5: NEXT STEPS ======== */
+    doc.addPage();
+    y = M;
+
+    sectionHeader(isES ? 'PRÓXIMOS PASOS' : 'NEXT STEPS');
+
+    var steps = isES ? [
+      { n: '01', t: 'Agenda tu llamada estratégica', d: '30 minutos para revisar este reporte y definir prioridades.' },
+      { n: '02', t: 'Recibe tu propuesta personalizada', d: 'Soluciones específicas con costos, tiempos y ROI proyectado.' },
+      { n: '03', t: 'Comienza la implementación', d: 'Tu equipo de ingeniería fraccionario entra en acción.' }
+    ] : [
+      { n: '01', t: 'Schedule your strategy call', d: '30 minutes to review this report and define priorities.' },
+      { n: '02', t: 'Receive your custom proposal', d: 'Specific solutions with costs, timelines, and projected ROI.' },
+      { n: '03', t: 'Begin implementation', d: 'Your fractional engineering team gets to work.' }
+    ];
+
+    steps.forEach(function(step) {
+      doc.setFont('courier', 'normal');
+      doc.setFontSize(20);
+      doc.setTextColor(224, 224, 224);
+      doc.text(step.n, M, y + 4);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(26, 26, 26);
+      doc.text(step.t, M + 16, y);
+      y += 6;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(107, 107, 107);
+      doc.text(step.d, M + 16, y);
+      y += 14;
+    });
+
+    y += 10;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(232, 53, 42);
+    doc.text(isES ? 'Agenda tu llamada:' : 'Book your call:', M, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(26, 26, 26);
+    doc.text('calendly.com/fedebaltoinvest/30min', M + 45, y);
+    y += 8;
+    doc.setTextColor(107, 107, 107);
+    doc.text('hola@ignealabs.com', M, y);
+
+    /* ======== FOOTERS ON ALL PAGES ======== */
+    addFooters();
+
+    var pdfName = (company || contact.first_name || 'reporte').replace(/\s+/g, '-').toLowerCase();
     doc.save('ignea-labs-reporte-' + pdfName + '.pdf');
   }
 

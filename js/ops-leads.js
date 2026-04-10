@@ -33,16 +33,14 @@ var OpsLeads = (function() {
 
   var CONTACT_FIELDS = [
     { key: 'first_name',        label: 'Nombre' },
-    { key: 'last_name',         label: 'Apellido' },
     { key: 'email',             label: 'Email' },
-    { key: 'phone',             label: 'Teléfono' },
+    { key: 'phone',             label: 'WhatsApp / Teléfono' },
     { key: 'company_name',      label: 'Empresa' },
-    { key: 'position',          label: 'Cargo' },
     { key: 'industry',          label: 'Industria' },
     { key: 'company_size',      label: 'Tamaño empresa' },
     { key: 'company_website',   label: 'Sitio web' },
     { key: 'company_linkedin',  label: 'LinkedIn' },
-    { key: 'annual_revenue',    label: 'Ingresos anuales' }
+    { key: 'revenue',           label: 'Ingresos mensuales' }
   ];
 
   var DIMENSION_LABELS = {
@@ -329,6 +327,7 @@ var OpsLeads = (function() {
     tabNav.innerHTML =
       '<button class="detail-tab active" data-dtab="summary">' + (lang === 'es' ? 'Resumen' : 'Summary') + '</button>' +
       '<button class="detail-tab" data-dtab="answers">' + (lang === 'es' ? 'Respuestas' : 'Answers') + '</button>' +
+      '<button class="detail-tab" data-dtab="ai">' + (lang === 'es' ? 'Análisis IA' : 'AI Analysis') + '</button>' +
       '<button class="detail-tab" data-dtab="actions">' + (lang === 'es' ? 'Acciones' : 'Actions') + '</button>';
     content.appendChild(tabNav);
 
@@ -509,59 +508,156 @@ var OpsLeads = (function() {
     tabAnswers.style.display = 'none';
 
     var answers = lead.diagnostic_answers || {};
-    var qLabels = QUESTION_LABELS[lang] || QUESTION_LABELS.es;
 
-    for (var q = 1; q <= 11; q++) {
-      var qKey = 'q' + q;
-      var answer = answers[qKey];
-      var openAnswer = answers[qKey + '_open'];
+    // Detect format: new intake (q4_headache etc.) vs old diagnostic (q1-q11)
+    var isIntakeFormat = answers.q4_headache !== undefined || answers.q5_timeleaks !== undefined || answers.q2_business !== undefined;
 
-      var block = document.createElement('div');
-      block.className = 'answer-block';
+    if (isIntakeFormat) {
+      // Show quick stats if available
+      if (lead.opportunityCount || lead.estimatedHoursLost) {
+        var statsBlock = document.createElement('div');
+        statsBlock.className = 'answer-block';
+        statsBlock.innerHTML =
+          '<div class="answer-q">' + (lang === 'es' ? 'Resumen rápido' : 'Quick stats') + '</div>' +
+          '<div class="answer-chips">' +
+            '<span class="answer-chip">' + (lead.opportunityCount || 0) + ' ' + (lang === 'es' ? 'oportunidades' : 'opportunities') + '</span>' +
+            '<span class="answer-chip">' + (lead.estimatedHoursLost || 0) + ' hrs/' + (lang === 'es' ? 'semana perdidas' : 'week lost') + '</span>' +
+          '</div>';
+        tabAnswers.appendChild(statsBlock);
+      }
 
-      var qText = document.createElement('div');
-      qText.className = 'answer-q';
-      qText.textContent = 'Q' + q + ': ' + (qLabels[qKey] || '');
-      block.appendChild(qText);
+      // Show scores if available
+      if (lead.score_breakdown) {
+        var sb = lead.score_breakdown;
+        var dimNames = lang === 'es'
+          ? { customerFlow: 'Flujo de Clientes', operationsFlow: 'Flujo de Operaciones', informationFlow: 'Flujo de Información', growthFlow: 'Flujo de Crecimiento' }
+          : { customerFlow: 'Customer Flow', operationsFlow: 'Operations Flow', informationFlow: 'Information Flow', growthFlow: 'Growth Flow' };
+        var scoreBlock = document.createElement('div');
+        scoreBlock.className = 'answer-block';
+        var scoreHtml = '<div class="answer-q">' + (lang === 'es' ? 'Puntuación: ' : 'Score: ') + (lead.total_score || 0) + '/100</div>';
+        ['customerFlow', 'operationsFlow', 'informationFlow', 'growthFlow'].forEach(function(dim) {
+          var val = sb[dim] || 0;
+          var pct = Math.round((val / 25) * 100);
+          scoreHtml += '<div style="margin:6px 0"><div style="display:flex;justify-content:space-between;font-size:13px;color:var(--gray);margin-bottom:3px"><span>' + (dimNames[dim] || dim) + '</span><span style="font-family:var(--fm)">' + val + '/25</span></div>' +
+            '<div style="height:4px;background:var(--border);width:100%"><div style="height:100%;width:' + pct + '%;background:var(--accent);transition:width .5s"></div></div></div>';
+        });
+        scoreBlock.innerHTML = scoreHtml;
+        tabAnswers.appendChild(scoreBlock);
+      }
 
-      if (answer !== undefined && answer !== null) {
-        if (Array.isArray(answer)) {
+      var INTAKE_QUESTIONS = lang === 'es' ? [
+        { key: 'q2_business',    label: 'Sobre su negocio' },
+        { key: 'q5_timeleaks',   label: 'Dónde pierden más tiempo' },
+        { key: 'q6_tools',       label: 'Herramientas actuales' },
+        { key: 'q4_headache',    label: 'Problema operativo principal' },
+        { key: 'q7_tried',       label: 'Intentos previos de resolver el problema' }
+      ] : [
+        { key: 'q2_business',    label: 'About their business' },
+        { key: 'q5_timeleaks',   label: 'Where the team loses time' },
+        { key: 'q6_tools',       label: 'Current tools' },
+        { key: 'q4_headache',    label: 'Biggest operational headache' },
+        { key: 'q7_tried',       label: 'Previous attempts to solve the problem' }
+      ];
+
+      INTAKE_QUESTIONS.forEach(function(qDef, idx) {
+        var val = answers[qDef.key];
+        var block = document.createElement('div');
+        block.className = 'answer-block';
+
+        var qText = document.createElement('div');
+        qText.className = 'answer-q';
+        qText.textContent = (idx + 1) + '. ' + qDef.label;
+        block.appendChild(qText);
+
+        if (Array.isArray(val) && val.length) {
           var chipsWrap = document.createElement('div');
           chipsWrap.className = 'answer-chips';
-          answer.forEach(function(item) {
+          val.forEach(function(item) {
             var chip = document.createElement('span');
             chip.className = 'answer-chip';
             chip.textContent = String(item);
             chipsWrap.appendChild(chip);
           });
           block.appendChild(chipsWrap);
-        } else if (typeof answer === 'number') {
-          var numEl = document.createElement('div');
-          numEl.className = 'answer-choice';
-          numEl.textContent = String(answer);
-          block.appendChild(numEl);
+        } else if (val && typeof val === 'string' && val.trim()) {
+          var ansEl = document.createElement('div');
+          ansEl.className = 'answer-text';
+          ansEl.textContent = val;
+          // Collapsible if long
+          if (val.length > 200) {
+            ansEl.style.maxHeight = '80px';
+            ansEl.style.overflow = 'hidden';
+            ansEl.style.cursor = 'pointer';
+            ansEl.title = lang === 'es' ? 'Clic para expandir' : 'Click to expand';
+            ansEl.addEventListener('click', function() {
+              if (ansEl.style.maxHeight) {
+                ansEl.style.maxHeight = '';
+                ansEl.style.overflow = '';
+              } else {
+                ansEl.style.maxHeight = '80px';
+                ansEl.style.overflow = 'hidden';
+              }
+            });
+          }
+          block.appendChild(ansEl);
         } else {
-          var choiceEl = document.createElement('div');
-          choiceEl.className = 'answer-choice';
-          choiceEl.textContent = String(answer);
-          block.appendChild(choiceEl);
+          var empty = document.createElement('div');
+          empty.className = 'answer-choice answer-empty';
+          empty.textContent = '—';
+          block.appendChild(empty);
         }
-      } else {
-        var noAnswer = document.createElement('div');
-        noAnswer.className = 'answer-choice answer-empty';
-        noAnswer.textContent = '—';
-        block.appendChild(noAnswer);
-      }
 
-      // Open text answer
-      if (openAnswer) {
-        var openEl = document.createElement('div');
-        openEl.className = 'answer-text';
-        openEl.textContent = '"' + String(openAnswer) + '"';
-        block.appendChild(openEl);
-      }
+        tabAnswers.appendChild(block);
+      });
+    } else {
+      // Legacy q1-q11 format
+      var qLabels = QUESTION_LABELS[lang] || QUESTION_LABELS.es;
+      for (var q = 1; q <= 11; q++) {
+        var qKey = 'q' + q;
+        var answer = answers[qKey];
+        var openAnswer = answers[qKey + '_open'];
 
-      tabAnswers.appendChild(block);
+        var block = document.createElement('div');
+        block.className = 'answer-block';
+
+        var qText = document.createElement('div');
+        qText.className = 'answer-q';
+        qText.textContent = 'Q' + q + ': ' + (qLabels[qKey] || '');
+        block.appendChild(qText);
+
+        if (answer !== undefined && answer !== null) {
+          if (Array.isArray(answer)) {
+            var chipsWrap = document.createElement('div');
+            chipsWrap.className = 'answer-chips';
+            answer.forEach(function(item) {
+              var chip = document.createElement('span');
+              chip.className = 'answer-chip';
+              chip.textContent = String(item);
+              chipsWrap.appendChild(chip);
+            });
+            block.appendChild(chipsWrap);
+          } else {
+            var choiceEl = document.createElement('div');
+            choiceEl.className = 'answer-choice';
+            choiceEl.textContent = String(answer);
+            block.appendChild(choiceEl);
+          }
+        } else {
+          var noAnswer = document.createElement('div');
+          noAnswer.className = 'answer-choice answer-empty';
+          noAnswer.textContent = '—';
+          block.appendChild(noAnswer);
+        }
+
+        if (openAnswer) {
+          var openEl = document.createElement('div');
+          openEl.className = 'answer-text';
+          openEl.textContent = '"' + String(openAnswer) + '"';
+          block.appendChild(openEl);
+        }
+
+        tabAnswers.appendChild(block);
+      }
     }
 
     // Copy answers button
@@ -571,6 +667,16 @@ var OpsLeads = (function() {
     copyBtn.textContent = lang === 'es' ? 'Copiar respuestas' : 'Copy answers';
     copyBtn.addEventListener('click', function() {
       var text = '';
+      if (isIntakeFormat) {
+        var copyQs = lang === 'es'
+          ? { q2_business: 'Sobre su negocio', q5_timeleaks: 'Pérdidas de tiempo', q6_tools: 'Herramientas', q4_headache: 'Problema principal', q7_tried: 'Intentos previos' }
+          : { q2_business: 'About their business', q5_timeleaks: 'Time sinks', q6_tools: 'Tools', q4_headache: 'Main problem', q7_tried: 'Previous attempts' };
+        Object.keys(copyQs).forEach(function(k) {
+          var v = answers[k];
+          text += copyQs[k] + ': ' + (Array.isArray(v) ? v.join(', ') : (v || '—')) + '\n\n';
+        });
+      } else {
+      var qLabels = QUESTION_LABELS[lang] || QUESTION_LABELS.es;
       for (var i = 1; i <= 11; i++) {
         var key = 'q' + i;
         var label = (qLabels[key] || 'Q' + i);
@@ -585,6 +691,7 @@ var OpsLeads = (function() {
         if (openAns) text += '"' + String(openAns) + '"\n';
         text += '\n';
       }
+      } // end else (legacy format)
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(function() {
           copyBtn.textContent = lang === 'es' ? 'Copiado' : 'Copied';
@@ -597,6 +704,227 @@ var OpsLeads = (function() {
     tabAnswers.appendChild(copyBtn);
 
     content.appendChild(tabAnswers);
+
+    // ── TAB: AI ANALYSIS ──
+    var tabAI = document.createElement('div');
+    tabAI.className = 'detail-tab-content';
+    tabAI.setAttribute('data-dtab', 'ai');
+    tabAI.style.display = 'none';
+
+    // Toggle buttons
+    var aiToggleRow = document.createElement('div');
+    aiToggleRow.className = 'ai-toggle-row';
+    var btnSummaryMode = document.createElement('button');
+    btnSummaryMode.className = 'btn-ghost btn-sm ai-mode-btn active';
+    btnSummaryMode.textContent = lang === 'es' ? 'Resumen rápido' : 'Quick Summary';
+    var btnDeepMode = document.createElement('button');
+    btnDeepMode.className = 'btn-ghost btn-sm ai-mode-btn';
+    btnDeepMode.textContent = lang === 'es' ? 'Análisis profundo' : 'Deep Analysis';
+    aiToggleRow.appendChild(btnSummaryMode);
+    aiToggleRow.appendChild(btnDeepMode);
+    tabAI.appendChild(aiToggleRow);
+
+    var aiResultContainer = document.createElement('div');
+    aiResultContainer.className = 'ai-result-container';
+    tabAI.appendChild(aiResultContainer);
+
+    var currentAIMode = 'summary';
+
+    function renderSummaryResult(data) {
+      var h = '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// RESUMEN EJECUTIVO' : '// EXECUTIVE SUMMARY') + '</div>' +
+        '<p class="ai-card-body">' + escHtml(data.overview) + '</p>' +
+      '</div>';
+
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// PUNTOS DE DOLOR' : '// PAIN POINTS') + '</div>' +
+        '<ul class="ai-card-list">';
+      (data.pain_points || []).forEach(function(p) { h += '<li>' + escHtml(p) + '</li>'; });
+      h += '</ul></div>';
+
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// PRIMER PROYECTO RECOMENDADO' : '// RECOMMENDED FIRST PROJECT') + '</div>' +
+        '<p class="ai-card-body ai-card-highlight">' + escHtml(data.recommended_project) + '</p>' +
+      '</div>';
+
+      // Savings with calculation
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// AHORRO ESTIMADO' : '// ESTIMATED SAVINGS') + '</div>' +
+        '<div class="ai-card-stat">$' + (data.monthly_savings_min || 0).toLocaleString() + ' – $' + (data.monthly_savings_max || 0).toLocaleString() + '/mo</div>';
+      if (data.savings_calculation) {
+        h += '<p class="ai-card-body" style="margin-top:8px;font-family:var(--fm);font-size:13px;white-space:pre-line">' + escHtml(data.savings_calculation) + '</p>';
+      }
+      h += '</div>';
+
+      // Price with formula
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// PRECIO SUGERIDO' : '// SUGGESTED PRICE') + '</div>' +
+        '<div class="ai-card-stat">$' + (data.suggested_price_min || 0).toLocaleString() + ' – $' + (data.suggested_price_max || 0).toLocaleString() + '</div>';
+      if (data.price_calculation) {
+        h += '<p class="ai-card-body" style="margin-top:8px;font-family:var(--fm);font-size:13px">' + escHtml(data.price_calculation) + '</p>';
+      }
+      h += '</div>';
+
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// PREGUNTAS PARA LA LLAMADA' : '// DISCOVERY CALL QUESTIONS') + '</div>' +
+        '<ol class="ai-card-list">';
+      (data.discovery_questions || []).forEach(function(q) { h += '<li>' + escHtml(q) + '</li>'; });
+      h += '</ol></div>';
+
+      // Unknowns
+      if (data.unknowns) {
+        h += '<div class="ai-card" style="border-color:rgba(239,159,39,0.2)">' +
+          '<div class="ai-card-tag" style="color:#EF9F27">' + (lang === 'es' ? '// LO QUE NO SABEMOS' : '// WHAT WE DON\'T KNOW') + '</div>' +
+          '<p class="ai-card-body">' + escHtml(data.unknowns) + '</p>' +
+        '</div>';
+      }
+
+      return h;
+    }
+
+    function renderDeepResult(data) {
+      var h = '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// EVALUACIÓN DEL NEGOCIO' : '// BUSINESS ASSESSMENT') + '</div>' +
+        '<p class="ai-card-body">' + escHtml(data.assessment).replace(/\n/g, '<br>') + '</p>' +
+      '</div>';
+
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// SOLUCIONES — ROADMAP POR FASES' : '// SOLUTIONS — PHASED ROADMAP') + '</div>';
+      (data.solutions || []).forEach(function(sol, idx) {
+        var phaseLabel = sol.phase ? (lang === 'es' ? 'FASE ' : 'PHASE ') + sol.phase : '' + (idx + 1);
+        var weeksLabel = sol.weeks ? ' (' + (lang === 'es' ? 'semanas ' : 'weeks ') + sol.weeks + ')' : '';
+        h += '<div class="ai-sol-card">' +
+          '<div class="ai-sol-rank">' + phaseLabel + '</div>' +
+          '<div class="ai-sol-body">' +
+            '<div class="ai-sol-name">' + escHtml(sol.name) + weeksLabel + '</div>' +
+            '<div class="ai-sol-desc">' + escHtml(sol.description) + '</div>';
+        if (sol.build_hours_breakdown) {
+          h += '<div style="font-family:var(--fm);font-size:12px;color:var(--dimgray);margin:4px 0">' + escHtml(sol.build_hours_breakdown) + '</div>';
+        }
+        if (sol.savings_calculation) {
+          h += '<div style="font-family:var(--fm);font-size:12px;color:var(--gray);margin:4px 0;white-space:pre-line">' + escHtml(sol.savings_calculation) + '</div>';
+        }
+        if (sol.why_this_order) {
+          h += '<div style="font-size:13px;color:var(--dimgray);font-style:italic;margin:4px 0">' + escHtml(sol.why_this_order) + '</div>';
+        }
+        h += '<div class="ai-sol-meta">' +
+              '<span>' + (sol.build_hours || '?') + 'h build</span>' +
+              '<span>$' + (sol.monthly_savings || 0).toLocaleString() + '/mo saved</span>' +
+              '<span>$' + (sol.suggested_price || 0).toLocaleString() + '</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      });
+      h += '</div>';
+
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// ANÁLISIS COMPETITIVO' : '// COMPETITIVE ANALYSIS') + '</div>' +
+        '<p class="ai-card-body">' + escHtml(data.competitive_analysis || '').replace(/\n/g, '<br>') + '</p>' +
+      '</div>';
+
+      // Discovery script — handle both array and structured object formats
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// GUIÓN DE DESCUBRIMIENTO' : '// DISCOVERY SCRIPT') + '</div>';
+      var ds = data.discovery_script;
+      if (ds && typeof ds === 'object' && !Array.isArray(ds)) {
+        // Structured format: { quantify: [], validate: [], close: [] }
+        if (ds.quantify && ds.quantify.length) {
+          h += '<div style="font-family:var(--fm);font-size:11px;color:var(--accent);letter-spacing:1px;margin:12px 0 6px">' + (lang === 'es' ? 'CUANTIFICAR' : 'QUANTIFY') + '</div><ol class="ai-card-list">';
+          ds.quantify.forEach(function(q) { h += '<li>' + escHtml(q) + '</li>'; });
+          h += '</ol>';
+        }
+        if (ds.validate && ds.validate.length) {
+          h += '<div style="font-family:var(--fm);font-size:11px;color:var(--accent);letter-spacing:1px;margin:12px 0 6px">' + (lang === 'es' ? 'VALIDAR' : 'VALIDATE') + '</div><ol class="ai-card-list">';
+          ds.validate.forEach(function(q) { h += '<li>' + escHtml(q) + '</li>'; });
+          h += '</ol>';
+        }
+        if (ds.close && ds.close.length) {
+          h += '<div style="font-family:var(--fm);font-size:11px;color:var(--accent);letter-spacing:1px;margin:12px 0 6px">' + (lang === 'es' ? 'CERRAR' : 'CLOSE') + '</div><ol class="ai-card-list">';
+          ds.close.forEach(function(q) { h += '<li>' + escHtml(q) + '</li>'; });
+          h += '</ol>';
+        }
+      } else if (Array.isArray(ds)) {
+        h += '<ol class="ai-card-list">';
+        ds.forEach(function(q) { h += '<li>' + escHtml(q) + '</li>'; });
+        h += '</ol>';
+      }
+      h += '</div>';
+
+      h += '<div class="ai-card">' +
+        '<div class="ai-card-tag">' + (lang === 'es' ? '// PUNTOS DE PROPUESTA' : '// PROPOSAL TALKING POINTS') + '</div>' +
+        '<ul class="ai-card-list">';
+      (data.proposal_talking_points || []).forEach(function(p) { h += '<li>' + escHtml(p) + '</li>'; });
+      h += '</ul></div>';
+
+      if (data.red_flags && data.red_flags.length) {
+        h += '<div class="ai-card ai-card-warn">' +
+          '<div class="ai-card-tag">' + (lang === 'es' ? '// BANDERAS ROJAS / OBJECIONES' : '// RED FLAGS / OBJECTIONS') + '</div>';
+        data.red_flags.forEach(function(f) {
+          if (typeof f === 'object' && f.objection) {
+            h += '<div style="margin:10px 0"><div style="font-weight:600;color:var(--coral);font-size:14px;margin-bottom:4px">' + escHtml(f.objection) + '</div>' +
+              '<div style="font-size:13px;color:var(--gray);line-height:1.5">' + escHtml(f.response) + '</div></div>';
+          } else {
+            h += '<div style="margin:6px 0;font-size:14px;color:var(--gray)">' + escHtml(typeof f === 'string' ? f : JSON.stringify(f)) + '</div>';
+          }
+        });
+        h += '</div>';
+      }
+
+      return h;
+    }
+
+    function runAIMode(mode) {
+      currentAIMode = mode;
+      btnSummaryMode.classList.toggle('active', mode === 'summary');
+      btnDeepMode.classList.toggle('active', mode === 'deep_analysis');
+
+      aiResultContainer.innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div>' +
+        (lang === 'es' ? 'Analizando...' : 'Analyzing...') + '</div>';
+
+      var promise;
+      if (mode === 'summary') {
+        promise = IgneaAI.generateSummary(lead);
+      } else {
+        // For deep analysis, try to get scraper data
+        var scraperData = lead.scraper_data || null;
+        promise = IgneaAI.generateDeepAnalysis(lead, scraperData);
+      }
+
+      promise.then(function(data) {
+        var html = mode === 'summary' ? renderSummaryResult(data) : renderDeepResult(data);
+
+        // Copy all button
+        html += '<button class="btn-ghost ai-copy-all" style="width:100%;margin-top:12px">' +
+          (lang === 'es' ? 'Copiar todo al portapapeles' : 'Copy all to clipboard') + '</button>';
+
+        aiResultContainer.innerHTML = html;
+
+        var copyAllBtn = aiResultContainer.querySelector('.ai-copy-all');
+        if (copyAllBtn) {
+          copyAllBtn.addEventListener('click', function() {
+            var text = aiResultContainer.innerText;
+            navigator.clipboard.writeText(text).then(function() {
+              copyAllBtn.textContent = lang === 'es' ? 'Copiado ✓' : 'Copied ✓';
+              setTimeout(function() {
+                copyAllBtn.textContent = lang === 'es' ? 'Copiar todo al portapapeles' : 'Copy all to clipboard';
+              }, 2000);
+            });
+          });
+        }
+
+        // Auto-fill calculator
+        if (mode === 'summary' || mode === 'deep_analysis') {
+          document.dispatchEvent(new CustomEvent('ops:autoFillCalc', { detail: { lead: lead, ai: data } }));
+        }
+      }).catch(function(err) {
+        aiResultContainer.innerHTML = '<div class="ai-error">' + escHtml(err.message) + '</div>';
+      });
+    }
+
+    btnSummaryMode.addEventListener('click', function() { runAIMode('summary'); });
+    btnDeepMode.addEventListener('click', function() { runAIMode('deep_analysis'); });
+
+    content.appendChild(tabAI);
 
     // ── TAB 3: Actions ──
     var tabActions = document.createElement('div');
@@ -1016,6 +1344,20 @@ var OpsLeads = (function() {
         if (lead) {
           lead[fieldKey] = value;
           lead.updated_at = now;
+        }
+
+        // Persist local submissions back to localStorage
+        if (lead && lead._local) {
+          try {
+            var subs = JSON.parse(localStorage.getItem('ignea_submissions') || '[]');
+            var sub = subs.find(function(s) { return s.id === leadId; });
+            if (sub) {
+              if (fieldKey === 'pipeline_stage') sub.pipeline_stage = value;
+              else if (fieldKey === 'notes') sub.notes = value;
+              else sub[fieldKey] = value;
+              localStorage.setItem('ignea_submissions', JSON.stringify(subs));
+            }
+          } catch(e) {}
         }
 
         var user = OpsAuth.getUser();

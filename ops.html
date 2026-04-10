@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ops | Ignea Labs</title>
 <meta name="robots" content="noindex, nofollow">
@@ -26,7 +27,7 @@
        ==================================================== -->
   <div id="accessGate">
     <div class="gate-terminal">
-      <div class="gate-logo">IGNEA<span>.OPS</span></div>
+      <div class="gate-logo"><img src="/assets/logo.svg" alt="ignea.labs" class="logo-img" style="height:32px"></div>
       <label class="gate-input-label" for="accessInput" data-i18n="ops.gate.label" style="font-family:var(--ff);font-size:13px;color:#6B7280;font-weight:500;letter-spacing:0.02em;display:block;margin-bottom:8px;text-align:left;width:100%">Access code</label>
       <input
         type="password"
@@ -49,11 +50,12 @@
 
     <!-- TOP BAR -->
     <div class="ops-topbar">
-      <div class="ops-brand">IGNEA<span>.OPS</span></div>
+      <div class="ops-brand"><img src="/assets/logo.svg" alt="ignea.labs" class="logo-img" style="height:24px"></div>
       <div class="ops-clock" id="opsTime" aria-live="polite">--:--:--</div>
       <div class="ops-user">
         <span id="opsUserName" class="ops-username"></span>
         <span class="ops-role" id="opsUserRole"></span>
+        <button id="apiKeyBtn" class="ops-logout" title="Claude API Key">API Key</button>
         <a href="#" id="logoutBtn" class="ops-logout" data-i18n="ops.logout">salir</a>
       </div>
     </div>
@@ -511,7 +513,7 @@
 
           <div class="calc-field">
             <label class="form-label" for="scraperLocation" data-i18n="ops.scraper.locationLabel">Ubicación</label>
-            <input type="text" id="scraperLocation" class="form-input" value="San Juan, Puerto Rico">
+            <input type="text" id="scraperLocation" class="form-input" value="" placeholder="Ciudad, País">
           </div>
 
           <div class="calc-field">
@@ -563,7 +565,10 @@
 </div><!-- /page -->
 
 <!-- SCRIPTS -->
-<script>window.CLAUDE_API_KEY = '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';</script>
+<script>
+// Load Claude API key from localStorage (set via ops settings)
+window.CLAUDE_API_KEY = localStorage.getItem('ignea_ops_claude_key') || '';
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/grid-bg.js"></script>
@@ -577,6 +582,22 @@
 <script src="js/ops-ai.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    var apiBtn = document.getElementById('apiKeyBtn');
+    if (apiBtn) {
+      apiBtn.addEventListener('click', function() {
+        var current = localStorage.getItem('ignea_ops_claude_key') || '';
+        var masked = current ? current.substring(0, 12) + '...' : '(not set)';
+        var newKey = prompt('Claude API Key\nCurrent: ' + masked + '\n\nEnter new key (or cancel to keep current):', current);
+        if (newKey !== null && newKey.trim()) {
+          localStorage.setItem('ignea_ops_claude_key', newKey.trim());
+          window.CLAUDE_API_KEY = newKey.trim();
+          apiBtn.textContent = 'API Key \u2713';
+        }
+      });
+      if (localStorage.getItem('ignea_ops_claude_key')) {
+        apiBtn.textContent = 'API Key \u2713';
+      }
+    }
   });
 </script>
 <script src="js/scroll-animations.js"></script>

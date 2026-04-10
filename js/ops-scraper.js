@@ -57,7 +57,7 @@ var OpsScraper = (function() {
     if (nameEl) nameEl.value = lead.company_name || '';
 
     var locEl = document.getElementById('scraperLocation');
-    if (locEl) locEl.value = lead.location || lead.city || 'San Juan, Puerto Rico';
+    if (locEl) locEl.value = lead.location || lead.city || '';
 
     var selEl = document.getElementById('scraperLeadSelect');
     if (selEl) selEl.value = lead.id;

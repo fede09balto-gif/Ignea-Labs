@@ -1,4 +1,8 @@
 {
+  "redirects": [
+    { "source": "/manifesto", "destination": "/thesis", "statusCode": 301 },
+    { "source": "/manifesto.html", "destination": "/thesis.html", "statusCode": 301 }
+  ],
   "rewrites": [
     { "source": "/ops", "destination": "/ops.html" },
     { "source": "/demo", "destination": "/demo.html" },

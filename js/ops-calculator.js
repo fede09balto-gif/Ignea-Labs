@@ -730,6 +730,28 @@ var OpsCalculator = (function() {
       }
     });
 
+    // Auto-fill from AI analysis
+    document.addEventListener('ops:autoFillCalc', function(e) {
+      if (!e.detail) return;
+      var lead = e.detail.lead;
+      var ai = e.detail.ai;
+      if (lead) prefillFromLead(lead);
+
+      // Override with AI-derived estimates if available
+      if (ai) {
+        var hoursEl = document.getElementById('calcHours');
+        var hoursValEl = document.getElementById('calcHoursVal');
+        // Estimate hours from AI solutions
+        if (ai.solutions && ai.solutions.length) {
+          var totalSaved = ai.solutions.reduce(function(sum, s) { return sum + (s.build_hours || 0); }, 0);
+          var avgHours = Math.min(80, Math.max(5, Math.round(totalSaved / 2)));
+          if (hoursEl) { hoursEl.value = avgHours; }
+          if (hoursValEl) { hoursValEl.innerHTML = avgHours + ' <span class="range-val-unit">hrs/semana</span>'; }
+        }
+        recalculate();
+      }
+    });
+
     // Initial render with default values
     recalculate();
   }

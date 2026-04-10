@@ -2529,3 +2529,30 @@
     display: none;
   }
 }
+
+/* ---- AI ANALYSIS CARDS ---- */
+.ai-toggle-row{display:flex;gap:8px;margin-bottom:20px}
+.ai-mode-btn{font-size:13px;padding:8px 16px;min-height:36px;letter-spacing:.5px}
+.ai-mode-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent3)}
+.ai-result-container{display:flex;flex-direction:column;gap:12px}
+.ai-card{background:var(--bg2);border:1px solid var(--border);padding:20px;transition:border-color .2s}
+.ai-card:hover{border-color:rgba(255,255,255,0.12)}
+.ai-card-tag{font-family:var(--fm);font-size:11px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.ai-card-body{font-size:15px;color:var(--gray);line-height:1.65;margin:0}
+.ai-card-highlight{color:var(--white);font-weight:600;font-size:16px}
+.ai-card-list{margin:0;padding-left:20px;color:var(--gray);font-size:14px;line-height:1.8}
+.ai-card-list li{margin-bottom:4px}
+.ai-card-row{display:flex;gap:12px}
+.ai-card-half{flex:1}
+.ai-card-stat{font-family:var(--fm);font-size:24px;font-weight:700;color:var(--accent);margin-top:4px}
+.ai-card-warn{border-color:var(--coral)}
+.ai-card-warn .ai-card-tag{color:var(--coral)}
+.ai-sol-card{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.ai-sol-card:last-child{border-bottom:none}
+.ai-sol-rank{font-family:var(--fm);font-size:14px;color:var(--accent);font-weight:700;flex-shrink:0;width:24px;text-align:center;padding-top:2px}
+.ai-sol-body{flex:1}
+.ai-sol-name{font-size:15px;font-weight:600;color:var(--white);margin-bottom:4px}
+.ai-sol-desc{font-size:13px;color:var(--gray);line-height:1.5;margin-bottom:8px}
+.ai-sol-meta{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--fm);font-size:12px;color:var(--dimgray);letter-spacing:.5px}
+.ai-sol-meta span{white-space:nowrap}
+@media(max-width:600px){.ai-card-row{flex-direction:column}}

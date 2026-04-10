@@ -2,10 +2,11 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ignea Labs | Infraestructura de IA para empresas en Puerto Rico</title>
+<title>Ignea Labs | Infraestructura de IA para empresas en América Latina</title>
 <meta name="description" content="Tu negocio pierde miles cada mes en procesos manuales. Diagnóstico gratuito de IA que mapea tu desperdicio operacional y lo convierte en ahorros proyectados.">
-<meta property="og:title" content="Ignea Labs | Infraestructura de IA para empresas en Puerto Rico">
+<meta property="og:title" content="Ignea Labs | Infraestructura de IA para empresas en América Latina">
 <meta property="og:description" content="Diagnóstico gratuito de IA que mapea tu desperdicio operacional y lo convierte en ahorros proyectados.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="/assets/og-image.png">
@@ -143,7 +144,12 @@ footer{border-top:1px solid var(--border)}
 .calc-result-label{font-size:15px;color:var(--gray);margin-bottom:8px}
 .calc-result-value{font-family:var(--fm);font-size:42px;font-weight:700;color:var(--coral);line-height:1;margin-bottom:4px}
 .calc-result-unit{font-family:var(--fm);font-size:14px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px}
-.calc-result-note{font-size:13px;color:var(--text-dim);margin-bottom:24px}
+.calc-result-note{font-size:13px;color:var(--text-dim);margin-bottom:16px}
+.calc-breakdown{text-align:left;margin:16px 0 12px;border-top:1px solid var(--border);padding-top:12px}
+.calc-breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.calc-breakdown-label{font-family:var(--fm);font-size:12px;color:var(--dimgray);letter-spacing:.3px}
+.calc-breakdown-val{font-family:var(--fm);font-size:14px;color:var(--white);font-weight:500;white-space:nowrap}
+.calc-breakdown-note{font-family:var(--fm);font-size:11px;color:var(--dimgray);text-align:left;line-height:1.5;margin-top:8px}
 
 /* ---- RESPONSIVE ---- */
 @media(max-width:768px){
@@ -183,7 +189,7 @@ footer{border-top:1px solid var(--border)}
 }
 </style>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"LocalBusiness","name":"Ignea Labs","description":"AI infrastructure for Puerto Rico SMBs","address":{"@type":"PostalAddress","addressLocality":"San Juan","addressRegion":"PR","postalCode":"00901","addressCountry":"US"},"email":"hola@ignealabs.com","areaServed":{"@type":"Place","name":"Puerto Rico"},"knowsLanguage":["es","en"]}
+{"@context":"https://schema.org","@type":"LocalBusiness","name":"Ignea Labs","description":"AI infrastructure for Latin American SMBs","email":"hola@ignealabs.com","areaServed":{"@type":"Place","name":"Latin America"},"knowsLanguage":["es","en"]}
 </script>
 <script defer data-domain="ignealabs.com" src="https://plausible.io/js/script.js"></script>
 </head>
@@ -197,13 +203,13 @@ footer{border-top:1px solid var(--border)}
 
 <!-- NAV -->
 <nav>
-  <a href="index.html" class="brand">
-    <span class="brand-name">IGNEA<span class="brand-accent">.LABS</span></span>
+  <a href="/" class="logo">
+    <img src="/assets/logo.svg" alt="ignea.labs" class="logo-img">
   </a>
   <div class="nav-right">
     <ul class="nav-links">
       <li><a href="index.html" class="active" data-i18n="nav.home">Inicio</a></li>
-      <li><a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a></li>
+      <li><a href="thesis.html" data-i18n="nav.thesis">Nuestra Tesis</a></li>
       <li><a href="diagnostic.html" data-i18n="nav.start">Empieza Aquí</a></li>
       <li><a href="contact.html" data-i18n="nav.contact">Contacto</a></li>
     </ul>
@@ -222,7 +228,7 @@ footer{border-top:1px solid var(--border)}
 <div class="mobile-overlay" id="mobileOverlay"></div>
 <div class="mobile-menu" id="mobileMenu">
   <a href="index.html" class="active" data-i18n="nav.home">Inicio</a>
-  <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+  <a href="thesis.html" data-i18n="nav.thesis">Nuestra Tesis</a>
   <a href="diagnostic.html" data-i18n="nav.start">Empieza Aquí</a>
   <a href="contact.html" data-i18n="nav.contact">Contacto</a>
 </div>
@@ -243,7 +249,7 @@ footer{border-top:1px solid var(--border)}
   <div class="cta-row">
     <a href="diagnostic.html" class="cta-primary" data-i18n-btn="hero.cta1">Agenda tu Llamada Gratis &rarr;</a>
     <a href="demo.html" class="cta-secondary"><span data-i18n="hero.cta.secondary">Ver reporte de muestra →</span></a>
-    <a href="manifesto.html" class="cta-secondary"><span data-i18n="hero.cta2">Read Manifesto</span><span class="arrow">&nbsp;&rarr;</span></a>
+    <a href="thesis.html" class="cta-secondary"><span data-i18n="hero.cta2">Read Our Thesis</span><span class="arrow">&nbsp;&rarr;</span></a>
   </div>
 </header>
 
@@ -253,18 +259,24 @@ footer{border-top:1px solid var(--border)}
 <section class="sec-marquee">
   <div class="marquee-track">
     <div class="marquee-inner">
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r1.ind">🍽 Restaurante · Bayamón</span><span class="mq-result" data-i18n="mq.r1.res">22 hrs/semana recuperadas</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r2.ind">🏥 Clínica · San Juan</span><span class="mq-result" data-i18n="mq.r2.res">60% menos no-shows</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r3.ind">⚖️ Firma Legal · Ponce</span><span class="mq-result" data-i18n="mq.r3.res">$1,840/mes recuperados</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r4.ind">🏨 Hotel · Condado</span><span class="mq-result" data-i18n="mq.r4.res">28% aumento en ocupación</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r5.ind">🛍 Retail · Caguas</span><span class="mq-result" data-i18n="mq.r5.res">Inventario 100% automatizado</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r6.ind">🏗 Construcción · Guaynabo</span><span class="mq-result" data-i18n="mq.r6.res">32 hrs/semana recuperadas</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r1.ind">🍽 Restaurante · Bayamón</span><span class="mq-result" data-i18n="mq.r1.res">22 hrs/semana recuperadas</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r2.ind">🏥 Clínica · San Juan</span><span class="mq-result" data-i18n="mq.r2.res">60% menos no-shows</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r3.ind">⚖️ Firma Legal · Ponce</span><span class="mq-result" data-i18n="mq.r3.res">$1,840/mes recuperados</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r4.ind">🏨 Hotel · Condado</span><span class="mq-result" data-i18n="mq.r4.res">28% aumento en ocupación</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r5.ind">🛍 Retail · Caguas</span><span class="mq-result" data-i18n="mq.r5.res">Inventario 100% automatizado</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r6.ind">🏗 Construcción · Guaynabo</span><span class="mq-result" data-i18n="mq.r6.res">32 hrs/semana recuperadas</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r1.ind">HOTEL · Granada, NI</span><span class="mq-result" data-i18n="mq.r1.res">28% aumento en ocupación</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r2.ind">FIRMA LEGAL · San Juan, PR</span><span class="mq-result" data-i18n="mq.r2.res">$1,840/mes recuperados</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r3.ind">MANUFACTURA · San Pedro Sula, HN</span><span class="mq-result" data-i18n="mq.r3.res">34 hrs/semana recuperadas</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r4.ind">CLÍNICA · Latinoamérica</span><span class="mq-result" data-i18n="mq.r4.res">60% menos no-shows</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r5.ind">RESTAURANTE · Miami, FL</span><span class="mq-result" data-i18n="mq.r5.res">22 hrs/semana recuperadas</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r6.ind">CONSTRUCCIÓN · Panamá City, PA</span><span class="mq-result" data-i18n="mq.r6.res">Inventario 100% automatizado</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r7.ind">RETAIL · Caguas, PR</span><span class="mq-result" data-i18n="mq.r7.res">Ciclos de restock 3.2x más rápidos</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r8.ind">AGRO-EXPORTACIÓN · Matagalpa, NI</span><span class="mq-result" data-i18n="mq.r8.res">$2,100/mes recuperados</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r9.ind">ESCUELA · San Salvador, SV</span><span class="mq-result" data-i18n="mq.r9.res">40% menos horas administrativas</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r1.ind">HOTEL · Granada, NI</span><span class="mq-result" data-i18n="mq.r1.res">28% aumento en ocupación</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r2.ind">FIRMA LEGAL · San Juan, PR</span><span class="mq-result" data-i18n="mq.r2.res">$1,840/mes recuperados</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r3.ind">MANUFACTURA · San Pedro Sula, HN</span><span class="mq-result" data-i18n="mq.r3.res">34 hrs/semana recuperadas</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r4.ind">CLÍNICA · Latinoamérica</span><span class="mq-result" data-i18n="mq.r4.res">60% menos no-shows</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r5.ind">RESTAURANTE · Miami, FL</span><span class="mq-result" data-i18n="mq.r5.res">22 hrs/semana recuperadas</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r6.ind">CONSTRUCCIÓN · Panamá City, PA</span><span class="mq-result" data-i18n="mq.r6.res">Inventario 100% automatizado</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r7.ind">RETAIL · Caguas, PR</span><span class="mq-result" data-i18n="mq.r7.res">Ciclos de restock 3.2x más rápidos</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r8.ind">AGRO-EXPORTACIÓN · Matagalpa, NI</span><span class="mq-result" data-i18n="mq.r8.res">$2,100/mes recuperados</span></div>
+      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r9.ind">ESCUELA · San Salvador, SV</span><span class="mq-result" data-i18n="mq.r9.res">40% menos horas administrativas</span></div>
     </div>
   </div>
 </section>
@@ -276,6 +288,11 @@ footer{border-top:1px solid var(--border)}
     <div class="whatwedo-text">
       <p data-i18n="whatwedo.p1">Vamos bajo la superficie de tu organización para encontrar lo que ha estado dormido.</p>
       <p data-i18n="whatwedo.p2">Nuestro proceso comienza con un diagnóstico profundo. Mapeamos tus flujos de trabajo, identificamos cuellos de botella y señalamos dónde la inteligencia artificial genera impacto medible. Luego diseñamos y desplegamos sistemas de IA personalizados — adaptados a tu operación, tus datos, tus objetivos.</p>
+
+      <div style="border-top:1px solid var(--border);padding-top:32px;margin-top:32px">
+        <p style="font-weight:700;color:var(--white);margin-bottom:12px" data-i18n="whatwedo.fractional.heading">Somos ingenieros fraccionarios.</p>
+        <p style="color:var(--body-light)" data-i18n="whatwedo.fractional.body">No colocamos ingenieros en tu nómina. Construimos infraestructura de IA que se integra permanentemente en tu operación — sistemas a la medida que funcionan como un equipo técnico completo, sin el costo fijo. Tu negocio obtiene la experiencia, la automatización y el retorno sin la carga de nómina.</p>
+      </div>
 
     </div>
   </div>
@@ -317,34 +334,66 @@ footer{border-top:1px solid var(--border)}
     <button class="ind-tab" data-tab="clinic" data-i18n="ind.clinic.label">Clínica</button>
     <button class="ind-tab" data-tab="hotel" data-i18n="ind.hotel.label">Hotel</button>
     <button class="ind-tab" data-tab="law" data-i18n="ind.law.label">Firma Legal</button>
+    <button class="ind-tab" data-tab="mfg" data-i18n="ind.mfg.label">Manufactura</button>
+    <button class="ind-tab" data-tab="agro" data-i18n="ind.agro.label">Agro-Exportación</button>
+    <button class="ind-tab" data-tab="school" data-i18n="ind.school.label">Escuela</button>
+    <button class="ind-tab" data-tab="construct" data-i18n="ind.construct.label">Construcción</button>
   </div>
   <div class="ind-panels">
     <div class="ind-panel active" data-panel="rest">
       <div class="ind-grid">
         <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.rest.pain">Coordinación por WhatsApp, reservas a mano, inventario en papel.</p></div>
         <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.rest.solution">Bot de WhatsApp para reservas y pedidos + alertas de inventario + rastreo automático de no-shows.</p></div>
-        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.rest.roi">Recupera 18–25 hrs/semana. ROI típico: 2.1 meses.</p></div>
+        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.rest.roi">Recupera 18–25 hrs/semana. ROI: 2.1 meses.</p></div>
       </div>
     </div>
     <div class="ind-panel" data-panel="clinic">
       <div class="ind-grid">
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.clinic.pain">Citas por teléfono, recordatorios manuales, expedientes en papel.</p></div>
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.clinic.solution">Agendamiento automático 24/7 + recordatorios por WhatsApp + resumen de notas por IA.</p></div>
-        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.clinic.roi">Reduce no-shows 60%. ROI típico: 1.8 meses.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.clinic.pain">Agendamiento manual, teléfono-tag con pacientes, expedientes en papel.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.clinic.solution">Bot de citas con IA + recordatorios automáticos + formularios de intake de pacientes.</p></div>
+        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.clinic.roi">60% menos no-shows. ROI: 1.8 meses.</p></div>
       </div>
     </div>
     <div class="ind-panel" data-panel="hotel">
       <div class="ind-grid">
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.hotel.pain">Reservas manuales, check-in en papel, comunicación desorganizada con huéspedes.</p></div>
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.hotel.solution">Motor de reservas integrado + mensajería automatizada a huéspedes + sincronización de canales.</p></div>
-        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.hotel.roi">Aumenta ocupación 15–30%. ROI típico: 2.4 meses.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.hotel.pain">Gestión manual de reservas, sin respuesta fuera de horario, operaciones en hojas de cálculo.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.hotel.solution">Bot de reservas 24/7 por WhatsApp + comunicación automatizada con huéspedes + dashboard de ocupación.</p></div>
+        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.hotel.roi">28% aumento en ocupación. ROI: 2.5 meses.</p></div>
       </div>
     </div>
     <div class="ind-panel" data-panel="law">
       <div class="ind-grid">
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.law.pain">Facturación manual, seguimiento de tiempo en Excel, intake de clientes por correo.</p></div>
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.law.solution">Intake automatizado de clientes + rastreo de horas con IA + facturación y recordatorios automáticos.</p></div>
-        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.law.roi">Captura 8–12 hrs/semana en facturación perdida. ROI: 1.5 meses.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.law.pain">Intake manual de clientes, seguimientos perdidos, caos documental.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.law.solution">Intake de clientes con IA + actualizaciones automáticas de estado de casos + organización de documentos.</p></div>
+        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.law.roi">Recupera $1,800+/mes. ROI: 2.0 meses.</p></div>
+      </div>
+    </div>
+    <div class="ind-panel" data-panel="mfg">
+      <div class="ind-grid">
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.mfg.pain">Rastreo de producción en papel, inventario a ciegas, coordinación con proveedores por teléfono.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.mfg.solution">Sistema de gestión de inventario + dashboard de producción + automatización de órdenes a proveedores.</p></div>
+        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.mfg.roi">Recupera 30+ hrs/semana. ROI: 2.8 meses.</p></div>
+      </div>
+    </div>
+    <div class="ind-panel" data-panel="agro">
+      <div class="ind-grid">
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.agro.pain">Rastreo manual de cosechas, papeleo de exportación, monitoreo de precios en múltiples mercados.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.agro.solution">Rastreador de cosechas y envíos + documentos de exportación automatizados + alertas de precios de mercado.</p></div>
+        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.agro.roi">$2,000+/mes recuperados. ROI: 2.3 meses.</p></div>
+      </div>
+    </div>
+    <div class="ind-panel" data-panel="school">
+      <div class="ind-grid">
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.school.pain">Matrícula manual, sobrecarga de comunicación con padres, conflictos de horarios.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.school.solution">Automatización de matrícula + bot de WhatsApp para padres + sistema de programación de clases.</p></div>
+        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.school.roi">40% menos horas administrativas. ROI: 1.9 meses.</p></div>
+      </div>
+    </div>
+    <div class="ind-panel" data-panel="construct">
+      <div class="ind-grid">
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.construct.pain">Rastreo de proyectos en cuadernos, desperdicio de materiales, coordinación de subcontratistas.</p></div>
+        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.construct.solution">Dashboard de proyectos + rastreo de materiales + programación automatizada de subcontratistas.</p></div>
+        <div class="ind-col ind-roi"><div class="ind-col-label" data-i18n="ind.col.roi">ROI típico</div><p data-i18n="ind.construct.roi">34 hrs/semana recuperadas. ROI: 2.6 meses.</p></div>
       </div>
     </div>
   </div>
@@ -393,7 +442,22 @@ footer{border-top:1px solid var(--border)}
       <div class="calc-result-value" id="calcResultValue">$0</div>
       <div class="calc-result-unit" data-i18n="calc.resultUnit">/mes</div>
       <div class="calc-result-note" data-i18n="calc.resultNote">en productividad desperdiciada</div>
-      <a href="diagnostic.html" class="btn-primary" data-i18n-btn="calc.cta">Agenda tu Llamada Gratis &rarr;</a>
+      <div class="calc-breakdown" id="calcBreakdown">
+        <div class="calc-breakdown-row">
+          <span class="calc-breakdown-label" data-i18n="calc.bd.manual">Horas manuales × costo/hora estimado</span>
+          <span class="calc-breakdown-val" id="calcBdManual">$0</span>
+        </div>
+        <div class="calc-breakdown-row">
+          <span class="calc-breakdown-label" data-i18n="calc.bd.lost">Oportunidades perdidas (clientes no atendidos)</span>
+          <span class="calc-breakdown-val" id="calcBdLost">$0</span>
+        </div>
+        <div class="calc-breakdown-row">
+          <span class="calc-breakdown-label" data-i18n="calc.bd.errors">Costo de errores y retrabajo</span>
+          <span class="calc-breakdown-val" id="calcBdErrors">$0</span>
+        </div>
+      </div>
+      <div class="calc-breakdown-note" id="calcBdNote"></div>
+      <a href="diagnostic.html" class="btn-primary" style="margin-top:24px" data-i18n-btn="calc.cta">Agenda tu Llamada Gratis &rarr;</a>
     </div>
   </div>
 </section>
@@ -411,12 +475,12 @@ footer{border-top:1px solid var(--border)}
   </div>
 </section>
 
-<!-- MANIFESTO QUOTE -->
+<!-- THESIS QUOTE -->
 <section class="sec-mq content-wrap fade-up">
   <div class="mq-body">
     <p class="mq-l1" data-i18n="mq.line1">No vendemos IA.</p>
     <p class="mq-l2" data-i18n="mq.line2">Construimos infraestructura.</p>
-    <a href="manifesto.html" class="mq-link" data-i18n="mq.link">Leer el Manifiesto →</a>
+    <a href="thesis.html" class="mq-link" data-i18n="mq.link">Leer Nuestra Tesis →</a>
   </div>
 </section>
 
@@ -437,13 +501,12 @@ footer{border-top:1px solid var(--border)}
   <div class="footer-inner content-wrap">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="f-brand" style="font-family:var(--fs);font-weight:400;letter-spacing:0.02em">Ignea<span>.</span></div>
+        <span class="logo"><img src="/assets/logo.svg" alt="ignea.labs" class="logo-img"></span>
         <div class="f-tag" data-i18n="footer.tag">Bajo la superficie, el potencial.</div>
-        <div style="font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;margin-top:6px" data-i18n="footer.address">San Juan, Puerto Rico</div>
       </div>
       <div class="footer-nav">
         <a href="index.html" data-i18n="nav.home">Inicio</a>
-        <a href="manifesto.html" data-i18n="nav.manifesto">Manifiesto</a>
+        <a href="thesis.html" data-i18n="nav.thesis">Nuestra Tesis</a>
         <a href="diagnostic.html" data-i18n="nav.start">Empieza Aquí</a>
         <a href="contact.html" data-i18n="nav.contact">Contacto</a>
       </div>
@@ -453,7 +516,7 @@ footer{border-top:1px solid var(--border)}
     </div>
     <div class="footer-bottom">
       &copy; 2026 Ignea Labs. <span data-i18n="footer.rights">Todos los derechos reservados.</span>
-      <span style="margin-left:12px;opacity:.65" data-i18n="footer.serving">Orgullosamente sirviendo a Puerto Rico</span>
+      <span style="margin-left:12px;opacity:.65" data-i18n="footer.serving">Sirviendo a América Latina</span>
     </div>
   </div>
 </footer>
@@ -609,6 +672,7 @@ document.addEventListener('DOMContentLoaded', function() {
     restaurant: 14, medical: 30, dental: 30, legal: 35,
     hotel: 16, retail: 14, construction: 22, logistics: 18
   };
+  var TEAM_HOURLY = { 3: 3, 8: 5, 25: 7, 75: 10 };
   var calcEmployees = 8;
   var calcIndustry = document.getElementById('calcIndustry');
   var calcHours = document.getElementById('calcHours');
@@ -619,16 +683,42 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateCalc() {
     var rate = CALC_RATES[calcIndustry.value] || 18;
     var hours = parseInt(calcHours.value) || 20;
-    var monthly = Math.round(hours * rate * 4.33);
+    var teamRate = TEAM_HOURLY[calcEmployees] || 5;
+
+    // Breakdown components
+    var manualCost = Math.round(hours * teamRate * 4.33);
+    var lostOpps = Math.round(hours * 0.3 * teamRate * 1.5 * 4.33);
+    var errorCost = Math.round(hours * 0.15 * teamRate * 4.33);
+    var monthly = manualCost + lostOpps + errorCost;
+
     // Cap at 30% of estimated revenue
     var estRevenue = calcEmployees * rate * 160;
     var cap = Math.round(estRevenue * 0.3);
-    if (monthly > cap) monthly = cap;
-    // Hard cap for credibility
-    if (monthly > 8000) monthly = 8000;
+    if (monthly > cap) { var ratio = cap / monthly; manualCost = Math.round(manualCost * ratio); lostOpps = Math.round(lostOpps * ratio); errorCost = Math.round(errorCost * ratio); monthly = cap; }
+    if (monthly > 8000) { var r2 = 8000 / monthly; manualCost = Math.round(manualCost * r2); lostOpps = Math.round(lostOpps * r2); errorCost = Math.round(errorCost * r2); monthly = 8000; }
+
     calcResultValue.textContent = '$' + monthly.toLocaleString('en-US');
     calcResult.classList.add('visible');
-    // Debounced analytics — fire once per 2s max
+
+    // Update breakdown
+    var bdManual = document.getElementById('calcBdManual');
+    var bdLost = document.getElementById('calcBdLost');
+    var bdErrors = document.getElementById('calcBdErrors');
+    var bdNote = document.getElementById('calcBdNote');
+    if (bdManual) bdManual.textContent = '$' + manualCost.toLocaleString('en-US');
+    if (bdLost) bdLost.textContent = '$' + lostOpps.toLocaleString('en-US');
+    if (bdErrors) bdErrors.textContent = '$' + errorCost.toLocaleString('en-US');
+
+    if (bdNote) {
+      var lang = localStorage.getItem('ignea_lang') || 'es';
+      var sizeLabel = calcEmployees <= 5 ? '1-5' : calcEmployees <= 15 ? '6-15' : calcEmployees <= 50 ? '16-50' : '50+';
+      var indLabel = calcIndustry.options[calcIndustry.selectedIndex].textContent;
+      bdNote.textContent = lang === 'es'
+        ? 'Basado en el costo promedio de mano de obra para equipos de ' + sizeLabel + ' empleados en ' + indLabel.toLowerCase() + '.'
+        : 'Based on average labor cost for teams of ' + sizeLabel + ' employees in ' + indLabel.toLowerCase() + '.';
+    }
+
+    // Debounced analytics
     if (typeof IgneaAnalytics !== 'undefined' && !updateCalc._t) {
       updateCalc._t = setTimeout(function() {
         IgneaAnalytics.track('calculator_used', { industry: calcIndustry.value, hours: calcHours.value });
@@ -670,7 +760,7 @@ document.querySelectorAll('.ind-tab').forEach(function(tab) {
 </script>
 
 <!-- WHATSAPP FLOAT -->
-<a href="https://wa.me/19493736407" target="_blank" rel="noopener" class="wa-float" aria-label="WhatsApp">
+<a href="https://wa.me/19493736407?text=Hola%2C%20complet%C3%A9%20el%20diagn%C3%B3stico%20en%20ignealabs.com%20y%20me%20gustar%C3%ADa%20agendar%20una%20llamada." target="_blank" rel="noopener" class="wa-float" aria-label="WhatsApp">
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
 </body>
