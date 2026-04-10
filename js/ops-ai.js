@@ -325,7 +325,7 @@
     doc.setFontSize(9);
     doc.setTextColor(120);
     doc.text(lang === 'es' ? 'Infraestructura de IA para empresas en América Latina' : 'AI Infrastructure for Latin American Businesses', margin, y);
-    doc.text('hola@ignealabs.com', margin, y + 4);
+    doc.text('ignealabs.ai@gmail.com', margin, y + 4);
 
     // Separator
     y += 12;
@@ -375,7 +375,7 @@
     y += 8;
     doc.setFontSize(8);
     doc.setTextColor(150);
-    doc.text('ignea.labs — hola@ignealabs.com — ignealabs.com', margin, y);
+    doc.text('ignea.labs — ignealabs.ai@gmail.com — ignealabs.com', margin, y);
     var confText = lang === 'es'
       ? 'Este documento es confidencial y fue preparado exclusivamente para ' + (lead.company_name || 'el cliente') + '.'
       : 'This document is confidential and was prepared exclusively for ' + (lead.company_name || 'the client') + '.';

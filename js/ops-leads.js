@@ -1318,7 +1318,7 @@ var OpsLeads = (function() {
     if (y > 260) { doc.addPage(); y = 20; }
     doc.setFontSize(8);
     doc.setTextColor(150);
-    doc.text('Generado por Ignea Labs — hola@ignealabs.com', 20, y);
+    doc.text('Generado por Ignea Labs — ignealabs.ai@gmail.com', 20, y);
     doc.text(lang === 'es' ? 'Este documento es confidencial.' : 'This document is confidential.', 20, y + 4);
 
     doc.save('Diagnostico_' + (lead.company_name || 'Lead').replace(/[^a-zA-Z0-9]/g, '_') + '_' + new Date().toISOString().slice(0, 10) + '.pdf');
