@@ -282,13 +282,37 @@
           <!-- Industry -->
           <div class="calc-field">
             <label class="form-label" for="calcIndustry" data-i18n="ops.calc.industryLabel">Industria / Giro</label>
-            <input type="text" id="calcIndustry" class="form-input" data-i18n-placeholder="ops.calc.industryPlaceholder" placeholder="ej. Restaurante, Clínica, Hotel...">
+            <input type="text" id="calcIndustry" class="form-input" list="industryList" data-i18n-placeholder="ops.calc.industryPlaceholder" placeholder="ej. Restaurante, Clínica, Hotel...">
+            <datalist id="industryList">
+              <option value="Restaurante / Food Service">
+              <option value="Clínica / Salud">
+              <option value="Hotel / Hospitality">
+              <option value="Bufete Legal / Law Firm">
+              <option value="Bienes Raíces / Real Estate">
+              <option value="Retail / Comercio">
+              <option value="Manufactura / Manufacturing">
+              <option value="Construcción / Construction">
+              <option value="Tecnología / Tech">
+              <option value="Finanzas / Finance">
+              <option value="Educación / Education">
+              <option value="Logística / Logistics">
+              <option value="E-commerce">
+              <option value="Consultoría / Consulting">
+              <option value="Agricultura / Agriculture">
+              <option value="Farmacéutica / Pharma">
+              <option value="Seguros / Insurance">
+              <option value="Automotriz / Automotive">
+              <option value="Energía / Energy">
+              <option value="Medios / Media">
+              <option value="Turismo / Tourism">
+              <option value="Gobierno / Government">
+            </datalist>
           </div>
 
           <!-- Team Size -->
           <div class="calc-field">
             <label class="form-label" for="calcTeamSize" data-i18n="ops.calc.teamLabel">Tamaño del equipo</label>
-            <input type="number" id="calcTeamSize" class="form-input" min="1" max="500" value="5" aria-describedby="calcTeamHint">
+            <input type="number" id="calcTeamSize" class="form-input" min="1" max="10000" value="10" aria-describedby="calcTeamHint">
             <span class="field-hint" id="calcTeamHint" data-i18n="ops.calc.teamHint">Número de empleados</span>
           </div>
 
@@ -439,7 +463,9 @@
                 <option value="1" data-i18n="ops.calc.revenue.1">$5K – $15K</option>
                 <option value="2" data-i18n="ops.calc.revenue.2" selected>$15K – $50K</option>
                 <option value="3" data-i18n="ops.calc.revenue.3">$50K – $150K</option>
-                <option value="4" data-i18n="ops.calc.revenue.4">Más de $150K</option>
+                <option value="4" data-i18n="ops.calc.revenue.4">$150K – $500K</option>
+                <option value="5" data-i18n="ops.calc.revenue.5">$500K – $1M</option>
+                <option value="6" data-i18n="ops.calc.revenue.6">Más de $1M</option>
               </select>
             </div>
           </div>

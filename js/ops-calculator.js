@@ -13,7 +13,7 @@ var OpsCalculator = (function() {
   /* ---- Helpers ---- */
 
   function getHourlyCost(revenueIndex) {
-    return [12, 15, 22, 30, 40, 18][revenueIndex] || 18;
+    return [12, 15, 22, 30, 40, 55, 75][revenueIndex] || 18;
   }
 
   var teamSizes = [3, 10, 30, 75];
