@@ -8,10 +8,11 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/shared.css">
 <link rel="stylesheet" href="css/components.css">
 <link rel="stylesheet" href="css/ops.css">
+<link rel="stylesheet" href="css/ops-light.css">
 <!-- Supabase: lightweight REST client in supabase-config.js, no SDK needed -->
 </head>
 <body>
@@ -26,22 +27,18 @@
   <div id="accessGate">
     <div class="gate-terminal">
       <div class="gate-logo">IGNEA<span>.OPS</span></div>
-      <div class="gate-line">
-        <span class="gate-prompt">&gt;&nbsp;</span>
-        <span class="gate-label" data-i18n="ops.gate.label">access_code</span>
-        <span class="gate-cursor blink">_</span>
-      </div>
+      <label class="gate-input-label" for="accessInput" data-i18n="ops.gate.label" style="font-family:var(--ff);font-size:13px;color:#6B7280;font-weight:500;letter-spacing:0.02em;display:block;margin-bottom:8px;text-align:left;width:100%">Access code</label>
       <input
         type="password"
         id="accessInput"
         autocomplete="off"
         spellcheck="false"
         data-i18n-placeholder="ops.gate.placeholder"
-        placeholder="········"
-        aria-label="Código de acceso"
+        placeholder="Enter access code"
+        aria-label="Access code"
       >
-      <span id="accessDenied" class="gate-denied" data-i18n="ops.gate.denied">// ACCESO DENEGADO</span>
-      <span id="accessTerminated" class="gate-terminated" data-i18n="ops.gate.terminated">// CONEXIÓN TERMINADA. RECARGA LA PÁGINA.</span>
+      <span id="accessDenied" class="gate-denied" data-i18n="ops.gate.denied">Access denied</span>
+      <span id="accessTerminated" class="gate-terminated" data-i18n="ops.gate.terminated">Connection terminated. Reload the page.</span>
     </div>
   </div>
 
