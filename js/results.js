@@ -859,7 +859,7 @@
     doc.text('calendly.com/fedebaltoinvest/30min', M + 45, y);
     y += 8;
     doc.setTextColor(107, 107, 107);
-    doc.text('ignealabs.ai@gmail.com', M, y);
+    doc.text('ignealabs@outlook.com', M, y);
 
     /* ======== FOOTERS ON ALL PAGES ======== */
     addFooters();
