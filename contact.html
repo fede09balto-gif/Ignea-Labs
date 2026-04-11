@@ -19,7 +19,14 @@
 <link rel="stylesheet" href="css/components.css">
 <style>
 /* CONTACT PAGE */
-.ct-section{padding:120px 0 100px}
+.ct-hero{padding:120px 0 80px}
+.ct-split{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:start}
+.ct-left{padding-right:60px;display:flex;flex-direction:column;justify-content:center;min-height:600px}
+.ct-right{border-left:1px solid var(--border);min-height:600px}
+.ct-right .calendly-inline-widget{height:100%;min-height:600px}
+
+.ct-form-section{padding:80px 0 100px;border-top:1px solid var(--border)}
+.ct-form-wrap{max-width:640px;margin:0 auto}
 
 .form-group{margin-bottom:20px}
 .form-group:last-child{margin-bottom:0}
@@ -30,11 +37,26 @@
 .success-msg h3{font-size:18px;font-weight:700;margin-bottom:8px}
 .success-msg p{font-size:13px;color:var(--gray);line-height:1.6}
 
+.ct-detail{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-size:15px;color:var(--gray)}
+.ct-detail svg{width:20px;height:20px;flex-shrink:0;stroke:var(--accent);fill:none}
+.ct-details-wrap{margin:32px 0 40px;padding:24px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.ct-email-line{font-size:14px;color:var(--dimgray);margin-top:24px}
+.ct-email-line a{color:var(--accent);text-decoration:none}
+.ct-email-line a:hover{opacity:.8}
+
+@media(max-width:900px){
+  .ct-split{grid-template-columns:1fr;gap:0}
+  .ct-left{padding-right:0;min-height:auto;padding-bottom:48px}
+  .ct-right{border-left:none;border-top:1px solid var(--border);min-height:auto}
+  .ct-right .calendly-inline-widget{min-height:700px}
+}
 @media(max-width:768px){
-  .ct-section{padding:80px 0 60px}
+  .ct-hero{padding:80px 0 60px}
+  .ct-form-section{padding:60px 0 60px}
 }
 @media(max-width:480px){
-  .ct-section{padding:60px 0 40px}
+  .ct-hero{padding:60px 0 40px}
+  .ct-form-section{padding:40px 0 40px}
 }
 </style>
 <script defer data-domain="ignealabs.com" src="https://plausible.io/js/script.js"></script>
@@ -74,75 +96,94 @@
 </div>
 
 <main>
-  <section class="ct-section">
-    <div class="content-wrap" style="max-width:640px">
+  <!-- HERO: Split layout — left intro, right Calendly -->
+  <section class="ct-hero">
+    <div class="content-wrap">
+      <div class="ct-split">
 
-      <div class="sec-tag" data-i18n="ct.tag">// Contacto</div>
-      <h1 style="font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:-0.02em;margin-bottom:16px" data-i18n="ct.headline">Hablemos.</h1>
-      <p style="font-size:15px;color:var(--body-light);line-height:1.7;margin-bottom:40px" data-i18n="ct.newSub">Trabajamos con un número selecto de organizaciones. Si estás listo para descubrir el potencial dormido en tu negocio, contáctanos.</p>
+        <div class="ct-left">
+          <div class="sec-tag" data-i18n="ct.tag">// Contacto</div>
+          <h1 style="font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:-0.02em;margin-bottom:16px" data-i18n="ct.cal.title">Habla con nosotros directamente</h1>
+          <p style="font-size:16px;color:var(--body-light);line-height:1.7;margin-bottom:0" data-i18n="ct.cal.sub">Elige un horario y hablamos — sin formularios, sin esperas.</p>
 
-      <div class="calendly-section">
-        <div class="sec-tag">// Agenda tu llamada</div>
-        <h2 style="font-size:clamp(20px,2.5vw,28px);font-weight:700;margin-bottom:8px" data-i18n="ct.cal.title">Habla con nosotros directamente</h2>
-        <p style="font-size:15px;color:var(--gray);margin-bottom:24px" data-i18n="ct.cal.sub">Elige un horario y hablamos — sin formularios, sin esperas.</p>
-        <div class="calendly-inline-widget"
-          data-url="https://calendly.com/fedebaltoinvest/30min?hide_gdpr_banner=1&background_color=0a0a0c&text_color=f5f4f2&primary_color=e8352a"
-          style="min-width:320px;height:700px;"></div>
-        <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+          <div class="ct-details-wrap">
+            <div class="ct-detail">
+              <svg viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span data-i18n="ct.duration">30 min</span>
+            </div>
+            <div class="ct-detail">
+              <svg viewBox="0 0 24 24" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              <span data-i18n="ct.conferencing">Videoconferencia — detalles al confirmar</span>
+            </div>
+          </div>
+
+          <div class="ct-email-line">
+            <span data-i18n="ct.emailDirect">O escríbenos directamente a</span>
+            <a href="mailto:ignealabs.ai@gmail.com">ignealabs.ai@gmail.com</a>
+          </div>
+        </div>
+
+        <div class="ct-right">
+          <div class="calendly-inline-widget"
+            data-url="https://calendly.com/fedebaltoinvest/30min?hide_gdpr_banner=1&background_color=0a0a0c&text_color=f5f4f2&primary_color=e8352a"
+            style="min-width:320px;width:100%;height:100%;min-height:600px;"></div>
+          <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+        </div>
+
       </div>
+    </div>
+  </section>
 
-      <div class="contact-divider"><span data-i18n="ct.or">— o escríbenos —</span></div>
+  <!-- FORM: Optional message section -->
+  <section class="ct-form-section">
+    <div class="content-wrap">
+      <div class="ct-form-wrap">
 
-      <form id="contactForm" onsubmit="return handleSubmit(event)">
+        <div class="sec-tag" data-i18n="ct.formTag">// O escríbenos</div>
+        <h2 style="font-size:clamp(22px,3vw,32px);font-weight:700;letter-spacing:-0.02em;margin-bottom:8px" data-i18n="ct.formTitle">Envíanos un mensaje</h2>
+        <p style="font-size:15px;color:var(--gray);margin-bottom:32px" data-i18n="ct.formSub">Prefieres escribir? Cuéntanos sobre tu negocio y te respondemos en 24 horas.</p>
 
-        <div class="form-group">
-          <label class="form-label" data-i18n="ct.nameLabel">Nombre</label>
-          <input type="text" class="form-input" name="name" required data-i18n-placeholder="ct.namePh" placeholder="Tu nombre">
+        <form id="contactForm" onsubmit="return handleSubmit(event)">
+
+          <div class="form-group">
+            <label class="form-label" data-i18n="ct.nameLabel">Nombre</label>
+            <input type="text" class="form-input" name="name" required data-i18n-placeholder="ct.namePh" placeholder="Tu nombre">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" data-i18n="ct.emailFormLabel">Email</label>
+            <input type="email" class="form-input" name="email" required data-i18n-placeholder="ct.emailPh" placeholder="tu@correo.com">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" data-i18n="ct.companyLabel">Empresa</label>
+            <input type="text" class="form-input" name="company" data-i18n-placeholder="ct.companyPh" placeholder="Nombre de tu empresa (opcional)">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" data-i18n="ct.msgLabel">Mensaje</label>
+            <textarea class="form-input" name="message" rows="5" required data-i18n-placeholder="ct.msgPh" placeholder="Cuéntanos sobre tu negocio y qué desafíos enfrentas..."></textarea>
+          </div>
+
+          <div class="form-group" style="margin-top:28px">
+            <button type="submit" class="btn-primary" data-i18n-btn="ct.submit">Enviar Mensaje &rarr;</button>
+          </div>
+
+        </form>
+
+        <div id="successMsg" class="success-msg">
+          <div class="success-icon">[&#10003;]</div>
+          <h3 data-i18n="ct.successTitle">Mensaje enviado.</h3>
+          <p data-i18n="ct.successSub">Te contactaremos dentro de 24 horas.</p>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" data-i18n="ct.emailFormLabel">Email</label>
-          <input type="email" class="form-input" name="email" required data-i18n-placeholder="ct.emailPh" placeholder="tu@correo.com">
+        <div id="errorMsg" class="success-msg">
+          <div class="success-icon" style="color:var(--coral)">[!]</div>
+          <h3 id="errorTitle" data-i18n="ct.errorTitle">Error al enviar.</h3>
+          <p id="errorSub" data-i18n="ct.errorSub">Intenta de nuevo.</p>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" data-i18n="ct.companyLabel">Empresa</label>
-          <input type="text" class="form-input" name="company" data-i18n-placeholder="ct.companyPh" placeholder="Nombre de tu empresa (opcional)">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" data-i18n="ct.websiteLabel">Sitio web</label>
-          <input type="url" class="form-input" name="website" data-i18n-placeholder="ct.websitePh" placeholder="https://tuempresa.com (opcional)">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" data-i18n="ct.msgLabel">Mensaje</label>
-          <textarea class="form-input" name="message" rows="5" required data-i18n-placeholder="ct.msgPh" placeholder="Cuéntanos sobre tu negocio y qué desafíos enfrentas..."></textarea>
-        </div>
-
-        <div class="form-group" style="margin-top:28px">
-          <button type="submit" class="btn-primary" data-i18n-btn="ct.submit">Enviar Mensaje &rarr;</button>
-        </div>
-
-      </form>
-
-      <div id="successMsg" class="success-msg">
-        <div class="success-icon">[&#10003;]</div>
-        <h3 data-i18n="ct.successTitle">Mensaje enviado.</h3>
-        <p data-i18n="ct.successSub">Te contactaremos dentro de 24 horas.</p>
       </div>
-
-      <div id="errorMsg" class="success-msg">
-        <div class="success-icon" style="color:var(--coral)">[!]</div>
-        <h3 id="errorTitle" data-i18n="ct.errorTitle">Error al enviar.</h3>
-        <p id="errorSub" data-i18n="ct.errorSub">Intenta de nuevo.</p>
-      </div>
-
-      <p style="margin-top:40px;font-size:13px;color:var(--dimgray)">
-        <span data-i18n="ct.emailDirect">O escríbenos directamente a</span>
-        <a href="mailto:ignealabs.ai@gmail.com" style="color:var(--accent)">ignealabs.ai@gmail.com</a>
-      </p>
-
     </div>
   </section>
 </main>

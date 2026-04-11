@@ -104,8 +104,12 @@ var IgneaI18n = (function() {
 
       // ---- CONTACT: CALENDLY ----
       "ct.cal.title": "Habla con nosotros directamente",
-      "ct.cal.sub": "Elige un horario y hablamos \u2014 sin formularios, sin esperas.",
-      "ct.or": "\u2014 o escríbenos \u2014",
+      "ct.cal.sub": "Elige un horario y hablamos — sin formularios, sin esperas.",
+      "ct.duration": "30 min",
+      "ct.conferencing": "Videoconferencia — detalles al confirmar",
+      "ct.formTitle": "Envíanos un mensaje",
+      "ct.formSub": "¿Prefieres escribir? Cuéntanos sobre tu negocio y te respondemos en 24 horas.",
+      "ct.or": "— o escríbenos —",
 
       // ---- DEMO REPORT ----
       "demo.banner": "Reporte de muestra \u2014 basado en datos agregados de operaciones de restaurantes en Latinoamérica.",
@@ -1335,8 +1339,12 @@ var IgneaI18n = (function() {
 
       // ---- CONTACT: CALENDLY ----
       "ct.cal.title": "Talk to us directly",
-      "ct.cal.sub": "Pick a time and let's talk \u2014 no forms, no waiting.",
-      "ct.or": "\u2014 or send a message \u2014",
+      "ct.cal.sub": "Pick a time and let's talk — no forms, no waiting.",
+      "ct.duration": "30 min",
+      "ct.conferencing": "Video call — details provided upon confirmation",
+      "ct.formTitle": "Send us a message",
+      "ct.formSub": "Prefer to write? Tell us about your business and we'll respond within 24 hours.",
+      "ct.or": "— or send a message —",
 
       // ---- DEMO REPORT ----
       "demo.banner": "Sample report \u2014 based on aggregated data from restaurant operations across Latin America.",
