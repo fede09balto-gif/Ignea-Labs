@@ -856,7 +856,7 @@
     doc.text(isES ? 'Agenda tu llamada:' : 'Book your call:', M, y);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(26, 26, 26);
-    doc.text('calendly.com/fedebaltoinvest/30min', M + 45, y);
+    doc.text('calendly.com/ignealabs/30min', M + 45, y);
     y += 8;
     doc.setTextColor(107, 107, 107);
     doc.text('ignealabs@outlook.com', M, y);
