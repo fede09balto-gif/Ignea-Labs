@@ -20,10 +20,10 @@
 <style>
 /* CONTACT PAGE */
 .ct-hero{padding:120px 0 80px}
-.ct-split{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:start}
-.ct-left{padding-right:60px;display:flex;flex-direction:column;justify-content:center;min-height:600px}
-.ct-right{border-left:1px solid var(--border);min-height:600px}
-.ct-right .calendly-inline-widget{height:700px;min-height:700px}
+.ct-split{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:stretch}
+.ct-left{padding-right:60px;display:flex;flex-direction:column;justify-content:center}
+.ct-right{border-left:1px solid var(--border)}
+.ct-right .calendly-inline-widget{height:1000px;min-height:1000px}
 
 .ct-form-section{padding:80px 0 100px;border-top:1px solid var(--border)}
 .ct-form-wrap{max-width:640px;margin:0 auto}
@@ -48,7 +48,7 @@
   .ct-split{grid-template-columns:1fr;gap:0}
   .ct-left{padding-right:0;min-height:auto;padding-bottom:48px}
   .ct-right{border-left:none;border-top:1px solid var(--border);min-height:auto}
-  .ct-right .calendly-inline-widget{min-height:700px}
+  .ct-right .calendly-inline-widget{height:1000px;min-height:1000px}
 }
 @media(max-width:768px){
   .ct-hero{padding:80px 0 60px}
