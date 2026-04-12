@@ -2358,6 +2358,11 @@ var IgneaI18n = (function() {
       if (val) el.innerHTML = val;
     });
 
+    // Reveal hidden i18n elements (anti-flash)
+    document.querySelectorAll('[data-i18n],[data-i18n-html],[data-i18n-btn]').forEach(function(el) {
+      el.style.visibility = 'visible';
+    });
+
     // Fire custom event for page-specific handlers
     document.dispatchEvent(new CustomEvent('langchange', { detail: { lang: lang } }));
   }
@@ -2366,6 +2371,11 @@ var IgneaI18n = (function() {
     var saved = localStorage.getItem('ignea_lang');
     if (saved && saved !== currentLang) {
       setLang(saved);
+    } else {
+      // Reveal hidden i18n elements even when language matches default
+      document.querySelectorAll('[data-i18n],[data-i18n-html],[data-i18n-btn]').forEach(function(el) {
+        el.style.visibility = 'visible';
+      });
     }
   }
 
