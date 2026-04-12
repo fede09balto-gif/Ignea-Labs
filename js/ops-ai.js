@@ -1,21 +1,13 @@
 /* ============================================================
    IGNEA LABS — AI Module (Claude API)
    Generates recommendations and proposals from diagnostic data.
-   Requires: window.CLAUDE_API_KEY to be set.
+   Calls /api/claude serverless proxy — API key stays server-side.
    ============================================================ */
 
 (function() {
   var CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 
-  function getApiKey() {
-    return window.CLAUDE_API_KEY || localStorage.getItem('ignea_ops_claude_key') || '';
-  }
-
   async function callClaude(systemPrompt, userMessage, opts) {
-    var key = getApiKey();
-    if (!key) {
-      throw new Error('Claude API key not configured. Click "API Key" in the ops nav to set it.');
-    }
     opts = opts || {};
 
     var body = {
@@ -26,14 +18,9 @@
     };
     if (opts.temperature !== undefined) body.temperature = opts.temperature;
 
-    var response = await fetch('https://api.anthropic.com/v1/messages', {
+    var response = await fetch('/api/claude', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
 

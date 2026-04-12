@@ -57,7 +57,6 @@
       <div class="ops-user">
         <span id="opsUserName" class="ops-username"></span>
         <span class="ops-role" id="opsUserRole"></span>
-        <button id="apiKeyBtn" class="ops-logout" title="Claude API Key">API Key</button>
         <a href="#" id="logoutBtn" class="ops-logout" data-i18n="ops.logout">salir</a>
       </div>
     </div>
@@ -593,10 +592,6 @@
 </div><!-- /page -->
 
 <!-- SCRIPTS -->
-<script>
-// Load Claude API key from localStorage (set via ops settings)
-window.CLAUDE_API_KEY = localStorage.getItem('ignea_ops_claude_key') || '';
-</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script src="js/grid-bg.js"></script>
 <script src="js/supabase-config.js"></script>
@@ -607,26 +602,6 @@ window.CLAUDE_API_KEY = localStorage.getItem('ignea_ops_claude_key') || '';
 <script src="js/ops-calculator.js"></script>
 <script src="js/ops-scraper.js"></script>
 <script src="js/ops-ai.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var apiBtn = document.getElementById('apiKeyBtn');
-    if (apiBtn) {
-      apiBtn.addEventListener('click', function() {
-        var current = localStorage.getItem('ignea_ops_claude_key') || '';
-        var masked = current ? current.substring(0, 12) + '...' : '(not set)';
-        var newKey = prompt('Claude API Key\nCurrent: ' + masked + '\n\nEnter new key (or cancel to keep current):', current);
-        if (newKey !== null && newKey.trim()) {
-          localStorage.setItem('ignea_ops_claude_key', newKey.trim());
-          window.CLAUDE_API_KEY = newKey.trim();
-          apiBtn.textContent = 'API Key \u2713';
-        }
-      });
-      if (localStorage.getItem('ignea_ops_claude_key')) {
-        apiBtn.textContent = 'API Key \u2713';
-      }
-    }
-  });
-</script>
 <script src="js/scroll-animations.js"></script>
 </body>
 </html>
