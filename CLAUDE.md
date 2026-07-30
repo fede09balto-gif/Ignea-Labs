@@ -3,7 +3,8 @@
 
 # Architecture
 - Vanilla HTML/CSS/JS static site. No frameworks. Hosted on Vercel.
-- Repo: github.com/fede09balto-gif/onda-ai
+- Repo: github.com/fede09balto-gif/Ignea-Labs (renamed from onda-ai; old remote URL still redirects via GitHub)
+- Vercel project serving www.ignealabs.com is **ignea-labs-w8bp** — NOT "ignea-labs" (that's a dead second project, last deployed long ago, unrelated to the live domain). Always confirm `vercel project ls` / `.vercel/project.json` point at ignea-labs-w8bp before trusting any CLI-level Vercel check.
 - i18n: data-i18n attributes, JS translations in i18n.js (~807 keys). Spanish default. localStorage key: ignea_lang
 - Future backend: Supabase (placeholder credentials currently)
 
