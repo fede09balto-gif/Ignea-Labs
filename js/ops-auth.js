@@ -15,7 +15,7 @@ var OpsAuth = (function() {
       var token = sessionStorage.getItem('ignea_ops_token');
       var userData = sessionStorage.getItem('ignea_ops_user');
 
-      if (token === 'authenticated' && userData) {
+      if (token && userData) {
         try {
           var user = JSON.parse(userData);
           showDashboard(user);
@@ -47,67 +47,43 @@ var OpsAuth = (function() {
 
   function handleAccessAttempt(value) {
     if (!value) return;
-
     if (failCount >= 3) return;
 
-    var client = IgneaSupabase.client;
-
-    // Try Supabase auth first, fall back to local passphrase
-    hashSHA256(value).then(function(hexHash) {
-      return client
-        .from('ops_users')
-        .select('*')
-        .eq('password_hash', hexHash)
-        .maybeSingle();
-    }).then(function(result) {
-      if (result && !result.error && result.data) {
-        // Supabase user found
-        var user = result.data;
+    fetch('/api/ops-auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: value })
+    }).then(function(res) {
+      if (res.ok) {
         var userData = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          permissions: user.permissions
+          id: 'operator',
+          name: 'Operador',
+          email: '',
+          role: 'admin',
+          permissions: ['read', 'write']
         };
-
+        sessionStorage.setItem('ignea_ops_token', value);
         sessionStorage.setItem('ignea_ops_user', JSON.stringify(userData));
-        sessionStorage.setItem('ignea_ops_token', 'authenticated');
-
-        client
-          .from('ops_users')
-          .update({ last_login: new Date().toISOString() })
-          .eq('id', user.id)
-          .then(function() {});
-
         showDashboard(userData);
+      } else if (res.status === 401) {
+        handleFailedAttempt();
       } else {
-        // Supabase returned no match — accept any non-empty string as local fallback
-        acceptLocalAuth(value);
+        showNetworkError();
       }
     }).catch(function() {
-      // Supabase unreachable — accept any non-empty string as local fallback
-      acceptLocalAuth(value);
+      // The verification endpoint is unreachable — fail closed rather than
+      // silently degrading. There is no local fallback path.
+      showNetworkError();
     });
   }
 
-  function acceptLocalAuth(value) {
-    if (!value || !value.trim()) {
-      handleFailedAttempt();
-      return;
+  function showNetworkError() {
+    var denied = document.getElementById('accessDenied');
+    if (denied) {
+      denied.textContent = (typeof IgneaI18n !== 'undefined' ? IgneaI18n.t('ops.gate.network_error') : null) || 'No se pudo verificar la sesión.';
+      denied.style.color = 'var(--coral, #F0997B)';
+      denied.style.display = 'block';
     }
-
-    var userData = {
-      id: 'local-' + Date.now(),
-      name: 'Operador',
-      email: '',
-      role: 'admin',
-      permissions: ['read', 'write']
-    };
-
-    sessionStorage.setItem('ignea_ops_user', JSON.stringify(userData));
-    sessionStorage.setItem('ignea_ops_token', 'authenticated');
-    showDashboard(userData);
   }
 
   function handleFailedAttempt() {
@@ -157,17 +133,6 @@ var OpsAuth = (function() {
         input.classList.remove('shake');
       }, 500);
     }
-  }
-
-  function hashSHA256(str) {
-    var encoder = new TextEncoder();
-    var data = encoder.encode(str);
-    return crypto.subtle.digest('SHA-256', data).then(function(hashBuffer) {
-      var hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(function(b) {
-        return b.toString(16).padStart(2, '0');
-      }).join('');
-    });
   }
 
   function showDashboard(user) {

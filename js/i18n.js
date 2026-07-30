@@ -1077,6 +1077,7 @@ var IgneaI18n = (function() {
       "ops.gate.placeholder": "········",
       "ops.gate.denied": "// ACCESO DENEGADO",
       "ops.gate.terminated": "// CONEXIÓN TERMINADA. RECARGA LA PÁGINA.",
+      "ops.gate.network_error": "No se pudo verificar la sesión.",
 
       // ---- OPS: SECTION TAGS ----
       "ops.calc.tag": "// Calculadora de propuesta",
@@ -2213,6 +2214,7 @@ var IgneaI18n = (function() {
       "ops.gate.placeholder": "········",
       "ops.gate.denied": "// ACCESS DENIED",
       "ops.gate.terminated": "// CONNECTION TERMINATED. RELOAD PAGE.",
+      "ops.gate.network_error": "Could not verify session.",
 
       // ---- OPS: SECTION TAGS ----
       "ops.calc.tag": "// Proposal calculator",

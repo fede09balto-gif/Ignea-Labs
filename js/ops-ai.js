@@ -5,22 +5,24 @@
    ============================================================ */
 
 (function() {
-  var CLAUDE_MODEL = 'claude-sonnet-4-20250514';
+  // Model, sampling params and max_tokens are pinned server-side in
+  // api/claude.js — nothing here reaches Anthropic unfiltered.
 
   async function callClaude(systemPrompt, userMessage, opts) {
     opts = opts || {};
 
     var body = {
-      model: CLAUDE_MODEL,
       max_tokens: opts.max_tokens || 4000,
       system: systemPrompt,
       messages: [{ role: 'user', content: userMessage }]
     };
-    if (opts.temperature !== undefined) body.temperature = opts.temperature;
 
     var response = await fetch('/api/claude', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-ignea-ops-token': sessionStorage.getItem('ignea_ops_token') || ''
+      },
       body: JSON.stringify(body)
     });
 
@@ -129,7 +131,7 @@
       '- Maximum 3 pain points, maximum 3 discovery questions.';
 
     var userMessage = buildDiagnosticContext(lead);
-    var result = await callClaude(systemPrompt, userMessage, { max_tokens: 2000, temperature: 0 });
+    var result = await callClaude(systemPrompt, userMessage, { max_tokens: 2000 });
     var cleaned = result.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     var parsed = JSON.parse(cleaned);
     setCache(lead.id, 'summary', parsed);
@@ -210,7 +212,7 @@
       '- Be direct about risks and what could go wrong.\n' +
       '- Proposal talking points must quote or closely mirror the client\'s actual words from the intake.';
 
-    var result = await callClaude(systemPrompt, context, { max_tokens: 4000, temperature: 0 });
+    var result = await callClaude(systemPrompt, context, { max_tokens: 4000 });
     var cleaned = result.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     var parsed = JSON.parse(cleaned);
     setCache(lead.id, 'deep_analysis', parsed);
