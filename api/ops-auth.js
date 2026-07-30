@@ -1,9 +1,17 @@
 import crypto from 'crypto';
 
-var ALLOWED_ORIGINS = new Set([
-  'https://ignealabs.com',
-  'https://www.ignealabs.com'
-]);
+var DEFAULT_ORIGINS = ['https://ignealabs.com', 'https://www.ignealabs.com'];
+
+// See api/claude.js for the same helper's contract: unset/empty env fails
+// closed to DEFAULT_ORIGINS, never open. No wildcard support.
+function loadAllowedOrigins() {
+  var raw = process.env.ALLOWED_ORIGINS;
+  if (!raw) return DEFAULT_ORIGINS;
+  var parsed = raw.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+  return parsed.length > 0 ? parsed : DEFAULT_ORIGINS;
+}
+
+var ALLOWED_ORIGINS = new Set(loadAllowedOrigins());
 
 // In-memory, per-instance only — see api/claude.js for the same caveat.
 var ipHits = new Map();

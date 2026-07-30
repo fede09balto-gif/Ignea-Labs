@@ -7,10 +7,20 @@ var IP_LIMIT = 30;
 var TOKEN_LIMIT = 20;
 var WINDOW_MS = 60000;
 
-var ALLOWED_ORIGINS = new Set([
-  'https://ignealabs.com',
-  'https://www.ignealabs.com'
-]);
+var DEFAULT_ORIGINS = ['https://ignealabs.com', 'https://www.ignealabs.com'];
+
+// ALLOWED_ORIGINS env var: comma-separated, replaces the default list when
+// set. Unset OR empty (including whitespace-only) fails closed to
+// DEFAULT_ORIGINS — it never falls open to allow-all. No wildcard support:
+// entries are matched by exact string equality only.
+function loadAllowedOrigins() {
+  var raw = process.env.ALLOWED_ORIGINS;
+  if (!raw) return DEFAULT_ORIGINS;
+  var parsed = raw.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+  return parsed.length > 0 ? parsed : DEFAULT_ORIGINS;
+}
+
+var ALLOWED_ORIGINS = new Set(loadAllowedOrigins());
 
 // In-memory, per-instance only. Vercel can run multiple concurrent instances
 // and cold-starts reset these maps, so this slows a brute-force attempt but
