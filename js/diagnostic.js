@@ -483,7 +483,18 @@
   var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
   function initVoiceInputs() {
-    if (!SpeechRecognition) return;
+    if (!SpeechRecognition) {
+      // No mic to offer on this browser — show why instead of failing silently.
+      var unsupportedText = (typeof IgneaI18n !== 'undefined' && IgneaI18n.t)
+        ? IgneaI18n.t('voice_unsupported') : 'voice_unsupported';
+      document.querySelectorAll('.voice-wrap').forEach(function(wrap) {
+        var msg = document.createElement('div');
+        msg.className = 'voice-error visible';
+        msg.textContent = unsupportedText;
+        wrap.insertAdjacentElement('afterend', msg);
+      });
+      return;
+    }
 
     document.querySelectorAll('.voice-wrap').forEach(function(wrap) {
       var field = wrap.querySelector('textarea, input[type="text"]');
@@ -635,7 +646,9 @@
           recognition = null;
           if (event.error === 'not-allowed') {
             showError('voice_permission_denied');
-          } else if (event.error !== 'aborted' && event.error !== 'no-speech') {
+          } else if (event.error === 'no-speech') {
+            showError('voice_no_speech');
+          } else if (event.error !== 'aborted') {
             showError('voice_error');
           }
         };

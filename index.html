@@ -9,9 +9,9 @@
 <meta property="og:title" content="Ignea Labs | Infraestructura de IA para empresas en América Latina">
 <meta property="og:description" content="Diagnóstico gratuito de IA que mapea tu desperdicio operacional y lo convierte en ahorros proyectados.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="/assets/og-image.png">
+<meta property="og:image" content="https://www.ignealabs.com/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="canonical" href="https://ignealabs.com/">
+<link rel="canonical" href="https://www.ignealabs.com/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- fonts loaded via shared.css @import -->
@@ -620,24 +620,6 @@ window.setLang = function(lang) {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   IgneaTerminal.init();
-
-  // Stat counters
-  function anim(el, end, suf, dur) {
-    var s = 0, st = end / (dur / 16), dec = String(end).includes('.');
-    function tick() {
-      s += st;
-      if (s >= end) { el.textContent = (dec ? end.toFixed(1) : Math.round(end)) + suf; return; }
-      el.textContent = (dec ? s.toFixed(1) : Math.round(s)) + suf;
-      requestAnimationFrame(tick);
-    }
-    tick();
-  }
-  setTimeout(function() {
-    anim(document.getElementById('s1'), 72, '', 1400);
-    anim(document.getElementById('s2'), 32, '', 1600);
-    anim(document.getElementById('s3'), 40, '', 1300);
-    anim(document.getElementById('s4'), 10, '', 1100);
-  }, 800);
 
   // Hamburger
   var ham = document.getElementById('hamburger');

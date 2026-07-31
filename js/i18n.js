@@ -1052,6 +1052,7 @@ var IgneaI18n = (function() {
       "voice_unsupported": "Tu navegador no soporta entrada de voz",
       "voice_error": "Error de voz. Intenta de nuevo.",
       "voice_permission_denied": "Permiso de micrófono denegado",
+      "voice_no_speech": "No escuchamos nada. Intenta de nuevo.",
 
       // ---- DIAGNOSTIC: NEW INDUSTRIES ----
       "intake.ind.manufacturing": "Manufactura",
@@ -2189,6 +2190,7 @@ var IgneaI18n = (function() {
       "voice_unsupported": "Your browser doesn't support voice input",
       "voice_error": "Voice error. Try again.",
       "voice_permission_denied": "Microphone permission denied",
+      "voice_no_speech": "We didn't hear anything. Try again.",
 
       // ---- DIAGNOSTIC: NEW INDUSTRIES ----
       "intake.ind.manufacturing": "Manufacturing",
