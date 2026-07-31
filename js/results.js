@@ -240,7 +240,7 @@
 
     var colors;
     if (score <= 25) colors = ['#F0997B', '#E85D30'];
-    else if (score <= 50) colors = ['#EF9F27', '#F0997B'];
+    else if (score <= 50) colors = ['#A66200', '#B25730'];
     else if (score <= 75) colors = ['#F07A3A', '#E5531A'];
     else colors = ['#E5531A', '#CC3A0D'];
 
@@ -258,7 +258,7 @@
     svg += '<stop offset="100%" stop-color="' + colors[1] + '"/>';
     svg += '</linearGradient></defs>';
     svg += '<g fill="none" stroke-width="7" transform="translate(50,50)">';
-    svg += '<circle r="' + radius + '" stroke="#1A1A2A" stroke-dasharray="' + halfCirc + ' ' + halfCirc + '"/>';
+    svg += '<circle r="' + radius + '" stroke="var(--line)" stroke-dasharray="' + halfCirc + ' ' + halfCirc + '"/>';
     svg += '<circle r="' + radius + '" stroke="url(#' + gradId + ')" stroke-dasharray="' + halfCirc + ' ' + halfCirc + '" stroke-dashoffset="0" stroke-linecap="round" id="gaugeFill" style="transition:stroke-dashoffset 1.4s cubic-bezier(0.65,0,0.35,1) 0.5s;"/>';
     svg += '</g></svg>';
 

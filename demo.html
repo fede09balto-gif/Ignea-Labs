@@ -114,11 +114,11 @@
 .gauge-number{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);text-align:center}
 .gauge-num{font-family:var(--fm);font-size:48px;font-weight:700;line-height:1}
 .gauge-of{font-family:var(--fm);font-size:14px;color:var(--text-dim);margin-top:2px}
-.level-badge{display:inline-block;font-family:var(--fm);font-size:14px;letter-spacing:2px;text-transform:uppercase;padding:8px 20px;border:1px solid var(--border);margin-top:20px}
+.level-badge{display:inline-block;font-family:var(--fm);font-weight:700;font-size:14px;letter-spacing:2px;text-transform:uppercase;padding:8px 20px;border:1px solid var(--border);margin-top:20px}
 .level-badge.level-critical{color:var(--coral);border-color:rgba(229,99,75,0.2)}
-.level-badge.level-developing{color:#EF9F27;border-color:rgba(239,159,39,0.2)}
+.level-badge.level-developing{color:#A66200;border-color:rgba(239,159,39,0.2)}
 .level-badge.level-competent{color:var(--accent);border-color:rgba(229,83,26,0.2)}
-.level-badge.level-advanced{color:#F07A3A;border-color:rgba(240,122,58,0.2)}
+.level-badge.level-advanced{color:#B84E15;border-color:rgba(240,122,58,0.2)}
 .level-desc{font-size:18px;color:var(--gray);line-height:1.7;max-width:580px;margin:16px auto 0}
 
 /* ---- SECTION 3: DIMENSIONS ---- */
@@ -130,7 +130,7 @@
 .dim-bar{height:4px;background:var(--border);width:100%;position:relative;overflow:hidden}
 .dim-fill{height:100%;width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
 .dim-fill.level-critical{background:var(--coral)}
-.dim-fill.level-developing{background:#EF9F27}
+.dim-fill.level-developing{background:#A66200}
 .dim-fill.level-competent{background:var(--accent)}
 .dim-fill.level-advanced{background:var(--accent)}
 .dim-insight{font-size:15px;color:var(--gray);margin-top:8px;line-height:1.55}
@@ -139,7 +139,7 @@
 .cost-headline{font-size:clamp(24px,3.5vw,32px);font-weight:700;color:var(--white);margin-bottom:40px;line-height:1.2;letter-spacing:-.02em}
 .cost-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
 .cost-card{background:var(--bg2);border:1px solid var(--border);padding:32px;text-align:center;transition:border-color .3s}
-.cost-card:hover{border-color:rgba(255,255,255,0.15)}
+.cost-card:hover{border-color:var(--ink)}
 .cost-num{font-family:var(--fm);font-size:32px;font-weight:700;color:var(--coral);line-height:1.2;margin-bottom:8px}
 .cost-card:last-child .cost-num{font-size:36px}
 .cost-label{font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
@@ -423,7 +423,6 @@
 <!-- SCRIPTS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="js/analytics.js"></script>
-<script src="js/grid-bg.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/scoring.js"></script>
 <script src="js/results.js"></script>
