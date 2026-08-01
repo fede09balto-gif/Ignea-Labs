@@ -268,7 +268,7 @@ async function play(k){
     }
     else if(e.t==='step'){
       addStep(e,true);
-      await wait(e.ms||620);
+      await wait(e.ms||520);
     }
     else if(e.t==='ops'){
       addOps(e,true);
@@ -277,13 +277,13 @@ async function play(k){
     else if(e.t==='out'||e.t==='doc'){
       var ty=typing();
       var len=e.t==='doc'?55:e.x.length;
-      await wait(Math.min(1100+len*30,2400));
+      await wait(Math.min(700+len*22,1500));
       if(my!==token){ty.remove();return;}
       ty.remove();
       var node=e.t==='doc'?addDoc(e,true):addMsg(e,true);
-      await wait(460); if(my!==token)return; ticks(node,false);
-      await wait(280); if(my!==token)return; ticks(node,true);
-      await wait(560);
+      await wait(340); if(my!==token)return; ticks(node,false);
+      await wait(220); if(my!==token)return; ticks(node,true);
+      await wait(380);
     }
     else if(e.t==='pf'){ pfShell(s.proforma,true); await wait(520); }
     else if(e.t==='row'){ pfRow(s.proforma,e.i,true); await wait(400); }

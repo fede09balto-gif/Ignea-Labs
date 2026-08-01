@@ -399,19 +399,20 @@ footer{border-top:1px solid var(--border)}
 
 <!-- WHATSAPP ASSISTANT DEMO -->
 <section class="ig" id="demo">
-  <p class="ig__label"><span>//</span> Demo</p>
-  <h2 class="ig__title">El cliente pregunta. El asistente cotiza. Usted solo aprueba.</h2>
-  <p class="ig__intro">Un pedido real, de principio a fin: lo que escribe el cliente, lo que el asistente resuelve mientras responde, lo que aparece en el mostrador, y la proforma que sale firmada al final.</p>
+  <p class="ig__label"><span>//</span> <span data-i18n="ig.label">Demo</span></p>
+  <h2 class="ig__title" data-i18n="ig.title">El cliente pregunta. El asistente cotiza. Usted solo aprueba.</h2>
+  <p class="ig__intro" data-i18n="ig.intro">Un pedido real, de principio a fin: lo que escribe el cliente, lo que el asistente resuelve mientras responde, lo que aparece en el mostrador, y la proforma que sale firmada al final.</p>
+  <p class="ig__esnote" data-i18n="ig.esnote"></p>
 
   <ul class="ig-tabs" role="tablist" aria-label="Escenarios">
-    <li role="presentation"><button class="ig-tab" role="tab" aria-selected="true" data-s="ferreteria">Ferretería</button></li>
-    <li role="presentation"><button class="ig-tab" role="tab" aria-selected="false" data-s="clinica">Clínica dental</button></li>
-    <li role="presentation"><button class="ig-tab" role="tab" aria-selected="false" data-s="hotel">Hotel</button></li>
+    <li role="presentation"><button class="ig-tab" role="tab" aria-selected="true" data-s="ferreteria"><span data-i18n="ig.tab.ferreteria">Ferretería</span></button></li>
+    <li role="presentation"><button class="ig-tab" role="tab" aria-selected="false" data-s="clinica"><span data-i18n="ig.tab.clinica">Clínica dental</span></button></li>
+    <li role="presentation"><button class="ig-tab" role="tab" aria-selected="false" data-s="hotel"><span data-i18n="ig.tab.hotel">Hotel</span></button></li>
   </ul>
 
   <div class="ig-flow">
     <div class="ig-col">
-      <p class="ig-col__cap"><i></i>Cliente — WhatsApp</p>
+      <p class="ig-col__cap"><i></i><span data-i18n="ig.cap.client">Cliente — WhatsApp</span></p>
       <div class="ig-phone">
         <div class="ig-screen">
           <div class="ig-status">
@@ -437,7 +438,7 @@ footer{border-top:1px solid var(--border)}
     </div>
 
     <div class="ig-col ig-col--rail">
-      <p class="ig-col__cap"><i></i>Asistente — proceso</p>
+      <p class="ig-col__cap"><i></i><span data-i18n="ig.cap.assistant">Asistente — proceso</span></p>
       <div class="ig-rail">
         <div class="ig-rail__hd"><span>En ejecución</span><span class="ig-rail__pulse" id="pulse"></span></div>
         <ul class="ig-steps" id="steps"></ul>
@@ -445,7 +446,7 @@ footer{border-top:1px solid var(--border)}
     </div>
 
     <div class="ig-col">
-      <p class="ig-col__cap"><i></i>Mostrador — panel Ignea</p>
+      <p class="ig-col__cap"><i></i><span data-i18n="ig.cap.ops">Mostrador — panel Ignea</span></p>
       <div class="ig-phone">
         <div class="ig-screen">
           <div class="ig-status ig-status--ops"><span>9:12</span><span class="ig-status__i">
@@ -463,28 +464,28 @@ footer{border-top:1px solid var(--border)}
   </div>
 
   <div class="ig-pfwrap">
-    <p class="ig-pf__cap"><i></i>Documento generado</p>
+    <p class="ig-pf__cap"><i></i><span data-i18n="ig.pf.cap">Documento generado</span></p>
     <div id="pf"></div>
   </div>
 
   <div class="ig-chips">
-    <span class="ig-chip"><b>—</b> Responde en segundos</span>
-    <span class="ig-chip"><b>—</b> Atiende 24/7, incluso domingos</span>
-    <span class="ig-chip"><b>—</b> Proforma en el formato del negocio</span>
-    <span class="ig-chip"><b>—</b> Pasa a una persona cuando hace falta</span>
+    <span class="ig-chip"><b>—</b> <span data-i18n="ig.chip1">Responde en segundos</span></span>
+    <span class="ig-chip"><b>—</b> <span data-i18n="ig.chip2">Atiende 24/7, incluso domingos</span></span>
+    <span class="ig-chip"><b>—</b> <span data-i18n="ig.chip3">Proforma en el formato del negocio</span></span>
+    <span class="ig-chip"><b>—</b> <span data-i18n="ig.chip4">Pasa a una persona cuando hace falta</span></span>
   </div>
 
   <div class="ig-act">
-    <button class="ig-replay" id="replay" type="button">Repetir demo</button>
-    <span class="ig-note">Demostración — datos de ejemplo</span>
+    <button class="ig-replay" id="replay" type="button" data-i18n="ig.replay">Repetir demo</button>
+    <span class="ig-note" data-i18n="ig.note">Demostración — datos de ejemplo</span>
   </div>
 
   <div class="ig-cta">
     <a href="diagnostic" class="btn-primary">
-      Quiero uno para mi negocio
+      <span data-i18n="ig.cta">Quiero uno para mi negocio</span>
       <svg width="15" height="11" viewBox="0 0 15 11" fill="none" aria-hidden="true"><path d="M9 1l4.5 4.5L9 10M13 5.5H1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
-    <span class="ig-cta__note">Diagnóstico gratuito &middot; 4 preguntas</span>
+    <span class="ig-cta__note" data-i18n="ig.cta.note">Diagnóstico gratuito &middot; 4 preguntas</span>
   </div>
 </section>
 

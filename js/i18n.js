@@ -34,6 +34,29 @@ var IgneaI18n = (function() {
       "stats.s5": "promedio para recuperar la inversión",
       "stats.unit.days": "días",
 
+      // ---- HOMEPAGE: WHATSAPP DEMO (section chrome only) ----
+      // The three scripted conversations stay in Spanish by decision; they live
+      // in js/wa-demo.js and are deliberately NOT keyed here.
+      "ig.label": "Demo",
+      "ig.title": "El cliente pregunta. El asistente cotiza. Usted solo aprueba.",
+      "ig.intro": "Un pedido real, de principio a fin: lo que escribe el cliente, lo que el asistente resuelve mientras responde, lo que aparece en el mostrador, y la proforma que sale firmada al final.",
+      "ig.esnote": "",
+      "ig.tab.ferreteria": "Ferretería",
+      "ig.tab.clinica": "Clínica dental",
+      "ig.tab.hotel": "Hotel",
+      "ig.cap.client": "Cliente — WhatsApp",
+      "ig.cap.assistant": "Asistente — proceso",
+      "ig.cap.ops": "Mostrador — panel Ignea",
+      "ig.pf.cap": "Documento generado",
+      "ig.chip1": "Responde en segundos",
+      "ig.chip2": "Atiende 24/7, incluso domingos",
+      "ig.chip3": "Proforma en el formato del negocio",
+      "ig.chip4": "Pasa a una persona cuando hace falta",
+      "ig.replay": "Repetir demo",
+      "ig.note": "Demostración — datos de ejemplo",
+      "ig.cta": "Quiero uno para mi negocio",
+      "ig.cta.note": "Diagnóstico gratuito · 4 preguntas",
+
       // ---- HOMEPAGE: CAPABILITY TICKER ----
       "tk.label": "Dónde se aplica",
       "tk.c1.meta": "Ferretería",
@@ -607,7 +630,7 @@ var IgneaI18n = (function() {
       "res.roiTag2": "// Retorno Estimado",
       "res.roi.timeLabel": "Tiempo que recuperas",
       "res.roi.valueLabel": "Valor de ese tiempo",
-      "res.roi.footnote": "Estas cifras son conservadoras. El impacto real suele ser 2-3x mayor cuando se considera el crecimiento de ingresos por mejor atención al cliente.",
+      "res.roi.footnote": "Esta estimación cuenta únicamente las horas de trabajo manual que se recuperan. No incluye ventas recuperadas ni errores evitados, porque esos dependen de la operación de cada negocio.",
 
       "res.cta.headline": "¿Listo para recuperar ese tiempo?",
       "res.cta.sub": "Agenda una llamada de 15 minutos. Te mostramos exactamente cómo implementar estas soluciones en tu negocio.",
@@ -1242,6 +1265,28 @@ var IgneaI18n = (function() {
       "stats.s5": "avg to recover your investment",
       "stats.unit.days": "days",
 
+      // ---- HOMEPAGE: WHATSAPP DEMO (section chrome only) ----
+      // Conversations intentionally remain in Spanish — see ig.esnote.
+      "ig.label": "Demo",
+      "ig.title": "The customer asks. The assistant quotes. You just approve.",
+      "ig.intro": "One real order, start to finish: what the customer writes, what the assistant works out while it replies, what lands at the counter, and the quote that comes out signed at the end.",
+      "ig.esnote": "The conversations run in Spanish, as they would in a real Nicaraguan shop.",
+      "ig.tab.ferreteria": "Ferretería",
+      "ig.tab.clinica": "Dental clinic",
+      "ig.tab.hotel": "Hotel",
+      "ig.cap.client": "Customer — WhatsApp",
+      "ig.cap.assistant": "Assistant — working",
+      "ig.cap.ops": "Counter — Ignea panel",
+      "ig.pf.cap": "Generated document",
+      "ig.chip1": "Replies in seconds",
+      "ig.chip2": "Answers 24/7, Sundays included",
+      "ig.chip3": "Quote in the shop's own format",
+      "ig.chip4": "Hands off to a person when needed",
+      "ig.replay": "Replay demo",
+      "ig.note": "Demonstration — sample data",
+      "ig.cta": "I want one for my business",
+      "ig.cta.note": "Free diagnostic · 4 questions",
+
       // ---- HOMEPAGE: CAPABILITY TICKER ----
       "tk.label": "Where it applies",
       "tk.c1.meta": "Ferretería",
@@ -1737,7 +1782,7 @@ var IgneaI18n = (function() {
       "res.roiTag2": "// Estimated Return",
       "res.roi.timeLabel": "Time you recover",
       "res.roi.valueLabel": "Value of that time",
-      "res.roi.footnote": "These figures are conservative. Real impact is typically 2-3x higher when you factor in revenue growth from better customer service.",
+      "res.roi.footnote": "This estimate counts only the manual hours recovered. It excludes recovered sales and avoided errors, since those depend on each business's operation.",
 
       "res.cta.headline": "Ready to reclaim that time?",
       "res.cta.sub": "Schedule a 15-minute call. We'll show you exactly how to implement these solutions in your business.",
