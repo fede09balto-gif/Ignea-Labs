@@ -131,21 +131,6 @@ var IgneaI18n = (function() {
       "cta.note": "Completamente encriptado. Resultados instantáneos.",
 
       // ---- HOMEPAGE: SOCIAL PROOF ----
-      "proof.tag": "// Resultados de Nuestros Clientes",
-      "proof.title": "Empresas que ya activaron su potencial.",
-      "proof.c1.tag": "PLATAFORMA DE CONTENIDO IA",
-      "proof.c1.name": "endgame.ai",
-      "proof.c1.stat": "80%",
-      "proof.c1.statLabel": "de operaciones automatizadas",
-      "proof.c1.desc": "Automatizamos el 80% de las operaciones de contenido. Eliminamos las dos posiciones de mayor salario. Empresa valorada en $30M pre-seed, levantó $5M.",
-      "proof.c2.tag": "GRUPO DE RESTAURANTES",
-      "proof.c2.stat": "32",
-      "proof.c2.statLabel": "hrs/semana recuperadas",
-      "proof.c2.desc": "Automatización de coordinación cocina-delivery y rastreo de inventario. Ahorro de ~$1,800/mes.",
-      "proof.c3.tag": "PRÁCTICA MÉDICA",
-      "proof.c3.stat": "45",
-      "proof.c3.statLabel": "hrs/semana recuperadas",
-      "proof.c3.desc": "Reemplazo de sistema manual de citas y seguimiento de seguros con sistemas de IA. Ahorro de ~$4,500/mes.",
 
       // ---- HOMEPAGE: ABOUT ----
       "about.tag": "// Quiénes Somos",
@@ -1367,21 +1352,6 @@ var IgneaI18n = (function() {
       "cta.note": "Fully encrypted. Instant results.",
 
       // ---- HOMEPAGE: SOCIAL PROOF ----
-      "proof.tag": "// Results From Our Clients",
-      "proof.title": "Companies that already activated their potential.",
-      "proof.c1.tag": "AI CONTENT PLATFORM",
-      "proof.c1.name": "endgame.ai",
-      "proof.c1.stat": "80%",
-      "proof.c1.statLabel": "of operations automated",
-      "proof.c1.desc": "Automated 80% of content operations. Eliminated the two highest-salary positions. Company valued at $30M pre-seed, raised $5M.",
-      "proof.c2.tag": "RESTAURANT GROUP",
-      "proof.c2.stat": "32",
-      "proof.c2.statLabel": "hrs/week recovered",
-      "proof.c2.desc": "Automated kitchen-to-delivery coordination and inventory tracking. ~$1,800/mo saved.",
-      "proof.c3.tag": "HEALTHCARE PRACTICE",
-      "proof.c3.stat": "45",
-      "proof.c3.statLabel": "hrs/week recovered",
-      "proof.c3.desc": "Replaced manual appointment booking and insurance follow-up with AI systems. ~$4,500/mo saved.",
 
       // ---- HOMEPAGE: ABOUT ----
       "about.tag": "// Who We Are",
