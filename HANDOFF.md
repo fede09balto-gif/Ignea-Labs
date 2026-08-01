@@ -1,14 +1,16 @@
 # SESSION HANDOFF — Ignea Labs / onda-ai
 
-Written at the end of a session that completed the entire previous handoff's §2 plan. Everything below §1 is shipped and verified on a branch; §2 is four approved-but-unbuilt work items. Read §1 and §2 before doing anything. The previous handoff's content is superseded — its plan is done.
+Written at the end of a session that completed the entire previous handoff's §2 plan, then merged it to production. Everything in §1 is **live on www.ignealabs.com**; §2 is four approved-but-unbuilt work items. Read §1 and §2 before doing anything. The previous handoff's content is superseded — its plan is done.
+
+**Start next session with §2.1 (Nicaragua cost model). It is now live and wrong on production.**
 
 ---
 
 ## 1. WHERE THINGS STAND
 
-### Branch `feat/hero-cta-ticker-nav-ghost` — NOT MERGED, awaiting visual approval
+### `feat/hero-cta-ticker-nav-ghost` — MERGED to `main` and DEPLOYED to production
 
-Four commits, all verified, none on production:
+Fast-forward merge (zero conflicts), `main` = `1a4c87b`, deployed via `vercel --prod --yes`.
 
 | Commit | What |
 |---|---|
@@ -17,9 +19,20 @@ Four commits, all verified, none on production:
 | `7090c49` | WhatsApp assistant demo on homepage (Phase B) + Supabase guard |
 | `411e5ae` | Demo pacing tightened, ROI footnote rewritten, demo chrome i18n'd |
 
-**Production is untouched and was re-verified after every push** — `www.ignealabs.com` is byte-identical to `main`. Re-verify before assuming: `curl -sL https://www.ignealabs.com/ | grep -c 'id="demo"'` must be 0.
+### Post-merge production verification (all passed on www.ignealabs.com)
 
-Last preview: `https://ignea-labs-w8bp-rkf20h5vf-fedebaltoinvest-7282s-projects.vercel.app` (built at `7090c49`; `411e5ae` is committed but **not yet deployed** — deploy before asking for visual review).
+- Served files **byte-identical to local `main`** — `index.html`, `shared.css`, `wa-demo.js`, `i18n.js`, `ticker-nudge.js`, `supabase-config.js`.
+- All 7 pages: HTTP 200, **console clean**, no horizontal overflow at 375/768/1440, nav ghost confirmed on every one.
+- Homepage body `rgb(255,255,255)`; exactly **1** filled-red element in the hero; 1 primary + 2 links + 3 SVG arrows.
+- `#demo` autoplays once on scroll-in, **23.8s**, all four panels render (8 chat msgs / 10 rail steps / 4 ops cards / 3 proforma rows, total C$ 17,997.50). Tabs switch cleanly — one selected, one day divider each. Demo CTA → `diagnostic`.
+- Ticker: 6 cards, rail 2200/1440 so it still bleeds, manual scroll works, nudge lands at 120.
+- 375px: float hides over `#demo` and returns; demo renders fully; no overflow.
+- EN toggle: chrome switches, conversation stays Spanish, `.ig__esnote` shows.
+- Footnote live on `/demo` and `/results`; zero hits for the old "2-3x mayor" copy.
+- SEO intact: `robots.txt` 200, `sitemap.xml` 200 with 5 locs each resolving **200 in 0 redirects**, canonical matches landed URL on all 5 pages, apex→www still a single hop.
+- **Full diagnostic funnel driven end to end on production**: landing → info → 4 question screens → hook screen. Submission record written, correct company/industry/hours, zero console errors, no failed requests.
+
+**Nothing behaved differently on production than in local verification.** Note that the *preview* could never be browser-verified — preview URLs sit behind Vercel's SSO wall — so all pre-merge browser testing ran against `localhost:8899` serving the same commit. The only production-only network call is `plausible.io` analytics, which is a pre-existing `<script>` tag from commit `dc493bd`, unrelated to this work.
 
 ### What shipped, and the non-obvious decisions inside it
 
@@ -53,7 +66,9 @@ Last preview: `https://ignea-labs-w8bp-rkf20h5vf-fedebaltoinvest-7282s-projects.
 
 All four were proposed in detail and approved. §1 first, §2 after it, §3 and §4 independent.
 
-### §2.1 — Nicaragua cost model (approved, do first)
+### §2.1 — Nicaragua cost model (approved, DO THIS FIRST — it is live and wrong)
+
+**This is now shipping to real visitors.** Every figure below is on production today. That is what makes it the first item rather than merely the next one.
 
 **The headline finding: five sources compute labor cost and they all disagree.**
 
@@ -125,6 +140,8 @@ Continuous, slow, right-to-left ambient motion. Pause on `:hover` and `focus-wit
 
 **BLOCKER: the Google Calendar booking link was never pasted.** The message said `[PASTE YOUR GOOGLE CALENDAR BOOKING LINK]` and the URL did not arrive. **Do not guess or invent a booking URL.** Ask for it first.
 
+Confirmed live post-merge: the diagnostic hook screen's CTA still reads *"Agendar mi llamada estratégica →"* and points at `https://calendly.com/ignealabs/30min`. That is the primary funnel exit, and it is the highest-value of the five replacements below.
+
 Rationale: Calendly assumes a US B2B booking habit. A ferretero in León will WhatsApp; he will not open a scheduling page. Larger prospects do expect a booking link. Both channels stay, chosen by page context, never three competing contact CTAs in one viewport.
 
 **Full inventory — live user-facing (5):**
@@ -166,6 +183,7 @@ Verify accents encode (`completé` → `complet%C3%A9`, `más` → `m%C3%A1s`) a
 - **Nothing on the public site states a result, timeline, or figure attributed to a client until there's a real one.** `thesis.html`'s aggregate Latin-America market statistics (region GDP, population served, consulting pricing) are explicitly fine — they describe the market, not our client outcomes. A full sweep of the live merged state found nothing beyond the three groups already cleaned, plus the ROI footnote now fixed.
 - Never print, echo, or ask for API keys/tokens in chat. Verify presence/scope via `vercel env ls` (names/scopes only), never values.
 - **Confirm `.vercel/project.json` says `ignea-labs-w8bp` before any Vercel CLI work** — not the dead `ignea-labs` decoy project.
+- Production now carries this work. To confirm what is live: `curl -sL https://www.ignealabs.com/ -o /tmp/p.html && diff -q /tmp/p.html index.html` from a clean `main`.
 - Preview URLs sit behind Vercel's SSO wall (302 → `vercel.com/sso-api`) for static content but not `/api/*`. Expected, not a bug.
 - **Verify by running things, not by reading code.** This session that caught: the reference file's own scroll-snap bug, a float-hide handler that silently no-op'd because `.wa-float` is parsed *after* the script tag, and a Supabase request failing only intermittently depending on when `networkidle` settled. All three looked fine in the source.
 - Don't guess at missing user-supplied values (booking links, phone numbers, tokens) — ask, or report exactly what was and wasn't found.
