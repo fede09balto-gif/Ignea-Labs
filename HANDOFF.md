@@ -272,7 +272,7 @@ Reusable, in case the next session wants the same rigor. Playwright is not insta
 
 ```bash
 ln -sfn ~/.npm/_npx/*/node_modules "$SCRATCH/node_modules"
-cd /Users/fedebalto/onda-ai && cd /Users/fedebalto/ignea-labs && python3 -m http.server 8899 &
+cd /Users/fedebalto/ignea-labs && python3 -m http.server 8899 &
 ```
 
 Checks worth repeating: console+overflow sweep at 375/768/1440 across all 7 pages; ES/EN round-trip asserting SVG/DOM survival rather than just absence of errors; baseline comparison by serving `git archive main` on a second port; Lighthouse before/after via `npx lighthouse --preset=desktop`; and for anything intermittent, **run it 3–4 times** — the Supabase failure appeared on run 3 of 3.
