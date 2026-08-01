@@ -23,8 +23,8 @@ var IgneaI18n = (function() {
       "hero.headline1": "Identificamos cómo tu",
       "hero.headline2pre": "negocio puede",
       "hero.headline2suf": "con IA.",
-      "hero.cta1": "Agenda tu Llamada Gratis &rarr;",
-      "hero.cta2": "Leer Nuestra Tesis",
+      "hero.cta1": "Agenda tu llamada gratis",
+      "hero.cta2": "Leer nuestra tesis",
 
       // ---- HOMEPAGE: STATS ----
       "stats.s1": "de PYMEs en PR usan procesos manuales",
@@ -34,29 +34,24 @@ var IgneaI18n = (function() {
       "stats.s5": "promedio para recuperar la inversión",
       "stats.unit.days": "días",
 
-      // ---- HOMEPAGE: MARQUEE ----
-      "mq.r1.ind": "HOTEL · Granada, NI",
-      "mq.r1.res": "28% aumento en ocupación",
-      "mq.r2.ind": "FIRMA LEGAL · San Juan, PR",
-      "mq.r2.res": "$1,840/mes recuperados",
-      "mq.r3.ind": "MANUFACTURA · San Pedro Sula, HN",
-      "mq.r3.res": "34 hrs/semana recuperadas",
-      "mq.r4.ind": "CLÍNICA · Latinoamérica",
-      "mq.r4.res": "60% menos no-shows",
-      "mq.r5.ind": "RESTAURANTE · Miami, FL",
-      "mq.r5.res": "22 hrs/semana recuperadas",
-      "mq.r6.ind": "CONSTRUCCIÓN · Panamá City, PA",
-      "mq.r6.res": "Inventario 100% automatizado",
-      "mq.r7.ind": "RETAIL · Caguas, PR",
-      "mq.r7.res": "Ciclos de restock 3.2x más rápidos",
-      "mq.r8.ind": "AGRO-EXPORTACIÓN · Matagalpa, NI",
-      "mq.r8.res": "$2,100/mes recuperados",
-      "mq.r9.ind": "ESCUELA · San Salvador, SV",
-      "mq.r9.res": "40% menos horas administrativas",
+      // ---- HOMEPAGE: CAPABILITY TICKER ----
+      "tk.label": "Dónde se aplica",
+      "tk.c1.meta": "Ferretería",
+      "tk.c1.body": "Cotizaciones y proformas sin salir del mostrador",
+      "tk.c2.meta": "Clínica",
+      "tk.c2.body": "Agenda y recordatorios que reducen los no-shows",
+      "tk.c3.meta": "Restaurante",
+      "tk.c3.body": "Pedidos y reservas atendidos a cualquier hora",
+      "tk.c4.meta": "Retail",
+      "tk.c4.body": "Inventario y restock sin conteo manual",
+      "tk.c5.meta": "Agro-exportación",
+      "tk.c5.body": "Trazabilidad de lotes lista para auditoría",
+      "tk.c6.meta": "Construcción",
+      "tk.c6.body": "Presupuestos armados desde catálogo vivo",
 
       // ---- HOMEPAGE: HERO CTA ----
       "hero.cta.note": "Gratis. Sin compromiso. Sin llamadas de ventas.",
-      "hero.cta.secondary": "Ver reporte de muestra \u2192",
+      "hero.cta.secondary": "Ver reporte de muestra",
 
       // ---- HOMEPAGE: INDUSTRY TABS ----
       "ind.tag": "// Para tu industria",
@@ -1245,8 +1240,8 @@ var IgneaI18n = (function() {
       "hero.headline1": "We identify how your",
       "hero.headline2pre": "business can",
       "hero.headline2suf": "with AI.",
-      "hero.cta1": "Book Your Free Call &rarr;",
-      "hero.cta2": "Read Our Thesis",
+      "hero.cta1": "Book your free call",
+      "hero.cta2": "Read our thesis",
 
       // ---- HOMEPAGE: STATS ----
       "stats.s1": "of PR SMBs still run on manual processes",
@@ -1256,29 +1251,24 @@ var IgneaI18n = (function() {
       "stats.s5": "avg to recover your investment",
       "stats.unit.days": "days",
 
-      // ---- HOMEPAGE: MARQUEE ----
-      "mq.r1.ind": "HOTEL · Granada, NI",
-      "mq.r1.res": "28% occupancy increase",
-      "mq.r2.ind": "LAW FIRM · San Juan, PR",
-      "mq.r2.res": "$1,840/month recovered",
-      "mq.r3.ind": "MANUFACTURER · San Pedro Sula, HN",
-      "mq.r3.res": "34 hrs/week recovered",
-      "mq.r4.ind": "CLINIC · Latin America",
-      "mq.r4.res": "60% fewer no-shows",
-      "mq.r5.ind": "RESTAURANT · Miami, FL",
-      "mq.r5.res": "22 hrs/week recovered",
-      "mq.r6.ind": "CONSTRUCTION · Panama City, PA",
-      "mq.r6.res": "100% automated inventory",
-      "mq.r7.ind": "RETAIL · Caguas, PR",
-      "mq.r7.res": "3.2x faster restock cycles",
-      "mq.r8.ind": "AGRO-EXPORT · Matagalpa, NI",
-      "mq.r8.res": "$2,100/month recovered",
-      "mq.r9.ind": "SCHOOL · San Salvador, SV",
-      "mq.r9.res": "40% fewer admin hours",
+      // ---- HOMEPAGE: CAPABILITY TICKER ----
+      "tk.label": "Where it applies",
+      "tk.c1.meta": "Ferretería",
+      "tk.c1.body": "Quotes and proformas without leaving the counter",
+      "tk.c2.meta": "Clinic",
+      "tk.c2.body": "Scheduling and reminders that cut no-shows",
+      "tk.c3.meta": "Restaurant",
+      "tk.c3.body": "Orders and reservations handled around the clock",
+      "tk.c4.meta": "Retail",
+      "tk.c4.body": "Inventory and restock without manual counts",
+      "tk.c5.meta": "Agro-export",
+      "tk.c5.body": "Lot traceability, audit-ready",
+      "tk.c6.meta": "Construction",
+      "tk.c6.body": "Estimates built from a live catalog",
 
       // ---- HOMEPAGE: HERO CTA ----
       "hero.cta.note": "Free. No commitment. No sales calls.",
-      "hero.cta.secondary": "See a sample report \u2192",
+      "hero.cta.secondary": "See a sample report",
 
       // ---- HOMEPAGE: INDUSTRY TABS ----
       "ind.tag": "// For your industry",

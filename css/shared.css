@@ -76,7 +76,8 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:18px 4
 /* Nav CTA button */
 .nav-cta{padding:10px 24px!important;background:var(--accent)!important;color:var(--bg)!important;font-family:var(--ff)!important;font-size:14px!important;font-weight:600!important;border:none!important;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;transition:filter .2s!important}
 .nav-cta:hover{filter:brightness(1.1)!important}
-.btn-nav{padding:10px 24px;font-size:14px;letter-spacing:.3px}
+/* .btn-nav sizing lives after the button block below — it must override
+   whichever button class it is composed with. */
 
 /* Language Toggle */
 .lang-toggle{display:flex;align-items:center;gap:0;border:1px solid var(--border);overflow:hidden;margin-left:8px}
@@ -104,6 +105,9 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:18px 4
 .btn-primary:disabled{opacity:.3;cursor:not-allowed;filter:none}
 .btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border:1px solid var(--line);color:var(--ink);font-family:var(--ff);font-weight:500;font-size:16px;background:transparent;cursor:pointer;transition:all .2s;text-decoration:none;min-height:48px}
 .btn-ghost:hover{background:var(--red-wash);border-color:var(--ink)}
+/* Nav CTA sizing — declared after .btn-primary/.btn-ghost so it wins on equal
+   specificity and the nav button is the same height on every page. */
+.btn-nav{padding:10px 24px;font-size:14px;letter-spacing:.3px}
 
 /* ---- SECTION TAGS ---- */
 .sec-tag{font-family:var(--fm);font-size:14px;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;font-weight:500}
@@ -337,7 +341,7 @@ footer{border-top:1px solid var(--border);padding:80px 40px}
 
 /* ============================================================
    IGNEA LABS — Growth UI Additions
-   Stats row, marquee, industry tabs, thesis quote,
+   Stats row, capability ticker, industry tabs, thesis quote,
    WhatsApp float, demo banner, Calendly section
    ============================================================ */
 
@@ -362,15 +366,85 @@ footer{border-top:1px solid var(--border);padding:80px 40px}
 /* ---- HERO CTA NOTE ---- */
 .hero-cta-note{font-size:13px;color:var(--dimgray);margin-top:12px;font-family:var(--fm);letter-spacing:0.5px}
 
-/* ---- MARQUEE ---- */
-.sec-marquee{padding:48px 0;overflow:hidden}
-.marquee-track{overflow:hidden;mask-image:linear-gradient(to right,transparent,black 10%,black 90%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,black 10%,black 90%,transparent)}
-.marquee-inner{display:flex;gap:16px;width:max-content;animation:marqueeScroll 28s linear infinite}
-.marquee-inner:hover{animation-play-state:paused}
-@keyframes marqueeScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.marquee-card{display:flex;flex-direction:column;gap:4px;background:var(--bg2);border:1px solid var(--border);padding:16px 24px;white-space:nowrap;min-width:220px}
-.mq-industry{font-family:var(--fm);font-size:13px;color:var(--dimgray);text-transform:uppercase;letter-spacing:0.08em}
-.mq-result{font-size:16px;font-weight:600;color:var(--white)}
+/* ---- HERO CTA GROUP ----
+   One filled element. Everything else is a weighted text link.
+   Baseline-aligned so the eye reads primary -> secondary -> tertiary. */
+.cta{display:flex;align-items:baseline;gap:28px;flex-wrap:wrap}
+
+.cta__primary{
+  font-family:var(--ff);font-size:16px;font-weight:600;letter-spacing:-.01em;
+  color:#fff;background:var(--red);border:0;border-radius:8px;
+  padding:16px 32px;cursor:pointer;text-decoration:none;
+  display:inline-flex;align-items:center;gap:10px;
+  box-shadow:var(--shadow-1);
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.cta__primary:hover{transform:translateY(-1px);box-shadow:var(--shadow-2);background:#D92F24}
+.cta__primary:active{transform:translateY(0);box-shadow:var(--shadow-1)}
+.cta__primary svg{transition:transform .18s ease}
+.cta__primary:hover svg{transform:translateX(3px)}
+
+.cta__link{
+  font-family:var(--ff);font-size:15px;font-weight:500;color:var(--ink);
+  text-decoration:none;background:none;border:0;padding:4px 0;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;position:relative;
+  transition:color .18s ease;
+}
+.cta__link:after{
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
+  background:var(--line);transition:background .18s ease;
+}
+/* invisible hit-area extension: 44px+ tap target without moving the underline */
+.cta__link:before{content:"";position:absolute;inset:-10px 0;}
+.cta__link:hover{color:var(--ink)}
+.cta__link:hover:after{background:var(--red)}
+.cta__link svg{transition:transform .18s ease}
+.cta__link:hover svg{transform:translateX(3px)}
+
+.cta__link--muted{font-size:14px;color:var(--ink-2)}
+.cta__link--muted:hover{color:var(--ink)}
+
+.cta__primary:focus-visible,.cta__link:focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:3px}
+
+/* ---- CAPABILITY TICKER ----
+   Cards, not table cells. No borders — tint + one soft shadow.
+   Row bleeds off the right edge to imply continuation.
+   Container math tracks .hero (max-width 960, 40px gutter / 20px on mobile). */
+.ticker{margin-top:76px;position:relative;overflow:hidden;padding-bottom:8px}
+.ticker__label{font-family:var(--fm);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin:0 auto 16px;padding-left:40px;max-width:960px}
+/* No scroll-snap: proximity snapping fires on load, jumps past the leading
+   spacer, and flushes card 1 to the viewport edge — which defeats the spacer's
+   only job (aligning the rail's first card with the hero). Free scroll instead. */
+.ticker__rail{display:flex;gap:16px;padding:4px 40px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.ticker__rail::-webkit-scrollbar{display:none}
+/* Leading spacer aligns card 1 with the hero's text edge. The negative margin
+   cancels the flex gap the spacer would otherwise add on top of the offset. */
+.ticker__rail:before{content:"";flex:0 0 max(0px,calc((100vw - 960px)/2));margin-right:-16px}
+
+.tcard{
+  flex:0 0 auto;min-width:252px;max-width:300px;
+  background:var(--bg-tint);border:0;border-radius:10px;
+  padding:20px 24px;box-shadow:var(--shadow-1);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.tcard:hover{transform:translateY(-1px);box-shadow:var(--shadow-2)}
+.tcard__meta{font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:7px;margin-bottom:11px}
+.tcard__meta i{width:4px;height:4px;border-radius:50%;background:var(--red);flex:none;font-style:normal}
+.tcard__body{font-size:17px;font-weight:500;line-height:1.38;color:var(--ink);letter-spacing:-.005em}
+.ticker__fade{position:absolute;top:0;right:0;bottom:0;width:80px;background:linear-gradient(to right,transparent,var(--bg));pointer-events:none}
+
+@media(max-width:768px){
+  .cta{gap:20px}
+  .cta__primary{width:100%;justify-content:center}
+  .ticker__rail{padding-left:20px;padding-right:20px}
+  .ticker__label{padding-left:20px}
+  .ticker__rail:before{display:none}
+  .tcard{min-width:228px}
+}
+@media(prefers-reduced-motion:reduce){
+  .cta__primary,.cta__link,.tcard,.cta__primary svg,.cta__link svg{transition:none}
+  .cta__primary:hover,.tcard:hover{transform:none}
+}
 
 /* ---- INDUSTRY TABS ---- */
 .sec-industry{padding:80px 0}

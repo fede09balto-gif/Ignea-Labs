@@ -50,15 +50,8 @@
 @media(max-width:640px){.we-you-block{grid-template-columns:1fr;gap:2rem}.we-col{border-right:none;border-bottom:1px solid var(--border);padding-right:0;padding-bottom:1.5rem}.you-col{padding-left:0}}
 
 .hero-divider{width:100%;height:1px;background:var(--border);margin:3rem 0;opacity:0;animation:fadeUp .6s ease forwards .7s}
-.cta-row{display:flex;gap:1rem;flex-wrap:wrap;justify-content:flex-start;opacity:0;animation:fadeUp .7s ease forwards .85s;width:100%}
-
-/* New CTA button styles */
-.cta-primary{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.4rem;background:var(--accent);color:var(--bg);font-family:var(--ff);font-size:1rem;font-weight:500;cursor:pointer;text-decoration:none;transition:opacity .2s,transform .15s;min-height:48px;border:none}
-.cta-primary:hover{opacity:.88;transform:translateY(-1px)}
-.cta-secondary{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.4rem;background:transparent;color:var(--gray);font-family:var(--ff);font-size:1rem;font-weight:400;border:1px solid var(--border);cursor:pointer;text-decoration:none;transition:border-color .2s,background .2s,color .2s;min-height:48px}
-.cta-secondary:hover{border-color:var(--ink);background:var(--bg2);color:var(--white)}
-.cta-secondary .arrow{transition:transform .2s;display:inline-block}
-.cta-secondary:hover .arrow{transform:translateX(2px)}
+/* .cta group styles live in shared.css; only the hero's entrance timing is local */
+.cta{opacity:0;animation:fadeUp .7s ease forwards .85s;width:100%}
 
 @keyframes fadeUp{0%{opacity:0;transform:translateY(18px)}100%{opacity:1;transform:translateY(0)}}
 
@@ -106,8 +99,7 @@ footer{border-top:1px solid var(--border)}
 .footer-contact a:hover{color:var(--accent)}
 .footer-bottom{padding:20px 0;border-top:1px solid var(--border);font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px}
 
-/* ---- NAV: btn-nav ---- */
-.btn-nav{padding:10px 24px!important;font-size:14px!important}
+/* ---- NAV: btn-nav sizing now lives in shared.css (single source of truth) ---- */
 
 
 /* ---- ABOUT ---- */
@@ -181,7 +173,6 @@ footer{border-top:1px solid var(--border)}
 }
 @media(max-width:480px){
   .hero h1{font-size:28px}
-  .cta-row{flex-direction:column;width:100%;max-width:320px}
   .stats-row{grid-template-columns:1fr 1fr}
   .whatwedo-text p:first-child{font-size:16px}
   .calc-result-value{font-size:32px}
@@ -213,7 +204,7 @@ footer{border-top:1px solid var(--border)}
       <li><a href="diagnostic" data-i18n="nav.start">Empieza Aquí</a></li>
       <li><a href="contact" data-i18n="nav.contact">Contacto</a></li>
     </ul>
-    <a href="diagnostic" class="btn-primary btn-nav" data-i18n-html="nav.cta">Agenda tu Llamada &rarr;</a>
+    <a href="diagnostic" class="btn-ghost btn-nav" data-i18n-html="nav.cta">Agenda tu Llamada &rarr;</a>
     <button class="hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -246,39 +237,54 @@ footer{border-top:1px solid var(--border)}
 
   <div class="hero-divider"></div>
 
-  <div class="cta-row">
-    <a href="diagnostic" class="cta-primary" data-i18n-btn="hero.cta1">Agenda tu Llamada Gratis &rarr;</a>
-    <a href="demo" class="cta-secondary"><span data-i18n="hero.cta.secondary">Ver reporte de muestra →</span></a>
-    <a href="thesis" class="cta-secondary"><span data-i18n="hero.cta2">Leer Nuestra Tesis</span><span class="arrow">&nbsp;&rarr;</span></a>
+  <div class="cta">
+    <a class="cta__primary" href="diagnostic">
+      <span data-i18n="hero.cta1">Agenda tu llamada gratis</span>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none" aria-hidden="true"><path d="M9 1l4.5 4.5L9 10M13 5.5H1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a class="cta__link" href="demo">
+      <span data-i18n="hero.cta.secondary">Ver reporte de muestra</span>
+      <svg width="13" height="10" viewBox="0 0 15 11" fill="none" aria-hidden="true"><path d="M9 1l4.5 4.5L9 10M13 5.5H1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a class="cta__link cta__link--muted" href="thesis">
+      <span data-i18n="hero.cta2">Leer nuestra tesis</span>
+      <svg width="12" height="9" viewBox="0 0 15 11" fill="none" aria-hidden="true"><path d="M9 1l4.5 4.5L9 10M13 5.5H1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
   </div>
 </header>
 
 <!-- STATS -->
 
-<!-- MARQUEE -->
-<section class="sec-marquee">
-  <div class="marquee-track">
-    <div class="marquee-inner">
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r1.ind">HOTEL · Granada, NI</span><span class="mq-result" data-i18n="mq.r1.res">28% aumento en ocupación</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r2.ind">FIRMA LEGAL · San Juan, PR</span><span class="mq-result" data-i18n="mq.r2.res">$1,840/mes recuperados</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r3.ind">MANUFACTURA · San Pedro Sula, HN</span><span class="mq-result" data-i18n="mq.r3.res">34 hrs/semana recuperadas</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r4.ind">CLÍNICA · Latinoamérica</span><span class="mq-result" data-i18n="mq.r4.res">60% menos no-shows</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r5.ind">RESTAURANTE · Miami, FL</span><span class="mq-result" data-i18n="mq.r5.res">22 hrs/semana recuperadas</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r6.ind">CONSTRUCCIÓN · Panamá City, PA</span><span class="mq-result" data-i18n="mq.r6.res">Inventario 100% automatizado</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r7.ind">RETAIL · Caguas, PR</span><span class="mq-result" data-i18n="mq.r7.res">Ciclos de restock 3.2x más rápidos</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r8.ind">AGRO-EXPORTACIÓN · Matagalpa, NI</span><span class="mq-result" data-i18n="mq.r8.res">$2,100/mes recuperados</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r9.ind">ESCUELA · San Salvador, SV</span><span class="mq-result" data-i18n="mq.r9.res">40% menos horas administrativas</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r1.ind">HOTEL · Granada, NI</span><span class="mq-result" data-i18n="mq.r1.res">28% aumento en ocupación</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r2.ind">FIRMA LEGAL · San Juan, PR</span><span class="mq-result" data-i18n="mq.r2.res">$1,840/mes recuperados</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r3.ind">MANUFACTURA · San Pedro Sula, HN</span><span class="mq-result" data-i18n="mq.r3.res">34 hrs/semana recuperadas</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r4.ind">CLÍNICA · Latinoamérica</span><span class="mq-result" data-i18n="mq.r4.res">60% menos no-shows</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r5.ind">RESTAURANTE · Miami, FL</span><span class="mq-result" data-i18n="mq.r5.res">22 hrs/semana recuperadas</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r6.ind">CONSTRUCCIÓN · Panamá City, PA</span><span class="mq-result" data-i18n="mq.r6.res">Inventario 100% automatizado</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r7.ind">RETAIL · Caguas, PR</span><span class="mq-result" data-i18n="mq.r7.res">Ciclos de restock 3.2x más rápidos</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r8.ind">AGRO-EXPORTACIÓN · Matagalpa, NI</span><span class="mq-result" data-i18n="mq.r8.res">$2,100/mes recuperados</span></div>
-      <div class="marquee-card"><span class="mq-industry" data-i18n="mq.r9.ind">ESCUELA · San Salvador, SV</span><span class="mq-result" data-i18n="mq.r9.res">40% menos horas administrativas</span></div>
-    </div>
+<!-- CAPABILITY TICKER -->
+<section class="ticker">
+  <p class="ticker__label" data-i18n="tk.label">Dónde se aplica</p>
+  <div class="ticker__rail" id="tickerRail">
+    <article class="tcard">
+      <div class="tcard__meta"><i></i><span data-i18n="tk.c1.meta">Ferretería</span></div>
+      <div class="tcard__body" data-i18n="tk.c1.body">Cotizaciones y proformas sin salir del mostrador</div>
+    </article>
+    <article class="tcard">
+      <div class="tcard__meta"><i></i><span data-i18n="tk.c2.meta">Clínica</span></div>
+      <div class="tcard__body" data-i18n="tk.c2.body">Agenda y recordatorios que reducen los no-shows</div>
+    </article>
+    <article class="tcard">
+      <div class="tcard__meta"><i></i><span data-i18n="tk.c3.meta">Restaurante</span></div>
+      <div class="tcard__body" data-i18n="tk.c3.body">Pedidos y reservas atendidos a cualquier hora</div>
+    </article>
+    <article class="tcard">
+      <div class="tcard__meta"><i></i><span data-i18n="tk.c4.meta">Retail</span></div>
+      <div class="tcard__body" data-i18n="tk.c4.body">Inventario y restock sin conteo manual</div>
+    </article>
+    <article class="tcard">
+      <div class="tcard__meta"><i></i><span data-i18n="tk.c5.meta">Agro-exportación</span></div>
+      <div class="tcard__body" data-i18n="tk.c5.body">Trazabilidad de lotes lista para auditoría</div>
+    </article>
+    <article class="tcard">
+      <div class="tcard__meta"><i></i><span data-i18n="tk.c6.meta">Construcción</span></div>
+      <div class="tcard__body" data-i18n="tk.c6.body">Presupuestos armados desde catálogo vivo</div>
+    </article>
   </div>
+  <div class="ticker__fade"></div>
 </section>
 
 <!-- WHAT WE DO -->
@@ -614,6 +620,7 @@ window.setLang = function(lang) {
 </script>
 <script src="js/analytics.js"></script>
 <script src="js/terminal.js"></script>
+<script src="js/ticker-nudge.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   IgneaTerminal.init();

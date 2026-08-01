@@ -8,10 +8,23 @@
 - i18n: data-i18n attributes, JS translations in i18n.js (~807 keys). Spanish default. localStorage key: ignea_lang
 - Future backend: Supabase (placeholder credentials currently)
 
-# Design Tokens (from shared.css)
---bg: #0a0a0c; --accent: #e8352a; --text: rgba(245,244,242,0.95); --border: rgba(255,255,255,0.08);
+# Design Tokens (from shared.css — white editorial theme, Phase A)
+--bg: #FFFFFF; --bg-tint: #F7F7F5; --ink: #0A0A0C; --ink-2: #55555C; --ink-3: #8E8E94;
+--line: #E6E5E1; --red: #E8352A; --red-wash: rgba(232,53,42,.07);
+--code-bg: #0A0A0C; --code-ink: #F5F5F2;
+--shadow-1: 0 1px 2px rgba(10,10,12,.05); --shadow-2: 0 12px 32px rgba(10,10,12,.07);
 --ff: 'DM Sans', sans-serif; --fs: 'DM Serif Display', serif; --fm: 'JetBrains Mono', monospace;
-Logo: "IGNEA" white + ".LABS" in var(--accent). No teal. Border-radius: 0px everywhere.
+Older names (--accent, --border, --white, --gray, --bg2, --text-*) are still live as aliases in
+shared.css — prefer the canonical names above in new code, don't churn existing call sites.
+Logo: "IGNEA" in var(--ink) + ".LABS" in var(--red). No teal.
+
+## Border radius
+Radius signals "you can touch this." Sharp corners are the page; rounded corners are the controls.
+- **Interactive surfaces get radius**: buttons 8px, cards and tiles 10px, small pills/dots as needed.
+- **Everything structural stays square**: sections, dividers, rules, code blocks, tables, the
+  proforma, form field frames, image and container edges.
+If you're unsure, ask whether the element responds to a click, tap, or hover. If it doesn't, it's
+square.
 
 # Pages
 | Page | Status | Notes |
