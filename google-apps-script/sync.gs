@@ -1,4 +1,4 @@
-// Google Apps Script — Onda AI Sheets Sync
+// Google Apps Script — Ignea Labs Sheets Sync
 // Deploy as web app: Execute as Me, Access: Anyone
 // Paste the deployment URL into js/sheets-sync.js SHEETS_SYNC_URL
 
@@ -44,5 +44,5 @@ function doPost(e) {
 }
 
 function doGet(e) {
-  return ContentService.createTextOutput('Onda AI Sheets Sync is running.');
+  return ContentService.createTextOutput('Ignea Labs Sheets Sync is running.');
 }

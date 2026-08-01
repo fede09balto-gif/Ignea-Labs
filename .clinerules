@@ -7,7 +7,7 @@
 - **Styling:** Vanilla CSS with CSS custom properties. No Tailwind, no preprocessors.
 - **i18n:** Custom JS i18n system using data-i18n attributes. Spanish is PRIMARY. English is secondary. Default: ES.
 - **Deployment:** Vercel (static site)
-- **Repo:** github.com/fede09balto-gif/onda-ai
+- **Repo:** github.com/fede09balto-gif/Ignea-Labs (renamed from onda-ai)
 
 ## Design System
 ### Colors

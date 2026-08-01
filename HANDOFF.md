@@ -1,8 +1,12 @@
-# SESSION HANDOFF — Ignea Labs / onda-ai
+# SESSION HANDOFF — Ignea Labs
 
 Written at the end of a session that completed the entire previous handoff's §2 plan, then merged it to production. Everything in §1 is **live on www.ignealabs.com**; §2 is four approved-but-unbuilt work items. Read §1 and §2 before doing anything. The previous handoff's content is superseded — its plan is done.
 
 **Start next session with §2.1 (Nicaragua cost model). It is now live and wrong on production.**
+
+**Since that was written:** §2.4 (Calendly -> Google Calendar + Formspree) is DONE and live —
+see §1b. `frame-ancestors 'none'` is also live. §2.1 is now the only thing left in §2 that
+touches customer-facing numbers.
 
 ---
 
@@ -33,6 +37,31 @@ Fast-forward merge (zero conflicts), `main` = `1a4c87b`, deployed via `vercel --
 - **Full diagnostic funnel driven end to end on production**: landing → info → 4 question screens → hook screen. Submission record written, correct company/industry/hours, zero console errors, no failed requests.
 
 **Nothing behaved differently on production than in local verification.** Note that the *preview* could never be browser-verified — preview URLs sit behind Vercel's SSO wall — so all pre-merge browser testing ran against `localhost:8899` serving the same commit. The only production-only network call is `plausible.io` analytics, which is a pre-existing `<script>` tag from commit `dc493bd`, unrelated to this work.
+
+### `feat/formspree-google-calendar` — MERGED and DEPLOYED (`73310c9`), plus `ee446cf`
+
+- **Formspree live** at `f/xrenwoeo`. reCAPTCHA had to be disabled in the Formspree
+  dashboard — it returns `403 {"error":"In order to submit via AJAX..."}` while enabled.
+  Formshield ML filtering stays on. **Free tier: 50 submissions/month, 2 spent on tests.**
+  No autoresponse exists, so the on-page state is the entire receipt; success and error
+  states both carry a WhatsApp exit.
+- **Calendly fully gone from code** (0 hits across all served html/js/css/json). Booking is
+  `https://calendar.app.google/E4dfYkm8epTzdsiT7` at all five sites: contact, demo, results,
+  the diagnostic hook, and the PDF.
+- **contact.html is single-column**, 640px, both channels at equal weight. This removed the
+  last third-party embed on the site, which is what made `ee446cf` possible.
+- **`ee446cf`** adds `Content-Security-Policy: frame-ancestors 'none'` to `vercel.json`.
+  The `X-Frame-Options` removal in `ccf4c28` was a misdiagnosis — that header governs whether
+  *our* pages may be framed, not iframes we embed, and Calendly sent `ALLOWALL` anyway.
+- **wa.me prefills fixed** — 4 context-appropriate messages replacing the single
+  "completé el diagnóstico" that was claiming a completed diagnostic on the homepage float
+  and thesis. The runtime score-injecting link in `results.js` was deliberately left alone.
+- **Booking page language:** cannot be forced to Spanish. `?hl=es` returns `lang="en-US"`
+  unchanged; the page follows the organiser's Google account language. Microcopy warns before
+  the click. **Open question for Fede:** the booking window renders 7:00am-2:30pm Managua,
+  which is exactly 9:00am-5:00pm Eastern — strong evidence the availability block was authored
+  in Eastern hours. The page is pinned to Managua and does not convert for the viewer
+  (verified across three forced browser timezones). Fede is checking it in Google Calendar.
 
 ### What shipped, and the non-obvious decisions inside it
 
@@ -193,6 +222,29 @@ Verify accents encode (`completé` → `complet%C3%A9`, `más` → `m%C3%A1s`) a
 
 ## 4. KNOWN ISSUES NOT BEING FIXED RIGHT NOW
 
+- **`results.html` has never actually been browser-verified, and every sweep that claimed
+  otherwise measured the wrong page.** `js/results.js:58` redirects to `diagnostic.html`
+  whenever `sessionStorage.ignea_diagnostic_scores` / `_answers` are absent. In a browser
+  that redirect always fires, so Playwright sweeps reporting "/results console clean,
+  no overflow" were silently measuring `diagnostic.html`. Curl-based content checks of
+  `results.html` (the ROI footnote, the Calendly strings) were valid, since curl runs no JS.
+  **Only `demo.html` writes those two sessionStorage keys**, with hardcoded sample data —
+  `js/diagnostic.js`, the live funnel, never writes them. Nothing anywhere links to
+  `results.html`, and `robots.txt` disallows it. So it is reachable only by visiting
+  `demo.html` first and then typing the URL by hand. Effectively dead; `demo.html` is
+  serving the sample-report role. Do not trust any historical "results.html verified" claim.
+- **`js/grid-bg.js` still paints the Onda-era teal palette** — `rgb(0,229,191)`,
+  `rgb(0,160,140)`, `rgb(0,200,170)`, with a comment reading "Primary: teal glow (our
+  accent)". This contradicts the no-teal rule. Blast radius is tiny and measured:
+  `index.html` only references it in a stale comment and never loads it; `results.html`
+  loads it but redirects away; only auth-gated `ops.html` actually renders the canvas, where
+  1 of 2,598 sampled pixels was teal-family. **Filed deliberately, not fixed.**
+- **12 orphaned `stats.*` i18n keys.** The homepage STATS section no longer exists
+  (`<!-- STATS -->` is an empty comment; only dead `.stats-row` CSS remains) but the keys
+  and their translations are still in `js/i18n.js`. **Left deliberately**, same reasoning as
+  the `dx.*` keys — harmless, and removal risks touching live paths for no user benefit.
+
+
 - **DM Sans 600/700 are not imported.** `shared.css` imports only `wght@300;400;500`, so `.btn-primary` (600), the demo's `mark.ig-hl` (700) and the footer's `.f-brand` (800) all render **synthetic bold**. Site-wide and pre-existing. **Decision: leave it, noted deliberately.** Adding weights changes font rendering on every page.
 - `demo.html` / `results.html` third savings card renders **"2.3 meses"** with a sub-label **"meses"** underneath — duplicated unit. Pre-existing, cosmetic.
 - `contact.html` console shows Datadog / WebGL / `requestStorageAccess` noise. Verified **pre-existing** by running the unmodified page from `git HEAD` — identical 5 messages. Third-party, not ours.
@@ -203,9 +255,13 @@ Verify accents encode (`completé` → `complet%C3%A9`, `más` → `m%C3%A1s`) a
 
 ## 5. VERCEL / DEPLOYMENT REFERENCE
 
-- Correct project: **`ignea-labs-w8bp`** (org `fedebaltoinvest-7282s-projects`). Dead decoy: `ignea-labs`.
+- Correct project: **`ignea-labs-w8bp`** (org `fedebaltoinvest-7282s-projects`). Dead decoy Vercel
+  project: `ignea-labs`. **Name collision warning:** the local working directory is now also
+  called `ignea-labs` (`~/ignea-labs`). They are unrelated — the directory is fine, the Vercel
+  project of that name is the dead one. Judge by context: a path means the folder, a Vercel
+  project name means the decoy.
 - Env vars: `ANTHROPIC_API_KEY` (Prod/Preview/Dev), `IGNEA_OPS_TOKEN` (Preview/Prod), `ALLOWED_ORIGINS` (**Preview only — never set on Production**, which correctly uses the hardcoded fallback).
-- Repo: `github.com/fede09balto-gif/Ignea-Labs` (renamed from `onda-ai`; old remote URL still redirects, push/pull both work). **The working directory is still named `onda-ai`.**
+- Repo: `github.com/fede09balto-gif/Ignea-Labs` (renamed from `onda-ai`; old remote URL still redirects, push/pull both work). **The working directory was renamed to `~/ignea-labs` (was `~/onda-ai`).**
 - `vercel.json` sets `cleanUrls:true`, which **308-redirects every `.html` path**. Canonicals, `sitemap.xml`, and internal links must point at the clean form. When curling to verify, fetch `/` not `/index.html` or you'll measure the redirect instead of the page.
 
 ---
@@ -216,7 +272,7 @@ Reusable, in case the next session wants the same rigor. Playwright is not insta
 
 ```bash
 ln -sfn ~/.npm/_npx/*/node_modules "$SCRATCH/node_modules"
-cd /Users/fedebalto/onda-ai && python3 -m http.server 8899 &
+cd /Users/fedebalto/onda-ai && cd /Users/fedebalto/ignea-labs && python3 -m http.server 8899 &
 ```
 
 Checks worth repeating: console+overflow sweep at 375/768/1440 across all 7 pages; ES/EN round-trip asserting SVG/DOM survival rather than just absence of errors; baseline comparison by serving `git archive main` on a second port; Lighthouse before/after via `npx lighthouse --preset=desktop`; and for anything intermittent, **run it 3–4 times** — the Supabase failure appeared on run 3 of 3.
