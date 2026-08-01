@@ -397,6 +397,97 @@ footer{border-top:1px solid var(--border)}
   </div>
 </section>
 
+<!-- WHATSAPP ASSISTANT DEMO -->
+<section class="ig" id="demo">
+  <p class="ig__label"><span>//</span> Demo</p>
+  <h2 class="ig__title">El cliente pregunta. El asistente cotiza. Usted solo aprueba.</h2>
+  <p class="ig__intro">Un pedido real, de principio a fin: lo que escribe el cliente, lo que el asistente resuelve mientras responde, lo que aparece en el mostrador, y la proforma que sale firmada al final.</p>
+
+  <ul class="ig-tabs" role="tablist" aria-label="Escenarios">
+    <li role="presentation"><button class="ig-tab" role="tab" aria-selected="true" data-s="ferreteria">Ferretería</button></li>
+    <li role="presentation"><button class="ig-tab" role="tab" aria-selected="false" data-s="clinica">Clínica dental</button></li>
+    <li role="presentation"><button class="ig-tab" role="tab" aria-selected="false" data-s="hotel">Hotel</button></li>
+  </ul>
+
+  <div class="ig-flow">
+    <div class="ig-col">
+      <p class="ig-col__cap"><i></i>Cliente — WhatsApp</p>
+      <div class="ig-phone">
+        <div class="ig-screen">
+          <div class="ig-status">
+            <span>9:12</span>
+            <span class="ig-status__i">
+              <svg width="15" height="10" viewBox="0 0 15 10" fill="currentColor" aria-hidden="true"><rect y="6" width="2.6" height="4" rx=".6"/><rect x="4" y="4" width="2.6" height="6" rx=".6"/><rect x="8" y="2" width="2.6" height="8" rx=".6"/><rect x="12" width="2.6" height="10" rx=".6" opacity=".45"/></svg>
+              <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true"><rect x=".5" y=".5" width="16" height="9" rx="2" stroke="currentColor"/><rect x="2" y="2" width="11" height="6" rx="1" fill="currentColor"/><rect x="18" y="3.5" width="1.6" height="3" rx=".7" fill="currentColor"/></svg>
+            </span>
+          </div>
+          <header class="ig-wahead">
+            <svg width="9" height="15" viewBox="0 0 9 15" fill="none" aria-hidden="true"><path d="M7.5 1L1.5 7.5 7.5 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <div class="ig-wahead__av" id="av">FC</div>
+            <div class="ig-wahead__m"><div class="ig-wahead__n" id="nm">Ferretería La Central</div><div class="ig-wahead__s">en línea</div></div>
+            <svg width="4" height="16" viewBox="0 0 4 16" fill="currentColor" opacity=".85" aria-hidden="true"><circle cx="2" cy="2" r="1.7"/><circle cx="2" cy="8" r="1.7"/><circle cx="2" cy="14" r="1.7"/></svg>
+          </header>
+          <div class="ig-chat" id="chat" role="log" aria-live="polite" aria-label="Conversación de ejemplo"></div>
+          <div class="ig-bar">
+            <div class="ig-bar__b">Escribe un mensaje</div>
+            <div class="ig-bar__s"><svg width="15" height="15" viewBox="0 0 16 16" fill="#fff" aria-hidden="true"><path d="M1 15l14-7L1 1l3 6 7 1-7 1-3 6z"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ig-col ig-col--rail">
+      <p class="ig-col__cap"><i></i>Asistente — proceso</p>
+      <div class="ig-rail">
+        <div class="ig-rail__hd"><span>En ejecución</span><span class="ig-rail__pulse" id="pulse"></span></div>
+        <ul class="ig-steps" id="steps"></ul>
+      </div>
+    </div>
+
+    <div class="ig-col">
+      <p class="ig-col__cap"><i></i>Mostrador — panel Ignea</p>
+      <div class="ig-phone">
+        <div class="ig-screen">
+          <div class="ig-status ig-status--ops"><span>9:12</span><span class="ig-status__i">
+            <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true"><rect x=".5" y=".5" width="16" height="9" rx="2" stroke="currentColor"/><rect x="2" y="2" width="11" height="6" rx="1" fill="currentColor"/><rect x="18" y="3.5" width="1.6" height="3" rx=".7" fill="currentColor"/></svg>
+          </span></div>
+          <header class="ig-ophead">
+            <span class="ig-ophead__d"></span>
+            <span class="ig-ophead__n">Pedidos</span>
+            <span class="ig-ophead__s" id="opcount">0 nuevos</span>
+          </header>
+          <div class="ig-ops" id="ops" role="log" aria-live="polite" aria-label="Panel del mostrador"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ig-pfwrap">
+    <p class="ig-pf__cap"><i></i>Documento generado</p>
+    <div id="pf"></div>
+  </div>
+
+  <div class="ig-chips">
+    <span class="ig-chip"><b>—</b> Responde en segundos</span>
+    <span class="ig-chip"><b>—</b> Atiende 24/7, incluso domingos</span>
+    <span class="ig-chip"><b>—</b> Proforma en el formato del negocio</span>
+    <span class="ig-chip"><b>—</b> Pasa a una persona cuando hace falta</span>
+  </div>
+
+  <div class="ig-act">
+    <button class="ig-replay" id="replay" type="button">Repetir demo</button>
+    <span class="ig-note">Demostración — datos de ejemplo</span>
+  </div>
+
+  <div class="ig-cta">
+    <a href="diagnostic" class="btn-primary">
+      Quiero uno para mi negocio
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none" aria-hidden="true"><path d="M9 1l4.5 4.5L9 10M13 5.5H1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <span class="ig-cta__note">Diagnóstico gratuito &middot; 4 preguntas</span>
+  </div>
+</section>
+
 <!-- CALCULATOR -->
 <section class="sec-calculator fade-up">
   <div class="content-wrap" style="text-align:center">
@@ -613,6 +704,7 @@ window.setLang = function(lang) {
 <script src="js/analytics.js"></script>
 <script src="js/terminal.js"></script>
 <script src="js/ticker-nudge.js"></script>
+<script src="js/wa-demo.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   IgneaTerminal.init();

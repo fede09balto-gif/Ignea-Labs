@@ -12,6 +12,22 @@ var IgneaSupabase = (function() {
   var EDGE_FN_URL = PROJECT_URL + '/functions/v1';
   // -----------------------------------------------
 
+  /* Until the placeholders above are replaced with real values, every request
+     resolves to a hostname that does not exist — which surfaces as a failed
+     request in the console of any visitor who opens devtools, on five pages.
+     Detect that state and skip the network call entirely.
+
+     The client object itself must still exist: callers guard on
+     `IgneaSupabase.client` (and diagnostic.js dereferences .client after only
+     checking that IgneaSupabase is defined), so removing it would throw.
+     Queries instead resolve to the same {data, error} shape a failed request
+     produced, so every existing caller behaves exactly as it did before —
+     minus the doomed fetch. */
+  function isConfigured() {
+    return PROJECT_URL.indexOf('YOUR_PROJECT_ID') === -1 &&
+           KEY.indexOf('YOUR_ANON_KEY') === -1;
+  }
+
   var headers = {
     'apikey': KEY,
     'Authorization': 'Bearer ' + KEY,
@@ -111,6 +127,14 @@ var IgneaSupabase = (function() {
   };
 
   QueryBuilder.prototype._execute = function(method) {
+    if (!isConfigured()) {
+      return Promise.resolve({
+        data: null,
+        error: { message: 'Supabase is not configured' },
+        status: 0
+      });
+    }
+
     var url = URL + '/' + this._table + '?select=' + encodeURIComponent(this._select);
 
     for (var i = 0; i < this._filters.length; i++) {
