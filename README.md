@@ -73,7 +73,7 @@ supabase/           Schema, seeds, Edge Functions
 | `diagnostic_completed` | Submit final question |
 | `results_viewed` | Results page loaded |
 | `results_pdf_downloaded` | PDF button clicked |
-| `results_cta_calendly` | Calendly CTA clicked |
+| `results_cta_booking` | Booking-link CTA clicked (Google Calendar) |
 | `results_cta_whatsapp` | WhatsApp CTA clicked |
 | `calculator_used` | Homepage calculator used |
 | `language_toggled` | Language switched |

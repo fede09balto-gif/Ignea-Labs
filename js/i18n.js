@@ -55,6 +55,7 @@ var IgneaI18n = (function() {
       "ig.replay": "Repetir demo",
       "ig.note": "Demostración — datos de ejemplo",
       "ig.cta": "Quiero uno para mi negocio",
+      "ig.cta.wa": "Preguntar por WhatsApp",
       "ig.cta.note": "Diagnóstico gratuito · 4 preguntas",
 
       // ---- HOMEPAGE: CAPABILITY TICKER ----
@@ -111,9 +112,9 @@ var IgneaI18n = (function() {
       "mq.line2": "Construimos infraestructura.",
       "mq.link": "Leer Nuestra Tesis \u2192",
 
-      // ---- CONTACT: CALENDLY ----
+      // ---- CONTACT: BOOKING + WHATSAPP ----
       "ct.cal.title": "Habla con nosotros directamente",
-      "ct.cal.sub": "Elige un horario y hablamos — sin formularios, sin esperas.",
+      "ct.cal.sub": "Escríbenos por WhatsApp o reserva un horario — lo que te sea más cómodo.",
       "ct.duration": "30 min",
       "ct.conferencing": "Videoconferencia — detalles al confirmar",
       "ct.formTitle": "Envíanos un mensaje",
@@ -669,7 +670,8 @@ var IgneaI18n = (function() {
       "res.savings.breakevenUnit": "meses",
       "res.cta2.headline": "¿Listo para activar estos ahorros?",
       "res.cta2.sub": "Agenda tu llamada estratégica. 15 minutos para mostrarte el plan de implementación exacto para tu negocio.",
-      "res.cta.calendly": "Agenda tu Llamada Estratégica &rarr;",
+      "res.cta.book": "Reservar un horario",
+      "res.cta.bookNote": "La página de reservas abre en inglés · 30 min · videollamada",
       "res.cta.whatsapp": "Contactar por WhatsApp",
 
       // ---- RESULTS: GENERIC SOLUTIONS ----
@@ -787,10 +789,14 @@ var IgneaI18n = (function() {
       "ct.msgPh": "Cuéntanos sobre tu negocio y qué desafíos enfrentas...",
       "ct.submit": "Enviar Mensaje &rarr;",
       "ct.successTitle": "Mensaje enviado.",
-      "ct.successSub": "Te contactaremos dentro de 24 horas.",
+      "ct.successSub": "Lo recibimos. Te respondemos dentro de 24 horas hábiles al correo que nos diste.",
+      "ct.successNote": "No vas a recibir un correo de confirmación automático. Si necesitas respuesta ahora, escríbenos por WhatsApp.",
+      "ct.ch.whatsapp": "Escríbenos por WhatsApp",
+      "ct.ch.book": "Reservar un horario",
+      "ct.bookingNote": "La página de reservas abre en inglés",
       "ct.sending": "Enviando...",
       "ct.errorTitle": "Error al enviar.",
-      "ct.errorSub": "Intenta de nuevo.",
+      "ct.errorSub": "No pudimos enviar tu mensaje. Escríbenos por WhatsApp o al correo de abajo.",
 
       // ---- FOOTER ----
       "footer.tag": "Bajo la superficie, el potencial.",
@@ -1285,6 +1291,7 @@ var IgneaI18n = (function() {
       "ig.replay": "Replay demo",
       "ig.note": "Demonstration — sample data",
       "ig.cta": "I want one for my business",
+      "ig.cta.wa": "Ask on WhatsApp",
       "ig.cta.note": "Free diagnostic · 4 questions",
 
       // ---- HOMEPAGE: CAPABILITY TICKER ----
@@ -1341,9 +1348,9 @@ var IgneaI18n = (function() {
       "mq.line2": "We build infrastructure.",
       "mq.link": "Read Our Thesis \u2192",
 
-      // ---- CONTACT: CALENDLY ----
+      // ---- CONTACT: BOOKING + WHATSAPP ----
       "ct.cal.title": "Talk to us directly",
-      "ct.cal.sub": "Pick a time and let's talk — no forms, no waiting.",
+      "ct.cal.sub": "Message us on WhatsApp or book a time — whichever suits you.",
       "ct.duration": "30 min",
       "ct.conferencing": "Video call — details provided upon confirmation",
       "ct.formTitle": "Send us a message",
@@ -1821,7 +1828,8 @@ var IgneaI18n = (function() {
       "res.savings.breakevenUnit": "months",
       "res.cta2.headline": "Ready to activate these savings?",
       "res.cta2.sub": "Book your strategy call. 15 minutes to show you the exact implementation plan for your business.",
-      "res.cta.calendly": "Book Your Strategy Call &rarr;",
+      "res.cta.book": "Book a time slot",
+      "res.cta.bookNote": "Booking page · 30 min · video call",
       "res.cta.whatsapp": "Contact via WhatsApp",
 
       // ---- RESULTS: GENERIC SOLUTIONS ----
@@ -1939,10 +1947,14 @@ var IgneaI18n = (function() {
       "ct.msgPh": "Tell us about your business and what challenges you face...",
       "ct.submit": "Send Message &rarr;",
       "ct.successTitle": "Message sent.",
-      "ct.successSub": "We'll contact you within 24 hours.",
+      "ct.successSub": "We got it. We'll reply within 24 business hours to the address you gave us.",
+      "ct.successNote": "You won't get an automatic confirmation email. If you need an answer now, message us on WhatsApp.",
+      "ct.ch.whatsapp": "Message us on WhatsApp",
+      "ct.ch.book": "Book a time slot",
+      "ct.bookingNote": "The booking page opens in English",
       "ct.sending": "Sending...",
       "ct.errorTitle": "Failed to send.",
-      "ct.errorSub": "Please try again.",
+      "ct.errorSub": "We couldn't send your message. Message us on WhatsApp or use the email below.",
 
       // ---- FOOTER ----
       "footer.tag": "Beneath the surface, the potential.",

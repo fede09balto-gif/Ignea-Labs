@@ -355,7 +355,7 @@ footer{border-top:1px solid var(--border);padding:80px 40px}
 /* ============================================================
    IGNEA LABS — Growth UI Additions
    Stats row, capability ticker, industry tabs, thesis quote,
-   WhatsApp float, demo banner, Calendly section
+   WhatsApp float, demo banner, booking section
    ============================================================ */
 
 /* ---- STATS ROW ---- */
@@ -496,8 +496,7 @@ footer{border-top:1px solid var(--border);padding:80px 40px}
 .demo-banner{background:var(--accent);color:var(--bg);text-align:center;padding:12px 24px;font-size:14px;font-weight:600;position:sticky;top:0;z-index:1001}
 .demo-banner a{color:var(--bg);text-decoration:underline}
 
-/* ---- CALENDLY SECTION ---- */
-.calendly-section{margin-bottom:48px}
+/* ---- BOOKING SECTION ---- */
 .contact-divider{text-align:center;color:var(--dimgray);font-family:var(--fm);font-size:13px;letter-spacing:1px;margin:0 0 40px}
 
 
@@ -676,3 +675,10 @@ mark.ig-hl.on{background:var(--red-wash);box-shadow:inset 0 -2px 0 var(--red)}
    English reader gets one line explaining why. Hidden in ES, where it is moot. */
 .ig__esnote{display:none}
 html[lang="en"] .ig__esnote{display:block;font-family:var(--fm);font-size:10.5px;letter-spacing:.06em;color:var(--ink-3);margin:-22px 0 34px;max-width:58ch;line-height:1.7}
+.ig-cta__wa{min-height:48px}
+@media(max-width:560px){.ig-cta__wa{width:100%;justify-content:center}}
+
+/* Diagnostic hook screen — WhatsApp primary, booking secondary */
+.hook-cta-alt{margin-top:12px}
+.hook-booking-note{font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dimgray);margin-top:12px}
+.cta-booking-note{font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dimgray);margin-top:14px}

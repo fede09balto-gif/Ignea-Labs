@@ -467,7 +467,7 @@
   function setupCTA() {
     var score = scoreData.total || 0;
     var waLink = document.getElementById('ctaWhatsApp');
-    var calLink = document.getElementById('ctaCalendly');
+    var bookLink = document.getElementById('ctaBooking');
     if (waLink) {
       var msg = encodeURIComponent(
         lang() === 'es'
@@ -481,9 +481,9 @@
         if (typeof IgneaAnalytics !== 'undefined') IgneaAnalytics.track('results_cta_whatsapp');
       });
     }
-    if (calLink) {
-      calLink.addEventListener('click', function() {
-        if (typeof IgneaAnalytics !== 'undefined') IgneaAnalytics.track('results_cta_calendly');
+    if (bookLink) {
+      bookLink.addEventListener('click', function() {
+        if (typeof IgneaAnalytics !== 'undefined') IgneaAnalytics.track('results_cta_booking');
       });
     }
   }
@@ -854,9 +854,16 @@
     doc.setFontSize(11);
     doc.setTextColor(232, 53, 42);
     doc.text(isES ? 'Agenda tu llamada:' : 'Book your call:', M, y);
+    y += 6;
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(26, 26, 26);
-    doc.text('calendly.com/ignealabs/30min', M + 45, y);
+    // Own line: the booking URL is a 37-char opaque token and reads badly
+    // trailing a label. Shrink only if it would overrun the right margin.
+    var bookUrl = 'calendar.app.google/E4dfYkm8epTzdsiT7';
+    var avail = doc.internal.pageSize.getWidth() - M * 2;
+    if (doc.getTextWidth(bookUrl) > avail) doc.setFontSize(9);
+    doc.text(bookUrl, M, y);
+    doc.setFontSize(11);
     y += 8;
     doc.setTextColor(107, 107, 107);
     doc.text('ignealabs@outlook.com', M, y);

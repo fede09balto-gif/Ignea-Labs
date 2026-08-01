@@ -347,8 +347,17 @@
       ? 'Tu equipo pierde aproximadamente <strong>' + hoursLost + ' horas/semana</strong> en trabajo manual.'
       : 'Your team loses approximately <strong>' + hoursLost + ' hours/week</strong> on manual work.';
     var lockText = lang === 'es' ? 'Desbloquear en tu llamada' : 'Unlock in your call';
-    var ctaText = lang === 'es' ? 'Agendar mi llamada estratégica →' : 'Book my strategy call →';
     var ctaNote = lang === 'es' ? '15 minutos. Sin compromiso.' : '15 minutes. No commitment.';
+    // WhatsApp primary, booking secondary — the ferreteria audience messages,
+    // it does not open a scheduling page. Booking stays for larger prospects.
+    var waText   = lang === 'es' ? 'Escríbenos por WhatsApp' : 'Message us on WhatsApp';
+    var waMsg    = lang === 'es'
+      ? 'Hola, completé el diagnóstico en ignealabs.com y me gustaría agendar una llamada.'
+      : 'Hi, I completed the diagnostic on ignealabs.com and would like to book a call.';
+    var bookText = lang === 'es' ? 'Reservar un horario' : 'Book a time slot';
+    var bookNote = lang === 'es'
+      ? 'La página de reservas abre en inglés · 30 min · videollamada'
+      : 'Booking page · 30 min · video call';
 
     var lockSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"><rect x="3" y="11" width="18" height="11"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 
@@ -370,7 +379,9 @@
         '<p class="hook-sub">' + subTemplate + '</p>' +
         '<p class="hook-hours">' + hoursText + '</p>' +
         '<div class="hook-cards">' + cardsHtml + '</div>' +
-        '<a href="https://calendly.com/ignealabs/30min" target="_blank" rel="noopener" class="btn-primary hook-cta">' + ctaText + '</a>' +
+        '<a href="https://wa.me/50589423985?text=' + encodeURIComponent(waMsg) + '" target="_blank" rel="noopener" class="btn-primary hook-cta">' + waText + '</a>' +
+        '<a href="https://calendar.app.google/E4dfYkm8epTzdsiT7" target="_blank" rel="noopener" class="btn-ghost hook-cta-alt">' + bookText + '</a>' +
+        '<p class="hook-booking-note">' + bookNote + '</p>' +
         '<p class="hook-note">' + ctaNote + '</p>' +
       '</div>';
 
