@@ -1,19 +1,46 @@
 {
   "redirects": [
-    { "source": "/manifesto", "destination": "/thesis", "statusCode": 301 },
-    { "source": "/manifesto.html", "destination": "/thesis.html", "statusCode": 301 }
+    {
+      "source": "/manifesto",
+      "destination": "/thesis",
+      "statusCode": 301
+    },
+    {
+      "source": "/manifesto.html",
+      "destination": "/thesis.html",
+      "statusCode": 301
+    }
   ],
   "rewrites": [
-    { "source": "/ops", "destination": "/ops.html" },
-    { "source": "/demo", "destination": "/demo.html" },
-    { "source": "/(.*)", "destination": "/404.html" }
+    {
+      "source": "/ops",
+      "destination": "/ops.html"
+    },
+    {
+      "source": "/demo",
+      "destination": "/demo.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/404.html"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors 'none'"
+        }
       ]
     }
   ],
