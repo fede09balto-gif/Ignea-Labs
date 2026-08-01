@@ -1,101 +1,204 @@
 # SESSION HANDOFF — Ignea Labs / onda-ai
 
-Written at the end of a long session, stopped deliberately at low context. Read this before doing anything else. Previous handoff (API lockdown discovery) is fully resolved and archived below in §6; everything above it is current state and the actual plan to execute next.
+Written at the end of a session that completed the entire previous handoff's §2 plan. Everything below §1 is shipped and verified on a branch; §2 is four approved-but-unbuilt work items. Read §1 and §2 before doing anything. The previous handoff's content is superseded — its plan is done.
 
 ---
 
-## 1. WHERE THINGS STAND ON `main` (all live on www.ignealabs.com)
+## 1. WHERE THINGS STAND
 
-In order, all merged and production-verified this session:
+### Branch `feat/hero-cta-ticker-nav-ghost` — NOT MERGED, awaiting visual approval
 
-1. **`fix/api-lockdown`** — merged, live. Open relay closed (verified: spoofed-origin POST now returns 401, was 200). Real ops-auth gate. `ALLOWED_ORIGINS` env var Preview-only; Production correctly uses the hardcoded fallback (never set it for Production).
-2. **`fix/seo-and-deadcode`** (Sprint 02B) — merged, live. Canonicals + `robots.txt`/`sitemap.xml` + absolute `og:image` + dead stat-counter removal + Formspree visible-failure (verified, no code change needed) + voice failure states (no-speech, unsupported-browser) + WhatsApp number swapped to `+505 8942 3985` + `IGNEA_DIAGNOSTIC_SPEC_v3.md` reconstructed. **Correction made mid-sprint and also live**: `vercel.json`'s `cleanUrls:true` 308-redirects every `.html` path — canonicals, `sitemap.xml`, and every internal nav/footer link were still pointing at the pre-redirect `.html` form even after the apex→www fix. Fixed everywhere, re-verified live (every page now resolves in the expected single hop, canonical matches landed URL exactly).
-3. **`revamp/light-theme`** (Phase A) — merged, live. White editorial theme. Rebased cleanly onto the above two before merging (zero conflicts, verified with `git merge-tree` both times). `www.ignealabs.com` confirmed white, console-clean, real E2E diagnostic submission driven against production post-merge with zero errors.
-4. **Group 3 client-claims deletion** — merged, live, commit `74d751c`, pushed directly to `main` today per explicit instruction, **not independently re-verified against the live deploy** (context ran out) — see §3 for exactly what to check first in the next session.
+Four commits, all verified, none on production:
 
-**Two source files copied into repo root, not yet committed, not yet ported:**
-- `ignea-hero-cta-redesign.html` (from `~/Downloads`; a `ignea-hero-cta-redesign (1).html` also exists there — **not diffed against the copy in the repo, don't assume they match**, check before trusting either)
-- `ignea-wa-demo-v2.html` (from `~/Downloads`)
+| Commit | What |
+|---|---|
+| `0f87109` | Hero CTA group + capability ticker + ghost nav CTA |
+| `a2c27a1` | Industry-tab "ROI típico" column removed (Group 2) |
+| `7090c49` | WhatsApp assistant demo on homepage (Phase B) + Supabase guard |
+| `411e5ae` | Demo pacing tightened, ROI footnote rewritten, demo chrome i18n'd |
 
-Both are read in full already (this session's context, now gone — re-read them fresh next session, don't trust memory of their contents).
+**Production is untouched and was re-verified after every push** — `www.ignealabs.com` is byte-identical to `main`. Re-verify before assuming: `curl -sL https://www.ignealabs.com/ | grep -c 'id="demo"'` must be 0.
 
----
+Last preview: `https://ignea-labs-w8bp-rkf20h5vf-fedebaltoinvest-7282s-projects.vercel.app` (built at `7090c49`; `411e5ae` is committed but **not yet deployed** — deploy before asking for visual review).
 
-## 2. WHAT'S APPROVED AND WAITING — DO THIS NEXT SESSION, IN THIS ORDER
+### What shipped, and the non-obvious decisions inside it
 
-### Step 0 — verify Group 3 landed clean
-Before anything else: confirm production deployed commit `74d751c`, curl `www.ignealabs.com` and grep the served `js/i18n.js` for `proof.` (must be zero hits), console-clean check on the homepage. This is the one piece of work this session pushed to `main` without a post-deploy check.
+**Hero CTA + ticker.** Ported from `ignea-hero-cta-redesign.html` (now deleted). Two deliberate deviations from the reference:
 
-### Step 1 — hero CTA + ticker redesign (small, approved, do first)
-Port `ignea-hero-cta-redesign.html` **exactly as it renders**. Specifics the user gave explicitly:
-- Hero CTA: one filled red primary + two weighted text links, baseline-aligned, 28px gap. Primary is the *only* filled element in the hero.
-- Ticker cards: no borders, `--bg-tint` background, 10px radius, `--shadow-1`, 20px/24px padding, 16px gap. Rail scrolls horizontally, bleeds off the right edge under the fade gradient — deliberate, keep it.
-- Mobile: primary goes full-width, rail padding tightens, cards to 228px min-width.
-- `prefers-reduced-motion`: kill the hover transforms.
-- Extract CSS into `css/shared.css` using **existing** tokens only — no new CSS variables, do not copy the file's own `:root` block (it duplicates what's already in `shared.css`).
-- Skip the comparison scaffolding at the bottom of the source file (`.demo-note`, `.demo-sep`, `.old`) — reference only, not to be ported.
-- Port the new ticker copy (industry-capability descriptions, not client results) — this is Group 1 below, same change.
-- **Verify**: 375/768/1440 — no page-level horizontal overflow (ticker's internal scroll is fine and expected, page itself must not scroll), visible focus states on all three CTAs, console clean.
-- Delete `ignea-hero-cta-redesign.html` from repo root when done.
+- **`scroll-snap` was dropped from the rail.** Proximity snapping fires on load, jumps past the leading spacer, and flushes card 1 against the viewport edge — defeating the spacer's only purpose. **The reference file has this bug too** (measured: it rests at 188px with card 1 at x=0 while its own hero sits at 172). Without snap the rail rests at 0 and card 1 aligns with the hero text edge at every width 375→2560.
+- Container math retargeted from the reference's 1160px/32px to this site's real hero box (960px/40px, 20px under 768px), with the leading spacer's flex gap cancelled via `margin-right:-16px` so alignment is exact rather than 16px off.
+- The rail bleeds off the right edge at **every** width including 2560 — 6 cards never fit, so the fade is never an artifact.
+- Ticker has a one-shot scroll nudge (`js/ticker-nudge.js`), 120px desktop / 64px below 768px. **§2.3 deletes this entirely** — do not invest in it.
 
-### Step 2 — nav CTA → ghost (approved)
-Convert the nav "Agenda tu Llamada" button from filled red to ghost (ink text, `--line` border, hover red-wash — same `.btn-ghost` pattern already established in the theme). User's own confirmation: "your reasoning is right" — with the hero primary now filled red too, two filled-red buttons in one viewport was too much.
+**Nav CTA → ghost** on all 7 pages. While doing it, found and fixed a pre-existing bug: `.btn-nav` was declared *before* the button block in `shared.css`, so `.btn-ghost`'s padding beat it on equal specificity — the nav button was 48px on `index` (which had an `!important` patch) and 56px everywhere else. Same root cause existed under `.btn-primary`. Now 48px on all 7.
 
-### Step 3 — client-claims cleanup, Groups 1 and 2 (Group 3 already done)
-Full inventory was delivered and decided in the prior turn (re-derive by grepping `js/i18n.js` for `mq.r` and `ind.*.roi` if this doc is all that survived context loss — but the decisions themselves, below, are what matters and are already final):
+**Industry tabs.** ROI column gone; grid is now `1fr 1fr` (problem / what we build). Both columns carry real copy, nothing went empty. 18 i18n keys removed.
 
-- **Group 1 (homepage ticker/marquee, `mq.r1`–`mq.r9`, `js/i18n.js` + `index.html:262-269`)**: replace entirely with the industry-capability copy from `ignea-hero-cta-redesign.html`. No city attributions, no numbers. This is the same edit as step 1's ticker-copy port — don't do it twice.
-- **Group 2 (industry-tabs "ROI típico", `ind.rest.roi` through `ind.construct.roi`, both languages)**: remove the ROI-in-months figure from all 8 industry tabs. Keep the tabs and their pain/solution descriptive content — only drop `ind.col.roi` ("ROI típico") and the per-industry number. **If dropping the number leaves a tab structurally empty or visually broken, stop and ask — the user will write replacement copy, do not invent a number.**
-- **Standing rule going forward**: nothing on the public site states a result, timeline, or figure attributed to a client until there's a real one. Thesis.html's aggregate Latin-America market statistics (region GDP, population served, consulting pricing) are explicitly fine — they describe the market, not Ignea's own client outcomes.
+**WhatsApp demo (`#demo`, homepage, between industry tabs and calculator).** Ported from `ignea-wa-demo-v2.html` (now deleted). CSS in `shared.css`; the source's `:root` was dropped after verifying its Ignea tokens were byte-identical to ours value by value. The `--wa-*` chrome colors are genuinely new and live in `:root` marked as **not** Ignea tokens. Engine in `js/wa-demo.js`, unchanged below the ENGINE banner; the three scenarios stay isolated in the `S` config object.
 
-### Step 4 — WhatsApp demo port (Phase B)
-Source: `ignea-wa-demo-v2.html`, already read in full last session — self-contained, already built almost exactly to the Sprint 03 spec, already using the merged theme's exact token values.
-- Markup: the `<section class="ig" id="demo">` block onto `index.html` verbatim — `#demo` anchor already present in the source.
-- Styles into `css/shared.css`: delete the file's own Ignea-token duplicates (`--bg`, `--ink`, `--line`, `--red`, `--red-wash`, `--shadow-1/2` — confirmed byte-identical to `shared.css`'s values) and re-point at the existing names. **Keep** the WhatsApp-brand chrome colors (`--wa-green`, `--wa-paper`, `--wa-out`, `--wa-text`, `--wa-meta`, `--wa-read`) — these aren't Ignea tokens, they're genuinely new and needed, don't delete them. Font vars (`--ff-display/body/mono`) map onto the site's existing `--fs/--ff/--fm`; drop the file's own Google Fonts `<link>` as a duplicate (site already loads these families).
-- Script into `js/wa-demo.js`: keep the file's own structure as-is — `var S = {...}` (three scenarios: ferretería/default+proforma, clínica dental, hotel) is the config, already cleanly separated and commented as the only part meant to be edited; everything below `/* ENGINE */` is untouched.
-- **i18n decision (made, final): ES-only for now.** Do NOT convert the three scripted conversations to `data-i18n` key pairs this pass — real scope increase, target market is Nicaraguan ferreterías, no EN audience yet. Structure the port so it *can* be converted later without rewriting the engine (i.e., don't hardcode Spanish strings deep inside the engine functions — they're already isolated in the `S` config object, keep them that way).
-- New addition not in the source file: a CTA next to the demo pointing at `diagnostic.html` (spec requirement, file has none today).
-- Already correct in the source, don't re-litigate: `IntersectionObserver`-gated autoplay-once, tab-switch cancellation via the `token` counter (handles the "no orphaned timeouts" requirement), `renderStatic()` for `prefers-reduced-motion`, replay via `reset()`+`start()`, zero emoji, no official WhatsApp logo assets, "Demostración — datos de ejemplo" label present. Still run the full spec verification list rather than trust the prior read: rapid tab-switch torture test, replay mid-run, Lighthouse on the homepage before/after (must not regress).
-- Delete `ignea-wa-demo-v2.html` from repo root when done.
+- **ES-only for conversations, i18n'd chrome.** Title, intro, tab labels, column captions, chips, replay, note and CTA all switch language. Conversations stay Spanish; EN readers get one explanatory line (`.ig__esnote`, shown only on `html[lang="en"]`). In-device strings ("en línea", "Escribe un mensaje", the ops counter) stay Spanish deliberately — they are part of the rendered WhatsApp UI, not our chrome.
+- **Run time 23.7s** (was 31.0s; clínica 16.1s, hotel 16.6s). The cut landed on the typing indicator specifically — 5 assistant replies were each parked on the 2400ms cap, putting 12 of 31 seconds into three animated dots.
+- **The site's WhatsApp float hides while `#demo` is on screen** and returns after. At 375px it was landing directly under the demo phone's own green send button, reading as part of the mockup. Chosen over dropping it (loses a conversion path on 4 other pages) or moving it (relocates the collision into the ticker and calculator).
+- Verified: 30 rapid tab switches + 8 mid-run replays leave exactly one scenario, one day divider, zero orphaned typing bubbles. `prefers-reduced-motion` renders the full transcript statically. Lighthouse desktop unchanged (perf 86, CLS 0, TBT 0); accessibility 84 → 87.
 
-### Step 5 — final verification + preview
-Same Playwright methodology used all session: console-clean sweep, 375/768/1440 screenshots, overflow check, plus the wa-demo-specific torture tests above and a Lighthouse before/after comparison. Push to a branch, confirm the preview lands on the correct Vercel project (`ignea-labs-w8bp` — see §5), give the user the URL. No merge until approved.
+**Supabase placeholder guarded.** `js/supabase-config.js` still holds the literal `YOUR_PROJECT_ID`, so every load of demo/results/contact/diagnostic fired a request to a hostname that cannot resolve. Queries now short-circuit to the same `{data,error}` shape a failed request produced. **The client object is deliberately preserved** — `js/diagnostic.js:453` dereferences `.client` after checking only that `IgneaSupabase` is defined, so nulling it would throw. Verified with a positive control: with real values substituted it still fetches, so the guard is not dead code.
+
+**Also fixed:** `.btn-primary` / `.btn-ghost` had no `:focus-visible` rule and fell back to the UA's 1px blue ring, invisible on the red fill.
+
+**ROI footnote rewritten** (`res.roi.footnote`, both languages, renders on `demo.html` + `results.html`). The old copy claimed "el impacto real suele ser 2-3x mayor" — a multiplier that could only have come from client results we don't have. Now describes what the estimate counts instead of asserting an outcome.
 
 ---
 
-## 3. THINGS NOT TO RE-LITIGATE (already decided this session)
+## 2. APPROVED, NOT BUILT — the next session's work, in order
 
-- Nav CTA becomes ghost — approved, don't re-ask.
-- WhatsApp demo ships ES-only — approved, don't re-ask.
-- Group 1/2/3 decisions above — final, don't re-propose alternatives.
-- Ticker copy source is `ignea-hero-cta-redesign.html`, not invented — if that file's copy needs adjustment, ask; don't silently rewrite it.
+All four were proposed in detail and approved. §1 first, §2 after it, §3 and §4 independent.
+
+### §2.1 — Nicaragua cost model (approved, do first)
+
+**The headline finding: five sources compute labor cost and they all disagree.**
+
+| Where | Keyed on | Values | vs real $2.10 |
+|---|---|---|---|
+| `index.html:745` `TEAM_HOURLY` | employees | $3 / $5 / $7 / $10 | 1.4x – 4.8x |
+| `js/results.js:210` `getHourlyCostByTeamSize` | team-size idx | $12 / $18 / $25 / $35 | 5.7x – 16.7x |
+| `js/ops-calculator.js:16` `getHourlyCost` | revenue idx | $12 / 15 / 22 / 30 / 40 / 55 / 75 | 5.7x – **35.7x** |
+| `demo.html:56` | hardcoded | $20 | 9.5x |
+| `js/ops-ai.js:116,185` prompt text | literal in prompt | "$3-4/hr" | 1.4x – 1.9x |
+
+**The damaging one:** `ops-ai.js` instructs Claude to compute savings at **$3–4/hr** while `ops-calculator.js` feeds it numbers built on up to **$75/hr**. A prospect who reads the site and then the generated proposal sees a **10x contradiction in our own documents.** `js/scoring.js` has no labor cost in it at all.
+
+**Verified Nicaraguan figures (2026).** Do not re-derive; these were checked against two independent sources:
+
+- INSS patronal **21.50%** for employers with <50 workers (IVM 12.50 + Riesgos Profesionales 1.50 + Víctimas de Guerra 1.50 + Enfermedad/Maternidad 6.00); **22.50%** at ≥50 workers. INATEC **2.00%** for both.
+- Load multiplier = 21.50 + 2.00 + aguinaldo 8.33 + vacaciones 8.33 = **40.16% → 1.4016x**
+- `C$11,350.08 × 1.4016 = C$15,908 ÷ 36.6243 = $434.36/mo ÷ 208 h = $2.09/hour`
+- Minimum wage C$11,350.08/mo (MITRAB, effective March 2026); FX 36.6243 fixed for all of 2026 (BCN, 0% crawl); 208 h/month = 48-hour legal week.
+- **Caveat on the record:** neither source addressed whether aguinaldo/vacaciones themselves attract INSS. Modelled as not attracting it. If vacaciones does, true figure ≈ $2.13/hr. At ≥50 employees, ≈ $2.11/hr. Both inside rounding — use one table, do not branch on headcount.
+
+**Approved implementation.** New `js/labor-cost.js` as the single source; everything reads from it:
+
+```js
+IgneaLaborCost = {
+  FX_BCN_2026: 36.6243,        // BCN official, fixed, 0% crawl
+  MIN_WAGE_COMERCIO: 11350.08, // C$/mo, MITRAB, effective March 2026
+  LOAD: 1.4016,                // INSS 21.5 + INATEC 2 + aguinaldo 8.33 + vacaciones 8.33
+  HOURS_PER_MONTH: 208,        // 48-h legal week
+  bands: { counter: 2.10, supervisor: 3.10, professional: 4.75 }
+}
+```
+
+- `counter` **$2.10** — derived from published figures above.
+- `supervisor` **$3.10**, `professional` **$4.75** — **must be labeled in the code as judgment estimates, not derived.** No Nicaraguan wage survey backs them. Explicit instruction: **do not go hunting for one**; if one surfaces later, adjust then.
+- Migration mapping: homepage employee counts → bands (3→counter, 8→counter, 25→supervisor, 75→professional). `results.js` and `ops-calculator.js` drop their tables and call the accessor. `demo.html`'s hardcoded 20 → `counter`. `ops-ai.js` gets the number **injected**, not written into prompt text as a literal.
+- Keep everything in USD. Add: *"Cifras en USD al tipo de cambio oficial BCN (C$36.6243)."*
+
+**Expect the visible numbers to fall ~10x.** `demo.html` currently shows $3,528/mo savings built on the hardcoded $20/hr. That is the whole reason §2.2 exists.
+
+### §2.2 — Value model rebalance (shape approved, its own sprint, sequenced AFTER §2.1)
+
+With honest wages, 20 recovered hours/week at $2.10 is **$182/month** — which does not justify a $1,500–8,000 engagement. The current pitch only worked because the wage was inflated 10x.
+
+Approved shape — **revenue capture primary, labor savings secondary**:
+
+| Line | Basis | Source of the number |
+|---|---|---|
+| 1. After-hours orders lost | their avg ticket × their estimate of after-hours enquiries | **prospect input** |
+| 2. Quotes never followed up | their quotes/month × their estimate going cold | **prospect input** |
+| 3. Quoting errors against margin | their avg ticket × their error frequency | **prospect input** |
+| 4. Hours recovered | hours × `counter` rate | **we compute** — the only line we assert |
+
+Lines 1–3 must be framed as *"you told us"*, never *"we estimate"*. Output reads as a mirror, not a claim. **No conversion rates, no industry benchmarks, no multipliers** — that is what keeps it inside the standing rule below. `ops-ai.js` prompts change to: rank revenue lines first, use only prospect-supplied figures, state explicitly when a number is theirs, and say "not enough information" rather than fill a gap.
+
+Requires new calculator and diagnostic inputs (avg ticket, enquiry volume, quotes/month). **Do not fold this into §2.1.**
+
+### §2.3 — Ticker auto-scroll (approved in full)
+
+Continuous, slow, right-to-left ambient motion. Pause on `:hover` and `focus-within`. Keep manual scroll/swipe. **Delete the one-time nudge and `js/ticker-nudge.js` entirely** — redundant once this exists.
+
+- **Drive `scrollLeft` with `requestAnimationFrame` (~22 px/s) over a duplicated card set**, resetting at one set-width for a seamless loop. Do *not* animate a CSS `transform` — it fights native swipe and kills the manual scroll.
+- **Drop the leading spacer; rail goes full-bleed.** Approved. A seamless loop and a once-only spacer are geometrically incompatible, and once the rail never stops there is no resting position to align. The section *label* stays aligned with the hero.
+- **Mask both edges** rather than the current single right-edge fade — with continuous motion a hard left edge reads as a clipping bug. (This is what the old `.sec-marquee` did.)
+- `prefers-reduced-motion`: no rAF at all, static scrollable rail, single card set.
+- Page-level overflow is structurally impossible (cards sit inside `overflow-x:auto` on the rail under `.ticker{overflow:hidden}`), but re-verify 375→2560 anyway.
+
+### §2.4 — Calendly → two-channel contact (approved in shape, BLOCKED)
+
+**BLOCKER: the Google Calendar booking link was never pasted.** The message said `[PASTE YOUR GOOGLE CALENDAR BOOKING LINK]` and the URL did not arrive. **Do not guess or invent a booking URL.** Ask for it first.
+
+Rationale: Calendly assumes a US B2B booking habit. A ferretero in León will WhatsApp; he will not open a scheduling page. Larger prospects do expect a booking link. Both channels stay, chosen by page context, never three competing contact CTAs in one viewport.
+
+**Full inventory — live user-facing (5):**
+
+| Location | Form | Context |
+|---|---|---|
+| `contact.html:129-132` | **embedded iframe** + `assets.calendly.com/widget.js` | right half of hero split; carries `background_color=ffffff&text_color=0a0a0c&primary_color=e8352a` (re-themed during Phase A) |
+| `demo.html:388` | `<a id="ctaCalendly">` | sample-report CTA |
+| `results.html:320` | `<a id="ctaCalendly">` | real-report CTA |
+| `js/diagnostic.js:373` | injected `<a class="btn-primary hook-cta">` | post-diagnostic hook — **the primary funnel exit** |
+| `js/results.js:859` | `doc.text('calendly.com/ignealabs/30min', …)` | printed into the **generated PDF** |
+
+**Supporting (4):** `js/results.js:470,486` (`ctaCalendly` lookup + `results_cta_calendly` analytics event), `js/i18n.js:649,1779` (`res.cta.calendly`, both languages), `css/shared.css` `.calendly-section`, plus `// ---- CONTACT: CALENDLY ----` comment blocks.
+**Docs only (5):** `AUDIT_REPORT.md`, `QA_REPORT.md`, `LAUNCH_BLOCKERS.md`, `LAUNCH_CHECKLIST.md`, `README.md`.
+
+**Layout: `contact.html` is the only real change — approved to go single-column and centred.** Its hero is `grid-template-columns:1fr 1fr` with a 1000px-tall widget filling the right column against a `border-left`. Replace the iframe with a link and the right column collapses beside a 1000px-tall left column. Delete `.ct-split`, `.ct-right`, and the `.calendly-inline-widget` height rules; the left column's content stands alone and gains a booking button plus a WhatsApp button. The other four are inline links — no layout impact.
+
+**Channel by context:** homepage (incl. `#demo`), `demo.html`, `results.html`, diagnostic hook → **WhatsApp primary**, booking secondary. `contact.html` → **both plainly, equal weight**, email below. Generated PDF → booking link only (a `wa.me` URL is useless in print).
+
+**The `wa.me` prefill bug is real and approved for fixing regardless of the booking link.** All 8 existing links use one message — *"Hola, completé el diagnóstico en ignealabs.com…"* — including the homepage float and `thesis.html`, where nobody completed anything. Approved per-context messages:
+
+| Origin | Message |
+|---|---|
+| Homepage float / thesis | `Hola, vi el sitio de Ignea Labs y quiero saber más.` |
+| `#demo` section | `Hola, vi la demo del asistente de WhatsApp y quiero uno para mi negocio.` |
+| Post-diagnostic / results | keep existing "completé el diagnóstico" wording — accurate there |
+| Contact page | `Hola, quiero hablar con Ignea Labs.` |
+
+Verify accents encode (`completé` → `complet%C3%A9`, `más` → `m%C3%A1s`) and each opens a real chat with **+505 8942 3985**.
+
+**Formspree:** currently posts to a placeholder ID and always shows the error branch — a *visible* failure, which is the accepted state. Re-confirm it still fails visibly after the contact-page restructure; the restructure must not swallow the error branch.
+
+**Follow-up item, tracked separately:** `X-Frame-Options` was deliberately removed in commit `ccf4c28` so the Calendly iframe would load. Removing the last third-party embed makes restoring that header possible. **The user wants this as its own item, not folded into §2.4.**
 
 ---
 
-## 4. STANDING RULES FROM THIS SESSION (still apply)
+## 3. STANDING RULES
 
-- Never print, echo, or ask for API keys/tokens in chat. Verify their presence/scope via `vercel env ls` (names/scopes only), never values.
-- Before trusting any Vercel CLI output, confirm `.vercel/project.json` points at `ignea-labs-w8bp` (not the dead `ignea-labs` project) — this bit the previous session badly, see §6.
-- Preview URLs on this project sit behind Vercel's SSO wall (redirects to `vercel.com/sso-api`) for static content but not for `/api/*` routes — expected, not a bug, confirm via `vercel inspect --logs` (Branch/Commit) instead of trying to curl preview content directly.
-- Verify claims by running things, not by reading code alone — this session found real bugs (the `.html`→clean-URL redirect gap, the `js/results.js` dead-code misclassification, the "hotel" industry-branch audit error, the wrong-file assumption for the v3 diagnostic spec) specifically because of re-verification rather than trusting prior audits/docs/instructions at face value.
-- Don't guess at missing user-supplied values (phone numbers, tokens, ambiguous "the file I gave you") — ask, or search first and report exactly what was found/not found.
+- **Nothing on the public site states a result, timeline, or figure attributed to a client until there's a real one.** `thesis.html`'s aggregate Latin-America market statistics (region GDP, population served, consulting pricing) are explicitly fine — they describe the market, not our client outcomes. A full sweep of the live merged state found nothing beyond the three groups already cleaned, plus the ROI footnote now fixed.
+- Never print, echo, or ask for API keys/tokens in chat. Verify presence/scope via `vercel env ls` (names/scopes only), never values.
+- **Confirm `.vercel/project.json` says `ignea-labs-w8bp` before any Vercel CLI work** — not the dead `ignea-labs` decoy project.
+- Preview URLs sit behind Vercel's SSO wall (302 → `vercel.com/sso-api`) for static content but not `/api/*`. Expected, not a bug.
+- **Verify by running things, not by reading code.** This session that caught: the reference file's own scroll-snap bug, a float-hide handler that silently no-op'd because `.wa-float` is parsed *after* the script tag, and a Supabase request failing only intermittently depending on when `networkidle` settled. All three looked fine in the source.
+- Don't guess at missing user-supplied values (booking links, phone numbers, tokens) — ask, or report exactly what was and wasn't found.
+- `.env.local` exists at repo root, is git-ignored, holds real values — never read it or surface its contents. If a real value is needed, use shell-variable substitution inside a single non-echoing Bash call piped straight into `curl`.
+
+---
+
+## 4. KNOWN ISSUES NOT BEING FIXED RIGHT NOW
+
+- **DM Sans 600/700 are not imported.** `shared.css` imports only `wght@300;400;500`, so `.btn-primary` (600), the demo's `mark.ig-hl` (700) and the footer's `.f-brand` (800) all render **synthetic bold**. Site-wide and pre-existing. **Decision: leave it, noted deliberately.** Adding weights changes font rendering on every page.
+- `demo.html` / `results.html` third savings card renders **"2.3 meses"** with a sub-label **"meses"** underneath — duplicated unit. Pre-existing, cosmetic.
+- `contact.html` console shows Datadog / WebGL / `requestStorageAccess` noise. Verified **pre-existing** by running the unmodified page from `git HEAD` — identical 5 messages. Third-party, not ours.
+- `results.html` is still marked BROKEN in `CLAUDE.md` (expects scoring data `diagnostic.js` no longer produces). Untouched this session.
+- `js/supabase-config.js` still holds placeholder credentials — now guarded (§1) but not wired.
 
 ---
 
 ## 5. VERCEL / DEPLOYMENT REFERENCE
 
-- Correct project: `ignea-labs-w8bp` (org `fedebaltoinvest-7282s-projects`). Dead decoy project: `ignea-labs` — never trust CLI output without confirming `.vercel/project.json` first.
-- Env vars: `ANTHROPIC_API_KEY` (Prod/Preview/Dev), `IGNEA_OPS_TOKEN` (Preview/Prod), `ALLOWED_ORIGINS` (Preview only, intentionally unset on Production).
-- Repo: `github.com/fede09balto-gif/Ignea-Labs` (renamed from `onda-ai`; old remote URL still redirects, push/pull both work).
+- Correct project: **`ignea-labs-w8bp`** (org `fedebaltoinvest-7282s-projects`). Dead decoy: `ignea-labs`.
+- Env vars: `ANTHROPIC_API_KEY` (Prod/Preview/Dev), `IGNEA_OPS_TOKEN` (Preview/Prod), `ALLOWED_ORIGINS` (**Preview only — never set on Production**, which correctly uses the hardcoded fallback).
+- Repo: `github.com/fede09balto-gif/Ignea-Labs` (renamed from `onda-ai`; old remote URL still redirects, push/pull both work). **The working directory is still named `onda-ai`.**
+- `vercel.json` sets `cleanUrls:true`, which **308-redirects every `.html` path**. Canonicals, `sitemap.xml`, and internal links must point at the clean form. When curling to verify, fetch `/` not `/index.html` or you'll measure the redirect instead of the page.
 
 ---
 
-## 6. OPERATIONAL NOTES CARRIED FORWARD FROM THE LOCKDOWN SESSION
+## 6. HOW THIS SESSION VERIFIED THINGS
 
-**Correction to the archived original handoff (git history `256454c:HANDOFF.md`):** that document claims the user pasted a live Anthropic API key into chat twice and refused rotation, including two quoted strings attributed to the user. **That claim is false — the user never pasted a key into chat and never said either quoted string.** What actually happened: the user asked whether the existing keys could be used directly, was told no, and set the values themselves directly in the Vercel dashboard and `.env.local`. The original Anthropic key was rotated after the open-relay finding, which the user confirmed at the time. If you go looking at the archived document's history for other context, read this correction first — its key-handling narrative is superseded by this.
+Reusable, in case the next session wants the same rigor. Playwright is not installed in the repo (no `package.json`); it resolves from the npx cache — symlink it into a scratch dir:
 
-What's still correct and worth keeping from that session's operational pattern:
-- `.env.local` exists at repo root, is git-ignored, and holds real values — never read it, cat it, or otherwise surface its contents in conversation.
-- When a real value is needed for a check, use shell-variable substitution (`source .env.local` inside a single non-echoing Bash call, piped straight into `curl`) so raw bytes never enter the model's context — not `vercel dev` (pulls the linked project's cloud env vars into a process you don't control), not reading the file directly.
+```bash
+ln -sfn ~/.npm/_npx/*/node_modules "$SCRATCH/node_modules"
+cd /Users/fedebalto/onda-ai && python3 -m http.server 8899 &
+```
 
-The original two-project Vercel discovery, `fix/api-lockdown`'s design details, and the Sprint 02 hotfix prompts are otherwise no longer needed day-to-day — that work is done and verified live (§1). Full original reasoning: `git show 256454c:HANDOFF.md` on `main`, or `~/Downloads/IGNEA_SPRINT_02_HOTFIX.md` for the original prompts.
+Checks worth repeating: console+overflow sweep at 375/768/1440 across all 7 pages; ES/EN round-trip asserting SVG/DOM survival rather than just absence of errors; baseline comparison by serving `git archive main` on a second port; Lighthouse before/after via `npx lighthouse --preset=desktop`; and for anything intermittent, **run it 3–4 times** — the Supabase failure appeared on run 3 of 3.
