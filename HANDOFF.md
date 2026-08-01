@@ -14,7 +14,7 @@ In order, all merged and production-verified this session:
 4. **Group 3 client-claims deletion** — merged, live, commit `74d751c`, pushed directly to `main` today per explicit instruction, **not independently re-verified against the live deploy** (context ran out) — see §3 for exactly what to check first in the next session.
 
 **Two source files copied into repo root, not yet committed, not yet ported:**
-- `ignea-hero-cta-redesign.html` (from `~/Downloads`, also seen as `ignea-hero-cta-redesign (1).html` there — same content, use the repo-root copy)
+- `ignea-hero-cta-redesign.html` (from `~/Downloads`; a `ignea-hero-cta-redesign (1).html` also exists there — **not diffed against the copy in the repo, don't assume they match**, check before trusting either)
 - `ignea-wa-demo-v2.html` (from `~/Downloads`)
 
 Both are read in full already (this session's context, now gone — re-read them fresh next session, don't trust memory of their contents).
@@ -90,6 +90,12 @@ Same Playwright methodology used all session: console-clean sweep, 375/768/1440 
 
 ---
 
-## 6. ARCHIVED — prior session's API-lockdown handoff (fully resolved, kept for history only)
+## 6. OPERATIONAL NOTES CARRIED FORWARD FROM THE LOCKDOWN SESSION
 
-The original two-project Vercel discovery, the `fix/api-lockdown` design details, and the Sprint 02 hotfix prompts are no longer needed day-to-day — that work is done and verified live (§1 above). If you need the original reasoning, it's in git history (`git show 256454c:HANDOFF.md` on `main`, or `~/Downloads/IGNEA_SPRINT_02_HOTFIX.md` for the original prompts). Not reproduced here to keep this document focused on what's actually next.
+**Correction to the archived original handoff (git history `256454c:HANDOFF.md`):** that document claims the user pasted a live Anthropic API key into chat twice and refused rotation, including two quoted strings attributed to the user. **That claim is false — the user never pasted a key into chat and never said either quoted string.** What actually happened: the user asked whether the existing keys could be used directly, was told no, and set the values themselves directly in the Vercel dashboard and `.env.local`. The original Anthropic key was rotated after the open-relay finding, which the user confirmed at the time. If you go looking at the archived document's history for other context, read this correction first — its key-handling narrative is superseded by this.
+
+What's still correct and worth keeping from that session's operational pattern:
+- `.env.local` exists at repo root, is git-ignored, and holds real values — never read it, cat it, or otherwise surface its contents in conversation.
+- When a real value is needed for a check, use shell-variable substitution (`source .env.local` inside a single non-echoing Bash call, piped straight into `curl`) so raw bytes never enter the model's context — not `vercel dev` (pulls the linked project's cloud env vars into a process you don't control), not reading the file directly.
+
+The original two-project Vercel discovery, `fix/api-lockdown`'s design details, and the Sprint 02 hotfix prompts are otherwise no longer needed day-to-day — that work is done and verified live (§1). Full original reasoning: `git show 256454c:HANDOFF.md` on `main`, or `~/Downloads/IGNEA_SPRINT_02_HOTFIX.md` for the original prompts.
