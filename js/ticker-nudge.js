@@ -8,8 +8,18 @@
 (function () {
   'use strict';
 
-  var DISTANCE = 120;
+  /* 120px reads as a hint on desktop but slices card 1 in half on a 375px
+     screen, which over-signals. Scale it down below the mobile breakpoint. */
+  var DISTANCE_DESKTOP = 120;
+  var DISTANCE_MOBILE = 64;
+  var MOBILE_QUERY = '(max-width: 768px)';
   var DURATION = 900;
+
+  function distance() {
+    return (window.matchMedia && window.matchMedia(MOBILE_QUERY).matches)
+      ? DISTANCE_MOBILE
+      : DISTANCE_DESKTOP;
+  }
 
   var rail = document.getElementById('tickerRail');
   if (!rail || !('IntersectionObserver' in window)) return;
@@ -53,7 +63,7 @@
     if (max <= 1) return; // nothing to reveal — cards already fit
 
     var from = rail.scrollLeft;
-    var target = Math.min(DISTANCE, max - from);
+    var target = Math.min(distance(), max - from);
     if (target <= 0) return;
 
     var start = null;

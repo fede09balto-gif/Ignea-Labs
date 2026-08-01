@@ -453,12 +453,13 @@ footer{border-top:1px solid var(--border);padding:80px 40px}
 .ind-tab.active,.ind-tab:hover{border-color:var(--accent);color:var(--white);background:var(--accent3)}
 .ind-panel{display:none}
 .ind-panel.active{display:block}
-.ind-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);overflow:hidden}
+/* Two columns: the problem, and what we build. The third ("ROI típico") is
+   gone — nothing on the public site states a client result until there's a
+   real one to state. */
+.ind-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);overflow:hidden}
 .ind-col{background:var(--bg2);padding:32px}
-.ind-roi{background:var(--bg3)}
 .ind-col-label{font-family:var(--fm);font-size:11px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
 .ind-col p{color:var(--gray);line-height:1.6;font-size:15px;margin:0}
-.ind-roi p{color:var(--white);font-weight:500}
 @media(max-width:768px){.ind-grid{grid-template-columns:1fr}}
 
 /* ---- THESIS QUOTE ---- */
