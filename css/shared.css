@@ -41,6 +41,7 @@
   --ff:'DM Sans',sans-serif;
   --fs:'DM Serif Display',serif;
   --fm:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.22,.9,.28,1);
 
   /* WhatsApp brand chrome — used only by the demo section. These are NOT
      Ignea tokens; they exist so the rendered conversation reads as WhatsApp
@@ -682,3 +683,95 @@ html[lang="en"] .ig__esnote{display:block;font-family:var(--fm);font-size:10.5px
 .hook-cta-alt{margin-top:12px}
 .hook-booking-note{font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dimgray);margin-top:12px}
 .cta-booking-note{font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dimgray);margin-top:14px}
+
+/* ============================================================
+   HOMEPAGE COMPONENTS v2 — industry tabs, scenario tabs, chips,
+   calculator. Replaces four hairline-box treatments. Existing
+   tokens only; --ease is the shared motion curve.
+   ============================================================ */
+
+/* ---- A. INDUSTRY TABS + VARIANT-3 PANEL ---- */
+.itabs{position:relative}
+.itabs__mask{position:relative}
+.itabs__mask:after{content:"";position:absolute;top:0;right:0;bottom:14px;width:56px;background:linear-gradient(to right,transparent,var(--bg));pointer-events:none;opacity:1;transition:opacity .25s var(--ease)}
+.itabs__mask.at-end:after{opacity:0}
+.itabs__rail{display:flex;gap:28px;overflow-x:auto;scrollbar-width:none;padding-bottom:14px}
+.itabs__rail::-webkit-scrollbar{display:none}
+.itab{flex:0 0 auto;background:none;border:0;padding:10px 0;cursor:pointer;font-family:var(--ff);font-size:15px;color:var(--ink-3);white-space:nowrap;transition:color .22s var(--ease);min-height:44px}
+.itab:hover{color:var(--ink-2)}
+.itab[aria-selected="true"]{color:var(--ink);font-weight:500}
+.itab:focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:2px}
+.itabs__line{height:1px;background:var(--line);position:relative}
+.itabs__ind{position:absolute;left:0;top:-1px;height:2px;background:var(--red);width:0;display:block;transition:transform .42s var(--ease),width .42s var(--ease)}
+
+.ipanel{padding-top:30px;transition:opacity .28s var(--ease),transform .28s var(--ease)}
+.ipanel.out{opacity:0;transform:translateY(6px)}
+.ipanel__prob{font-size:15px;line-height:1.55;color:var(--ink-3);margin:0;max-width:52ch}
+.ipanel__prob b{font-family:var(--fm);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);font-weight:400;display:block;margin-bottom:9px}
+.ipanel__card{margin-top:26px;background:var(--code-bg);border-radius:10px;padding:22px 24px;box-shadow:var(--shadow-2)}
+.ipanel__card b{display:flex;align-items:center;gap:9px;font-family:var(--fm);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);font-weight:400;margin-bottom:14px}
+.ipanel__card b i{width:5px;height:5px;border-radius:50%;background:var(--red);flex:none;font-style:normal}
+.ipanel__card p{margin:0;font-size:16px;line-height:1.55;color:var(--code-ink)}
+.ipanel__out{margin-top:16px;padding-top:14px;border-top:1px solid #26262C;font-family:var(--fm);font-size:11.5px;color:var(--code-ink);line-height:1.9}
+
+/* ---- B. SCENARIO TABS ---- */
+.stabs{display:inline-flex;position:relative;border:1px solid var(--line);border-radius:10px;padding:4px;background:var(--bg-tint);gap:2px;list-style:none;margin:0 0 40px}
+.stabs__blk{position:absolute;top:4px;left:4px;height:calc(100% - 8px);background:var(--bg);border-radius:7px;box-shadow:var(--shadow-1);width:0;transition:transform .4s var(--ease),width .4s var(--ease)}
+.stab{position:relative;z-index:1;background:none;border:0;cursor:pointer;font-family:var(--fm);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);padding:0 18px;height:44px;min-height:44px;transition:color .22s var(--ease);white-space:nowrap}
+.stab:hover{color:var(--ink-2)}
+.stab[aria-selected="true"]{color:var(--ink)}
+.stab:focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:6px}
+.stab i{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--red);margin-right:9px;opacity:0;transform:scale(.4);transition:opacity .3s var(--ease),transform .3s var(--ease);font-style:normal;vertical-align:middle}
+.stab[aria-selected="true"] i{opacity:1;transform:scale(1)}
+
+/* ---- C. CAPABILITY CHIPS (not interactive — no hover, no pointer) ---- */
+.caps{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:44px 0 0}
+.cap{flex:1 1 200px;padding:18px 22px;display:flex;align-items:flex-start;gap:12px;opacity:0;transform:translateY(8px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
+.cap + .cap{border-left:1px solid var(--line)}
+.caps.in .cap{opacity:1;transform:none}
+.caps.in .cap:nth-child(2){transition-delay:.07s}
+.caps.in .cap:nth-child(3){transition-delay:.14s}
+.caps.in .cap:nth-child(4){transition-delay:.21s}
+.cap__dash{width:0;height:1px;background:var(--red);flex:none;margin-top:7px;transition:width .5s var(--ease) .2s}
+.caps.in .cap__dash{width:16px}
+.cap__txt{font-family:var(--fm);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-2);line-height:1.65}
+
+/* ---- D. CALCULATOR ---- */
+.seg{display:flex;position:relative;border:1px solid var(--line);border-radius:10px;padding:4px;background:var(--bg-tint);margin-bottom:34px}
+.seg__blk{position:absolute;top:4px;left:4px;height:calc(100% - 8px);background:var(--bg);border-radius:7px;box-shadow:var(--shadow-1);width:0;transition:transform .38s var(--ease),width .38s var(--ease)}
+.seg button{position:relative;z-index:1;flex:1;background:none;border:0;cursor:pointer;font-family:var(--ff);font-size:15px;color:var(--ink-3);height:44px;transition:color .22s var(--ease)}
+.seg button[aria-pressed="true"]{color:var(--ink);font-weight:500}
+.seg button:focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:6px}
+.slider__val{font-family:var(--fs);font-size:40px;color:var(--red);line-height:1;text-align:center;margin-bottom:14px;font-variant-numeric:tabular-nums}
+.slider__track{position:relative;height:2px;background:var(--line);margin:22px 0 10px}
+.slider__fill{position:absolute;left:0;top:0;height:2px;background:var(--red);width:0;transition:width .12s linear}
+.slider input{-webkit-appearance:none;appearance:none;width:100%;background:none;position:absolute;top:-21px;left:0;height:44px;margin:0;cursor:pointer}
+.slider input::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--red);border:0;border-radius:3px;cursor:grab;box-shadow:var(--shadow-1);transition:transform .18s var(--ease)}
+.slider input::-webkit-slider-thumb:active{cursor:grabbing;transform:scale(1.12)}
+.slider input::-moz-range-thumb{width:18px;height:18px;background:var(--red);border:0;border-radius:3px;box-shadow:var(--shadow-1)}
+.slider input:focus-visible{outline:2px solid var(--red);outline-offset:6px;border-radius:4px}
+.slider__ends{display:flex;justify-content:space-between;font-family:var(--fm);font-size:10px;color:var(--ink-3);letter-spacing:.08em}
+.calcout{margin-top:44px;border-top:1px solid var(--ink);padding-top:26px}
+.calcout__cap{font-size:14px;color:var(--ink-2);text-align:center;margin:0 0 10px}
+.calcout__big{font-family:var(--fs);font-size:clamp(46px,7vw,68px);line-height:1;text-align:center;color:var(--red);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.calcout__unit{font-family:var(--fm);font-size:12px;color:var(--ink-3);text-align:center;margin:8px 0 4px;letter-spacing:.1em}
+.calcout__sub{font-size:13px;color:var(--ink-3);text-align:center;margin:0 0 28px}
+.calcout__rows{border-top:1px solid var(--line)}
+.crow{display:flex;align-items:baseline;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.crow__k{font-family:var(--fm);font-size:11px;color:var(--ink-2)}
+.crow__dots{flex:1;border-bottom:1px dotted var(--line);transform:translateY(-3px)}
+.crow__v{font-family:var(--fm);font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
+.calcout__foot{font-family:var(--fm);font-size:10px;color:var(--ink-3);line-height:1.9;margin:18px 0 0}
+
+@media(max-width:768px){
+  .caps{border-left:0;border-right:0}
+  .cap{flex:1 1 100%;border-top:1px solid var(--line)}
+  .cap + .cap{border-left:0}
+  .stabs{display:flex;width:100%}
+  .stab{flex:1;padding:0 8px;font-size:9.5px}
+}
+@media(prefers-reduced-motion:reduce){
+  .itabs__ind,.ipanel,.stabs__blk,.stab i,.cap,.cap__dash,.seg__blk,.slider__fill,.slider input::-webkit-slider-thumb{transition:none!important}
+  .cap{opacity:1;transform:none}
+  .caps.in .cap__dash,.cap__dash{width:16px}
+}

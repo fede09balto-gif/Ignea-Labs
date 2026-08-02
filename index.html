@@ -127,21 +127,6 @@ footer{border-top:1px solid var(--border)}
 .calc-field select{width:100%;padding:14px 18px;background:var(--bg2);border:1px solid var(--border);color:var(--white);font-family:var(--ff);font-size:16px;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;min-height:48px}
 .calc-field select:focus{border-color:var(--accent)}
 .calc-field select option{background:var(--bg2);color:var(--white)}
-.calc-cards{display:flex;gap:12px;flex-wrap:wrap}
-.calc-card{padding:14px 22px;background:var(--bg2);border:1px solid var(--border);color:var(--gray);font-family:var(--ff);font-size:16px;cursor:pointer;transition:all .2s;min-height:48px;display:flex;align-items:center}
-.calc-card:hover{border-color:var(--ink);color:var(--white)}
-.calc-card.selected{border-color:var(--accent);background:var(--accent3);color:var(--white)}
-.calc-result{margin-top:40px;padding:32px;background:var(--bg2);border:1px solid var(--border);text-align:center;opacity:0;transition:opacity .4s}
-.calc-result.visible{opacity:1}
-.calc-result-label{font-size:15px;color:var(--gray);margin-bottom:8px}
-.calc-result-value{font-family:var(--fm);font-size:42px;font-weight:700;color:var(--coral);line-height:1;margin-bottom:4px}
-.calc-result-unit{font-family:var(--fm);font-size:14px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px}
-.calc-result-note{font-size:13px;color:var(--text-dim);margin-bottom:16px}
-.calc-breakdown{text-align:left;margin:16px 0 12px;border-top:1px solid var(--border);padding-top:12px}
-.calc-breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
-.calc-breakdown-label{font-family:var(--fm);font-size:12px;color:var(--dimgray);letter-spacing:.3px}
-.calc-breakdown-val{font-family:var(--fm);font-size:14px;color:var(--white);font-weight:500;white-space:nowrap}
-.calc-breakdown-note{font-family:var(--fm);font-size:11px;color:var(--dimgray);text-align:left;line-height:1.5;margin-top:8px}
 
 /* ---- RESPONSIVE ---- */
 @media(max-width:768px){
@@ -169,14 +154,12 @@ footer{border-top:1px solid var(--border)}
   .btn-nav{display:none}
   .pr-grid{grid-template-columns:1fr}
   .sec-about,.sec-builtforpr,.sec-calculator{padding:60px 20px}
-  .calc-cards{flex-direction:column}
-}
+  }
 @media(max-width:480px){
   .hero h1{font-size:28px}
   .stats-row{grid-template-columns:1fr 1fr}
   .whatwedo-text p:first-child{font-size:16px}
-  .calc-result-value{font-size:32px}
-}
+  }
 </style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"LocalBusiness","name":"Ignea Labs","description":"AI infrastructure for Latin American SMBs","email":"ignealabs@outlook.com","areaServed":{"@type":"Place","name":"Latin America"},"knowsLanguage":["es","en"]}
@@ -336,64 +319,29 @@ footer{border-top:1px solid var(--border)}
 <section class="sec-industry content-wrap fade-up">
   <div class="sec-tag" data-i18n="ind.tag">// Para tu industria</div>
   <h2 style="font-size:clamp(24px,3vw,36px);margin-bottom:0" data-i18n="ind.title">Lo que construimos para ti</h2>
-  <div class="ind-tabs">
-    <button class="ind-tab active" data-tab="rest" data-i18n="ind.rest.label">Restaurante</button>
-    <button class="ind-tab" data-tab="clinic" data-i18n="ind.clinic.label">Clínica</button>
-    <button class="ind-tab" data-tab="hotel" data-i18n="ind.hotel.label">Hotel</button>
-    <button class="ind-tab" data-tab="law" data-i18n="ind.law.label">Firma Legal</button>
-    <button class="ind-tab" data-tab="mfg" data-i18n="ind.mfg.label">Manufactura</button>
-    <button class="ind-tab" data-tab="agro" data-i18n="ind.agro.label">Agro-Exportación</button>
-    <button class="ind-tab" data-tab="school" data-i18n="ind.school.label">Escuela</button>
-    <button class="ind-tab" data-tab="construct" data-i18n="ind.construct.label">Construcción</button>
+  <div class="itabs">
+    <div class="itabs__mask">
+      <div class="itabs__rail" role="tablist" aria-label="Industrias" id="indRail">
+        <button class="itab" type="button" role="tab" aria-controls="indPanel" aria-selected="true" data-tab="ferre" data-i18n="ind.ferre.label">Ferretería</button>
+        <button class="itab" type="button" role="tab" aria-controls="indPanel" aria-selected="false" data-tab="rest" data-i18n="ind.rest.label">Restaurante</button>
+        <button class="itab" type="button" role="tab" aria-controls="indPanel" aria-selected="false" data-tab="clinic" data-i18n="ind.clinic.label">Clínica</button>
+        <button class="itab" type="button" role="tab" aria-controls="indPanel" aria-selected="false" data-tab="hotel" data-i18n="ind.hotel.label">Hotel</button>
+        <button class="itab" type="button" role="tab" aria-controls="indPanel" aria-selected="false" data-tab="law" data-i18n="ind.law.label">Firma Legal</button>
+        <button class="itab" type="button" role="tab" aria-controls="indPanel" aria-selected="false" data-tab="mfg" data-i18n="ind.mfg.label">Manufactura</button>
+        <button class="itab" type="button" role="tab" aria-controls="indPanel" aria-selected="false" data-tab="agro" data-i18n="ind.agro.label">Agro-Exportación</button>
+        <button class="itab" type="button" role="tab" aria-controls="indPanel" aria-selected="false" data-tab="school" data-i18n="ind.school.label">Escuela</button>
+        <button class="itab" type="button" role="tab" aria-controls="indPanel" aria-selected="false" data-tab="construct" data-i18n="ind.construct.label">Construcción</button>
+      </div>
+    </div>
+    <div class="itabs__line"><span class="itabs__ind" id="indInd"></span></div>
   </div>
-  <div class="ind-panels">
-    <div class="ind-panel active" data-panel="rest">
-      <div class="ind-grid">
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.rest.pain">Coordinación por WhatsApp, reservas a mano, inventario en papel.</p></div>
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.rest.solution">Bot de WhatsApp para reservas y pedidos + alertas de inventario + rastreo automático de no-shows.</p></div>
-      </div>
-    </div>
-    <div class="ind-panel" data-panel="clinic">
-      <div class="ind-grid">
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.clinic.pain">Agendamiento manual, teléfono-tag con pacientes, expedientes en papel.</p></div>
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.clinic.solution">Bot de citas con IA + recordatorios automáticos + formularios de intake de pacientes.</p></div>
-      </div>
-    </div>
-    <div class="ind-panel" data-panel="hotel">
-      <div class="ind-grid">
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.hotel.pain">Gestión manual de reservas, sin respuesta fuera de horario, operaciones en hojas de cálculo.</p></div>
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.hotel.solution">Bot de reservas 24/7 por WhatsApp + comunicación automatizada con huéspedes + dashboard de ocupación.</p></div>
-      </div>
-    </div>
-    <div class="ind-panel" data-panel="law">
-      <div class="ind-grid">
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.law.pain">Intake manual de clientes, seguimientos perdidos, caos documental.</p></div>
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.law.solution">Intake de clientes con IA + actualizaciones automáticas de estado de casos + organización de documentos.</p></div>
-      </div>
-    </div>
-    <div class="ind-panel" data-panel="mfg">
-      <div class="ind-grid">
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.mfg.pain">Rastreo de producción en papel, inventario a ciegas, coordinación con proveedores por teléfono.</p></div>
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.mfg.solution">Sistema de gestión de inventario + dashboard de producción + automatización de órdenes a proveedores.</p></div>
-      </div>
-    </div>
-    <div class="ind-panel" data-panel="agro">
-      <div class="ind-grid">
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.agro.pain">Rastreo manual de cosechas, papeleo de exportación, monitoreo de precios en múltiples mercados.</p></div>
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.agro.solution">Rastreador de cosechas y envíos + documentos de exportación automatizados + alertas de precios de mercado.</p></div>
-      </div>
-    </div>
-    <div class="ind-panel" data-panel="school">
-      <div class="ind-grid">
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.school.pain">Matrícula manual, sobrecarga de comunicación con padres, conflictos de horarios.</p></div>
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.school.solution">Automatización de matrícula + bot de WhatsApp para padres + sistema de programación de clases.</p></div>
-      </div>
-    </div>
-    <div class="ind-panel" data-panel="construct">
-      <div class="ind-grid">
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.problem">El problema</div><p data-i18n="ind.construct.pain">Rastreo de proyectos en cuadernos, desperdicio de materiales, coordinación de subcontratistas.</p></div>
-        <div class="ind-col"><div class="ind-col-label" data-i18n="ind.col.build">Lo que construimos</div><p data-i18n="ind.construct.solution">Dashboard de proyectos + rastreo de materiales + programación automatizada de subcontratistas.</p></div>
-      </div>
+
+  <div class="ipanel" id="indPanel" role="tabpanel" aria-live="polite">
+    <p class="ipanel__prob"><b data-i18n="ind.col.problem">El problema</b><span id="indProb">Precios en la cabeza del dueño, cotizaciones a mano, inventario en cuaderno.</span></p>
+    <div class="ipanel__card">
+      <b><i></i><span data-i18n="ind.col.build">Lo que construimos</span></b>
+      <p id="indSol">Asistente de WhatsApp que consulta existencias y arma la proforma en el formato del negocio.</p>
+      <div class="ipanel__out" id="indOut">Cotización y proforma quedan listas en la misma conversación</div>
     </div>
   </div>
 </section>
@@ -405,10 +353,11 @@ footer{border-top:1px solid var(--border)}
   <p class="ig__intro" data-i18n="ig.intro">Un pedido real, de principio a fin: lo que escribe el cliente, lo que el asistente resuelve mientras responde, lo que aparece en el mostrador, y la proforma que sale firmada al final.</p>
   <p class="ig__esnote" data-i18n="ig.esnote"></p>
 
-  <ul class="ig-tabs" role="tablist" aria-label="Escenarios">
-    <li role="presentation"><button class="ig-tab" role="tab" aria-selected="true" data-s="ferreteria"><span data-i18n="ig.tab.ferreteria">Ferretería</span></button></li>
-    <li role="presentation"><button class="ig-tab" role="tab" aria-selected="false" data-s="clinica"><span data-i18n="ig.tab.clinica">Clínica dental</span></button></li>
-    <li role="presentation"><button class="ig-tab" role="tab" aria-selected="false" data-s="hotel"><span data-i18n="ig.tab.hotel">Hotel</span></button></li>
+  <ul class="stabs" role="tablist" aria-label="Escenarios" id="sTabs">
+    <span class="stabs__blk" id="sBlk"></span>
+    <li role="presentation"><button class="stab" type="button" role="tab" aria-selected="true" data-s="ferreteria"><i></i><span data-i18n="ig.tab.ferreteria">Ferretería</span></button></li>
+    <li role="presentation"><button class="stab" type="button" role="tab" aria-selected="false" data-s="clinica"><i></i><span data-i18n="ig.tab.clinica">Clínica dental</span></button></li>
+    <li role="presentation"><button class="stab" type="button" role="tab" aria-selected="false" data-s="hotel"><i></i><span data-i18n="ig.tab.hotel">Hotel</span></button></li>
   </ul>
 
   <div class="ig-flow">
@@ -469,11 +418,11 @@ footer{border-top:1px solid var(--border)}
     <div id="pf"></div>
   </div>
 
-  <div class="ig-chips">
-    <span class="ig-chip"><b>—</b> <span data-i18n="ig.chip1">Responde en segundos</span></span>
-    <span class="ig-chip"><b>—</b> <span data-i18n="ig.chip2">Atiende 24/7, incluso domingos</span></span>
-    <span class="ig-chip"><b>—</b> <span data-i18n="ig.chip3">Proforma en el formato del negocio</span></span>
-    <span class="ig-chip"><b>—</b> <span data-i18n="ig.chip4">Pasa a una persona cuando hace falta</span></span>
+  <div class="caps" id="caps">
+    <div class="cap"><span class="cap__dash"></span><span class="cap__txt" data-i18n="ig.chip1">Responde en segundos</span></div>
+    <div class="cap"><span class="cap__dash"></span><span class="cap__txt" data-i18n="ig.chip2">Atiende 24/7, incluso domingos</span></div>
+    <div class="cap"><span class="cap__dash"></span><span class="cap__txt" data-i18n="ig.chip3">Proforma en el formato del negocio</span></div>
+    <div class="cap"><span class="cap__dash"></span><span class="cap__txt" data-i18n="ig.chip4">Pasa a una persona cuando hace falta</span></div>
   </div>
 
   <div class="ig-act">
@@ -500,56 +449,51 @@ footer{border-top:1px solid var(--border)}
     <div class="calc-form" style="text-align:left">
       <div class="calc-field">
         <label data-i18n="calc.industryLabel">¿En qué industria estás?</label>
-        <select id="calcIndustry">
-          <option value="restaurant" data-i18n="dx.industry.restaurant">Restaurantes y alimentación</option>
-          <option value="medical" data-i18n="dx.industry.medical">Clínica médica</option>
-          <option value="dental" data-i18n="dx.industry.dental">Clínica dental</option>
-          <option value="legal" data-i18n="dx.industry.legal">Servicios legales</option>
-          <option value="hotel" data-i18n="dx.industry.hotel">Hotelería y turismo</option>
-          <option value="retail" data-i18n="dx.industry.retail">Comercio minorista</option>
-          <option value="construction" data-i18n="dx.industry.construction">Construcción</option>
-          <option value="logistics" data-i18n="dx.industry.logistics">Logística y transporte</option>
+        <select id="calcIndustry" data-custom>
+          <option value="restaurant" data-i18n="calc.ind.restaurant">Restaurante</option>
+          <option value="medical" data-i18n="calc.ind.medical">Clínica médica</option>
+          <option value="dental" data-i18n="calc.ind.dental">Clínica dental</option>
+          <option value="legal" data-i18n="calc.ind.legal">Firma legal</option>
+          <option value="hotel" data-i18n="calc.ind.hotel">Hotel</option>
+          <option value="retail" data-i18n="calc.ind.retail">Retail</option>
+          <option value="construction" data-i18n="calc.ind.construction">Construcción</option>
+          <option value="logistics" data-i18n="calc.ind.logistics">Logística</option>
         </select>
       </div>
+
       <div class="calc-field">
-        <label data-i18n="calc.employeesLabel">¿Cuántos empleados?</label>
-        <div class="calc-cards" id="calcEmployees">
-          <div class="calc-card" data-val="3">1–5</div>
-          <div class="calc-card selected" data-val="8">6–15</div>
-          <div class="calc-card" data-val="25">16–50</div>
-          <div class="calc-card" data-val="75">50+</div>
+        <label data-i18n="calc.teamLabel">¿Cuántos empleados?</label>
+        <div class="seg" id="calcSeg">
+          <span class="seg__blk" id="calcSegBlk"></span>
+          <button type="button" aria-pressed="false" data-n="3">1–5</button>
+          <button type="button" aria-pressed="true"  data-n="8">6–15</button>
+          <button type="button" aria-pressed="false" data-n="25">16–50</button>
+          <button type="button" aria-pressed="false" data-n="75">50+</button>
         </div>
       </div>
+
       <div class="calc-field">
         <label data-i18n="calc.hoursLabel">Horas semanales en tareas manuales</label>
-        <div class="range-wrap">
-          <div class="range-val" id="calcHoursVal">20</div>
-          <input type="range" class="range-input" id="calcHours" min="5" max="80" value="20">
-          <div class="range-labels"><span>5 hrs</span><span>80 hrs</span></div>
+        <div class="slider">
+          <div class="slider__val" id="calcHoursVal">20</div>
+          <div class="slider__track">
+            <div class="slider__fill" id="calcFill"></div>
+            <input type="range" min="5" max="80" value="20" id="calcHours" aria-label="Horas semanales en tareas manuales">
+          </div>
+          <div class="slider__ends"><span>5 hrs</span><span>80 hrs</span></div>
         </div>
       </div>
     </div>
-    <div class="calc-result" id="calcResult">
-      <div class="calc-result-label" data-i18n="calc.resultLabel">Tu negocio está perdiendo aproximadamente</div>
-      <div class="calc-result-value" id="calcResultValue">$0</div>
-      <div class="calc-result-unit" data-i18n="calc.resultUnit">/mes</div>
-      <div class="calc-result-note" data-i18n="calc.resultNote">en productividad desperdiciada</div>
-      <div class="calc-breakdown" id="calcBreakdown">
-        <div class="calc-breakdown-row">
-          <span class="calc-breakdown-label" data-i18n="calc.bd.manual">Horas manuales × costo/hora estimado</span>
-          <span class="calc-breakdown-val" id="calcBdManual">$0</span>
-        </div>
-        <div class="calc-breakdown-row">
-          <span class="calc-breakdown-label" data-i18n="calc.bd.lost">Oportunidades perdidas (clientes no atendidos)</span>
-          <span class="calc-breakdown-val" id="calcBdLost">$0</span>
-        </div>
-        <div class="calc-breakdown-row">
-          <span class="calc-breakdown-label" data-i18n="calc.bd.errors">Costo de errores y retrabajo</span>
-          <span class="calc-breakdown-val" id="calcBdErrors">$0</span>
-        </div>
+
+    <div class="calcout">
+      <p class="calcout__cap" data-i18n="calc.resultLabel">Tu negocio está perdiendo aproximadamente</p>
+      <div class="calcout__big" id="calcResultValue">$0</div>
+      <p class="calcout__unit" data-i18n="calc.resultUnit">/mes</p>
+      <p class="calcout__sub" data-i18n="calc.resultNote">en productividad desperdiciada</p>
+      <div class="calcout__rows">
+        <div class="crow"><span class="crow__k" data-i18n="calc.bd.manual">Horas manuales × costo/hora estimado</span><span class="crow__dots"></span><span class="crow__v" id="calcBdManual">$0</span></div>
       </div>
-      <div class="calc-breakdown-note" id="calcBdNote"></div>
-      <a href="diagnostic" class="btn-primary" style="margin-top:24px" data-i18n-btn="calc.cta">Agenda tu Llamada Gratis &rarr;</a>
+      <p class="calcout__foot" id="calcBdNote"></p>
     </div>
   </div>
 </section>
@@ -708,6 +652,7 @@ window.setLang = function(lang) {
 <script src="js/terminal.js"></script>
 <script src="js/ticker-nudge.js"></script>
 <script src="js/wa-demo.js"></script>
+<script src="js/home-ui.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   IgneaTerminal.init();
@@ -740,94 +685,6 @@ document.addEventListener('DOMContentLoaded', function() {
     fadeBlocks.forEach(function(b) { obs.observe(b); });
   }
 
-  // Calculator logic
-  var CALC_RATES = {
-    restaurant: 14, medical: 30, dental: 30, legal: 35,
-    hotel: 16, retail: 14, construction: 22, logistics: 18
-  };
-  var calcEmployees = 8;
-  var calcIndustry = document.getElementById('calcIndustry');
-  var calcHours = document.getElementById('calcHours');
-  var calcHoursVal = document.getElementById('calcHoursVal');
-  var calcResult = document.getElementById('calcResult');
-  var calcResultValue = document.getElementById('calcResultValue');
-
-  function updateCalc() {
-    var rate = CALC_RATES[calcIndustry.value] || 18;
-    var hours = parseInt(calcHours.value) || 20;
-    var teamRate = IgneaLaborCost.rateForHeadcount(calcEmployees);
-
-    // Breakdown components
-    var manualCost = Math.round(hours * teamRate * 4.33);
-    var lostOpps = Math.round(hours * 0.3 * teamRate * 1.5 * 4.33);
-    var errorCost = Math.round(hours * 0.15 * teamRate * 4.33);
-    var monthly = manualCost + lostOpps + errorCost;
-
-    // Cap at 30% of estimated revenue
-    var estRevenue = calcEmployees * rate * 160;
-    var cap = Math.round(estRevenue * 0.3);
-    if (monthly > cap) { var ratio = cap / monthly; manualCost = Math.round(manualCost * ratio); lostOpps = Math.round(lostOpps * ratio); errorCost = Math.round(errorCost * ratio); monthly = cap; }
-    if (monthly > 8000) { var r2 = 8000 / monthly; manualCost = Math.round(manualCost * r2); lostOpps = Math.round(lostOpps * r2); errorCost = Math.round(errorCost * r2); monthly = 8000; }
-
-    calcResultValue.textContent = '$' + monthly.toLocaleString('en-US');
-    calcResult.classList.add('visible');
-
-    // Update breakdown
-    var bdManual = document.getElementById('calcBdManual');
-    var bdLost = document.getElementById('calcBdLost');
-    var bdErrors = document.getElementById('calcBdErrors');
-    var bdNote = document.getElementById('calcBdNote');
-    if (bdManual) bdManual.textContent = '$' + manualCost.toLocaleString('en-US');
-    if (bdLost) bdLost.textContent = '$' + lostOpps.toLocaleString('en-US');
-    if (bdErrors) bdErrors.textContent = '$' + errorCost.toLocaleString('en-US');
-
-    if (bdNote) {
-      var lang = localStorage.getItem('ignea_lang') || 'es';
-      var sizeLabel = calcEmployees <= 5 ? '1-5' : calcEmployees <= 15 ? '6-15' : calcEmployees <= 50 ? '16-50' : '50+';
-      var indLabel = calcIndustry.options[calcIndustry.selectedIndex].textContent;
-      bdNote.textContent = lang === 'es'
-        ? 'Basado en el costo promedio de mano de obra para equipos de ' + sizeLabel + ' empleados en ' + indLabel.toLowerCase() + '.'
-        : 'Based on average labor cost for teams of ' + sizeLabel + ' employees in ' + indLabel.toLowerCase() + '.';
-    }
-
-    // Debounced analytics
-    if (typeof IgneaAnalytics !== 'undefined' && !updateCalc._t) {
-      updateCalc._t = setTimeout(function() {
-        IgneaAnalytics.track('calculator_used', { industry: calcIndustry.value, hours: calcHours.value });
-        updateCalc._t = null;
-      }, 2000);
-    }
-  }
-
-  if (calcIndustry) {
-    calcIndustry.addEventListener('change', updateCalc);
-    calcHours.addEventListener('input', function() {
-      calcHoursVal.textContent = this.value;
-      updateCalc();
-    });
-    document.querySelectorAll('.calc-card').forEach(function(card) {
-      card.addEventListener('click', function() {
-        document.querySelectorAll('.calc-card').forEach(function(c) { c.classList.remove('selected'); });
-        this.classList.add('selected');
-        calcEmployees = parseInt(this.getAttribute('data-val')) || 8;
-        updateCalc();
-      });
-    });
-    updateCalc();
-  }
-});
-</script>
-<script>
-// Industry tabs
-document.querySelectorAll('.ind-tab').forEach(function(tab) {
-  tab.addEventListener('click', function() {
-    var target = tab.dataset.tab;
-    document.querySelectorAll('.ind-tab').forEach(function(t) { t.classList.remove('active'); });
-    document.querySelectorAll('.ind-panel').forEach(function(p) { p.classList.remove('active'); });
-    tab.classList.add('active');
-    var panel = document.querySelector('.ind-panel[data-panel="' + target + '"]');
-    if (panel) panel.classList.add('active');
-  });
 });
 </script>
 
