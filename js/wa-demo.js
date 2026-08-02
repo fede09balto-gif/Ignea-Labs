@@ -133,7 +133,7 @@ var chat=document.getElementById('chat'), steps=document.getElementById('steps')
     ops=document.getElementById('ops'), pfEl=document.getElementById('pf'),
     nm=document.getElementById('nm'), av=document.getElementById('av'),
     pulse=document.getElementById('pulse'), opcount=document.getElementById('opcount'),
-    tabs=[].slice.call(document.querySelectorAll('.ig-tab')),
+    tabs=[].slice.call(document.querySelectorAll('.stab')),
     replay=document.getElementById('replay'), section=document.getElementById('demo');
 
 var timers=[], running=false, current='ferreteria', token=0, opsN=0,
