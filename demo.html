@@ -12,8 +12,12 @@
 <meta property="og:image" content="https://www.ignealabs.com/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://www.ignealabs.com/demo">
+<script src="js/labor-cost.js"></script>
 <script>
 (function() {
+  // Sample-report total, derived from the single labor-cost source so the
+  // whole breakdown moves when the rate does.
+  var SAMPLE_MONTH = Math.round(32 * IgneaLaborCost.rate('counter') * 4.33);
   var answers = {
     contact: {
       firstName: "", lastName: "",
@@ -51,20 +55,25 @@
       informationFlow: 3,
       growthFlow: 12
     },
-    roi: {
-      weeklyWastedHours: 32,
-      hourlyCost: 20,
-      totalMonthlyCost: 2540,
-      annualCost: 30480
-    },
+    roi: (function () {
+      // Derived, not typed. These were 2540 / 30480, computed from the old
+      // hardcoded $20/hr. Anything downstream of the rate must move with it.
+      var h = 32, r = IgneaLaborCost.rate('counter');
+      return {
+        weeklyWastedHours: h,
+        hourlyCost: r,
+        totalMonthlyCost: Math.round(h * r * 4.33),
+        annualCost: Math.round(h * r * 52)
+      };
+    })(),
     costHours: 32,
-    costMonth: 2540,
-    costYear: 30480,
+    costMonth: Math.round(32 * IgneaLaborCost.rate('counter') * 4.33),
+    costYear: Math.round(32 * IgneaLaborCost.rate('counter') * 52),
     painpoints: [
-      { key: "customerFlow", monthlyCost: 720, insight: "Ingresos perdidos por consultas sin respuesta, no-shows y tiempos de respuesta lentos." },
-      { key: "operationsFlow", monthlyCost: 960, insight: "Horas de personal desperdiciadas en agenda manual, conteo de inventario y coordinación." },
-      { key: "informationFlow", monthlyCost: 540, insight: "Erosión de márgenes por costos de alimentos sin rastrear, sobre-dotación de personal en horas lentas y precios de menú incorrectos." },
-      { key: "growthFlow", monthlyCost: 320, insight: "Costo de adquisición elevado por marketing manual y cero retención automatizada." }
+      { key: "customerFlow", monthlyCost: Math.round(SAMPLE_MONTH * 0.2835), insight: "Ingresos perdidos por consultas sin respuesta, no-shows y tiempos de respuesta lentos." },
+      { key: "operationsFlow", monthlyCost: Math.round(SAMPLE_MONTH * 0.378), insight: "Horas de personal desperdiciadas en agenda manual, conteo de inventario y coordinación." },
+      { key: "informationFlow", monthlyCost: Math.round(SAMPLE_MONTH * 0.2126), insight: "Erosión de márgenes por costos de alimentos sin rastrear, sobre-dotación de personal en horas lentas y precios de menú incorrectos." },
+      { key: "growthFlow", monthlyCost: Math.round(SAMPLE_MONTH * 0.126), insight: "Costo de adquisición elevado por marketing manual y cero retención automatizada." }
     ],
     solutions: ["customer", "operations", "information"],
     savingsMonth: 2640,

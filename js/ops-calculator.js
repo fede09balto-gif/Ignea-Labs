@@ -12,8 +12,12 @@ var OpsCalculator = (function() {
 
   /* ---- Helpers ---- */
 
+  /* Single source: js/labor-cost.js. Was [12,15,22,30,40,55,75] —
+     up to 36x the real Nicaraguan loaded rate, and the figures this fed
+     into ops-ai.js contradicted that prompt's own "$3-4/hr" by ~10x. */
   function getHourlyCost(revenueIndex) {
-    return [12, 15, 22, 30, 40, 55, 75][revenueIndex] || 18;
+    var band = ['counter','counter','counter','supervisor','supervisor','professional','professional'][revenueIndex] || 'counter';
+    return IgneaLaborCost.rate(band);
   }
 
   var teamSizes = [3, 10, 30, 75];

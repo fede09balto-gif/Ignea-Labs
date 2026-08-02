@@ -57,6 +57,11 @@
       if (lead.opportunityCount) parts.push('Opportunities identified: ' + lead.opportunityCount);
       if (lead.estimatedHoursLost) parts.push('Estimated hours lost/week: ' + lead.estimatedHoursLost);
       if (lead.revenue) parts.push('Monthly revenue range: ' + lead.revenue);
+      // The labor rate is supplied, never invented by the model. Single
+      // source is js/labor-cost.js; see its header for the derivation.
+      parts.push('RATE_USD_PER_HOUR: ' + IgneaLaborCost.rateForHeadcount(
+        parseInt(String(lead.teamSize || lead.company_size || '5').replace(/\D/g, ''), 10) || 5
+      ) + ' (loaded Nicaraguan labor cost — use this rate, do not substitute your own)');
     } else {
       parts.push('Score: ' + (lead.total_score || 0) + '/100 (' + (lead.score_level || 'unknown') + ')');
       if (lead.score_breakdown) {
@@ -113,7 +118,7 @@
       '  "overview": "2-3 sentences. What the business does, their core operational bottleneck, and the estimated scale of the problem. No fluff.",\n' +
       '  "pain_points": ["Each bullet with a SPECIFIC metric from their answers. Not \\"they waste time on WhatsApp\\" but \\"Staff spends ~3hrs/day on 30-50 repetitive WhatsApp messages, displacing in-person service.\\""],\n' +
       '  "recommended_project": "One project only. Name it, describe what it does in one sentence, and explain why THIS one goes first.",\n' +
-      '  "savings_calculation": "Show your math step by step. Example: 3 hrs/day x 6 days/week x 4 weeks = 72 hrs/month. At estimated $3-4/hr = $216-$288/month in direct labor. Plus revenue recovery: $200-400/month. Total: $416-$688/month. Never give a savings number without showing the calculation.",\n' +
+      '  "savings_calculation": "Show your math step by step. Use RATE_USD_PER_HOUR (given above) as the labor rate — do not invent one. Example: 3 hrs/day x 6 days/week x 4 weeks = 72 hrs/month x RATE = direct labor saved. Never give a savings number without showing the calculation, and never state a revenue-recovery figure unless the client supplied the inputs for it.",\n' +
       '  "monthly_savings_min": 0,\n' +
       '  "monthly_savings_max": 0,\n' +
       '  "price_calculation": "Formula: (monthly savings x 4 months) x 30% capture rate. Show the formula with actual numbers.",\n' +
@@ -182,7 +187,7 @@
       '      "build_hours": 40,\n' +
       '      "build_hours_breakdown": "20h for component A + 15h for component B + 5h testing",\n' +
       '      "monthly_savings": 1200,\n' +
-      '      "savings_calculation": "Show calculation from their specific numbers. Example: 3 hrs/day x 6 days x 4 wks = 72 hrs/mo x $4/hr = $288 labor + $400 revenue recovery = $688/mo",\n' +
+      '      "savings_calculation": "Show calculation from their specific numbers using RATE_USD_PER_HOUR (given above). Example: 3 hrs/day x 6 days x 4 wks = 72 hrs/mo x RATE = labor saved. Do not add a revenue-recovery figure unless the client supplied the inputs for it.",\n' +
       '      "suggested_price": 3500,\n' +
       '      "price_formula": "savings x 4 months x 30% = price",\n' +
       '      "why_this_order": "Why this phase comes at this position in the sequence"\n' +

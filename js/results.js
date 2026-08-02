@@ -206,9 +206,11 @@
     setTimeout(function() { requestAnimationFrame(tick); }, 400);
   }
 
-  /* ---- HOURLY COST BY TEAM SIZE (NOT revenue) ---- */
+  /* ---- HOURLY COST — single source: js/labor-cost.js ---- */
+  /* Was [12,18,25,35], i.e. 6x-17x the real Nicaraguan loaded rate. */
   function getHourlyCostByTeamSize(teamSizeIdx) {
-    return [12, 18, 25, 35][teamSizeIdx] || 18;
+    var band = ['counter', 'counter', 'supervisor', 'professional'][teamSizeIdx] || 'counter';
+    return IgneaLaborCost.rate(band);
   }
 
   /* ---- SECTION 1: REPORT HEADER ---- */

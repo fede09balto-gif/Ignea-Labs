@@ -183,6 +183,7 @@ footer{border-top:1px solid var(--border)}
 </script>
 <style>[data-i18n],[data-i18n-html],[data-i18n-btn]{visibility:hidden}</style>
 <script src="js/i18n.js"></script>
+<script src="js/labor-cost.js"></script>
 <script defer data-domain="ignealabs.com" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
@@ -744,7 +745,6 @@ document.addEventListener('DOMContentLoaded', function() {
     restaurant: 14, medical: 30, dental: 30, legal: 35,
     hotel: 16, retail: 14, construction: 22, logistics: 18
   };
-  var TEAM_HOURLY = { 3: 3, 8: 5, 25: 7, 75: 10 };
   var calcEmployees = 8;
   var calcIndustry = document.getElementById('calcIndustry');
   var calcHours = document.getElementById('calcHours');
@@ -755,7 +755,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateCalc() {
     var rate = CALC_RATES[calcIndustry.value] || 18;
     var hours = parseInt(calcHours.value) || 20;
-    var teamRate = TEAM_HOURLY[calcEmployees] || 5;
+    var teamRate = IgneaLaborCost.rateForHeadcount(calcEmployees);
 
     // Breakdown components
     var manualCost = Math.round(hours * teamRate * 4.33);
