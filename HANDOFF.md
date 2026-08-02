@@ -63,6 +63,32 @@ Fast-forward merge (zero conflicts), `main` = `1a4c87b`, deployed via `vercel --
   in Eastern hours. The page is pinned to Managua and does not convert for the viewer
   (verified across three forced browser timezones). Fede is checking it in Google Calendar.
 
+### `feat/labor-cost-and-components` — IN PROGRESS, not merged
+
+Two commits pushed. **`dfb0d52` closes §2.1.** `js/labor-cost.js` is now the only hourly-rate
+source on the site; `counter` is derived in code from the published figures (recomputes to
+$2.09/hr, $434.36/month), and `supervisor`/`professional` are labelled in-file as judgment
+estimates. All five disagreeing consumers were migrated — `TEAM_HOURLY`,
+`getHourlyCostByTeamSize`, `getHourlyCost`, `demo.html`'s hardcoded 20 — and `ops-ai.js` no
+longer contains a rate literal at all: the real rate is injected as `RATE_USD_PER_HOUR` with an
+instruction not to substitute one, which removes the 10x contradiction between the site and the
+proposals it generated.
+
+Two things surfaced doing it. `demo.html` carried more old-rate arithmetic than the audit found —
+`totalMonthlyCost: 2540`, `annualCost: 30480`, and four painpoint costs summing to exactly 2540,
+all built from the $20 rate; those are now derived so the breakdown moves with the rate, and the
+sample report drops from **$3,528/mo to $157/mo**. And a load-order bug was introduced and fixed:
+`demo.html` evaluates its sample data inline near the top of `<head>`, so the script tag has to
+precede it or the page throws and bounces to the diagnostic redirect.
+
+**`fb3b0ee` adds the industry-panel copy**, additive only and not yet referenced by any markup:
+the Ferretería trio plus nine `ind.*.out` output lines in both languages. Every timing from the
+reference file was dropped — the demo demonstrates artifacts, not latency, and its 23.7s runtime
+is animation pacing. Sample identifiers were left out too, since the panel has no "datos de
+ejemplo" label. **The component port (A–D) was started and deliberately reverted**: the new
+`.itabs`/`.ipanel` markup was in place before its CSS and JS existed, which left the page broken,
+and the remaining work did not fit the session. `index.html` is back at HEAD and re-verified.
+
 ### What shipped, and the non-obvious decisions inside it
 
 **Hero CTA + ticker.** Ported from `ignea-hero-cta-redesign.html` (now deleted). Two deliberate deviations from the reference:
