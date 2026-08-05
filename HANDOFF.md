@@ -273,6 +273,58 @@ that before paying for it. The trial page also throws two console errors from th
 prototype's own script reaching for the nav I stripped when swapping in the real one; those
 are assembly artifacts, not design problems, so judge layout and pinning, not interactions.
 
+## 2c. /PROBALO GUIDED DEMO — steps 1-3 done on `feat/probalo-data` (`379112c`)
+
+Branch not merged, no preview. `probalo.html` and `ignea-landing-v4.html` are now IN the
+repo (both were in ~/Downloads). Steps 4-6 start fresh.
+
+**Architecture decision (settled, do not re-open): option A.** The prototype's TREE replies
+were JavaScript functions doing real arithmetic, so they could not be JSON at all. They are
+now templates with a deliberately small placeholder vocabulary, resolved by
+`js/tryit-resolver.js`. The property that decided it: the whitelist of named calculations is
+simultaneously what makes JSON extraction possible AND what makes the eval walker able to
+recompute and assert — one mechanism, both jobs.
+
+**`data/ferreteria-catalog.json`** — 44 SKUs, 9 categories. Fede's original 12 keep their
+prices, `source:"fede-estimate"`, still UNVERIFIED until a ferretero in Leon confirms them.
+The other 32 have real names/units/categories/codes but **`p:null`, `source:"TODO"`** — those
+were never estimated by anyone. **Do not fill them in by guessing.** The reason is not
+squeamishness: the eval asserts replies against this file, so invented prices would be
+validated against themselves and pass at 100%. Cordobas deliberately; the site calculator
+stays USD because engagement pricing is USD.
+
+**`data/tryit-tree.json`** — 19 nodes, 4 entry points, verified: no dangling chips, no
+unreachable nodes, no dead ends. No price literal in any copy string. Scenario quantities
+that ARE legitimately literal (40 m2, 14 bolsas, proforma numbers) are declared per-node in
+`allowDigits`, so the bare-digit walker can distinguish a scripted quantity from a leaked
+price instead of guessing. Widen that list only deliberately.
+
+**`js/tryit-resolver.js`** — `price()` is the single chokepoint for reading a price, so a
+null-priced SKU cannot reach a prospect: `PriceUnavailable` throws on localhost and returns
+null in production so the engine drops the chip rather than rendering a broken quote.
+Verified: all 19 nodes render, arithmetic matches the prototype exactly (PRO-1043 totals
+C$23,756.70 both ways), and the guard fires on a TODO SKU.
+
+**Step 4 next, before the API route** — walk every path and assert: (1) figures recomputed
+from the catalog, not string-matched, since derived values never appear in it; (2) every chip
+resolves; (3) every node reachable from an entry; (4) no dead ends; (5) the strict bare-digit
+guard with `allowDigits` as the only exception list. Doing step 4 before step 5 proves the
+guided path while it is still pure-local.
+
+Then **step 5** `/api/tryit` per the contract commented above `askServer()` in
+`probalo.html`: origin allowlist failing closed, per-IP rate limit, daily token ceiling,
+server-side turn cap, pinned model, `GROQ_API_KEY` server-side only, client never sends a
+system prompt, `{degraded:true}` falls back silently. Add a **non-user-facing failure
+counter** for the route (not a console.log — those are banned in production); the silent
+fallback is right for prospects but means a fully broken API is otherwise invisible. Then
+**step 6**, styles onto shared.css tokens.
+
+**Open question for Fede, unresolved:** the 70-80% LLM-call reduction is a prediction. A
+synthetic walker reports ~100% chip usage by construction because it never free-types, so
+decide what the real measurement is — instrumented live sessions, or a modelled estimate
+from the tree's branching factor. Those give very different numbers, and the answer decides
+whether the free tier is viable.
+
 ## 3. STANDING RULES
 
 - **Nothing on the public site states a result, timeline, or figure attributed to a client until there's a real one.** `thesis.html`'s aggregate Latin-America market statistics (region GDP, population served, consulting pricing) are explicitly fine — they describe the market, not our client outcomes. A full sweep of the live merged state found nothing beyond the three groups already cleaned, plus the ROI footnote now fixed.
