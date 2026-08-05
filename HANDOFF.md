@@ -457,6 +457,49 @@ re-run against the new format: **20/20 nodes pass** (19 + `identidad`), includin
 three fresh positive controls (stray digit, dangling chip, and the freeTextEntry
 wiring check specifically) to confirm the updated checks are real, not vacuous.
 
+### Closing-card fix (this session, second pass)
+
+**Root cause of the first attempt's bug: `#close` was a DOM sibling of `.screen`,
+not a child of it.** `.screen{overflow:hidden}` only clips its own descendants —
+positioned outside that subtree, the hidden card (`translateY(105%)`) rendered
+below `.phone`'s own bounds, unclipped, parking in open page space instead of
+disappearing. Fixed properly this time, not patched:
+
+- `#close` and a new `#scrim` moved to be actual DOM children of `.screen`, after
+  `.bar`. `.screen` gained `position:relative` so `#close{position:absolute;
+  left:0;right:0;bottom:0}` resolves against `.screen`'s own box, not `.phone`'s
+  (which has 10px of padding `.screen` doesn't) — previously `left:10px;right:10px;
+  bottom:10px` were relative to the wrong box entirely.
+- Hidden state is `translateY(100%)` (was `105%`, no longer needed now that it's
+  flush to the correct container) — verified by measuring the actual computed
+  `transform` matrix at load: it resolves to exactly the card's own rendered
+  height (e.g. `434.98px` at 375px viewport), and the card's bounding-box top
+  lands exactly on `.screen`'s bounding-box bottom at all of 375/768/1440 —
+  zero pixels inside the visible frame, confirmed both by bounding-box math and
+  by screenshotting just the `.phone` element at each width (`/tmp/probalo-phone-
+  {375,768,1440}.png` during this session — not committed, local verification
+  artifacts).
+- New `.scrim` (also a `.screen` child, `rgba(10,10,12,.35)`, fades independently
+  of the card's slide) dims the visible conversation above the card while it's
+  open, toggled by the same `endDemo()` / `start()` calls that toggle `#close`.
+- `border-radius:24px 24px 29px 29px` unchanged — bottom corners already matched
+  `.screen`'s own `29px`, so the card doesn't square off inside the rounded frame.
+- Reduced-motion override simplified: previously forced `position:static` on
+  `#close`, which — now that it's a real flex child of `.screen` instead of a
+  block child of unconstrained `.phone` — would have broken out of `.screen`'s
+  fixed `660px` height. Transition-killing alone (already global under
+  `prefers-reduced-motion`) is sufficient: the slide becomes an instant cut
+  instead of an animation, with no layout change needed.
+
+Verified at 375/768/1440 (Playwright, screenshots + computed-style + bounding-box
+inspection, not just visual spot-check): hidden and fully clipped at load on all
+three; triggered via the turn cap (8 chip taps) at 375px, card renders **fully
+within `.screen`'s bounds**, does **not** overlap the `.meta` "mensajes restantes"
+line below the phone (card bottom at `781.4px`, meta top at `805.4px`); `#scrim`
+correctly toggles `.on` alongside the card; **Repetir la demostración** resets both
+`#close` and `#scrim` cleanly, card returns to its fully-clipped off-screen
+position. Zero console errors throughout.
+
 **End-to-end verification (this session).** Vercel's build compiled `tryit.js` from ESM to
 CommonJS cleanly (confirms the `import catalog from '...json' with {type:'json'}` syntax
 works in the real build, not just local Node). Since the deployed preview is fully
