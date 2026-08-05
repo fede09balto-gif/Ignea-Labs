@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Probalo gratis — Ignea Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   IGNEA — /probalo  ·  STARTING POINT, not finished
+   Chip-driven ferretería assistant.
+
+   ARCHITECTURE (do not change without asking):
+   · Chip taps resolve against TREE. Deterministic. NO API CALL.
+     Replies are COMPOSED FROM CATALOG at runtime — no price is
+     ever written into reply text.
+   · Free-typed input is the only thing that would hit the API.
+     Here it uses the local fallback responder. The API call is
+     stubbed at askServer() with the contract documented.
+   · Fallback responder exists FIRST so it can never be the thing
+     that got skipped.
+
+   Uses the site's white-theme tokens. Drop this :root when porting.
+   ============================================================ */
+:root{
+  --bg:#FFFFFF; --bg-tint:#F7F7F5;
+  --ink:#0A0A0C; --ink-2:#55555C; --ink-3:#8E8E94;
+  --line:#E6E5E1; --red:#E8352A; --red-wash:rgba(232,53,42,.07);
+  --shadow-1:0 1px 2px rgba(10,10,12,.05);
+  --shadow-2:0 12px 32px rgba(10,10,12,.07);
+  --shadow-3:0 30px 70px rgba(10,10,12,.14);
+  --wa-green:#008069; --wa-paper:#EFEAE2; --wa-out:#D9FDD3;
+  --wa-text:#111B21; --wa-meta:#667781; --wa-read:#53BDEB;
+  --ff:'DM Sans',sans-serif; --fs:'DM Serif Display',Georgia,serif; --fm:'JetBrains Mono',monospace;
+  --out:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff);-webkit-font-smoothing:antialiased}
+
+.nav{display:flex;align-items:center;justify-content:space-between;max-width:1180px;margin:0 auto;padding:24px 40px;border-bottom:1px solid var(--line)}
+.nav__logo{font-weight:500;letter-spacing:.06em;font-size:17px}
+.nav__logo i{display:inline-block;width:6px;height:6px;background:var(--red);border-radius:50%;margin:0 7px;vertical-align:middle;font-style:normal}
+.nav__links{display:flex;gap:24px;font-size:14.5px;color:var(--ink-2)}
+.nav__links b{color:var(--ink);font-weight:500}
+
+.wrap{max-width:1180px;margin:0 auto;padding:64px 40px 90px;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,420px);gap:56px;align-items:start}
+.lab{font-family:var(--fm);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);margin:0 0 16px}
+.lab span{color:var(--red)}
+.h1{font-family:var(--fs);font-size:clamp(34px,4.4vw,56px);line-height:1.06;letter-spacing:-.018em;margin:0 0 20px;max-width:15ch}
+.h1 em{font-style:italic;color:var(--red)}
+.sub{font-size:17px;line-height:1.6;color:var(--ink-2);max-width:46ch;margin:0 0 34px}
+
+.how{border-top:1px solid var(--line)}
+.how__i{display:flex;gap:16px;padding:18px 2px;border-bottom:1px solid var(--line);align-items:flex-start}
+.how__n{font-family:var(--fm);font-size:11px;color:var(--red);padding-top:3px;flex:none}
+.how__t{font-size:15px;line-height:1.55;color:var(--ink-2)}
+.how__t b{color:var(--ink);font-weight:500}
+
+.disc{margin-top:30px;border:1px dashed var(--line);border-radius:10px;padding:18px 20px}
+.disc p{font-family:var(--fm);font-size:10.5px;letter-spacing:.05em;line-height:1.9;color:var(--ink-3);margin:0}
+.disc b{color:var(--ink-2);font-weight:400}
+
+/* ---------------- phone ---------------- */
+.stage{position:sticky;top:28px;justify-self:center}
+.phone{width:376px;border-radius:38px;background:#0A0A0C;padding:10px;box-shadow:var(--shadow-3)}
+.screen{border-radius:29px;overflow:hidden;background:var(--wa-paper);height:660px;display:flex;flex-direction:column}
+.status{display:flex;justify-content:space-between;align-items:center;background:var(--wa-green);color:#fff;font-size:11px;font-weight:500;padding:8px 16px 2px}
+.wahead{display:flex;align-items:center;gap:11px;background:var(--wa-green);color:#fff;padding:8px 13px 11px}
+.wahead__av{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
+.wahead__n{font-size:14.5px;font-weight:500;line-height:1.2}
+.wahead__s{font-size:11.5px;opacity:.85}
+.wahead__m{flex:1;min-width:0}
+
+.chat{flex:1;overflow-y:auto;padding:14px 10px 8px;display:flex;flex-direction:column;gap:7px;scroll-behavior:smooth}
+.chat::-webkit-scrollbar{width:0}
+.daychip{align-self:center;background:#FFF;color:var(--wa-meta);font-size:11px;padding:5px 12px;border-radius:8px;box-shadow:0 1px 1px rgba(0,0,0,.06)}
+
+.msg{max-width:84%;padding:7px 10px 5px;border-radius:9px;font-size:13.4px;line-height:1.45;color:var(--wa-text);box-shadow:0 1px 1px rgba(0,0,0,.07);white-space:pre-wrap;word-wrap:break-word;animation:pop .24s var(--out) both}
+.msg--in{align-self:flex-start;background:#FFF;border-top-left-radius:2px}
+.msg--out{align-self:flex-end;background:var(--wa-out);border-top-right-radius:2px}
+.msg b{font-weight:700}
+.msg__meta{display:flex;justify-content:flex-end;align-items:center;gap:3px;font-size:10px;color:var(--wa-meta);margin-top:3px}
+.tk{width:15px;height:11px}.tk path{fill:var(--wa-meta);transition:fill .3s}
+.tk.read path{fill:var(--wa-read)}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+
+.typing{align-self:flex-start;background:#FFF;border-radius:9px;border-top-left-radius:2px;padding:11px 12px;display:flex;gap:4px;box-shadow:0 1px 1px rgba(0,0,0,.07)}
+.typing i{width:7px;height:7px;border-radius:50%;background:#9AA5AC;animation:blink 1.25s infinite}
+.typing i:nth-child(2){animation-delay:.18s}
+.typing i:nth-child(3){animation-delay:.36s}
+@keyframes blink{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+
+/* quick-reply chips, inside the thread */
+.chips{display:flex;flex-direction:column;gap:5px;align-self:stretch;margin-top:3px;animation:pop .3s var(--out) both}
+.chip{background:#FFF;border:1px solid rgba(0,128,105,.28);color:var(--wa-green);border-radius:8px;padding:10px 12px;font-size:12.8px;font-family:var(--ff);font-weight:500;text-align:center;cursor:pointer;transition:background .16s,transform .16s;min-height:44px}
+.chip:hover{background:rgba(0,128,105,.06)}
+.chip:active{transform:scale(.99)}
+.chip--free{color:var(--wa-meta);border-color:rgba(0,0,0,.12);font-weight:400}
+.chip:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+
+/* input bar */
+.bar{background:var(--wa-paper);padding:8px 9px 11px;display:flex;gap:7px;align-items:center;border-top:1px solid rgba(0,0,0,.05)}
+.bar input{flex:1;background:#FFF;border:0;border-radius:20px;padding:11px 15px;font-size:13.5px;font-family:var(--ff);color:var(--wa-text);outline:none;min-width:0}
+.bar input::placeholder{color:#B4BCC2}
+.bar button{width:38px;height:38px;border-radius:50%;background:var(--wa-green);border:0;flex:none;display:grid;place-items:center;cursor:pointer;transition:opacity .18s}
+.bar button:disabled{opacity:.4;cursor:default}
+.bar button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+
+.meta{display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-family:var(--fm);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.meta b{color:var(--red);font-weight:400}
+
+/* ---------------- closing card ---------------- */
+.close{position:absolute;left:10px;right:10px;bottom:10px;background:#FFF;border-radius:24px 24px 29px 29px;box-shadow:0 -18px 40px rgba(10,10,12,.13);padding:24px 22px 20px;transform:translateY(105%);transition:transform .55s var(--out);z-index:5}
+.close.on{transform:none}
+.close__k{font-family:var(--fm);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.close__k i{width:5px;height:5px;border-radius:50%;background:var(--red);flex:none;font-style:normal}
+.close__t{font-family:var(--fs);font-size:23px;line-height:1.18;margin:0 0 16px}
+.opt{display:block;width:100%;text-align:left;background:none;border:1px solid var(--line);border-radius:9px;padding:13px 15px;margin-bottom:7px;font-family:var(--ff);font-size:14px;color:var(--ink);cursor:pointer;text-decoration:none;transition:.18s;min-height:46px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.opt:hover{border-color:var(--ink);background:var(--red-wash)}
+.opt--pri{background:var(--red);border-color:var(--red);color:#fff;font-weight:500}
+.opt--pri:hover{background:#D92F24;border-color:#D92F24}
+.opt small{font-family:var(--fm);font-size:9px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+.opt:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.close__replay{background:none;border:0;font-family:var(--fm);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);cursor:pointer;padding:10px 0 0;width:100%}
+.close__replay:hover{color:var(--ink)}
+
+.phone{position:relative}
+
+@media(max-width:900px){
+  .wrap{grid-template-columns:1fr;padding:44px 20px 64px;gap:40px}
+  .stage{position:static;justify-self:stretch}
+  .phone{width:100%;max-width:376px;margin:0 auto}
+  .nav__links{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .close{transform:none;position:static;box-shadow:none;border-top:1px solid var(--line);border-radius:0}
+  .close:not(.on){display:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav__logo">IGNEA<i></i>LABS</div>
+  <div class="nav__links"><span>Inicio</span><span>Nuestra Tesis</span><b>Probalo</b><span>Contacto</span></div>
+</nav>
+
+<main class="wrap">
+  <div>
+    <p class="lab"><span>//</span> Probalo gratis</p>
+    <h1 class="h1">Escríbale al asistente. <em>Como lo haría un cliente</em>.</h1>
+    <p class="sub">Este es el mismo asistente que construimos para ferreterías, con un catálogo de ejemplo cargado. Pregúntele precios, pídale que le recomiende material, o mándele a armar una cotización.</p>
+
+    <div class="how">
+      <div class="how__i"><span class="how__n">01</span><span class="how__t"><b>Toque una pregunta</b> — o escriba la suya en el cuadro de abajo.</span></div>
+      <div class="how__i"><span class="how__n">02</span><span class="how__t"><b>Responde con el catálogo cargado</b> — precios y existencias salen de datos, no de memoria.</span></div>
+      <div class="how__i"><span class="how__n">03</span><span class="how__t"><b>Pídale una cotización</b> — la arma con IVA 15% y se la entrega.</span></div>
+    </div>
+
+    <div class="disc">
+      <p><b>Demostración.</b> Ferretería La Central no existe: es un negocio de ejemplo con un catálogo de prueba. Los precios son estimaciones de mercado y no corresponden a ninguna ferretería real. Para su negocio cargamos su catálogo y sus precios.</p>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="phone">
+      <div class="screen">
+        <div class="status"><span>9:41</span>
+          <span><svg width="15" height="10" viewBox="0 0 15 10" fill="currentColor" aria-hidden="true"><rect y="6" width="2.6" height="4" rx=".6"/><rect x="4" y="4" width="2.6" height="6" rx=".6"/><rect x="8" y="2" width="2.6" height="8" rx=".6"/><rect x="12" width="2.6" height="10" rx=".6" opacity=".5"/></svg></span>
+        </div>
+        <header class="wahead">
+          <div class="wahead__av">FC</div>
+          <div class="wahead__m"><div class="wahead__n">Ferretería La Central</div><div class="wahead__s">en línea</div></div>
+        </header>
+        <div class="chat" id="chat" role="log" aria-live="polite" aria-label="Conversación con el asistente"></div>
+        <form class="bar" id="bar">
+          <input id="input" type="text" maxlength="400" placeholder="Escriba un mensaje" autocomplete="off" aria-label="Escriba un mensaje">
+          <button type="submit" id="send" aria-label="Enviar">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="#fff" aria-hidden="true"><path d="M1 15l14-7L1 1l3 6 7 1-7 1-3 6z"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- closing card -->
+      <div class="close" id="close" role="dialog" aria-label="Fin de la demostración" aria-hidden="true">
+        <p class="close__k"><i></i>Fin de la demostración</p>
+        <h2 class="close__t" id="closeT">¿Le sirvió esta demostración?</h2>
+        <a class="opt opt--pri" id="optWa" href="#" target="_blank" rel="noopener">Sí, quiero uno para mi negocio <small>WhatsApp</small></a>
+        <a class="opt" id="optDx" href="/diagnostic">Quiero saber qué me costaría <small>4 preguntas</small></a>
+        <a class="opt" id="optCal" href="#" target="_blank" rel="noopener">Prefiero hablar con alguien <small>30 min</small></a>
+        <button class="opt" id="optNo" type="button">Solo estaba viendo</button>
+        <button class="close__replay" id="replay" type="button">Repetir la demostración</button>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span>Demostración — datos de ejemplo</span>
+      <span><b id="left">8</b> mensajes restantes</span>
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+'use strict';
+
+/* ============================================================
+   CONFIG
+   ============================================================ */
+var CFG = {
+  MAX_TURNS: 8,
+  WA_NUMBER: '50589423985',
+  BOOKING_URL: 'https://calendar.app.google/E4dfYkm8epTzdsiT7',
+  API: '/api/tryit'            // stubbed below — see askServer()
+};
+
+/* ============================================================
+   CATALOG — starting subset.
+   PORT NOTE: move to data/ferreteria-catalog.json and expand to
+   ~40 SKUs. PRICES ARE UNVERIFIED ESTIMATES. Must be confirmed
+   with a real ferretero in León before this page goes public.
+   Nothing below may hardcode a price in reply text — every
+   figure is read from here at runtime.
+   ============================================================ */
+var CAT = {
+  iva: 0.15,
+  flete: { costo: 150, cobertura: 'el casco urbano de León', corte: '2:00 pm' },
+  horario: 'lunes a sábado de 7:00 am a 5:30 pm',
+  pagos: 'efectivo, transferencia o tarjeta',
+  validez: 8,
+  items: {
+    'CEM-HOL-42': { n:'Cemento Holcim Fuerte', p:385, e:140, u:'bolsa de 42.5 kg' },
+    'CEM-CAN-42': { n:'Cemento Canal',         p:372, e:95,  u:'bolsa de 42.5 kg' },
+    'VAR-014-6':  { n:'Varilla 1/4"',          p:92,  e:900, u:'6 m' },
+    'VAR-038-6':  { n:'Varilla 3/8"',          p:195, e:620, u:'6 m' },
+    'VAR-012-6':  { n:'Varilla 1/2"',          p:310, e:380, u:'6 m' },
+    'BLO-15':     { n:'Bloque de 15 cm',       p:26,  e:2400,u:'unidad' },
+    'BLO-20':     { n:'Bloque de 20 cm',       p:34,  e:1600,u:'unidad' },
+    'ARE-M3':     { n:'Arena de río',          p:1150,e:18,  u:'m³' },
+    'GRA-M3':     { n:'Grava 3/4',             p:1380,e:12,  u:'m³' },
+    'ZIN-CAL26':  { n:'Zinc ondulado cal. 26', p:545, e:210, u:'lámina de 10 pies' },
+    'PIN-SUR-GL': { n:'Pintura Sur látex',     p:590, e:140, u:'galón' },
+    'TAL-BD-650': { n:'Taladro percutor 650W', p:2350,e:14,  u:'unidad' }
+  },
+  rend: { bloquesM2: 12.5, cementoM3: 7, pinturaM2Gal: 30 }
+};
+function it(sku){ return CAT.items[sku]; }
+function money(v){ return 'C$' + v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function m0(v){ return 'C$' + v.toLocaleString('en-US'); }
+
+/* ============================================================
+   TREE — every reply COMPOSED from CAT. No price literals.
+   PORT NOTE: move to data/tryit-tree.json so copy is editable
+   without touching the engine. Four entry points, each reaching
+   a proforma in 3-4 turns. No dead ends.
+   ============================================================ */
+var TREE = {
+
+  /* ---- 1. precio de cemento ---- */
+  cem_precio: {
+    ask: '¿A cómo está la bolsa de cemento?',
+    say: function(){ var c=it('CEM-HOL-42'), a=it('CEM-CAN-42');
+      return 'Buenas. '+c.n+' está a '+m0(c.p)+' la '+c.u+', hay '+c.e+' en existencia.\n'+
+             'También manejo '+a.n+' a '+m0(a.p)+'. ¿Para qué trabajo lo ocupa?'; },
+    chips: ['cem_cuantas','cem_barato','cot_cemento']
+  },
+  cem_cuantas: {
+    ask: '¿Cuántas bolsas ocupo para una losa de 30 m²?',
+    say: function(){ var c=it('CEM-HOL-42');
+      var m3=30*0.10, b=Math.ceil(m3*CAT.rend.cementoM3);
+      return 'Para 30 m² con losa de 10 cm son unos '+m3.toFixed(1)+' m³ de concreto, o sea '+b+' bolsas aproximadamente ('+m0(b*c.p)+').\n'+
+             'Es un estimado de campo, no cálculo estructural — el ingeniero de la obra tiene la última palabra.'; },
+    chips: ['var_losa','cot_cemento','entrega_hacen']
+  },
+  cem_barato: {
+    ask: '¿Tiene otra marca más barata?',
+    say: function(){ var c=it('CEM-HOL-42'), a=it('CEM-CAN-42');
+      return a.n+' está a '+m0(a.p)+', o sea '+m0(c.p-a.p)+' menos que el '+c.n+'. Quedan '+a.e+' bolsas.\n'+
+             'Los dos sirven para repello y piso. Para losa la gente aquí prefiere el Holcim.'; },
+    chips: ['cot_cemento','var_losa','entrega_hacen']
+  },
+
+  /* ---- 2. recomendación de varilla ---- */
+  var_losa: {
+    ask: '¿Qué varilla ocupo para una losa?',
+    say: function(){ var a=it('VAR-038-6'), b=it('VAR-012-6');
+      return 'Para losa de vivienda lo normal es '+a.n+' — '+m0(a.p)+' la de '+a.u+', hay '+a.e+'.\n'+
+             'Si lleva más carga o mayor claro, el ingeniero puede pedir '+b.n+' a '+m0(b.p)+'.'; },
+    chips: ['var_precios','var_carga','cot_varilla']
+  },
+  var_precios: {
+    ask: '¿A cómo está cada una?',
+    say: function(){ var q=it('VAR-014-6'), a=it('VAR-038-6'), b=it('VAR-012-6');
+      return 'Varilla de 6 m:\n'+
+             '· '+q.n+' — '+m0(q.p)+' ('+q.e+' disponibles)\n'+
+             '· '+a.n+' — '+m0(a.p)+' ('+a.e+')\n'+
+             '· '+b.n+' — '+m0(b.p)+' ('+b.e+')'; },
+    chips: ['cot_varilla','var_carga','entrega_hacen']
+  },
+  var_carga: {
+    ask: '¿Y si la losa lleva más carga?',
+    say: function(){ var b=it('VAR-012-6');
+      return 'Ahí lo común es subir a '+b.n+' — '+m0(b.p)+' la de '+b.u+', hay '+b.e+'.\n'+
+             'Eso ya depende del claro y de la carga: se lo confirma su ingeniero. Yo le puedo cotizar las dos opciones.'; },
+    chips: ['cot_varilla','var_precios','humano']
+  },
+
+  /* ---- 3. cotización de pared (camino principal) ---- */
+  cot_pared: {
+    ask: 'Necesito cotizar material para una pared',
+    say: function(){ var b=it('BLO-15');
+      return 'Con gusto. ¿De cuántos metros cuadrados es la pared?\n'+
+             'Para que se dé una idea: el '+b.n+' está a '+m0(b.p)+' y hay '+b.e+' en existencia.'; },
+    chips: ['pared_m2','pared_bloques','entrega_hacen']
+  },
+  pared_bloques: {
+    ask: '¿Cuántos bloques por metro cuadrado?',
+    say: function(){ return 'Son unos '+CAT.rend.bloquesM2+' bloques por m² de pared, contando junta.\n'+
+             'Dígame los metros y le armo el cálculo completo con cemento y arena.'; },
+    chips: ['pared_m2','pared_agrega','humano']
+  },
+  pared_m2: {
+    ask: 'Son 40 m²',
+    say: function(){ var b=it('BLO-15'), n=Math.ceil(40*CAT.rend.bloquesM2);
+      return 'Para 40 m² son unos '+n+' bloques de 15 cm — '+m0(n*b.p)+'.\n'+
+             'Le falta el mortero. ¿Le agrego cemento y arena?'; },
+    chips: ['pared_agrega','cot_final','entrega_hacen']
+  },
+  pared_agrega: {
+    ask: 'Sí, agregue el cemento y la arena',
+    say: function(){ var c=it('CEM-CAN-42'), a=it('ARE-M3');
+      return 'Para pegar y repellar 40 m² le calculo 14 bolsas de '+c.n+' ('+m0(14*c.p)+') y 2 m³ de '+a.n+' ('+m0(2*a.p)+').\n'+
+             'Estimado de campo. ¿Le armo la proforma?'; },
+    chips: ['cot_final','entrega_hacen','humano']
+  },
+  cot_final: {
+    ask: 'Sí, mándeme la proforma',
+    say: function(){
+      var b=it('BLO-15'), c=it('CEM-CAN-42'), a=it('ARE-M3');
+      var nb=Math.ceil(40*CAT.rend.bloquesM2);
+      var l1=nb*b.p, l2=14*c.p, l3=2*a.p, f=CAT.flete.costo;
+      var sub=l1+l2+l3+f, iva=sub*CAT.iva, tot=sub+iva;
+      return 'PROFORMA PRO-1043\n'+
+             '· '+nb+' '+b.n+' — '+money(l1)+'\n'+
+             '· 14 '+c.n+' — '+money(l2)+'\n'+
+             '· 2 m³ '+a.n+' — '+money(l3)+'\n'+
+             '· Flete local — '+money(f)+'\n'+
+             'Subtotal '+money(sub)+' · IVA 15% '+money(iva)+'\n'+
+             'TOTAL '+money(tot)+' — válida '+CAT.validez+' días.'; },
+    chips: ['entrega_cuando','pagos','fin']
+  },
+  cot_cemento: {
+    ask: 'Póngame 20 bolsas en una cotización',
+    say: function(){ var c=it('CEM-HOL-42');
+      var l=20*c.p, f=CAT.flete.costo, sub=l+f, iva=sub*CAT.iva;
+      return 'PROFORMA PRO-1044\n'+
+             '· 20 '+c.n+' — '+money(l)+'\n'+
+             '· Flete local — '+money(f)+'\n'+
+             'Subtotal '+money(sub)+' · IVA 15% '+money(iva)+'\n'+
+             'TOTAL '+money(sub+iva)+' — válida '+CAT.validez+' días.'; },
+    chips: ['entrega_cuando','pagos','fin']
+  },
+  cot_varilla: {
+    ask: 'Agregue 40 varillas de 3/8',
+    say: function(){ var v=it('VAR-038-6'), c=it('CEM-HOL-42');
+      var l1=40*v.p, l2=20*c.p, f=CAT.flete.costo, sub=l1+l2+f, iva=sub*CAT.iva;
+      return 'PROFORMA PRO-1045\n'+
+             '· 40 '+v.n+' — '+money(l1)+'\n'+
+             '· 20 '+c.n+' — '+money(l2)+'\n'+
+             '· Flete local — '+money(f)+'\n'+
+             'Subtotal '+money(sub)+' · IVA 15% '+money(iva)+'\n'+
+             'TOTAL '+money(sub+iva)+' — válida '+CAT.validez+' días.'; },
+    chips: ['entrega_cuando','pagos','fin']
+  },
+
+  /* ---- 4. entregas y pagos ---- */
+  entrega_hacen: {
+    ask: '¿Hacen entregas?',
+    say: function(){ return 'Sí. Dentro de '+CAT.flete.cobertura+' el flete es '+m0(CAT.flete.costo)+'.\n'+
+             'Si el pedido entra antes de las '+CAT.flete.corte+', sale el mismo día.'; },
+    chips: ['entrega_fuera','pagos','cot_cemento']
+  },
+  entrega_cuando: {
+    ask: '¿Cuándo me la pueden entregar?',
+    say: function(){ return 'Si aprueba antes de las '+CAT.flete.corte+', se la mandamos el mismo día dentro de '+CAT.flete.cobertura+'.\n'+
+             'Después de esa hora, al siguiente día hábil. Atendemos de '+CAT.horario+'.'; },
+    chips: ['pagos','entrega_fuera','fin']
+  },
+  entrega_fuera: {
+    ask: '¿Llegan fuera de León?',
+    say: function(){ return 'Fuera del casco urbano se cotiza según la distancia — ese precio no lo tengo en el sistema.\n'+
+             'Le paso con alguien del equipo para que le confirme el flete a su dirección.'; },
+    chips: ['humano','pagos','fin']
+  },
+  pagos: {
+    ask: '¿Aceptan tarjeta?',
+    say: function(){ return 'Sí. Recibimos '+CAT.pagos+'.\n'+
+             'Para crédito sí necesita hablar con una persona del equipo, eso yo no lo apruebo.'; },
+    chips: ['entrega_cuando','humano','fin']
+  },
+
+  /* ---- utilitarios ---- */
+  humano: {
+    ask: 'Mejor páseme con una persona',
+    say: function(){ return 'Claro. Le paso con el equipo por WhatsApp y ahí le atienden directo.\n'+
+             'Mientras tanto, ¿le puedo ayudar con algo más del catálogo?'; },
+    chips: ['cem_precio','var_losa','fin']
+  },
+  fin: {
+    ask: 'Ya vi suficiente',
+    say: function(){ return 'Perfecto. Cualquier cosa aquí estoy — atiendo a cualquier hora.'; },
+    chips: []
+  }
+};
+
+/* entry points shown at the start */
+var ENTRY = ['cem_precio','var_losa','cot_pared','entrega_hacen'];
+
+/* ============================================================
+   FALLBACK RESPONDER — built first, deliberately.
+   Runs when the API is unavailable, the budget is spent, or in
+   this prototype for ALL free text. Keyword match over CAT only:
+   it can state a price it doesn't have.
+   ============================================================ */
+var KEYS = [
+  { k:['cemento','holcim','canal','bolsa'], sku:'CEM-HOL-42' },
+  { k:['varilla','hierro','acero','3/8','1/2','quintal'], sku:'VAR-038-6' },
+  { k:['bloque','pared','muro'], sku:'BLO-15' },
+  { k:['arena'], sku:'ARE-M3' },
+  { k:['grava','piedrin'], sku:'GRA-M3' },
+  { k:['zinc','lamina','techo'], sku:'ZIN-CAL26' },
+  { k:['pintura','pintar','latex'], sku:'PIN-SUR-GL' },
+  { k:['taladro','herramienta'], sku:'TAL-BD-650' }
+];
+function fallback(text){
+  var t = text.toLowerCase();
+  if(/entrega|flete|domicilio|llevan|mandan/.test(t)) return TREE.entrega_hacen.say();
+  if(/tarjeta|pago|efectivo|transferencia|credito|crédito/.test(t)) return TREE.pagos.say();
+  if(/horario|abren|cierran|hora/.test(t)) return 'Atendemos de '+CAT.horario+'. Por aquí le respondo a cualquier hora.';
+  for(var i=0;i<KEYS.length;i++){
+    for(var j=0;j<KEYS[i].k.length;j++){
+      if(t.indexOf(KEYS[i].k[j]) > -1){
+        var p = it(KEYS[i].sku);
+        return p.n+' está a '+m0(p.p)+' la '+p.u+', hay '+p.e+' en existencia.\n¿Le armo una cotización?';
+      }
+    }
+  }
+  return 'Ese no lo tengo en el sistema. Le paso con alguien del mostrador para que le confirme si lo manejamos.\n¿Le ayudo con algo más del catálogo?';
+}
+
+/* ============================================================
+   SERVER CALL — stubbed.
+   PORT CONTRACT for /api/tryit:
+     POST { message: string(<=400), sessionId: string }
+     · origin allowlist from ALLOWED_ORIGINS, fail closed
+     · per-IP rate limit + global daily token ceiling
+     · session turn cap enforced SERVER-side, not here
+     · model / max_tokens / temperature pinned server-side
+     · client NEVER sends a system prompt
+     · GROQ_API_KEY server-side only
+     Returns { reply: string } or { degraded: true } when the
+     budget is spent — on degraded, use fallback() silently.
+   ============================================================ */
+async function askServer(text){
+  try{
+    var r = await fetch(CFG.API, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message:text, sessionId:SID })
+    });
+    if(!r.ok) throw new Error('http '+r.status);
+    var d = await r.json();
+    if(d.degraded || !d.reply) return fallback(text);
+    return d.reply;
+  }catch(e){
+    return fallback(text);   /* never show a broken state to a prospect */
+  }
+}
+
+/* ============================================================
+   ENGINE
+   ============================================================ */
+var chat=document.getElementById('chat'), bar=document.getElementById('bar'),
+    input=document.getElementById('input'), send=document.getElementById('send'),
+    left=document.getElementById('left'), closeEl=document.getElementById('close'),
+    SID = 's'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+var turns=0, busy=false, ended=false, chipCount=0, freeCount=0;
+var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function scroll(){ chat.scrollTop = chat.scrollHeight; }
+function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function addMsg(text, out){
+  var el=document.createElement('div');
+  el.className='msg msg--'+(out?'out':'in');
+  el.innerHTML = esc(text) + '<div class="msg__meta"><span>9:4'+Math.min(9,1+turns)+'</span>'+
+    (out?'<svg class="tk" viewBox="0 0 18 12"><path d="M1 6.6l3 3.2 6.2-8"/><path d="M6.6 9.8l6.2-8" transform="translate(3.6 0)"/></svg>':'')+'</div>';
+  chat.appendChild(el); scroll();
+  if(out){ setTimeout(function(){ var t=el.querySelector('.tk'); if(t) t.classList.add('read'); }, 700); }
+  return el;
+}
+function typing(){
+  var el=document.createElement('div'); el.className='typing';
+  el.innerHTML='<i></i><i></i><i></i>'; chat.appendChild(el); scroll(); return el;
+}
+function clearChips(){ [].slice.call(chat.querySelectorAll('.chips')).forEach(function(c){ c.remove(); }); }
+
+function showChips(ids){
+  clearChips();
+  if(ended) return;
+  var box=document.createElement('div'); box.className='chips';
+  ids.forEach(function(id){
+    var node=TREE[id]; if(!node) return;
+    var b=document.createElement('button');
+    b.type='button'; b.className='chip'; b.textContent=node.ask;
+    b.addEventListener('click', function(){ pickChip(id); });
+    box.appendChild(b);
+  });
+  var f=document.createElement('button');
+  f.type='button'; f.className='chip chip--free'; f.textContent='Escribir otra cosa';
+  f.addEventListener('click', function(){ input.focus(); });
+  box.appendChild(f);
+  chat.appendChild(box); scroll();
+}
+
+function spendTurn(){
+  turns++;
+  left.textContent = Math.max(0, CFG.MAX_TURNS - turns);
+  if(turns >= CFG.MAX_TURNS) setTimeout(endDemo, 900);
+}
+
+/* chip path — deterministic, NO api call */
+function pickChip(id){
+  if(busy || ended) return;
+  var node=TREE[id]; if(!node) return;
+  busy=true; chipCount++;
+  clearChips();
+  addMsg(node.ask, true);
+  var t=typing();
+  var reply = node.say();
+  var wait = reduce ? 0 : Math.min(500 + reply.length*11, 1500);
+  setTimeout(function(){
+    t.remove();
+    addMsg(reply, false);
+    spendTurn();
+    if(id==='fin'){ busy=false; endDemo(); return; }
+    if(node.chips && node.chips.length) showChips(node.chips);
+    busy=false;
+  }, wait);
+}
+
+/* free text — the only path that would hit the API */
+async function sendFree(text){
+  if(busy || ended) return;
+  busy=true; freeCount++;
+  clearChips();
+  addMsg(text, true);
+  var t=typing();
+  var reply = await askServer(text);
+  var wait = reduce ? 0 : Math.min(600 + reply.length*10, 1700);
+  setTimeout(function(){
+    t.remove();
+    addMsg(reply, false);
+    spendTurn();
+    if(!ended) showChips(nearest(text));
+    busy=false;
+  }, wait);
+}
+/* steer free-text users back onto the tree */
+function nearest(text){
+  var t=text.toLowerCase();
+  if(/varilla|hierro|losa|acero/.test(t)) return ['var_precios','cot_varilla','entrega_hacen'];
+  if(/bloque|pared|muro/.test(t))         return ['pared_bloques','pared_m2','cot_pared'];
+  if(/entrega|flete|pago|tarjeta/.test(t))return ['entrega_cuando','pagos','humano'];
+  return ['cem_precio','var_losa','cot_pared'];
+}
+
+/* ---- closing card ---- */
+function endDemo(){
+  if(ended) return;
+  ended=true;
+  clearChips();
+  input.disabled=true; send.disabled=true;
+  input.placeholder='Demostración terminada';
+  document.getElementById('optWa').href =
+    'https://wa.me/'+CFG.WA_NUMBER+'?text='+encodeURIComponent('Buenas, probé la demo del asistente y quiero uno para mi negocio.');
+  document.getElementById('optCal').href = CFG.BOOKING_URL;
+  closeEl.classList.add('on');
+  closeEl.setAttribute('aria-hidden','false');
+  var first=closeEl.querySelector('.opt'); if(first) first.focus();
+}
+/* PORT NOTE: log ONLY these — choice, entry path, turn count,
+   chip vs free split. No message contents, ever. */
+function logChoice(choice){
+  var payload={ choice:choice, turns:turns, chips:chipCount, free:freeCount, entry:firstEntry };
+  if(window.plausible) window.plausible('tryit_close',{props:payload});
+  console.log('[tryit]', payload);
+}
+var firstEntry=null;
+
+['optWa','optDx','optCal'].forEach(function(id){
+  document.getElementById(id).addEventListener('click', function(){ logChoice(id); });
+});
+document.getElementById('optNo').addEventListener('click', function(){
+  logChoice('optNo');
+  document.getElementById('closeT').textContent='Gracias por probarla.';
+  [].slice.call(closeEl.querySelectorAll('.opt')).forEach(function(o,i){ if(i>0) o.style.display='none'; });
+  document.getElementById('optWa').textContent='Escribir por WhatsApp';
+});
+document.getElementById('replay').addEventListener('click', start);
+
+bar.addEventListener('submit', function(e){
+  e.preventDefault();
+  var v=input.value.trim();
+  if(!v || busy || ended) return;
+  if(!firstEntry) firstEntry='free';
+  input.value='';
+  sendFree(v);
+});
+
+/* ---- boot ---- */
+function start(){
+  ended=false; busy=false; turns=0; chipCount=0; freeCount=0; firstEntry=null;
+  chat.innerHTML=''; left.textContent=CFG.MAX_TURNS;
+  input.disabled=false; send.disabled=false; input.placeholder='Escriba un mensaje';
+  closeEl.classList.remove('on'); closeEl.setAttribute('aria-hidden','true');
+  var d=document.createElement('div'); d.className='daychip'; d.textContent='HOY'; chat.appendChild(d);
+  addMsg('¡Buenas! Soy el asistente de Ferretería La Central. Le puedo dar precios, recomendarle material o armarle una cotización.\n¿En qué le ayudo?', false);
+  showChips(ENTRY);
+}
+/* record which entry chip was tapped first */
+var _pick=pickChip;
+pickChip=function(id){ if(!firstEntry) firstEntry=id; _pick(id); };
+
+start();
+})();
+</script>
+</body>
+</html>

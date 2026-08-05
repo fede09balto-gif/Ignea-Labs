@@ -1,0 +1,91 @@
+{
+  "_README": [
+    "Catalog for the /probalo guided demo. NOTHING here is verified.",
+    "",
+    "PRICE PROVENANCE — read before using any figure:",
+    "  source: 'fede-estimate'  -> Fede's own unverified estimate. Usable, but the",
+    "                              page does not go public until a real ferretero in",
+    "                              Leon confirms them.",
+    "  source: 'TODO'           -> price is null. NOT estimated by anyone. The engine",
+    "                              hard-refuses to compose a reply from a null price:",
+    "                              it throws in dev, and silently skips the SKU in",
+    "                              production. Never fill these in by guessing.",
+    "",
+    "Currency is cordobas (C$) deliberately. The site's calculator is USD because",
+    "engagement pricing is USD; a ferreteria catalog in dollars would be absurd to a",
+    "Nicaraguan buyer. Different units for different purposes.",
+    "",
+    "No reply text anywhere may contain a price literal. Every figure is read from",
+    "here at runtime and the eval walker enforces it."
+  ],
+
+  "meta": {
+    "currency": "NIO",
+    "symbol": "C$",
+    "verified": false,
+    "verifiedBy": null,
+    "verifiedOn": null
+  },
+
+  "terms": {
+    "iva": 0.15,
+    "validez": 8,
+    "horario": "lunes a sábado de 7:00 am a 5:30 pm",
+    "pagos": "efectivo, transferencia o tarjeta",
+    "flete": { "costo": 150, "cobertura": "el casco urbano de León", "corte": "2:00 pm", "source": "fede-estimate" }
+  },
+
+  "rend": {
+    "bloquesM2": 12.5,
+    "cementoM3": 7,
+    "pinturaM2Gal": 30
+  },
+
+  "items": {
+    "CEM-HOL-42":  { "n": "Cemento Holcim Fuerte",       "p": 385,  "e": 140,  "u": "bolsa de 42.5 kg", "cat": "cemento",     "source": "fede-estimate" },
+    "CEM-CAN-42":  { "n": "Cemento Canal",               "p": 372,  "e": 95,   "u": "bolsa de 42.5 kg", "cat": "cemento",     "source": "fede-estimate" },
+    "VAR-014-6":   { "n": "Varilla 1/4\"",               "p": 92,   "e": 900,  "u": "6 m",              "cat": "acero",       "source": "fede-estimate" },
+    "VAR-038-6":   { "n": "Varilla 3/8\"",               "p": 195,  "e": 620,  "u": "6 m",              "cat": "acero",       "source": "fede-estimate" },
+    "VAR-012-6":   { "n": "Varilla 1/2\"",               "p": 310,  "e": 380,  "u": "6 m",              "cat": "acero",       "source": "fede-estimate" },
+    "BLO-15":      { "n": "Bloque de 15 cm",             "p": 26,   "e": 2400, "u": "unidad",           "cat": "mamposteria", "source": "fede-estimate" },
+    "BLO-20":      { "n": "Bloque de 20 cm",             "p": 34,   "e": 1600, "u": "unidad",           "cat": "mamposteria", "source": "fede-estimate" },
+    "ARE-M3":      { "n": "Arena de río",                "p": 1150, "e": 18,   "u": "m³",               "cat": "agregados",   "source": "fede-estimate" },
+    "GRA-M3":      { "n": "Grava 3/4",                   "p": 1380, "e": 12,   "u": "m³",               "cat": "agregados",   "source": "fede-estimate" },
+    "ZIN-CAL26":   { "n": "Zinc ondulado cal. 26",       "p": 545,  "e": 210,  "u": "lámina de 10 pies","cat": "techo",       "source": "fede-estimate" },
+    "PIN-SUR-GL":  { "n": "Pintura Sur látex",           "p": 590,  "e": 140,  "u": "galón",            "cat": "pintura",     "source": "fede-estimate" },
+    "TAL-BD-650":  { "n": "Taladro percutor 650W",       "p": 2350, "e": 14,   "u": "unidad",           "cat": "herramienta", "source": "fede-estimate" },
+
+    "CEM-HOL-50":  { "n": "Cemento Holcim uso general",  "p": null, "e": null, "u": "bolsa de 50 kg",   "cat": "cemento",     "source": "TODO" },
+    "VAR-034-6":   { "n": "Varilla 3/4\"",               "p": null, "e": null, "u": "6 m",              "cat": "acero",       "source": "TODO" },
+    "VAR-058-6":   { "n": "Varilla 5/8\"",               "p": null, "e": null, "u": "6 m",              "cat": "acero",       "source": "TODO" },
+    "ALA-REC-QQ":  { "n": "Alambre de amarre recocido",  "p": null, "e": null, "u": "quintal",          "cat": "acero",       "source": "TODO" },
+    "CLA-24-LB":   { "n": "Clavo de 2 1/2\"",            "p": null, "e": null, "u": "libra",            "cat": "acero",       "source": "TODO" },
+    "MAL-ELE-6":   { "n": "Malla electrosoldada 6x6",    "p": null, "e": null, "u": "rollo",            "cat": "acero",       "source": "TODO" },
+    "BLO-10":      { "n": "Bloque de 10 cm",             "p": null, "e": null, "u": "unidad",           "cat": "mamposteria", "source": "TODO" },
+    "LAD-CUA":     { "n": "Ladrillo cuarterón",          "p": null, "e": null, "u": "unidad",           "cat": "mamposteria", "source": "TODO" },
+    "PIE-CAN-M3":  { "n": "Piedra cantera",              "p": null, "e": null, "u": "unidad",           "cat": "mamposteria", "source": "TODO" },
+    "ARE-AMA-M3":  { "n": "Arena amarilla",              "p": null, "e": null, "u": "m³",               "cat": "agregados",   "source": "TODO" },
+    "HOR-M3":      { "n": "Hormigón rojo",               "p": null, "e": null, "u": "m³",               "cat": "agregados",   "source": "TODO" },
+    "CAL-QQ":      { "n": "Cal hidratada",               "p": null, "e": null, "u": "quintal",          "cat": "agregados",   "source": "TODO" },
+    "ZIN-CAL28":   { "n": "Zinc ondulado cal. 28",       "p": null, "e": null, "u": "lámina de 10 pies","cat": "techo",       "source": "TODO" },
+    "ZIN-LIS-26":  { "n": "Zinc liso cal. 26",           "p": null, "e": null, "u": "lámina",           "cat": "techo",       "source": "TODO" },
+    "PER-AUT-2":   { "n": "Perlín 2x4",                  "p": null, "e": null, "u": "6 m",              "cat": "techo",       "source": "TODO" },
+    "GOL-TEC-CJ":  { "n": "Golosos para zinc",           "p": null, "e": null, "u": "caja de 100",      "cat": "techo",       "source": "TODO" },
+    "PIN-SUR-CU":  { "n": "Pintura Sur látex",           "p": null, "e": null, "u": "cubeta de 5 gal",  "cat": "pintura",     "source": "TODO" },
+    "PIN-ACE-GL":  { "n": "Pintura de aceite",           "p": null, "e": null, "u": "galón",            "cat": "pintura",     "source": "TODO" },
+    "SEL-GL":      { "n": "Sellador para pared",         "p": null, "e": null, "u": "galón",            "cat": "pintura",     "source": "TODO" },
+    "BRO-4":       { "n": "Brocha 4\"",                  "p": null, "e": null, "u": "unidad",           "cat": "pintura",     "source": "TODO" },
+    "ROD-9":       { "n": "Rodillo 9\"",                 "p": null, "e": null, "u": "unidad",           "cat": "pintura",     "source": "TODO" },
+    "TUB-PVC-12":  { "n": "Tubo PVC 1/2\" agua",         "p": null, "e": null, "u": "6 m",              "cat": "hidraulica",  "source": "TODO" },
+    "TUB-PVC-4":   { "n": "Tubo PVC 4\" drenaje",        "p": null, "e": null, "u": "6 m",              "cat": "hidraulica",  "source": "TODO" },
+    "COD-PVC-12":  { "n": "Codo PVC 1/2\"",              "p": null, "e": null, "u": "unidad",           "cat": "hidraulica",  "source": "TODO" },
+    "PEG-PVC-CU":  { "n": "Pegamento PVC",               "p": null, "e": null, "u": "cuarto",           "cat": "hidraulica",  "source": "TODO" },
+    "CAB-THHN-12": { "n": "Cable THHN #12",              "p": null, "e": null, "u": "metro",            "cat": "electrico",   "source": "TODO" },
+    "TUB-CON-12":  { "n": "Tubo conduit 1/2\"",          "p": null, "e": null, "u": "3 m",              "cat": "electrico",   "source": "TODO" },
+    "BRE-20A":     { "n": "Breaker 20A",                 "p": null, "e": null, "u": "unidad",           "cat": "electrico",   "source": "TODO" },
+    "CAR-CEM-25":  { "n": "Carretilla de construcción",  "p": null, "e": null, "u": "unidad",           "cat": "herramienta", "source": "TODO" },
+    "PAL-CUA":     { "n": "Pala cuadrada",               "p": null, "e": null, "u": "unidad",           "cat": "herramienta", "source": "TODO" },
+    "CUC-ALB":     { "n": "Cuchara de albañil",          "p": null, "e": null, "u": "unidad",           "cat": "herramienta", "source": "TODO" },
+    "NIV-24":      { "n": "Nivel de 24\"",               "p": null, "e": null, "u": "unidad",           "cat": "herramienta", "source": "TODO" }
+  }
+}

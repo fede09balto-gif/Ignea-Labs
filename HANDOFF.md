@@ -233,6 +233,46 @@ Verify accents encode (`completé` → `complet%C3%A9`, `más` → `m%C3%A1s`) a
 
 ---
 
+## 2b. V4 LANDING PROTOTYPE — local trial done, VIABLE
+
+`ignea-landing-v4.html` (now in the repo, was in ~/Downloads). Trial page built at
+`index-v4-test.html`, untracked, `index.html` untouched. Served at
+`localhost:8899/index-v4-test.html`.
+
+**position:sticky SURVIVES in our real DOM — this was the make-or-break and it passes.**
+The stage pins at `top:0` and holds through 2,400px of scroll. Do not re-derive this from
+the CSS; it is counter-intuitive. `body{overflow-x:hidden}` (shared.css:58) DOES force
+`overflow-y` to compute to `auto`, which normally breaks sticky — it does not here because
+body's scrollHeight equals its clientHeight (both 7510px), so body never becomes a real
+scrollport and sticky resolves against the viewport. A control run with
+`body{overflow-x:visible}` forced gave identical results.
+
+**Trap for whoever tests this next:** `html{scroll-behavior:smooth}` (shared.css:57) makes
+`window.scrollTo` animate, so any measurement taken immediately after a scroll reads a
+mid-animation position. My first test reported sticky FAILING because of this and the
+verdict was wrong. Disable smooth scrolling before measuring; the tell is `window.scrollY`
+returning 0 right after a 500px scroll.
+
+**Standing caveat:** sticky works today by a margin that depends on body never gaining its
+own scrollbar. If we commit to the pinned story, remove `body{overflow-x:hidden}` and fix
+horizontal overflow at source instead — otherwise a future change breaks the story silently.
+
+Other measured findings: nav is `position:sticky; top:0; z-index:100; height 85px`, so the
+stage needs `top:85px` / `height:calc(100svh - 85px)`. Frame time during pinned scroll was
+**16.7ms median, 16.9ms max** — identical to baseline, no jank from adding a per-frame rAF
+loop alongside the existing observers (caveat: the ticker and wa-demo observers had not
+fired yet at that scroll depth, so re-measure with all of them live). `100svh` and `100dvh`
+both supported; the `*` reset does not interfere. Exactly two class collisions — `.hero`
+and `.in`, namespaced to `.v4-*`. The prototype's `:root` is otherwise a verbatim copy of
+ours and needs only two tokens we lack: `--shadow-3` and `--out`.
+
+**The real cost is not technical.** The prototype needs ~30-40 new i18n keys x2 languages
+(act narration, inventory rail, proforma labels, bridge copy) — none exist — and it replaces
+the rotating-word hero we have iterated on repeatedly. Decide whether the pinned story earns
+that before paying for it. The trial page also throws two console errors from the
+prototype's own script reaching for the nav I stripped when swapping in the real one; those
+are assembly artifacts, not design problems, so judge layout and pinning, not interactions.
+
 ## 3. STANDING RULES
 
 - **Nothing on the public site states a result, timeline, or figure attributed to a client until there's a real one.** `thesis.html`'s aggregate Latin-America market statistics (region GDP, population served, consulting pricing) are explicitly fine — they describe the market, not our client outcomes. A full sweep of the live merged state found nothing beyond the three groups already cleaned, plus the ROI footnote now fixed.
