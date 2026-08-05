@@ -4,38 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Probalo gratis — Ignea Labs</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/shared.css">
 <style>
 /* ============================================================
-   IGNEA — /probalo  ·  STARTING POINT, not finished
-   Chip-driven ferretería assistant.
+   IGNEA — /probalo  ·  guided ferretería assistant demo.
 
    ARCHITECTURE (do not change without asking):
-   · Chip taps resolve against TREE. Deterministic. NO API CALL.
-     Replies are COMPOSED FROM CATALOG at runtime — no price is
-     ever written into reply text.
-   · Free-typed input is the only thing that would hit the API.
-     Here it uses the local fallback responder. The API call is
-     stubbed at askServer() with the contract documented.
+   · Chip taps resolve against TREE (data/tryit-tree.json).
+     Deterministic. NO API CALL. Replies are COMPOSED FROM CATALOG
+     (data/ferreteria-catalog.json) at runtime via
+     js/tryit-resolver.js — no price is ever written into reply text.
+   · Free-typed input is the only thing that hits the API
+     (/api/tryit, Groq-backed). The local fallback() responder
+     answers when the API is unavailable, over budget, or errors.
    · Fallback responder exists FIRST so it can never be the thing
      that got skipped.
 
-   Uses the site's white-theme tokens. Drop this :root when porting.
+   Tokens come from css/shared.css — no local :root.
    ============================================================ */
-:root{
-  --bg:#FFFFFF; --bg-tint:#F7F7F5;
-  --ink:#0A0A0C; --ink-2:#55555C; --ink-3:#8E8E94;
-  --line:#E6E5E1; --red:#E8352A; --red-wash:rgba(232,53,42,.07);
-  --shadow-1:0 1px 2px rgba(10,10,12,.05);
-  --shadow-2:0 12px 32px rgba(10,10,12,.07);
-  --shadow-3:0 30px 70px rgba(10,10,12,.14);
-  --wa-green:#008069; --wa-paper:#EFEAE2; --wa-out:#D9FDD3;
-  --wa-text:#111B21; --wa-meta:#667781; --wa-read:#53BDEB;
-  --ff:'DM Sans',sans-serif; --fs:'DM Serif Display',Georgia,serif; --fm:'JetBrains Mono',monospace;
-  --out:cubic-bezier(.16,1,.3,1);
-}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff);-webkit-font-smoothing:antialiased}
 
@@ -43,6 +29,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff);-webki
 .nav__logo{font-weight:500;letter-spacing:.06em;font-size:17px}
 .nav__logo i{display:inline-block;width:6px;height:6px;background:var(--red);border-radius:50%;margin:0 7px;vertical-align:middle;font-style:normal}
 .nav__links{display:flex;gap:24px;font-size:14.5px;color:var(--ink-2)}
+.nav__links a{color:inherit;text-decoration:none;transition:color .16s}
+.nav__links a:hover{color:var(--ink)}
 .nav__links b{color:var(--ink);font-weight:500}
 
 .wrap{max-width:1180px;margin:0 auto;padding:64px 40px 90px;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,420px);gap:56px;align-items:start}
@@ -145,7 +133,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff);-webki
 
 <nav class="nav">
   <div class="nav__logo">IGNEA<i></i>LABS</div>
-  <div class="nav__links"><span>Inicio</span><span>Nuestra Tesis</span><b>Probalo</b><span>Contacto</span></div>
+  <div class="nav__links"><a href="/">Inicio</a><a href="/thesis">Nuestra Tesis</a><b>Probalo</b><a href="/contact">Contacto</a></div>
 </nav>
 
 <main class="wrap">
@@ -177,8 +165,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff);-webki
         </header>
         <div class="chat" id="chat" role="log" aria-live="polite" aria-label="Conversación con el asistente"></div>
         <form class="bar" id="bar">
-          <input id="input" type="text" maxlength="400" placeholder="Escriba un mensaje" autocomplete="off" aria-label="Escriba un mensaje">
-          <button type="submit" id="send" aria-label="Enviar">
+          <input id="input" type="text" maxlength="400" placeholder="Cargando…" autocomplete="off" aria-label="Escriba un mensaje" disabled>
+          <button type="submit" id="send" aria-label="Enviar" disabled>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="#fff" aria-hidden="true"><path d="M1 15l14-7L1 1l3 6 7 1-7 1-3 6z"/></svg>
           </button>
         </form>
@@ -203,6 +191,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ff);-webki
   </div>
 </main>
 
+<script src="/js/tryit-resolver.js"></script>
 <script>
 (function(){
 'use strict';
@@ -214,216 +203,36 @@ var CFG = {
   MAX_TURNS: 8,
   WA_NUMBER: '50589423985',
   BOOKING_URL: 'https://calendar.app.google/E4dfYkm8epTzdsiT7',
-  API: '/api/tryit'            // stubbed below — see askServer()
+  API: '/api/tryit',
+  TREE_URL: '/data/tryit-tree.json',
+  CATALOG_URL: '/data/ferreteria-catalog.json'
 };
 
 /* ============================================================
-   CATALOG — starting subset.
-   PORT NOTE: move to data/ferreteria-catalog.json and expand to
-   ~40 SKUs. PRICES ARE UNVERIFIED ESTIMATES. Must be confirmed
-   with a real ferretero in León before this page goes public.
-   Nothing below may hardcode a price in reply text — every
-   figure is read from here at runtime.
+   DATA — loaded at boot from data/tryit-tree.json and
+   data/ferreteria-catalog.json, resolved through
+   js/tryit-resolver.js. Populated by loadData(); everything below
+   that reads TREE/ENTRY/CATALOG/RESOLVER only runs after boot().
    ============================================================ */
-var CAT = {
-  iva: 0.15,
-  flete: { costo: 150, cobertura: 'el casco urbano de León', corte: '2:00 pm' },
-  horario: 'lunes a sábado de 7:00 am a 5:30 pm',
-  pagos: 'efectivo, transferencia o tarjeta',
-  validez: 8,
-  items: {
-    'CEM-HOL-42': { n:'Cemento Holcim Fuerte', p:385, e:140, u:'bolsa de 42.5 kg' },
-    'CEM-CAN-42': { n:'Cemento Canal',         p:372, e:95,  u:'bolsa de 42.5 kg' },
-    'VAR-014-6':  { n:'Varilla 1/4"',          p:92,  e:900, u:'6 m' },
-    'VAR-038-6':  { n:'Varilla 3/8"',          p:195, e:620, u:'6 m' },
-    'VAR-012-6':  { n:'Varilla 1/2"',          p:310, e:380, u:'6 m' },
-    'BLO-15':     { n:'Bloque de 15 cm',       p:26,  e:2400,u:'unidad' },
-    'BLO-20':     { n:'Bloque de 20 cm',       p:34,  e:1600,u:'unidad' },
-    'ARE-M3':     { n:'Arena de río',          p:1150,e:18,  u:'m³' },
-    'GRA-M3':     { n:'Grava 3/4',             p:1380,e:12,  u:'m³' },
-    'ZIN-CAL26':  { n:'Zinc ondulado cal. 26', p:545, e:210, u:'lámina de 10 pies' },
-    'PIN-SUR-GL': { n:'Pintura Sur látex',     p:590, e:140, u:'galón' },
-    'TAL-BD-650': { n:'Taladro percutor 650W', p:2350,e:14,  u:'unidad' }
-  },
-  rend: { bloquesM2: 12.5, cementoM3: 7, pinturaM2Gal: 30 }
-};
-function it(sku){ return CAT.items[sku]; }
-function money(v){ return 'C$' + v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function m0(v){ return 'C$' + v.toLocaleString('en-US'); }
+var TREE = null, ENTRY = null, CATALOG = null, RESOLVER = null;
 
-/* ============================================================
-   TREE — every reply COMPOSED from CAT. No price literals.
-   PORT NOTE: move to data/tryit-tree.json so copy is editable
-   without touching the engine. Four entry points, each reaching
-   a proforma in 3-4 turns. No dead ends.
-   ============================================================ */
-var TREE = {
-
-  /* ---- 1. precio de cemento ---- */
-  cem_precio: {
-    ask: '¿A cómo está la bolsa de cemento?',
-    say: function(){ var c=it('CEM-HOL-42'), a=it('CEM-CAN-42');
-      return 'Buenas. '+c.n+' está a '+m0(c.p)+' la '+c.u+', hay '+c.e+' en existencia.\n'+
-             'También manejo '+a.n+' a '+m0(a.p)+'. ¿Para qué trabajo lo ocupa?'; },
-    chips: ['cem_cuantas','cem_barato','cot_cemento']
-  },
-  cem_cuantas: {
-    ask: '¿Cuántas bolsas ocupo para una losa de 30 m²?',
-    say: function(){ var c=it('CEM-HOL-42');
-      var m3=30*0.10, b=Math.ceil(m3*CAT.rend.cementoM3);
-      return 'Para 30 m² con losa de 10 cm son unos '+m3.toFixed(1)+' m³ de concreto, o sea '+b+' bolsas aproximadamente ('+m0(b*c.p)+').\n'+
-             'Es un estimado de campo, no cálculo estructural — el ingeniero de la obra tiene la última palabra.'; },
-    chips: ['var_losa','cot_cemento','entrega_hacen']
-  },
-  cem_barato: {
-    ask: '¿Tiene otra marca más barata?',
-    say: function(){ var c=it('CEM-HOL-42'), a=it('CEM-CAN-42');
-      return a.n+' está a '+m0(a.p)+', o sea '+m0(c.p-a.p)+' menos que el '+c.n+'. Quedan '+a.e+' bolsas.\n'+
-             'Los dos sirven para repello y piso. Para losa la gente aquí prefiere el Holcim.'; },
-    chips: ['cot_cemento','var_losa','entrega_hacen']
-  },
-
-  /* ---- 2. recomendación de varilla ---- */
-  var_losa: {
-    ask: '¿Qué varilla ocupo para una losa?',
-    say: function(){ var a=it('VAR-038-6'), b=it('VAR-012-6');
-      return 'Para losa de vivienda lo normal es '+a.n+' — '+m0(a.p)+' la de '+a.u+', hay '+a.e+'.\n'+
-             'Si lleva más carga o mayor claro, el ingeniero puede pedir '+b.n+' a '+m0(b.p)+'.'; },
-    chips: ['var_precios','var_carga','cot_varilla']
-  },
-  var_precios: {
-    ask: '¿A cómo está cada una?',
-    say: function(){ var q=it('VAR-014-6'), a=it('VAR-038-6'), b=it('VAR-012-6');
-      return 'Varilla de 6 m:\n'+
-             '· '+q.n+' — '+m0(q.p)+' ('+q.e+' disponibles)\n'+
-             '· '+a.n+' — '+m0(a.p)+' ('+a.e+')\n'+
-             '· '+b.n+' — '+m0(b.p)+' ('+b.e+')'; },
-    chips: ['cot_varilla','var_carga','entrega_hacen']
-  },
-  var_carga: {
-    ask: '¿Y si la losa lleva más carga?',
-    say: function(){ var b=it('VAR-012-6');
-      return 'Ahí lo común es subir a '+b.n+' — '+m0(b.p)+' la de '+b.u+', hay '+b.e+'.\n'+
-             'Eso ya depende del claro y de la carga: se lo confirma su ingeniero. Yo le puedo cotizar las dos opciones.'; },
-    chips: ['cot_varilla','var_precios','humano']
-  },
-
-  /* ---- 3. cotización de pared (camino principal) ---- */
-  cot_pared: {
-    ask: 'Necesito cotizar material para una pared',
-    say: function(){ var b=it('BLO-15');
-      return 'Con gusto. ¿De cuántos metros cuadrados es la pared?\n'+
-             'Para que se dé una idea: el '+b.n+' está a '+m0(b.p)+' y hay '+b.e+' en existencia.'; },
-    chips: ['pared_m2','pared_bloques','entrega_hacen']
-  },
-  pared_bloques: {
-    ask: '¿Cuántos bloques por metro cuadrado?',
-    say: function(){ return 'Son unos '+CAT.rend.bloquesM2+' bloques por m² de pared, contando junta.\n'+
-             'Dígame los metros y le armo el cálculo completo con cemento y arena.'; },
-    chips: ['pared_m2','pared_agrega','humano']
-  },
-  pared_m2: {
-    ask: 'Son 40 m²',
-    say: function(){ var b=it('BLO-15'), n=Math.ceil(40*CAT.rend.bloquesM2);
-      return 'Para 40 m² son unos '+n+' bloques de 15 cm — '+m0(n*b.p)+'.\n'+
-             'Le falta el mortero. ¿Le agrego cemento y arena?'; },
-    chips: ['pared_agrega','cot_final','entrega_hacen']
-  },
-  pared_agrega: {
-    ask: 'Sí, agregue el cemento y la arena',
-    say: function(){ var c=it('CEM-CAN-42'), a=it('ARE-M3');
-      return 'Para pegar y repellar 40 m² le calculo 14 bolsas de '+c.n+' ('+m0(14*c.p)+') y 2 m³ de '+a.n+' ('+m0(2*a.p)+').\n'+
-             'Estimado de campo. ¿Le armo la proforma?'; },
-    chips: ['cot_final','entrega_hacen','humano']
-  },
-  cot_final: {
-    ask: 'Sí, mándeme la proforma',
-    say: function(){
-      var b=it('BLO-15'), c=it('CEM-CAN-42'), a=it('ARE-M3');
-      var nb=Math.ceil(40*CAT.rend.bloquesM2);
-      var l1=nb*b.p, l2=14*c.p, l3=2*a.p, f=CAT.flete.costo;
-      var sub=l1+l2+l3+f, iva=sub*CAT.iva, tot=sub+iva;
-      return 'PROFORMA PRO-1043\n'+
-             '· '+nb+' '+b.n+' — '+money(l1)+'\n'+
-             '· 14 '+c.n+' — '+money(l2)+'\n'+
-             '· 2 m³ '+a.n+' — '+money(l3)+'\n'+
-             '· Flete local — '+money(f)+'\n'+
-             'Subtotal '+money(sub)+' · IVA 15% '+money(iva)+'\n'+
-             'TOTAL '+money(tot)+' — válida '+CAT.validez+' días.'; },
-    chips: ['entrega_cuando','pagos','fin']
-  },
-  cot_cemento: {
-    ask: 'Póngame 20 bolsas en una cotización',
-    say: function(){ var c=it('CEM-HOL-42');
-      var l=20*c.p, f=CAT.flete.costo, sub=l+f, iva=sub*CAT.iva;
-      return 'PROFORMA PRO-1044\n'+
-             '· 20 '+c.n+' — '+money(l)+'\n'+
-             '· Flete local — '+money(f)+'\n'+
-             'Subtotal '+money(sub)+' · IVA 15% '+money(iva)+'\n'+
-             'TOTAL '+money(sub+iva)+' — válida '+CAT.validez+' días.'; },
-    chips: ['entrega_cuando','pagos','fin']
-  },
-  cot_varilla: {
-    ask: 'Agregue 40 varillas de 3/8',
-    say: function(){ var v=it('VAR-038-6'), c=it('CEM-HOL-42');
-      var l1=40*v.p, l2=20*c.p, f=CAT.flete.costo, sub=l1+l2+f, iva=sub*CAT.iva;
-      return 'PROFORMA PRO-1045\n'+
-             '· 40 '+v.n+' — '+money(l1)+'\n'+
-             '· 20 '+c.n+' — '+money(l2)+'\n'+
-             '· Flete local — '+money(f)+'\n'+
-             'Subtotal '+money(sub)+' · IVA 15% '+money(iva)+'\n'+
-             'TOTAL '+money(sub+iva)+' — válida '+CAT.validez+' días.'; },
-    chips: ['entrega_cuando','pagos','fin']
-  },
-
-  /* ---- 4. entregas y pagos ---- */
-  entrega_hacen: {
-    ask: '¿Hacen entregas?',
-    say: function(){ return 'Sí. Dentro de '+CAT.flete.cobertura+' el flete es '+m0(CAT.flete.costo)+'.\n'+
-             'Si el pedido entra antes de las '+CAT.flete.corte+', sale el mismo día.'; },
-    chips: ['entrega_fuera','pagos','cot_cemento']
-  },
-  entrega_cuando: {
-    ask: '¿Cuándo me la pueden entregar?',
-    say: function(){ return 'Si aprueba antes de las '+CAT.flete.corte+', se la mandamos el mismo día dentro de '+CAT.flete.cobertura+'.\n'+
-             'Después de esa hora, al siguiente día hábil. Atendemos de '+CAT.horario+'.'; },
-    chips: ['pagos','entrega_fuera','fin']
-  },
-  entrega_fuera: {
-    ask: '¿Llegan fuera de León?',
-    say: function(){ return 'Fuera del casco urbano se cotiza según la distancia — ese precio no lo tengo en el sistema.\n'+
-             'Le paso con alguien del equipo para que le confirme el flete a su dirección.'; },
-    chips: ['humano','pagos','fin']
-  },
-  pagos: {
-    ask: '¿Aceptan tarjeta?',
-    say: function(){ return 'Sí. Recibimos '+CAT.pagos+'.\n'+
-             'Para crédito sí necesita hablar con una persona del equipo, eso yo no lo apruebo.'; },
-    chips: ['entrega_cuando','humano','fin']
-  },
-
-  /* ---- utilitarios ---- */
-  humano: {
-    ask: 'Mejor páseme con una persona',
-    say: function(){ return 'Claro. Le paso con el equipo por WhatsApp y ahí le atienden directo.\n'+
-             'Mientras tanto, ¿le puedo ayudar con algo más del catálogo?'; },
-    chips: ['cem_precio','var_losa','fin']
-  },
-  fin: {
-    ask: 'Ya vi suficiente',
-    say: function(){ return 'Perfecto. Cualquier cosa aquí estoy — atiendo a cualquier hora.'; },
-    chips: []
-  }
-};
-
-/* entry points shown at the start */
-var ENTRY = ['cem_precio','var_losa','cot_pared','entrega_hacen'];
+async function loadData(){
+  var r1 = await fetch(CFG.TREE_URL);
+  var r2 = await fetch(CFG.CATALOG_URL);
+  if(!r1.ok || !r2.ok) throw new Error('data fetch failed');
+  var treeData = await r1.json();
+  CATALOG = await r2.json();
+  RESOLVER = IgneaTryItResolver.make(CATALOG);
+  TREE = treeData.nodes;
+  ENTRY = treeData.entry;
+}
 
 /* ============================================================
    FALLBACK RESPONDER — built first, deliberately.
-   Runs when the API is unavailable, the budget is spent, or in
-   this prototype for ALL free text. Keyword match over CAT only:
-   it can state a price it doesn't have.
+   Runs when the API is unavailable, the budget is spent, or the
+   prospect free-types something the tree doesn't cover. Keyword
+   match over the loaded catalog, via RESOLVER so it never
+   hand-rolls a price.
    ============================================================ */
 var KEYS = [
   { k:['cemento','holcim','canal','bolsa'], sku:'CEM-HOL-42' },
@@ -437,14 +246,14 @@ var KEYS = [
 ];
 function fallback(text){
   var t = text.toLowerCase();
-  if(/entrega|flete|domicilio|llevan|mandan/.test(t)) return TREE.entrega_hacen.say();
-  if(/tarjeta|pago|efectivo|transferencia|credito|crédito/.test(t)) return TREE.pagos.say();
-  if(/horario|abren|cierran|hora/.test(t)) return 'Atendemos de '+CAT.horario+'. Por aquí le respondo a cualquier hora.';
+  if(/entrega|flete|domicilio|llevan|mandan/.test(t)) return RESOLVER.renderNode(TREE.entrega_hacen);
+  if(/tarjeta|pago|efectivo|transferencia|credito|crédito/.test(t)) return RESOLVER.renderNode(TREE.pagos);
+  if(/horario|abren|cierran|hora/.test(t)) return 'Atendemos de '+CATALOG.terms.horario+'. Por aquí le respondo a cualquier hora.';
   for(var i=0;i<KEYS.length;i++){
     for(var j=0;j<KEYS[i].k.length;j++){
       if(t.indexOf(KEYS[i].k[j]) > -1){
-        var p = it(KEYS[i].sku);
-        return p.n+' está a '+m0(p.p)+' la '+p.u+', hay '+p.e+' en existencia.\n¿Le armo una cotización?';
+        var p = RESOLVER.item(KEYS[i].sku);
+        return p.n+' está a '+RESOLVER.m0(p.p)+' la '+p.u+', hay '+p.e+' en existencia.\n¿Le armo una cotización?';
       }
     }
   }
@@ -452,8 +261,7 @@ function fallback(text){
 }
 
 /* ============================================================
-   SERVER CALL — stubbed.
-   PORT CONTRACT for /api/tryit:
+   SERVER CALL — /api/tryit, Groq-backed. Contract:
      POST { message: string(<=400), sessionId: string }
      · origin allowlist from ALLOWED_ORIGINS, fail closed
      · per-IP rate limit + global daily token ceiling
@@ -539,7 +347,8 @@ function pickChip(id){
   clearChips();
   addMsg(node.ask, true);
   var t=typing();
-  var reply = node.say();
+  var reply = RESOLVER.renderNode(node);
+  if(reply === null) reply = fallback(node.ask);   /* null-priced SKU — drop the quote, degrade gracefully */
   var wait = reduce ? 0 : Math.min(500 + reply.length*11, 1500);
   setTimeout(function(){
     t.remove();
@@ -634,7 +443,17 @@ function start(){
 var _pick=pickChip;
 pickChip=function(id){ if(!firstEntry) firstEntry=id; _pick(id); };
 
-start();
+/* ---- boot: load data, then start ---- */
+async function boot(){
+  try{
+    await loadData();
+    start();
+  }catch(e){
+    var d=document.createElement('div'); d.className='daychip'; d.textContent='HOY'; chat.appendChild(d);
+    addMsg('No se pudo cargar la demostración. Intente de nuevo más tarde, o escríbanos por WhatsApp.', false);
+  }
+}
+boot();
 })();
 </script>
 </body>

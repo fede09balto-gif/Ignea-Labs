@@ -21,6 +21,7 @@
   --code-ink:#F5F5F2;
   --shadow-1:0 1px 2px rgba(10,10,12,.05);
   --shadow-2:0 12px 32px rgba(10,10,12,.07);
+  --shadow-3:0 30px 70px rgba(10,10,12,.14);
 
   /* aliases — existing call sites across the codebase keep working unchanged */
   --bg2:var(--bg-tint);
@@ -42,6 +43,7 @@
   --fs:'DM Serif Display',serif;
   --fm:'JetBrains Mono',monospace;
   --ease:cubic-bezier(.22,.9,.28,1);
+  --out:cubic-bezier(.16,1,.3,1); /* secondary motion curve — /probalo's phone-mockup pops/slides. Distinct from --ease, not a replacement for it. */
 
   /* WhatsApp brand chrome — used only by the demo section. These are NOT
      Ignea tokens; they exist so the rendered conversation reads as WhatsApp

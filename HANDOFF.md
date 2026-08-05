@@ -273,10 +273,14 @@ that before paying for it. The trial page also throws two console errors from th
 prototype's own script reaching for the nav I stripped when swapping in the real one; those
 are assembly artifacts, not design problems, so judge layout and pinning, not interactions.
 
-## 2c. /PROBALO GUIDED DEMO — steps 1-3 done on `feat/probalo-data` (`379112c`)
+## 2c. /PROBALO GUIDED DEMO — steps 1-5 done on `feat/probalo-data`, step 6 next
 
 Branch not merged, no preview. `probalo.html` and `ignea-landing-v4.html` are now IN the
-repo (both were in ~/Downloads). Steps 4-6 start fresh.
+repo (both were in ~/Downloads). **Note: `probalo.html`'s inline `<script>` still has its
+own embedded `TREE`/`CAT` objects — it has not been re-pointed at `data/tryit-tree.json` /
+`data/ferreteria-catalog.json` / `js/tryit-resolver.js` yet.** Steps 4-5 validated and built
+the data-file path in isolation; wiring the page to consume it is unstarted work, separate
+from step 6 (styling).
 
 **Architecture decision (settled, do not re-open): option A.** The prototype's TREE replies
 were JavaScript functions doing real arithmetic, so they could not be JSON at all. They are
@@ -305,25 +309,86 @@ null in production so the engine drops the chip rather than rendering a broken q
 Verified: all 19 nodes render, arithmetic matches the prototype exactly (PRO-1043 totals
 C$23,756.70 both ways), and the guard fires on a TODO SKU.
 
-**Step 4 next, before the API route** — walk every path and assert: (1) figures recomputed
-from the catalog, not string-matched, since derived values never appear in it; (2) every chip
-resolves; (3) every node reachable from an entry; (4) no dead ends; (5) the strict bare-digit
-guard with `allowDigits` as the only exception list. Doing step 4 before step 5 proves the
-guided path while it is still pure-local.
+**Step 4 — done.** `scripts/tryit-walker.js` (Node, CommonJS, `node scripts/tryit-walker.js`).
+**19/19 nodes PASS, BUILD OK.** Asserts, per node: (1) every `{{calc ...}}` figure is
+recomputed by a SECOND, independent implementation of the whitelist — not a call into
+`js/tryit-resolver.js`'s own `CALC` map, so a wrong formula there can't validate itself
+against its own bug (this is literally what that file's CALC comment asks for); (2) every
+chip id resolves to a real node; (3) every node reachable from the 4 entries (BFS); (4) no
+dead ends — `fin` is the sole node with empty chips, and it alone carries `closes:true`;
+(5) the bare-digit guard — every digit in a node's STATIC template text (outside `{{...}}`
+spans) must be declared in that node's `allowDigits`, proving it's a scripted quantity, not
+a leaked price literal. Verified the checks are real, not vacuous, with three positive
+controls (stray digit, dangling chip id, a deliberately wrong `bolsasLosa` formula planted in
+the resolver) — all three caught, all three reverted; `git status` clean afterward.
 
-Then **step 5** `/api/tryit` per the contract commented above `askServer()` in
-`probalo.html`: origin allowlist failing closed, per-IP rate limit, daily token ceiling,
-server-side turn cap, pinned model, `GROQ_API_KEY` server-side only, client never sends a
-system prompt, `{degraded:true}` falls back silently. Add a **non-user-facing failure
-counter** for the route (not a console.log — those are banned in production); the silent
-fallback is right for prospects but means a fully broken API is otherwise invisible. Then
-**step 6**, styles onto shared.css tokens.
+**Step 5 — done.** `api/tryit.js`, modeled on the existing `api/claude.js` pattern
+(same origin-allowlist/rate-limit/`safeEqual` shapes, so the two routes read the same way).
+Contract from `probalo.html`'s `askServer()` comment, all satisfied:
 
-**Open question for Fede, unresolved:** the 70-80% LLM-call reduction is a prediction. A
-synthetic walker reports ~100% chip usage by construction because it never free-types, so
-decide what the real measurement is — instrumented live sessions, or a modelled estimate
-from the tree's branching factor. Those give very different numbers, and the answer decides
-whether the free tier is viable.
+- Origin allowlist from `ALLOWED_ORIGINS`, fails closed to the two production hosts (403)
+  when unset — same `loadAllowedOrigins()` as `api/claude.js`.
+- Per-IP rate limit (429, 20/60s) + a **session turn cap** (429, 8 — matches
+  `CFG.MAX_TURNS`) enforced server-side via in-memory maps; the client's own counter was
+  never trusted for either.
+- 400-char message cap enforced server-side (400) — the client's `maxlength` was never
+  trusted either.
+- Model (`llama-3.1-8b-instant`), `max_tokens` (220), `temperature` (0.4) pinned in the
+  route. The client sends only `{message, sessionId}`; nothing else is read off the body,
+  so there's no system-prompt/model override surface to close.
+- System prompt is built server-side, once, at module load, from `data/ferreteria-
+  catalog.json` — only the 12 **priced** SKUs are injected (the 32 `source:"TODO"` items
+  are never mentioned), so the model has nothing to invent a price for. Same principle as
+  `js/labor-cost.js`'s rate injection.
+- `GROQ_API_KEY` read from `process.env` only, added to `.env.example` (name only, no
+  value). **Not yet set in Vercel — Fede sets it, per standing rule never ask for the value.**
+- Daily token ceiling: **40,000 tokens/day**, hardcoded, well inside the verified 500K TPD
+  free-tier budget for `llama-3.1-8b-instant` (`console.groq.com/docs/rate-limits`,
+  checked directly, not trusted from a prior handoff's numbers — see the resolved 70-80%
+  question above). Deliberately not sized to an assumed call volume, since that volume is
+  unproven; see above.
+- Any failure path — budget spent, missing key, Groq non-2xx, malformed reply, thrown
+  exception/timeout (8s `AbortSignal.timeout`) — returns HTTP 200 `{degraded:true}`, never a
+  broken state. 403/429/400 are ordinary HTTP statuses, visible in Vercel's own metrics, and
+  are deliberately NOT counted below — the counter exists for the failure mode that is
+  otherwise invisible.
+- **Non-user-facing failure counter**: in-memory `degradedCount`, incremented only on the
+  `{degraded:true}` paths. Read via `GET /api/tryit` gated by the existing
+  `IGNEA_OPS_TOKEN` header (reuses the secret already in Vercel rather than adding a new
+  one) — returns `{degradedCount, dayKey, dayTokens, dailyTokenCeiling, sessionsTracked,
+  ipsTracked}`. No `console.log` anywhere in the route.
+
+Verified with a mock req/res harness (not deployed — no preview for this branch, see
+above): wrong method → 405; missing/wrong origin → 403; missing `sessionId` → 400;
+message > 400 chars → 400; no `GROQ_API_KEY` (true locally) → 200 `{degraded:true}`;
+25 rapid requests from one IP → 429; 10 requests on one `sessionId` → 429; `GET` without
+`IGNEA_OPS_TOKEN` configured → 500; `GET` with the wrong token → 401; `GET` with the right
+token → 200 showing `degradedCount` correctly incremented. **Not yet tested against the
+real Groq endpoint** — no `GROQ_API_KEY` was available in this session (never asked for
+one, per standing rule). First live test needs a real key in `.env.local` or Vercel Preview.
+
+**Step 6 next** — style `probalo.html` onto `shared.css` tokens, AND (unstarted, noted
+above) actually wire the page's inline `TREE`/`CAT`/`askServer()` to
+`data/tryit-tree.json` / `data/ferreteria-catalog.json` / `js/tryit-resolver.js` /
+`api/tryit.js` — right now the validated data files and the live page are two separate
+things that happen to agree by construction, not by reference.
+
+**70-80% LLM-call reduction — resolved, do not re-open.** A synthetic/branching-factor
+measurement was considered and dropped: it describes the shape of the tree, not what real
+users do, and reports ~100% chip usage by construction because it never free-types — it
+cannot answer the question it would be built to answer. The only real measurement is
+instrumented live sessions (chip-turn vs free-text-turn counts, already the exact fields
+`logChoice()` collects — see `probalo.html`'s `chipCount`/`freeCount`/`entry`). That
+instrumentation does not exist yet and free-tier viability is **UNPROVEN** until it does.
+
+**Design consequence for step 5:** the API route cannot assume the 70-80% figure holds.
+Build `/api/tryit` so being wrong about it degrades gracefully instead of breaking:
+the daily token ceiling is a hard server-side cap picked well inside Groq's free-tier
+budget (not sized to "expected" call volume), and every failure path — budget spent, rate
+limited, upstream error, timeout — returns `{degraded:true}` and lets the client's existing
+`fallback()` responder answer silently. A prospect never sees an error state; worst case
+the demo quietly runs on keyword-matched fallback replies instead of the LLM for the rest
+of the day. Re-open this only once real session data exists to size the ceiling against.
 
 ## 3. STANDING RULES
 

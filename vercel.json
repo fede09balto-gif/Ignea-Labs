@@ -21,6 +21,10 @@
       "destination": "/demo.html"
     },
     {
+      "source": "/probalo",
+      "destination": "/probalo.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/404.html"
     }
