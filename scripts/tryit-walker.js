@@ -15,13 +15,22 @@
         resolver's — a bug shipped in one won't validate itself
         against the other.
      2. Every chip id referenced by a node resolves to a real node.
-     3. Every node is reachable from one of the 4 entry points.
+     3. Every node is reachable from one of the 4 entry points, OR is
+        flagged `freeTextEntry: true` (reachable only through the
+        client's free-text intent detection, not any chip — treated as
+        an additional valid entry point here rather than a dead node).
      4. No dead ends: any node without chips must be the explicit
         closer (`closes:true`); nothing else may terminate silently.
      5. Every bare digit in a node's STATIC template text (i.e.
         outside {{...}} placeholders) is declared in that node's
         allowDigits — proving it's a scripted scenario quantity,
         not a leaked price literal.
+     6. Every `freeTextEntry` node is actually referenced somewhere in
+        probalo.html — a node nobody's code path ever looks up is the
+        same silent-gap failure mode this build exists to catch.
+
+   `node.say` is an array of 1-3 bubble templates; every check above that
+   used to run on one string now runs across all of a node's bubbles.
    ============================================================ */
 'use strict';
 
@@ -100,22 +109,29 @@ nodeIds.forEach(function (id) {
   var node = tree.nodes[id];
   var fails = [];
 
-  // 1. full render must succeed (proves every path/calc reference resolves
-  //    against the catalog — no undefined field, no unknown SKU, no
-  //    unwhitelisted calc name, no null-priced SKU reaching a template).
+  if (!Array.isArray(node.say)) fails.push('node.say is not an array (got ' + typeof node.say + ')');
+  var bubbles = Array.isArray(node.say) ? node.say : [];
+
+  // 1. full render must succeed for every bubble (proves every path/calc
+  //    reference resolves against the catalog — no undefined field, no
+  //    unknown SKU, no unwhitelisted calc name, no null-priced SKU
+  //    reaching a template).
   var rendered = null;
   try {
-    rendered = R.render(node.say);
+    rendered = bubbles.map(function (b) { return R.render(b); });
   } catch (e) {
     fails.push('render threw: ' + e.message);
   }
 
-  // 2. independent recompute of every calc invocation in the raw template.
+  // 2. independent recompute of every calc invocation, across all bubbles.
   //    Extract each {{...}} placeholder span first, then look for `calc`
   //    inside it — scanning the whole template would let the regex run on
   //    past the closing "}}" into surrounding prose.
-  var exprs = [], pm, placeholderRe = new RegExp(PLACEHOLDER_RE.source, 'g');
-  while ((pm = placeholderRe.exec(node.say))) exprs.push(pm[1]);
+  var exprs = [];
+  bubbles.forEach(function (b) {
+    var pm, placeholderRe = new RegExp(PLACEHOLDER_RE.source, 'g');
+    while ((pm = placeholderRe.exec(b))) exprs.push(pm[1]);
+  });
   var calls = [];
   exprs.forEach(function (expr) { calls = calls.concat(findCalcCalls(expr)); });
   calls.forEach(function (c) {
@@ -148,12 +164,27 @@ nodeIds.forEach(function (id) {
     if (!node.closes) fails.push('no chips and not marked closes:true — dead end');
   }
 
-  // 5. bare-digit guard
+  // 5. bare-digit guard, across all bubbles
   var allow = node.allowDigits || [];
-  var digits = staticDigits(node.say);
+  var digits = [];
+  bubbles.forEach(function (b) { digits = digits.concat(staticDigits(b)); });
   digits.forEach(function (d) {
     if (allow.indexOf(d) === -1) fails.push('bare digit "' + d + '" in static text not in allowDigits ' + JSON.stringify(allow));
   });
+
+  // 6. freeTextEntry nodes must actually be referenced somewhere in
+  //    probalo.html's source — a node the client never looks up is a
+  //    silent dead feature, not caught by chip-graph reachability since
+  //    it deliberately has no chip pointing at it.
+  if (node.freeTextEntry) {
+    var probaloSrc = fs.readFileSync(path.join(ROOT, 'probalo.html'), 'utf8');
+    // Matches both TREE['identidad'] / "identidad" quoted forms and the
+    // idiomatic TREE.identidad dot-access form actually used in probalo.html.
+    var idPattern = new RegExp('[\'"]' + id + '[\'"]|\\.' + id + '\\b');
+    if (!idPattern.test(probaloSrc)) {
+      fails.push('freeTextEntry node "' + id + '" is not referenced anywhere in probalo.html — nothing routes to it');
+    }
+  }
 
   results.push({ id: id, pass: fails.length === 0, fails: fails, rendered: rendered });
   if (fails.length) allOk = false;
@@ -166,8 +197,9 @@ tree.entry.forEach(function (id) {
   if (!tree.nodes[id]) globalFails.push('entry "' + id + '" does not resolve to a node');
 });
 
+var freeTextEntryIds = nodeIds.filter(function (id) { return tree.nodes[id].freeTextEntry; });
 var seen = {};
-var queue = tree.entry.slice();
+var queue = tree.entry.concat(freeTextEntryIds);
 while (queue.length) {
   var id = queue.shift();
   if (seen[id]) continue;
@@ -177,7 +209,7 @@ while (queue.length) {
   (n.chips || []).forEach(function (c) { if (!seen[c]) queue.push(c); });
 }
 var unreachable = nodeIds.filter(function (id) { return !seen[id]; });
-if (unreachable.length) globalFails.push('unreachable from the 4 entry points: ' + unreachable.join(', '));
+if (unreachable.length) globalFails.push('unreachable from the 4 entry points or free-text entry: ' + unreachable.join(', '));
 
 var closers = nodeIds.filter(function (id) { return tree.nodes[id].closes; });
 if (closers.length !== 1) globalFails.push('expected exactly 1 closing node, found ' + closers.length + ': ' + closers.join(', '));
@@ -192,7 +224,7 @@ results.forEach(function (r) {
 });
 console.log('\n=== global checks ===');
 if (globalFails.length === 0) {
-  console.log('[PASS] entry validity, full reachability, single closer (' + closers[0] + ')');
+  console.log('[PASS] entry validity, full reachability (4 chip entries + ' + freeTextEntryIds.length + ' free-text entry: ' + freeTextEntryIds.join(', ') + '), single closer (' + closers[0] + ')');
 } else {
   console.log('[FAIL] global');
   globalFails.forEach(function (f) { console.log('    - ' + f); });

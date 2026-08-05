@@ -390,6 +390,73 @@ above) actually wire the page's inline `TREE`/`CAT`/`askServer()` to
 `api/tryit.js` — right now the validated data files and the live page are two separate
 things that happen to agree by construction, not by reference.
 
+### Voice rewrite — "sound like a person at the counter" (this session)
+
+All 19 nodes plus a new 20th rewritten into Nicaraguan ferretería-counter register:
+short bubbles (2-3 per node, most under 15 words), reactive openers trimmed to about
+half the nodes and varied (no repeated filler), banned corporate-Spanish phrases,
+`ocupa`/`le mando`/`a cómo` register throughout. `node.say` changed from a single
+template string to an **array of 1-3 bubble templates**, one per chat message — this
+is the actual mechanism behind the rhythm, not just wording. `js/tryit-resolver.js`'s
+`renderNode()` now returns an array (or `null`, unchanged contract otherwise);
+`scripts/tryit-walker.js` updated to check every bubble in the array, not one string.
+
+**Two real bugs caught in review, both fixed at the source:**
+
+1. **Grammar: "dentro de el casco urbano" instead of "dentro del..."** —
+   `catalog.terms.flete.cobertura` stored the leading article ("el casco urbano de
+   León"), and two templates composed it as `"dentro de {{cobertura}}"`. Fixed by
+   dropping the article from the catalog value (`cobertura` is now the bare noun
+   phrase "casco urbano de León") and requiring `"dentro del {{cobertura}}"` at every
+   call site — including the Groq system prompt in `api/tryit.js`, which had the
+   identical bug in its own string concatenation. Swept the whole repo with a
+   word-boundary regex (`\b(de|a) el\b`) for other instances: **none found**, this
+   was the only one.
+2. **cem_cuantas arithmetic — caught before it shipped, not after.** A rewrite I
+   presented in chat (not yet in any file) showed 147 bolsas / C$56,595 for a 30 m²
+   losa; correct is **3.0 m³, 21 bolsas, C$8,085**, matching the original prototype
+   exactly. Root cause: a hand-arithmetic slip composing the example text for
+   presentation, not a code bug — `js/tryit-resolver.js`'s `CALC.m3Losa` /
+   `bolsasLosa` / `bolsasLosaCosto` were never touched and were already correct; the
+   walker's independent recompute had already validated this exact `{{calc m3Losa 30
+   0.10}}` invocation against a from-scratch second implementation when it originally
+   passed step 4. The walker never got a chance to catch or miss the chat-only error
+   because the error never reached a file the walker reads. Re-verified by hand
+   (`(30*0.10).toFixed(1)` = `"3.0"`, `Math.ceil(30*0.10*7)` = `21`,
+   `21*385` = `8085`) and by re-running the walker against the corrected file.
+
+**New node: `identidad`** — the one thing the assistant discloses, and only when
+asked directly: *"Soy el asistente de la ferretería, pero le resuelvo igual.|||¿Qué
+ocupa?"* (verbatim, approved copy, not paraphrased). Flagged `freeTextEntry: true` in
+`data/tryit-tree.json` — reachable only via `isBotIdentity()` regex detection in
+`probalo.html`'s `sendFree()`, checked *before* `askServer()` is ever called, so the
+honest answer never depends on Groq being up. Same check duplicated in `fallback()`
+as a second layer. The walker's reachability BFS now seeds from the 4 chip entries
+**plus** any `freeTextEntry`-flagged nodes, and separately verifies the node id is
+actually referenced in `probalo.html` (caught its own regex bug mid-implementation:
+the check only looked for quoted-string references like `TREE['identidad']`, missed
+the idiomatic `TREE.identidad` dot-access the code actually uses — fixed to match
+both forms, then re-confirmed the real wiring was correct all along).
+
+**Sequencer** (`sayBubbles()` in `probalo.html`): shared by the chip path, the Groq
+path, and `fallback()` — all three now return the same array-of-bubbles shape.
+Typing-indicator timing is `400ms + 25ms/char`, capped at `2000ms` (`3000ms` for a
+proforma's bubble specifically — assembling a quote takes a moment), `±10%` jitter so
+it isn't metronomic. **Groq's contract changed too**: `reply` is now 1-3 bubbles
+joined with `"|||"`, per the rewritten system prompt, split client-side into the same
+array shape before hitting the sequencer — rhythm applies to both paths, not just the
+scripted tree.
+
+Verified end-to-end on `localhost:8899` (Playwright): greeting renders as 2 separate
+bubbles; `cem_precio`'s 2 bubbles arrive **2149ms then 4442ms** after the chip tap —
+a real sequenced gap, not instant; the bot-identity question answers correctly and
+instantly with zero dependency on `/api/tryit` (which 501s on this static test
+server — the intercept fires before that call would even happen) and routes to
+`identidad`'s own chips, not the generic `nearest()` set; zero console errors. Walker
+re-run against the new format: **20/20 nodes pass** (19 + `identidad`), including
+three fresh positive controls (stray digit, dangling chip, and the freeTextEntry
+wiring check specifically) to confirm the updated checks are real, not vacuous.
+
 **End-to-end verification (this session).** Vercel's build compiled `tryit.js` from ESM to
 CommonJS cleanly (confirms the `import catalog from '...json' with {type:'json'}` syntax
 works in the real build, not just local Node). Since the deployed preview is fully

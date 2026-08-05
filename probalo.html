@@ -228,11 +228,23 @@ async function loadData(){
 }
 
 /* ============================================================
+   BOT-IDENTITY — the one thing the assistant discloses, and only
+   when asked directly. Never volunteered. Checked here (so it
+   survives the API being down) and again in the Groq system
+   prompt. The exact line is approved copy — do not paraphrase it.
+   ============================================================ */
+function isBotIdentity(t){
+  return /\b(bot|robot)\b|hablo con (una )?persona|es (usted )?(real|humano)|eres (real|humano)/.test(t);
+}
+
+/* ============================================================
    FALLBACK RESPONDER — built first, deliberately.
    Runs when the API is unavailable, the budget is spent, or the
    prospect free-types something the tree doesn't cover. Keyword
    match over the loaded catalog, via RESOLVER so it never
-   hand-rolls a price.
+   hand-rolls a price. Returns an array of bubbles, same shape as
+   RESOLVER.renderNode(), so the sequencer treats every source
+   uniformly.
    ============================================================ */
 var KEYS = [
   { k:['cemento','holcim','canal','bolsa'], sku:'CEM-HOL-42' },
@@ -246,18 +258,19 @@ var KEYS = [
 ];
 function fallback(text){
   var t = text.toLowerCase();
+  if(isBotIdentity(t)) return RESOLVER.renderNode(TREE.identidad);
   if(/entrega|flete|domicilio|llevan|mandan/.test(t)) return RESOLVER.renderNode(TREE.entrega_hacen);
   if(/tarjeta|pago|efectivo|transferencia|credito|crédito/.test(t)) return RESOLVER.renderNode(TREE.pagos);
-  if(/horario|abren|cierran|hora/.test(t)) return 'Atendemos de '+CATALOG.terms.horario+'. Por aquí le respondo a cualquier hora.';
+  if(/horario|abren|cierran|hora/.test(t)) return ['Atendemos '+CATALOG.terms.horario+'.', 'Pero por acá le respondo a cualquier hora.'];
   for(var i=0;i<KEYS.length;i++){
     for(var j=0;j<KEYS[i].k.length;j++){
       if(t.indexOf(KEYS[i].k[j]) > -1){
         var p = RESOLVER.item(KEYS[i].sku);
-        return p.n+' está a '+RESOLVER.m0(p.p)+' la '+p.u+', hay '+p.e+' en existencia.\n¿Le armo una cotización?';
+        return [p.n+' le queda a '+RESOLVER.m0(p.p)+' la '+p.u+', hay '+p.e+'.', '¿Le armo una cotización?'];
       }
     }
   }
-  return 'Ese no lo tengo en el sistema. Le paso con alguien del mostrador para que le confirme si lo manejamos.\n¿Le ayudo con algo más del catálogo?';
+  return ['Uy, ese no lo manejo.', 'Le paso con alguien del mostrador para que le confirme. ¿Le ayudo con algo más?'];
 }
 
 /* ============================================================
@@ -271,6 +284,9 @@ function fallback(text){
      · GROQ_API_KEY server-side only
      Returns { reply: string } or { degraded: true } when the
      budget is spent — on degraded, use fallback() silently.
+     `reply` is 1-3 bubbles joined with "|||" (the system prompt
+     enforces this); split here so callers always get an array,
+     the same shape fallback() and RESOLVER.renderNode() return.
    ============================================================ */
 async function askServer(text){
   try{
@@ -281,7 +297,8 @@ async function askServer(text){
     if(!r.ok) throw new Error('http '+r.status);
     var d = await r.json();
     if(d.degraded || !d.reply) return fallback(text);
-    return d.reply;
+    var bubbles = d.reply.split('|||').map(function(s){ return s.trim(); }).filter(Boolean);
+    return bubbles.length ? bubbles : fallback(text);
   }catch(e){
     return fallback(text);   /* never show a broken state to a prospect */
   }
@@ -315,6 +332,36 @@ function typing(){
 }
 function clearChips(){ [].slice.call(chat.querySelectorAll('.chips')).forEach(function(c){ c.remove(); }); }
 
+/* 400ms + 25ms/char, capped at 2s (3s for the proforma bubble — assembling
+   a quote takes a moment), ±10% jitter so it isn't metronomic. */
+function typingDelay(text, isProforma){
+  if(reduce) return 0;
+  var cap = isProforma ? 3000 : 2000;
+  var base = Math.min(400 + text.length*25, cap);
+  return Math.round(base * (0.9 + Math.random()*0.2));
+}
+
+/* Sequences an array of bubbles: typing indicator, pause scaled to length,
+   message, brief gap, repeat. Shared by the chip path, the Groq path and
+   fallback() — all three return the same array-of-bubbles shape, so this
+   is the one place that turns bubbles into a rendered conversation. */
+function sayBubbles(messages, onDone, isProformaNode){
+  var i = 0;
+  function next(){
+    if(i >= messages.length){ onDone(); return; }
+    var msg = messages[i], isLast = i === messages.length-1;
+    var t = typing();
+    setTimeout(function(){
+      t.remove();
+      addMsg(msg, false);
+      i++;
+      if(i < messages.length) setTimeout(next, reduce ? 0 : 280);
+      else next();
+    }, typingDelay(msg, isProformaNode && isLast));
+  }
+  next();
+}
+
 function showChips(ids){
   clearChips();
   if(ended) return;
@@ -346,36 +393,41 @@ function pickChip(id){
   busy=true; chipCount++;
   clearChips();
   addMsg(node.ask, true);
-  var t=typing();
   var reply = RESOLVER.renderNode(node);
   if(reply === null) reply = fallback(node.ask);   /* null-priced SKU — drop the quote, degrade gracefully */
-  var wait = reduce ? 0 : Math.min(500 + reply.length*11, 1500);
-  setTimeout(function(){
-    t.remove();
-    addMsg(reply, false);
+  sayBubbles(reply, function(){
     spendTurn();
     if(id==='fin'){ busy=false; endDemo(); return; }
     if(node.chips && node.chips.length) showChips(node.chips);
     busy=false;
-  }, wait);
+  }, node.proforma === true);
 }
 
-/* free text — the only path that would hit the API */
+/* free text — the only path that would hit the API, except a direct
+   bot-identity question, which is answered from the tree so it never
+   depends on the API being up. */
 async function sendFree(text){
   if(busy || ended) return;
   busy=true; freeCount++;
   clearChips();
   addMsg(text, true);
-  var t=typing();
+
+  if(isBotIdentity(text.toLowerCase())){
+    var idNode = TREE.identidad;
+    sayBubbles(RESOLVER.renderNode(idNode), function(){
+      spendTurn();
+      if(!ended) showChips(idNode.chips);
+      busy=false;
+    }, false);
+    return;
+  }
+
   var reply = await askServer(text);
-  var wait = reduce ? 0 : Math.min(600 + reply.length*10, 1700);
-  setTimeout(function(){
-    t.remove();
-    addMsg(reply, false);
+  sayBubbles(reply, function(){
     spendTurn();
     if(!ended) showChips(nearest(text));
     busy=false;
-  }, wait);
+  }, false);
 }
 /* steer free-text users back onto the tree */
 function nearest(text){
@@ -436,8 +488,9 @@ function start(){
   input.disabled=false; send.disabled=false; input.placeholder='Escriba un mensaje';
   closeEl.classList.remove('on'); closeEl.setAttribute('aria-hidden','true');
   var d=document.createElement('div'); d.className='daychip'; d.textContent='HOY'; chat.appendChild(d);
-  addMsg('¡Buenas! Soy el asistente de Ferretería La Central. Le puedo dar precios, recomendarle material o armarle una cotización.\n¿En qué le ayudo?', false);
-  showChips(ENTRY);
+  sayBubbles(['¡Buenas!', '¿En qué le ayudo? Precio, material, cotización, lo que ocupe.'], function(){
+    showChips(ENTRY);
+  }, false);
 }
 /* record which entry chip was tapped first */
 var _pick=pickChip;

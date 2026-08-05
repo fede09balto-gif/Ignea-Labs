@@ -1,9 +1,10 @@
 /* ============================================================
    IGNEA LABS — /probalo template resolver
 
-   Turns a `say` template from data/tryit-tree.json into finished text
-   using data/ferreteria-catalog.json. Deliberately tiny: field lookup,
-   two money formatters, and a CLOSED whitelist of named calculations.
+   Turns a `say` array (one template per chat bubble) from
+   data/tryit-tree.json into finished text using
+   data/ferreteria-catalog.json. Deliberately tiny: field lookup, two
+   money formatters, and a CLOSED whitelist of named calculations.
 
    Two invariants this file exists to enforce:
      1. No price literal ever reaches reply text. Templates carry
@@ -113,12 +114,15 @@
       });
     }
 
-    /* Node-level entry point. Returns null in production when the node
-       cannot be quoted, so the engine can drop the chip instead of
-       showing a broken price. */
+    /* Node-level entry point. `node.say` is an array of 1-3 templates, one
+       per chat bubble. Returns an array of rendered strings, or null in
+       production when the node cannot be quoted, so the engine can drop
+       the chip instead of showing a broken price. If ANY bubble in the
+       node references an unpriced SKU, the whole node fails together —
+       a node never renders half its bubbles. */
     function renderNode(node) {
       try {
-        return render(node.say);
+        return node.say.map(render);
       } catch (e) {
         if (e.name === 'PriceUnavailable') {
           if (DEV) throw e;          // fail loudly while building

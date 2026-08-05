@@ -32,7 +32,7 @@
     "validez": 8,
     "horario": "lunes a sábado de 7:00 am a 5:30 pm",
     "pagos": "efectivo, transferencia o tarjeta",
-    "flete": { "costo": 150, "cobertura": "el casco urbano de León", "corte": "2:00 pm", "source": "fede-estimate" }
+    "flete": { "costo": 150, "cobertura": "casco urbano de León", "corte": "2:00 pm", "source": "fede-estimate" }
   },
 
   "rend": {

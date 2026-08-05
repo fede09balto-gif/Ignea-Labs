@@ -2,6 +2,12 @@
   "_README": [
     "Guided-conversation tree for /probalo. Copy is editable here without touching code.",
     "",
+    "`say` is an ARRAY of 1-3 short strings, one per chat bubble, sent in sequence with a",
+    "typing indicator between them (see js/tryit-resolver.js renderNode, probalo.html's",
+    "sayBubbles()). Only a proforma bubble may be long — that's the one exception to the",
+    "under-15-words rule; everything else should read like a real counter person typed it,",
+    "not a paragraph.",
+    "",
     "INVARIANT: no price literal may appear in any `say` string. Every figure is a",
     "placeholder resolved against data/ferreteria-catalog.json at runtime, and the eval",
     "walker fails the build on any bare digit that is not whitelisted below.",
@@ -15,6 +21,12 @@
     "  {{r.bloquesM2}} {{r.cementoM3}} {{r.pinturaM2Gal}}",
     "  {{calc <name> <args...>}}               named calculation, whitelisted only",
     "",
+    "GRAMMAR NOTE: t.flete.cobertura is the bare noun phrase 'casco urbano de León' (no",
+    "leading article) precisely so templates can compose 'dentro del {{t.flete.cobertura}}'",
+    "correctly. Storing 'el casco urbano...' and writing 'dentro de {{...}}' produced 'dentro",
+    "de el casco urbano' — a real bug that shipped once. Always use 'del', never 'de', before",
+    "this placeholder.",
+    "",
     "WHITELISTED CALCULATIONS (js/tryit-resolver.js, CALC map):",
     "  bolsasLosa <m2> <espesor>   bags of cement for a slab",
     "  bloquesPared <m2>           blocks for a wall",
@@ -26,7 +38,14 @@
     "",
     "LITERAL-DIGIT WHITELIST: quantities that are part of the scripted scenario, not",
     "prices. Listed per node in `allowDigits` so the walker can tell a scenario",
-    "quantity from a leaked price. Add to it deliberately; never widen the rule."
+    "quantity from a leaked price. Add to it deliberately; never widen the rule.",
+    "",
+    "FREE-TEXT-ONLY NODES: `freeTextEntry: true` marks a node reachable only via the",
+    "client's free-text intent detection (see isBotIdentity() in probalo.html), not via any",
+    "chip. The walker treats these as additional valid entry points for reachability, and",
+    "separately checks that probalo.html actually references the node id somewhere — a node",
+    "flagged freeTextEntry that no code path ever looks up is exactly the kind of silent gap",
+    "this build should fail on."
   ],
 
   "entry": ["cem_precio", "var_losa", "cot_pared", "entrega_hacen"],
@@ -34,114 +53,181 @@
   "nodes": {
     "cem_precio": {
       "ask": "¿A cómo está la bolsa de cemento?",
-      "say": "Buenas. {{i.CEM-HOL-42.n}} está a {{m0 i.CEM-HOL-42.p}} la {{i.CEM-HOL-42.u}}, hay {{i.CEM-HOL-42.e}} en existencia.\n También manejo {{i.CEM-CAN-42.n}} a {{m0 i.CEM-CAN-42.p}}. ¿Para qué trabajo lo ocupa?",
+      "say": [
+        "{{i.CEM-HOL-42.n}} le queda a {{m0 i.CEM-HOL-42.p}} la {{i.CEM-HOL-42.u}}, hay {{i.CEM-HOL-42.e}}.",
+        "También manejo {{i.CEM-CAN-42.n}} a {{m0 i.CEM-CAN-42.p}}, por si acaso. ¿Para qué lo ocupa?"
+      ],
       "chips": ["cem_cuantas", "cem_barato", "cot_cemento"]
     },
     "cem_cuantas": {
       "ask": "¿Cuántas bolsas ocupo para una losa de 30 m²?",
-      "say": "Para 30 m² con losa de 10 cm son unos {{calc m3Losa 30 0.10}} m³ de concreto, o sea {{calc bolsasLosa 30 0.10}} bolsas aproximadamente ({{m0 (calc bolsasLosaCosto 30 0.10)}}).\n Es un estimado de campo, no cálculo estructural — el ingeniero de la obra tiene la última palabra.",
+      "say": [
+        "Para 30 m² a 10 cm son unos {{calc m3Losa 30 0.10}} m³ de concreto, o sea {{calc bolsasLosa 30 0.10}} bolsas — {{m0 (calc bolsasLosaCosto 30 0.10)}}.",
+        "Ojo, es estimado de campo no más. El ingeniero de la obra manda ahí."
+      ],
       "chips": ["var_losa", "cot_cemento", "entrega_hacen"],
       "allowDigits": [30, 10]
     },
     "cem_barato": {
       "ask": "¿Tiene otra marca más barata?",
-      "say": "{{i.CEM-CAN-42.n}} está a {{m0 i.CEM-CAN-42.p}}, o sea {{m0 (calc diff CEM-HOL-42 CEM-CAN-42)}} menos que el {{i.CEM-HOL-42.n}}. Quedan {{i.CEM-CAN-42.e}} bolsas.\n Los dos sirven para repello y piso. Para losa la gente aquí prefiere el Holcim.",
+      "say": [
+        "Fíjese que sí.",
+        "{{i.CEM-CAN-42.n}} le sale a {{m0 i.CEM-CAN-42.p}}, {{m0 (calc diff CEM-HOL-42 CEM-CAN-42)}} más barato que el Holcim. Quedan {{i.CEM-CAN-42.e}}.",
+        "Los dos sirven para repello y piso. Para losa la gente prefiere el Holcim, eso sí."
+      ],
       "chips": ["cot_cemento", "var_losa", "entrega_hacen"]
     },
 
     "var_losa": {
       "ask": "¿Qué varilla ocupo para una losa?",
-      "say": "Para losa de vivienda lo normal es {{i.VAR-038-6.n}} — {{m0 i.VAR-038-6.p}} la de {{i.VAR-038-6.u}}, hay {{i.VAR-038-6.e}}.\n Si lleva más carga o mayor claro, el ingeniero puede pedir {{i.VAR-012-6.n}} a {{m0 i.VAR-012-6.p}}.",
+      "say": [
+        "Mire, para losa de vivienda lo normal es la {{i.VAR-038-6.n}}.",
+        "Le queda a {{m0 i.VAR-038-6.p}} la de {{i.VAR-038-6.u}}, hay {{i.VAR-038-6.e}}.",
+        "Si lleva más carga o mayor claro, a veces el ingeniero pide {{i.VAR-012-6.n}} — esa a {{m0 i.VAR-012-6.p}}."
+      ],
       "chips": ["var_precios", "var_carga", "cot_varilla"]
     },
     "var_precios": {
       "ask": "¿A cómo está cada una?",
-      "say": "Varilla de 6 m:\n · {{i.VAR-014-6.n}} — {{m0 i.VAR-014-6.p}} ({{i.VAR-014-6.e}} disponibles)\n · {{i.VAR-038-6.n}} — {{m0 i.VAR-038-6.p}} ({{i.VAR-038-6.e}})\n · {{i.VAR-012-6.n}} — {{m0 i.VAR-012-6.p}} ({{i.VAR-012-6.e}})",
-      "chips": ["cot_varilla", "var_carga", "entrega_hacen"],
-      "allowDigits": [6]
+      "say": [
+        "{{i.VAR-014-6.n}} a {{m0 i.VAR-014-6.p}}, la {{i.VAR-038-6.n}} a {{m0 i.VAR-038-6.p}}, y la {{i.VAR-012-6.n}} a {{m0 i.VAR-012-6.p}}.",
+        "Las tres de {{i.VAR-014-6.u}}, y hay disponibilidad en las tres."
+      ],
+      "chips": ["cot_varilla", "var_carga", "entrega_hacen"]
     },
     "var_carga": {
       "ask": "¿Y si la losa lleva más carga?",
-      "say": "Ahí lo común es subir a {{i.VAR-012-6.n}} — {{m0 i.VAR-012-6.p}} la de {{i.VAR-012-6.u}}, hay {{i.VAR-012-6.e}}.\n Eso ya depende del claro y de la carga: se lo confirma su ingeniero. Yo le puedo cotizar las dos opciones.",
+      "say": [
+        "Ahí lo común es subir a {{i.VAR-012-6.n}} — {{m0 i.VAR-012-6.p}} la de {{i.VAR-012-6.u}}.",
+        "Ya eso depende del claro y la carga, se lo confirma su ingeniero. Yo le cotizo las dos si quiere."
+      ],
       "chips": ["cot_varilla", "var_precios", "humano"]
     },
 
     "cot_pared": {
       "ask": "Necesito cotizar material para una pared",
-      "say": "Con gusto. ¿De cuántos metros cuadrados es la pared?\n Para que se dé una idea: el {{i.BLO-15.n}} está a {{m0 i.BLO-15.p}} y hay {{i.BLO-15.e}} en existencia.",
+      "say": [
+        "Con gusto.",
+        "¿De cuántos metros cuadrados es la pared?",
+        "Para que se vaya haciendo idea, el {{i.BLO-15.n}} anda a {{m0 i.BLO-15.p}}."
+      ],
       "chips": ["pared_m2", "pared_bloques", "entrega_hacen"]
     },
     "pared_bloques": {
       "ask": "¿Cuántos bloques por metro cuadrado?",
-      "say": "Son unos {{r.bloquesM2}} bloques por m² de pared, contando junta.\n Dígame los metros y le armo el cálculo completo con cemento y arena.",
+      "say": [
+        "Unos {{r.bloquesM2}} por m², contando junta.",
+        "Dígame los metros y le armo el cálculo completo, con cemento y arena y todo."
+      ],
       "chips": ["pared_m2", "pared_agrega", "humano"]
     },
     "pared_m2": {
       "ask": "Son 40 m²",
-      "say": "Para 40 m² son unos {{calc bloquesPared 40}} bloques de 15 cm — {{m0 (calc bloquesParedCosto 40)}}.\n Le falta el mortero. ¿Le agrego cemento y arena?",
+      "say": [
+        "Para 40 m² son unos {{calc bloquesPared 40}} bloques de 15 — {{m0 (calc bloquesParedCosto 40)}}.",
+        "Ahí le falta el mortero. ¿Le agrego cemento y arena de una vez?"
+      ],
       "chips": ["pared_agrega", "cot_final", "entrega_hacen"],
       "allowDigits": [40, 15]
     },
     "pared_agrega": {
       "ask": "Sí, agregue el cemento y la arena",
-      "say": "Para pegar y repellar 40 m² le calculo 14 bolsas de {{i.CEM-CAN-42.n}} ({{m0 (calc lineTotal CEM-CAN-42 14)}}) y 2 m³ de {{i.ARE-M3.n}} ({{m0 (calc lineTotal ARE-M3 2)}}).\n Estimado de campo. ¿Le armo la proforma?",
+      "say": [
+        "Para pegar y repellar esos 40 m² son 14 bolsas de {{i.CEM-CAN-42.n}} ({{m0 (calc lineTotal CEM-CAN-42 14)}}) y 2 m³ de {{i.ARE-M3.n}} ({{m0 (calc lineTotal ARE-M3 2)}}).",
+        "Estimado de campo, eh. ¿Le armo la proforma?"
+      ],
       "chips": ["cot_final", "entrega_hacen", "humano"],
       "allowDigits": [40, 14, 2]
     },
 
     "cot_final": {
       "ask": "Sí, mándeme la proforma",
-      "say": "PROFORMA PRO-1043\n · {{calc bloquesPared 40}} {{i.BLO-15.n}} — {{money (calc bloquesParedCosto 40)}}\n · 14 {{i.CEM-CAN-42.n}} — {{money (calc lineTotal CEM-CAN-42 14)}}\n · 2 m³ {{i.ARE-M3.n}} — {{money (calc lineTotal ARE-M3 2)}}\n · Flete local — {{money t.flete.costo}}\n Subtotal {{money (calc subFinal)}} · IVA 15% {{money (calc ivaFinal)}}\n TOTAL {{money (calc totFinal)}} — válida {{t.validez}} días.",
+      "say": [
+        "Ya se la armo.",
+        "PROFORMA PRO-1043\n· {{calc bloquesPared 40}} {{i.BLO-15.n}} — {{money (calc bloquesParedCosto 40)}}\n· 14 {{i.CEM-CAN-42.n}} — {{money (calc lineTotal CEM-CAN-42 14)}}\n· 2 m³ {{i.ARE-M3.n}} — {{money (calc lineTotal ARE-M3 2)}}\n· Flete local — {{money t.flete.costo}}\nSubtotal {{money (calc subFinal)}} · IVA 15% {{money (calc ivaFinal)}}\nTOTAL {{money (calc totFinal)}} — válida {{t.validez}} días."
+      ],
       "chips": ["entrega_cuando", "pagos", "fin"],
       "allowDigits": [1043, 40, 14, 2, 15],
       "proforma": true
     },
     "cot_cemento": {
       "ask": "Póngame 20 bolsas en una cotización",
-      "say": "PROFORMA PRO-1044\n · 20 {{i.CEM-HOL-42.n}} — {{money (calc lineTotal CEM-HOL-42 20)}}\n · Flete local — {{money t.flete.costo}}\n Subtotal {{money (calc subCemento)}} · IVA 15% {{money (calc ivaCemento)}}\n TOTAL {{money (calc totCemento)}} — válida {{t.validez}} días.",
+      "say": [
+        "PROFORMA PRO-1044\n· 20 {{i.CEM-HOL-42.n}} — {{money (calc lineTotal CEM-HOL-42 20)}}\n· Flete local — {{money t.flete.costo}}\nSubtotal {{money (calc subCemento)}} · IVA 15% {{money (calc ivaCemento)}}\nTOTAL {{money (calc totCemento)}} — válida {{t.validez}} días."
+      ],
       "chips": ["entrega_cuando", "pagos", "fin"],
       "allowDigits": [1044, 20, 15],
       "proforma": true
     },
     "cot_varilla": {
       "ask": "Agregue 40 varillas de 3/8",
-      "say": "PROFORMA PRO-1045\n · 40 {{i.VAR-038-6.n}} — {{money (calc lineTotal VAR-038-6 40)}}\n · 20 {{i.CEM-HOL-42.n}} — {{money (calc lineTotal CEM-HOL-42 20)}}\n · Flete local — {{money t.flete.costo}}\n Subtotal {{money (calc subVarilla)}} · IVA 15% {{money (calc ivaVarilla)}}\n TOTAL {{money (calc totVarilla)}} — válida {{t.validez}} días.",
+      "say": [
+        "PROFORMA PRO-1045\n· 40 {{i.VAR-038-6.n}} — {{money (calc lineTotal VAR-038-6 40)}}\n· 20 {{i.CEM-HOL-42.n}} — {{money (calc lineTotal CEM-HOL-42 20)}}\n· Flete local — {{money t.flete.costo}}\nSubtotal {{money (calc subVarilla)}} · IVA 15% {{money (calc ivaVarilla)}}\nTOTAL {{money (calc totVarilla)}} — válida {{t.validez}} días."
+      ],
       "chips": ["entrega_cuando", "pagos", "fin"],
-      "allowDigits": [1045, 40, 20, 3, 8, 15],
+      "allowDigits": [1045, 40, 20, 15],
       "proforma": true
     },
 
     "entrega_hacen": {
       "ask": "¿Hacen entregas?",
-      "say": "Sí. Dentro de {{t.flete.cobertura}} el flete es {{m0 t.flete.costo}}.\n Si el pedido entra antes de las {{t.flete.corte}}, sale el mismo día.",
+      "say": [
+        "Sí, dentro del {{t.flete.cobertura}} el flete es {{m0 t.flete.costo}}.",
+        "Si entra antes de las {{t.flete.corte}}, se lo mando el mismo día."
+      ],
       "chips": ["entrega_fuera", "pagos", "cot_cemento"]
     },
     "entrega_cuando": {
       "ask": "¿Cuándo me la pueden entregar?",
-      "say": "Si aprueba antes de las {{t.flete.corte}}, se la mandamos el mismo día dentro de {{t.flete.cobertura}}.\n Después de esa hora, al siguiente día hábil. Atendemos de {{t.horario}}.",
+      "say": [
+        "Si aprueba antes de las {{t.flete.corte}}, se la mando ese mismo día, dentro del {{t.flete.cobertura}}.",
+        "Después de esa hora ya es al siguiente día hábil. Atendemos {{t.horario}}."
+      ],
       "chips": ["pagos", "entrega_fuera", "fin"]
     },
     "entrega_fuera": {
       "ask": "¿Llegan fuera de León?",
-      "say": "Fuera del casco urbano se cotiza según la distancia — ese precio no lo tengo en el sistema.\n Le paso con alguien del equipo para que le confirme el flete a su dirección.",
+      "say": [
+        "Uy, fuera del casco urbano ya se cotiza según distancia, ese no lo tengo aquí.",
+        "Le paso con alguien del equipo para que le confirme el flete a su dirección."
+      ],
       "chips": ["humano", "pagos", "fin"]
     },
     "pagos": {
       "ask": "¿Aceptan tarjeta?",
-      "say": "Sí. Recibimos {{t.pagos}}.\n Para crédito sí necesita hablar con una persona del equipo, eso yo no lo apruebo.",
+      "say": [
+        "Sí, recibimos {{t.pagos}}.",
+        "Para crédito sí le toca hablar con alguien del equipo, eso yo no lo manejo."
+      ],
       "chips": ["entrega_cuando", "humano", "fin"]
     },
 
     "humano": {
       "ask": "Mejor páseme con una persona",
-      "say": "Claro. Le paso con el equipo por WhatsApp y ahí le atienden directo.\n Mientras tanto, ¿le puedo ayudar con algo más del catálogo?",
+      "say": [
+        "Claro, le paso con el equipo y ahí le atienden directo.",
+        "Mientras tanto, ¿le ayudo con algo más?"
+      ],
       "chips": ["cem_precio", "var_losa", "fin"]
     },
     "fin": {
       "ask": "Ya vi suficiente",
-      "say": "Perfecto. Cualquier cosa aquí estoy — atiendo a cualquier hora.",
+      "say": [
+        "Perfecto.",
+        "Cualquier cosa aquí estoy, a cualquier hora."
+      ],
       "chips": [],
       "closes": true
+    },
+
+    "identidad": {
+      "ask": "¿Hablo con una persona o con un bot?",
+      "say": [
+        "Soy el asistente de la ferretería, pero le resuelvo igual.",
+        "¿Qué ocupa?"
+      ],
+      "chips": ["cem_precio", "var_losa", "cot_pared"],
+      "freeTextEntry": true
     }
   }
 }
