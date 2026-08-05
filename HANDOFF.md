@@ -63,9 +63,13 @@ Fast-forward merge (zero conflicts), `main` = `1a4c87b`, deployed via `vercel --
   in Eastern hours. The page is pinned to Managua and does not convert for the viewer
   (verified across three forced browser timezones). Fede is checking it in Google Calendar.
 
-### `feat/labor-cost-and-components` — IN PROGRESS, not merged
+### `feat/labor-cost-and-components` — MERGED into `main` (stale header, corrected)
 
-Two commits pushed. **`dfb0d52` closes §2.1.** `js/labor-cost.js` is now the only hourly-rate
+This section previously said "IN PROGRESS, not merged." **That was wrong as of this
+session's branch audit** — `git merge-base --is-ancestor` confirms both `dfb0d52` and
+`fb3b0ee` are ancestors of current `main` (`7928e4e`). The branch ref (local and on origin)
+is a stale pointer to already-absorbed work; see the branch audit near the end of this
+document. **`dfb0d52` closes §2.1.** `js/labor-cost.js` is now the only hourly-rate
 source on the site; `counter` is derived in code from the published figures (recomputes to
 $2.09/hr, $434.36/month), and `supervisor`/`professional` are labelled in-file as judgment
 estimates. All five disagreeing consumers were migrated — `TEAM_HOURLY`,
@@ -273,14 +277,27 @@ that before paying for it. The trial page also throws two console errors from th
 prototype's own script reaching for the nav I stripped when swapping in the real one; those
 are assembly artifacts, not design problems, so judge layout and pinning, not interactions.
 
-## 2c. /PROBALO GUIDED DEMO — steps 1-5 done on `feat/probalo-data`, step 6 next
+## 2c. /PROBALO GUIDED DEMO — steps 1-6 done on `feat/probalo-data`, pushed, preview deployed
 
-Branch not merged, no preview. `probalo.html` and `ignea-landing-v4.html` are now IN the
-repo (both were in ~/Downloads). **Note: `probalo.html`'s inline `<script>` still has its
-own embedded `TREE`/`CAT` objects — it has not been re-pointed at `data/tryit-tree.json` /
-`data/ferreteria-catalog.json` / `js/tryit-resolver.js` yet.** Steps 4-5 validated and built
-the data-file path in isolation; wiring the page to consume it is unstarted work, separate
-from step 6 (styling).
+**Branch pushed to origin, commit `b1eb8de`.** Preview:
+`https://ignea-labs-w8bp-invct35sg-fedebaltoinvest-7282s-projects.vercel.app` —
+**not merged, stopped deliberately for review.** `probalo.html` and `ignea-landing-v4.html`
+are now IN the repo (both were in ~/Downloads).
+
+**Correction to a stale note below:** §3's standing rule claims "Preview URLs sit behind
+Vercel's SSO wall for static content but not `/api/*`." **That is no longer true for this
+project — re-verified directly, don't trust the old claim.** `curl`ing this preview's
+`/api/tryit` returns `401 {"protection":{"vercel_auth_enabled":true,...}}`, same as the
+static pages. The whole deployment is SSO-walled, no `VERCEL_AUTOMATION_BYPASS_SECRET` is
+configured. Whoever reviews this preview needs to open it in a browser logged into the
+`fedebaltoinvest-7282s-projects` Vercel team to get past the wall.
+
+**probalo.html is now wired to the real data files — no longer two things that happened to
+agree by construction.** The embedded `TREE`/`CAT` objects are gone; the page fetches
+`/data/tryit-tree.json` and `/data/ferreteria-catalog.json` at boot, builds
+`IgneaTryItResolver.make(catalog)`, and both the deterministic chip path and the
+`fallback()` responder read through it. `askServer()` was already a real `fetch()` to
+`/api/tryit`, not a stub — only the doc comment calling it "stubbed" was stale.
 
 **Architecture decision (settled, do not re-open): option A.** The prototype's TREE replies
 were JavaScript functions doing real arithmetic, so they could not be JSON at all. They are
@@ -373,6 +390,68 @@ above) actually wire the page's inline `TREE`/`CAT`/`askServer()` to
 `api/tryit.js` — right now the validated data files and the live page are two separate
 things that happen to agree by construction, not by reference.
 
+**End-to-end verification (this session).** Vercel's build compiled `tryit.js` from ESM to
+CommonJS cleanly (confirms the `import catalog from '...json' with {type:'json'}` syntax
+works in the real build, not just local Node). Since the deployed preview is fully
+SSO-walled (see above), verification split across the venue that actually proves each
+claim:
+
+- **Chip path, deterministic and correct** — browser-verified on `localhost:8899` serving
+  the exact committed code (same equivalence argument §1 already used for this reason).
+  Walked cot_pared → pared_m2 → pared_agrega → cot_final: **PRO-1043 total C$23,756.70**,
+  byte-identical to the walker's and the old prototype's number. Zero console errors.
+- **Free text hitting Groq, for real** — `vercel dev` locally (real routing, real
+  functions, real `GROQ_API_KEY`, no SSO wall since it's a local session). 8 real calls
+  through the actual route, all correct and catalog-grounded (e.g. "¿A cómo está el
+  bloque de 15?" → "El bloque de 15 cm cuesta C$26" — exact catalog match).
+- **Fallback firing when the API is unavailable** — two distinct paths, both verified:
+  network-unreachable (browser test, static server has no `/api/tryit` → client's `catch`
+  block fires `fallback()`, correct price returned, turn counter still decremented, zero
+  console errors beyond the expected network-level 501 noise from the test harness itself)
+  and explicit `{degraded:true}` from a **deliberately broken `GROQ_API_KEY`, tested purely
+  locally** — Groq correctly 401s, the route catches `!response.ok` and returns
+  `200 {degraded:true}` exactly per contract. Vercel's real key was never touched.
+- **Session turn cap enforced server-side** — `vercel dev` can't prove this (see above,
+  resets module state per request). Re-confirmed instead with a direct single-process
+  handler harness: 10 calls on one `sessionId` → 200 ×8 then **429 ×2**, matching
+  `SESSION_TURN_CAP`.
+- **Closing card** — all three options resolve: `optWa` → real `wa.me` link with correct
+  percent-encoding, `optDx` → `/diagnostic`, `optCal` → the real Google Calendar booking
+  URL. Zero console errors.
+- **375/768/1440** — no horizontal overflow at any width, `.nav__links` correctly hides
+  under 900px, console clean at all three.
+
+**Tokens-per-turn — measured, not modeled. This is the number that was missing.**
+8 representative free-text messages sent to the real Groq endpoint (mirroring the route's
+exact system-prompt construction), reading `usage` directly off Groq's response:
+
+| | prompt | completion | total |
+|---|---|---|---|
+| average per turn | 603.9 | 31.3 | **635.1** |
+
+**The system prompt (~604 tokens) is nearly the whole cost of every turn**, not the reply —
+this route is stateless with no conversation history and no prompt caching, so the full
+catalog-grounded prompt is resent on every single free-text message regardless of how short
+the question or answer is. Consequences for the free-tier question still marked UNPROVEN
+above:
+
+- At the current **40,000/day ceiling**: ≈ **63 free-text turns/day** before the route
+  degrades to `fallback()` for the rest of the day.
+- Against the full verified Groq free-tier budget (500,000 TPD for
+  `llama-3.1-8b-instant`): ≈ **787 free-text turns/day** if the ceiling were raised to use
+  the whole account budget.
+- This makes the ceiling choice legible for the first time: it is not "40K tokens," it is
+  roughly **"63 free-text turns before fallback."** Whether that is enough in a real day
+  depends entirely on the still-unmeasured chip-vs-free-text split — the number this section
+  keeps deferring to instrumented live sessions. If real data later shows free-text turns
+  are rarer than 63/day, the ceiling is already generous; if a busy day produces more than
+  that, prospects after #63 get the fallback responder, not a broken page, so the standing
+  design goal (wrong-but-graceful) holds either way.
+- **Cheap lever if this turns out too tight**: prompt caching (Groq supports it) or
+  trimming the injected catalog would cut the ~604-token floor substantially, since it's
+  fixed overhead unrelated to the actual question. Not done this session — flagged for
+  whoever revisits the ceiling once real usage data exists.
+
 **70-80% LLM-call reduction — resolved, do not re-open.** A synthetic/branching-factor
 measurement was considered and dropped: it describes the shape of the tree, not what real
 users do, and reports ~100% chip usage by construction because it never free-types — it
@@ -396,7 +475,7 @@ of the day. Re-open this only once real session data exists to size the ceiling 
 - Never print, echo, or ask for API keys/tokens in chat. Verify presence/scope via `vercel env ls` (names/scopes only), never values.
 - **Confirm `.vercel/project.json` says `ignea-labs-w8bp` before any Vercel CLI work** — not the dead `ignea-labs` decoy project.
 - Production now carries this work. To confirm what is live: `curl -sL https://www.ignealabs.com/ -o /tmp/p.html && diff -q /tmp/p.html index.html` from a clean `main`.
-- Preview URLs sit behind Vercel's SSO wall (302 → `vercel.com/sso-api`) for static content but not `/api/*`. Expected, not a bug.
+- **Preview URLs sit behind Vercel's SSO wall for EVERYTHING, `/api/*` included** — corrected 2c: the previous claim that `/api/*` was exempt was checked directly against the `feat/probalo-data` preview and is false for this project's current protection settings. No automation bypass secret is configured. To test a preview's API without a browser session, use `vercel dev` locally instead (same routing/functions, no wall) — but note `vercel dev` does NOT reliably persist in-memory module state (rate-limit/turn-cap counters) across requests the way a warm deployed instance does, so use a direct single-process handler harness for anything that depends on that.
 - **Verify by running things, not by reading code.** This session that caught: the reference file's own scroll-snap bug, a float-hide handler that silently no-op'd because `.wa-float` is parsed *after* the script tag, and a Supabase request failing only intermittently depending on when `networkidle` settled. All three looked fine in the source.
 - Don't guess at missing user-supplied values (booking links, phone numbers, tokens) — ask, or report exactly what was and wasn't found.
 - `.env.local` exists at repo root, is git-ignored, holds real values — never read it or surface its contents. If a real value is needed, use shell-variable substitution inside a single non-echoing Bash call piped straight into `curl`.
@@ -446,6 +525,37 @@ of the day. Re-open this only once real session data exists to size the ceiling 
 - Env vars: `ANTHROPIC_API_KEY` (Prod/Preview/Dev), `IGNEA_OPS_TOKEN` (Preview/Prod), `ALLOWED_ORIGINS` (**Preview only — never set on Production**, which correctly uses the hardcoded fallback).
 - Repo: `github.com/fede09balto-gif/Ignea-Labs` (renamed from `onda-ai`; old remote URL still redirects, push/pull both work). **The working directory was renamed to `~/ignea-labs` (was `~/onda-ai`).**
 - `vercel.json` sets `cleanUrls:true`, which **308-redirects every `.html` path**. Canonicals, `sitemap.xml`, and internal links must point at the clean form. When curling to verify, fetch `/` not `/index.html` or you'll measure the redirect instead of the page.
+
+---
+
+## 5b. BRANCH AUDIT (this session) — only 1 branch actually has unmerged work
+
+Git-verified, not narrative-verified — this doc's own prose about branch status had drifted
+from reality (see the `feat/labor-cost-and-components` correction above). Trust `git
+branch --merged main` / `git rev-list --count`, not old handoff text, when this next goes
+stale too.
+
+| Branch | Commits ahead of `main` | Status |
+|---|---|---|
+| `feat/probalo-data` | **3** (`379112c`, `b9c82ae`, `b1eb8de`) | **The only real unmerged work.** Preview deployed, awaiting review before merge. |
+| `feat/formspree-google-calendar` | 0 | Fully absorbed into `main`. Stale ref. |
+| `feat/hero-cta-ticker-nav-ghost` | 0 | Fully absorbed into `main`. Stale ref. |
+| `feat/labor-cost-and-components` | 0 | Fully absorbed into `main`. Stale ref (see correction above). |
+| `fix/api-lockdown` | 0 | Fully absorbed into `main`. Stale ref. |
+| `fix/seo-and-deadcode` | 0 | Fully absorbed into `main`. Stale ref. |
+| `revamp/light-theme` | 0 | Fully absorbed into `main`. Stale ref. |
+| `claude/amazing-chaplygin` (origin only, no local ref) | 0 | Fully absorbed into `main`. Stale ref, dated 2026-04-12. |
+
+**Recommended consolidation, in order:**
+1. Review and merge `feat/probalo-data` (this session's preview) — the only branch with
+   anything left to do.
+2. Delete the other 7 refs, local and on origin — they're pointers to work `main` already
+   contains, not backups of anything at risk. `git branch -d <name>` locally (safe: `-d`
+   refuses to delete anything not fully merged, so it can't accidentally discard work) and
+   `git push origin --delete <name>` remotely.
+3. Nothing else needs sequencing — there is no second line of unmerged work waiting behind
+   this one. The "archaeology" risk was the stale narrative in this file claiming otherwise,
+   not the actual git state.
 
 ---
 
