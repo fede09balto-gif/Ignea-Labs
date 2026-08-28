@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- interactive-widget=resizes-content: shrink the LAYOUT viewport when the
+     on-screen keyboard opens, so the fixed #qNavFixed bar (the only Next
+     button on every screen — the inline .q-nav is display:none) rides above
+     the keyboard instead of sitting behind it. Chrome 108+ / Firefox 132+;
+     a no-op in Safari/iOS, which has not implemented it — there the
+     Enter-to-advance handler in js/diagnostic.js is the mitigation. -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>Empiece aquí | Ignea Labs</title>
 <meta name="description" content="Cuéntenos cómo trabaja hoy en 5 preguntas. Con eso preparamos una propuesta concreta para su negocio.">
 <meta property="og:title" content="Empiece aquí | Ignea Labs">

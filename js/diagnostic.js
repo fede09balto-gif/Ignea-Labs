@@ -271,15 +271,51 @@
       goTo(currentScreen - 1);
     });
 
-    // Enter to advance
+    // Enter to advance — single-line inputs only, never a textarea.
+    //
+    // Screens 2, 4 and 5 are open text and a textarea MUST get its newline.
+    // Before this guard the handler was scoped `currentScreen >= 2 && <= 5`
+    // with no target check: a ferretero writing a second sentence pressed
+    // return and got bounced forward mid-thought, and on screen 5 — where
+    // .btn-next IS the submit button — return SUBMITTED the form outright
+    // with the truncated answer. Verified in a browser before the fix.
+    //
+    // Anything that already owns Enter for itself is excluded for the same
+    // reason: the custom select (open/close, pick option), the voice mic card
+    // (start/stop recording), and any focused button or link.
+    //
+    // Screen 1 (infoScreen) is included deliberately. It is eight fields deep
+    // and its inline .q-nav is display:none, so the fixed bottom bar is the
+    // ONLY Next button — exactly where an on-screen keyboard lands. Giving the
+    // keyboard's own return key a job is the mitigation that works everywhere,
+    // including iOS, where interactive-widget is not implemented.
+    //
+    // No e.isComposing guard on purpose: Gboard keeps the current word in
+    // composition, so guarding on it would risk return doing nothing on the
+    // very screen this exists to unblock. The audience is Spanish-language,
+    // so IME candidate-selection-with-Enter is not a realistic conflict.
+    function enterAdvances(el) {
+      if (!el) return true;
+      var tag = (el.tagName || '').toLowerCase();
+      if (tag === 'textarea' || tag === 'button' || tag === 'a' || tag === 'select') return false;
+      if (el.isContentEditable) return false;
+      if (el.closest && el.closest('.custom-select, .mic-card')) return false;
+      return true;
+    }
+
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && currentScreen >= 2 && currentScreen <= 5) {
-        var active = document.querySelector('.q-wrap.active');
-        if (active) {
-          var nextBtn = active.querySelector('.btn-next');
-          if (nextBtn && !nextBtn.disabled) nextBtn.click();
-        }
-      }
+      if (e.key !== 'Enter') return;
+      if (e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
+      if (currentScreen < 1 || currentScreen > 5) return;
+      if (!enterAdvances(e.target)) return;
+      var active = document.querySelector('.q-wrap.active');
+      if (!active) return;
+      var nextBtn = active.id === 'infoScreen'
+        ? document.getElementById('infoNextBtn')
+        : active.querySelector('.btn-next');
+      if (!nextBtn || nextBtn.disabled) return;
+      e.preventDefault();
+      nextBtn.click();
     });
 
     updateInfoBtn();
