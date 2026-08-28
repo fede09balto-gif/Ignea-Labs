@@ -26,11 +26,11 @@
     automotive: 'Automotriz', media: 'Medios y comunicación', government: 'Gobierno',
     other: 'Otro'
   };
-  var REVENUE_LABELS = {
-    under5k: 'Menos de $5,000', '5k-15k': '$5,000 – $15,000', '15k-50k': '$15,000 – $50,000',
-    '50k-150k': '$50,000 – $150,000', '150k-500k': '$150,000 – $500,000',
-    '500k-1m': '$500,000 – $1M', over1m: 'Más de $1M', prefer_not: 'Prefiere no decir'
-  };
+  /* Córdoba brackets. These are the ORIGINAL USD boundaries converted at
+     the BCN rate — no new boundaries were invented. Built by
+     revenueBracketLabels() below so the email label, the <option> label
+     and the rate all come from one place. */
+  var REVENUE_LABELS = {};
   var TIMELEAK_LABELS = {
     same_questions: 'Respondiendo las mismas preguntas', scheduling: 'Agendando o confirmando citas',
     followups: 'Dando seguimiento a clientes', data_entry: 'Pasando datos de un lugar a otro',
@@ -48,6 +48,97 @@
     return arr.map(function(v) { return labelize(map, v); }).join(', ');
   }
 
+  /* ---- revenue brackets, USD boundaries shown in córdobas (D3) ----
+     The <option> value attributes stay 'under5k', '5k-15k', ... forever:
+     they are what localStorage, the ops dashboard and every historical
+     submission are keyed on. Only the visible label is converted, so the
+     currency switch does not orphan past data.
+
+     FX comes from js/labor-cost.js (the site's single source for the BCN
+     rate). If that script did not load, we return null and simply leave
+     the static Spanish labels already in the markup alone. */
+  var REVENUE_USD_BOUNDS = { k5: 5000, k15: 15000, k50: 50000, k150: 150000, k500: 500000, m1: 1000000 };
+
+  function revenueBracketLabels(lang) {
+    if (typeof IgneaLaborCost === 'undefined' || !IgneaLaborCost.FX_BCN_2026) return null;
+    var fx = IgneaLaborCost.FX_BCN_2026;
+    var en = lang === 'en';
+    var M = en ? ' million' : ' millones';
+    // thousands, rounded to the nearest 1,000 so the label is readable
+    function k(usd) { return 'C$' + (Math.round(usd * fx / 1000) * 1000).toLocaleString('en-US'); }
+    // millions, one decimal
+    function m(usd) { return (usd * fx / 1000000).toFixed(1); }
+
+    var k5 = k(REVENUE_USD_BOUNDS.k5), k15 = k(REVENUE_USD_BOUNDS.k15);
+    var m50 = m(REVENUE_USD_BOUNDS.k50), m150 = m(REVENUE_USD_BOUNDS.k150);
+    var m500 = m(REVENUE_USD_BOUNDS.k500), m1m = m(REVENUE_USD_BOUNDS.m1);
+
+    return {
+      'under5k':   (en ? 'Under ' : 'Menos de ') + k5,
+      '5k-15k':    k5 + ' – ' + k15,
+      '15k-50k':   k15 + ' – C$' + m50 + M,
+      '50k-150k':  'C$' + m50 + ' – C$' + m150 + M,
+      '150k-500k': 'C$' + m150 + ' – C$' + m500 + M,
+      '500k-1m':   'C$' + m500 + ' – C$' + m1m + M,
+      'over1m':    (en ? 'Over C$' : 'Más de C$') + m1m + M
+    };
+    // NOTE: 'prefer_not' is deliberately NOT in this map. The dropdown the
+    // prospect reads is first person ("Prefiero no decir" — I'd rather not
+    // say); the email label describing what they chose is third person
+    // ("Prefiere no decir" — they'd rather not say). Writing the email
+    // phrasing back into the <option> would put the wrong voice in front
+    // of the user, so the two are kept separate below.
+  }
+
+  /* Rewrites the <option> labels and refreshes REVENUE_LABELS (used by the
+     Formspree email). Runs before initAllCustomSelects() on DOMContentLoaded
+     — diagnostic.js registers its handler first — and again on langchange,
+     where it is registered before custom-select's own handler, so the
+     widget re-reads these values rather than the i18n defaults. */
+  function localizeRevenueBrackets() {
+    var lang = (typeof IgneaI18n !== 'undefined' && IgneaI18n.getLang) ? IgneaI18n.getLang() : 'es';
+    var brackets = revenueBracketLabels(lang);
+    if (!brackets) return;
+
+    // Email map: the money brackets plus the third-person phrasing for
+    // prefer_not, since this describes the prospect's choice to us.
+    REVENUE_LABELS = {};
+    Object.keys(brackets).forEach(function(k) { REVENUE_LABELS[k] = brackets[k]; });
+    REVENUE_LABELS.prefer_not = lang === 'en' ? 'Prefers not to say' : 'Prefiere no decir';
+
+    // DOM: money brackets only — never touch the prefer_not <option>, whose
+    // first-person wording lives in the markup and i18n.
+    var sel = document.getElementById('dxRevenue');
+    if (!sel) return;
+    Object.keys(brackets).forEach(function(val) {
+      var opt = sel.querySelector('option[value="' + val + '"]');
+      if (opt) opt.textContent = brackets[val];
+    });
+  }
+
+  /* ---- Formspree endpoint ------------------------------------------
+     TODO(fede): create a dedicated "Diagnóstico" form in the Formspree
+     dashboard and paste its id below. A form id looks like 'xabcdefg' —
+     paste the ID ONLY, not the full https://formspree.io/f/... URL.
+
+     Why a second form: /diagnostic and contact.html currently share one
+     endpoint, so every diagnostic notification arrives titled "New form
+     submission on Ignea Labs — Contacto". That opening line comes from
+     the form's name in Formspree's own dashboard and cannot be overridden
+     by any field we submit — a separate form is the only way to fix it.
+
+     It costs nothing: Formspree's 50/month free allowance is per-ACCOUNT,
+     not per-form, and every plan includes unlimited forms. Two forms do
+     NOT halve the headroom; they draw from the same 50.
+
+     Until the id is pasted, this falls back to the shared contact
+     endpoint — which is exactly today's working behaviour, so leaving it
+     null breaks nothing. */
+  var FORMSPREE_DIAGNOSTIC_FORM_ID = null;        // <-- paste the new id here
+  var FORMSPREE_SHARED_FORM_ID     = 'xrenwoeo';  // shared with contact.html
+  var FORMSPREE_ENDPOINT = 'https://formspree.io/f/' +
+    (FORMSPREE_DIAGNOSTIC_FORM_ID || FORMSPREE_SHARED_FORM_ID);
+
   var landingScreen, infoScreen, hookScreen;
   var progWrap, progBar, progText;
 
@@ -58,6 +149,11 @@
     progWrap = document.getElementById('progressWrap');
     progBar  = document.getElementById('progFill');
     progText = document.getElementById('progText');
+
+    // Córdoba revenue labels — must run before initAllCustomSelects()
+    // (inline script in diagnostic.html) reads the <option> text.
+    localizeRevenueBrackets();
+    document.addEventListener('langchange', localizeRevenueBrackets);
 
     // Restore progress
     restoreProgress();
@@ -84,6 +180,15 @@
     ['dxFirstName', 'dxEmail', 'dxCompany', 'dxPhone'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.addEventListener('input', updateInfoBtn);
+    });
+
+    // Persist every contact field as it is typed/selected, so a refresh
+    // mid-form never costs the prospect their name and number.
+    CONTACT_FIELD_IDS.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('input', saveContactFields);
+      el.addEventListener('change', saveContactFields);
     });
 
     // Card click handlers — multi-select
@@ -284,22 +389,90 @@
     var phone = (document.getElementById('dxPhone') || {}).value || '';
     if (!name.trim() || !email.trim() || !company.trim() || !phone.trim()) return false;
     if (email.indexOf('@') === -1) return false;
+    if (!phoneLooksReal(phone)) return false;
     return true;
+  }
+
+  /* Deliberately permissive. Rejecting a number a prospect actually has is
+     far worse than accepting an odd one, so this only asks: are there
+     enough digits in here to be a phone number at all?
+
+     Accepts every real Nicaraguan shape — 8935-9013, 8935 9013, 89359013,
+     +505 8935 9013, (505) 2315-1177 — plus international numbers and a
+     business that pastes two lines ("8935-9013 / 2315-1177"). Rejects the
+     actual failure mode we saw: free text with no digits in it. */
+  function phoneLooksReal(raw) {
+    var digits = String(raw).replace(/\D/g, '');
+    return digits.length >= 8 && digits.length <= 20;
+  }
+
+  function updatePhoneHint() {
+    var input = document.getElementById('dxPhone');
+    var hint = document.getElementById('dxPhoneHint');
+    if (!input || !hint) return;
+    var val = input.value || '';
+    // Only nudge once they've actually typed something — never scold an
+    // empty field they simply haven't reached yet.
+    var show = val.trim().length > 0 && !phoneLooksReal(val);
+    hint.classList.toggle('visible', show);
   }
 
   function updateInfoBtn() {
     var btn = document.getElementById('infoNextBtn');
     if (btn) btn.disabled = !validateInfo();
+    updatePhoneHint();
     if (typeof window.syncFixedNav === 'function') window.syncFixedNav();
+  }
+
+  /* Step-1 contact fields. These used to live only in the DOM, so a refresh
+     (which restores the SCREEN position from sessionStorage) would drop the
+     prospect back into the middle of the form with their name, email,
+     company and phone silently wiped. Nobody retypes that. Persisted under
+     the same `ignea_` prefix convention as everything else. */
+  var CONTACT_FIELD_IDS = [
+    'dxFirstName', 'dxEmail', 'dxCompany', 'dxPhone',
+    'dxWebsite', 'dxLinkedin', 'dxIndustry', 'dxSize', 'dxRevenue'
+  ];
+
+  function saveContactFields() {
+    try {
+      var data = {};
+      CONTACT_FIELD_IDS.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el && el.value) data[id] = el.value;
+      });
+      sessionStorage.setItem('ignea_intake_contact', JSON.stringify(data));
+    } catch(e) {}
+  }
+
+  function restoreContactFields() {
+    try {
+      var raw = sessionStorage.getItem('ignea_intake_contact');
+      if (!raw) return;
+      var data = JSON.parse(raw);
+      CONTACT_FIELD_IDS.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el || !data[id]) return;
+        el.value = data[id];
+        // <select>s are wrapped by custom-select.js, which reads the native
+        // value at init. Restoring before that runs is enough; fire change
+        // so anything already listening stays in sync.
+        if (el.tagName === 'SELECT') el.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    } catch(e) {}
   }
 
   function saveProgress() {
     try {
       sessionStorage.setItem('ignea_intake_answers', JSON.stringify(answers));
     } catch(e) {}
+    saveContactFields();
   }
 
   function restoreProgress() {
+    // Contact fields first: this must land before initAllCustomSelects()
+    // reads the native <select> values on DOMContentLoaded.
+    restoreContactFields();
     try {
       var saved = sessionStorage.getItem('ignea_intake_answers');
       if (saved) {
@@ -549,7 +722,7 @@
         } catch (e) {}
       }
 
-      fetch('https://formspree.io/f/xrenwoeo', {
+      fetch(FORMSPREE_ENDPOINT, {
         method: 'POST',
         body: fd,
         headers: { 'Accept': 'application/json' }
@@ -584,6 +757,7 @@
     try {
       sessionStorage.removeItem('ignea_intake_answers');
       sessionStorage.removeItem('ignea_intake_screen');
+      sessionStorage.removeItem('ignea_intake_contact');
     } catch(e) {}
 
     // Go to hook screen

@@ -47,6 +47,17 @@
 .info-full{grid-column:1 / -1}
 .info-confidential{font-family:var(--fm);font-size:13px;color:var(--text-dim);letter-spacing:1px;margin-top:12px;text-align:center}
 
+/* Optional revenue question, last screen (D3). Visually de-emphasised and
+   set apart from the required question above it so it reads as an extra,
+   not as another thing standing between the prospect and submit. */
+.dx-revenue{margin-top:28px;padding-top:24px;border-top:1px solid var(--border)}
+.dx-revenue .form-label{color:var(--gray)}
+.dx-revenue-note{font-size:13px;color:var(--text-dim);line-height:1.55;margin-top:8px}
+
+/* Inline field hint — non-blocking tone, used by the phone check. */
+.field-hint{font-size:13px;color:var(--coral);line-height:1.5;margin-top:6px;display:none}
+.field-hint.visible{display:block}
+
 /* QUESTION SCREENS */
 .q-counter{font-family:var(--fm);font-size:12px;color:var(--accent);letter-spacing:2.5px;margin-bottom:20px;text-transform:uppercase}
 .q-text{font-size:clamp(20px,3vw,28px);font-weight:700;color:var(--white);line-height:1.35;margin-bottom:36px;letter-spacing:-.02em}
@@ -137,7 +148,7 @@
       <li><a href="diagnostic" class="active" data-i18n="nav.start">Empieza Aquí</a></li>
       <li><a href="contact" data-i18n="nav.contact">Contacto</a></li>
     </ul>
-    <a href="diagnostic" class="btn-ghost btn-nav" data-i18n-html="nav.cta">Agenda tu Llamada &rarr;</a>
+    <a href="https://calendar.app.google/E4dfYkm8epTzdsiT7" target="_blank" rel="noopener" class="btn-ghost btn-nav" data-i18n-html="nav.cta">Agenda tu Llamada &rarr;</a>
     <button class="hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -170,10 +181,14 @@
 <!-- ============================================ -->
 <div class="q-wrap dx-landing active" id="landingScreen">
   <h1 data-i18n="intake.landing.headline">Cuéntanos sobre tu negocio. Preparamos todo para una llamada que vale la pena.</h1>
-  <p class="dx-landing-sub" data-i18n="intake.landing.sub">5 preguntas. 3 minutos. Cero compromiso. Nos da lo que necesitamos para llegar a la llamada listos — sin hacerte perder tiempo repitiendo lo básico.</p>
+  <p class="dx-landing-sub" data-i18n="intake.landing.sub">5 preguntas cortas. Cero compromiso. Nos da lo que necesitamos para llegar a la llamada listos — sin hacerte perder tiempo repitiendo lo básico.</p>
+  <!-- The "3 minutos" chip was removed deliberately: three of the five
+       screens are open-ended text, so the real completion time is
+       composition time we cannot promise. A time claim discovered to be
+       wrong mid-form is exactly when people abandon. intake.landing.s2 is
+       left orphaned in i18n.js rather than churning live paths. -->
   <div class="dx-landing-stats">
-    <span data-i18n="intake.landing.s1">5 preguntas</span>
-    <span data-i18n="intake.landing.s2">3 minutos</span>
+    <span data-i18n="intake.landing.s1">5 preguntas cortas</span>
     <span data-i18n="intake.landing.s3">100% confidencial</span>
   </div>
   <button class="btn-gradient" id="landingStartBtn" data-i18n-btn="intake.landing.cta">Empezar &rarr;</button>
@@ -202,7 +217,8 @@
     </div>
     <div class="info-field">
       <label class="form-label" for="dxPhone" data-i18n="intake.field.phone">WhatsApp o teléfono</label>
-      <input type="tel" class="form-input" id="dxPhone" required autocomplete="tel">
+      <input type="tel" class="form-input" id="dxPhone" required autocomplete="tel" inputmode="tel">
+      <p class="field-hint" id="dxPhoneHint" data-i18n="intake.phone.hint">¿Está completo el número? Por ejemplo: 8935-9013</p>
     </div>
     <div class="info-field">
       <label class="form-label" for="dxWebsite" data-i18n="intake.field.website">Sitio web (opcional)</label>
@@ -255,20 +271,10 @@
         <option value="1000+">1,000+</option>
       </select>
     </div>
-    <div class="info-field">
-      <label class="form-label" for="dxRevenue" data-i18n="intake.field.revenue">Ingresos mensuales (opcional)</label>
-      <select class="form-select" id="dxRevenue" data-custom>
-        <option value="">—</option>
-        <option value="under5k" data-i18n="intake.rev.under5k">Menos de $5,000</option>
-        <option value="5k-15k" data-i18n="intake.rev.5k15k">$5,000 – $15,000</option>
-        <option value="15k-50k" data-i18n="intake.rev.15k50k">$15,000 – $50,000</option>
-        <option value="50k-150k" data-i18n="intake.rev.50k150k">$50,000 – $150,000</option>
-        <option value="150k-500k" data-i18n="intake.rev.150k500k">$150,000 – $500,000</option>
-        <option value="500k-1m" data-i18n="intake.rev.500k1m">$500,000 – $1M</option>
-        <option value="over1m" data-i18n="intake.rev.over1m">Más de $1M</option>
-        <option value="prefer_not" data-i18n="intake.rev.prefer_not">Prefiero no decir</option>
-      </select>
-    </div>
+    <!-- Ingresos mensuales moved OUT of this screen to the last question
+         screen (SCREEN 5). Asking an employee for the company's revenue on
+         the first screen, before any trust exists, is a plausible
+         tab-close — and a non-owner often doesn't know the figure. -->
   </div>
 
   <div class="q-nav">
@@ -353,6 +359,32 @@
   <div class="voice-wrap">
     <textarea class="q-textarea q-optional" data-q="q7_tried" data-i18n-placeholder="intake.q7.ph" placeholder="Si contrataste a alguien, probaste un software, o lo intentaste internamente — cuéntanos qué pasó. Si no has intentado nada, déjalo en blanco."></textarea>
   </div>
+
+  <!-- Ingresos mensuales — moved here from SCREEN 1 (D3). Optional, last
+       thing asked, after the prospect has already invested four screens.
+       Brackets are the ORIGINAL USD boundaries converted at the BCN rate
+       in js/labor-cost.js (FX_BCN_2026 = 36.6243) — no new boundaries were
+       invented. The option `value` attributes are deliberately unchanged
+       (under5k, 5k-15k, ...) so localStorage, the ops dashboard and any
+       historical submission stay comparable; only the visible label is in
+       córdobas. diagnostic.js re-derives these labels at runtime from
+       FX_BCN_2026, so if the rate ever moves the labels move with it. -->
+  <div class="dx-revenue">
+    <label class="form-label" for="dxRevenue" data-i18n="intake.field.revenue">Ingresos mensuales aproximados (opcional)</label>
+    <select class="form-select" id="dxRevenue" data-custom>
+      <option value="">—</option>
+      <option value="under5k" data-i18n="intake.rev.under5k">Menos de C$183,000</option>
+      <option value="5k-15k" data-i18n="intake.rev.5k15k">C$183,000 – C$549,000</option>
+      <option value="15k-50k" data-i18n="intake.rev.15k50k">C$549,000 – C$1.8 millones</option>
+      <option value="50k-150k" data-i18n="intake.rev.50k150k">C$1.8 – C$5.5 millones</option>
+      <option value="150k-500k" data-i18n="intake.rev.150k500k">C$5.5 – C$18.3 millones</option>
+      <option value="500k-1m" data-i18n="intake.rev.500k1m">C$18.3 – C$36.6 millones</option>
+      <option value="over1m" data-i18n="intake.rev.over1m">Más de C$36.6 millones</option>
+      <option value="prefer_not" data-i18n="intake.rev.prefer_not">Prefiero no decir</option>
+    </select>
+    <p class="dx-revenue-note" data-i18n="intake.rev.note">Opcional. Nos ayuda a proponer algo del tamaño correcto. Si prefieres no decirlo, no hay problema — puedes dejarlo en blanco.</p>
+  </div>
+
   <div class="q-nav">
     <button class="btn-ghost btn-prev" data-i18n-btn="q.back">&larr; Anterior</button>
     <button class="btn-primary btn-next" data-i18n-btn="intake.submit">Enviar y Agendar Llamada &rarr;</button>
@@ -403,6 +435,9 @@
 <!-- SCRIPTS -->
 <script src="js/analytics.js"></script>
 <script src="js/custom-select.js"></script>
+<!-- Single source of the BCN rate. Must precede diagnostic.js, which
+     derives the córdoba revenue brackets from IgneaLaborCost.FX_BCN_2026. -->
+<script src="js/labor-cost.js"></script>
 <script src="js/diagnostic.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/sheets-sync.js"></script>
