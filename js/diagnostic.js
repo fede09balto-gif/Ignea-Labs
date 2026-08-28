@@ -9,6 +9,44 @@
   var answers = {};
   var TOTAL_STEPS = 5; // progress bar steps (info + 4 question screens)
 
+  // Human-readable labels for the Formspree notification email — the raw
+  // <option value> codes (e.g. "retail", "5k-15k") aren't scannable on a
+  // phone. Keys must stay in sync with the <option value> attributes in
+  // diagnostic.html; this is presentation-only, never sent to Supabase/
+  // localStorage, which keep the raw codes.
+  var INDUSTRY_LABELS = {
+    restaurant: 'Restaurante / alimentación', medical: 'Clínica médica o dental',
+    legal: 'Servicios legales', hotel: 'Hotelería y turismo', retail: 'Comercio / retail',
+    construction: 'Construcción', logistics: 'Logística y transporte',
+    accounting: 'Contabilidad y finanzas', realestate: 'Bienes raíces',
+    education: 'Educación', agriculture: 'Agricultura', manufacturing: 'Manufactura',
+    tech: 'Tecnología', consulting: 'Consultoría', ecommerce: 'E-commerce',
+    insurance: 'Seguros', pharma: 'Farmacéutica', energy: 'Energía',
+    automotive: 'Automotriz', media: 'Medios y comunicación', government: 'Gobierno',
+    other: 'Otro'
+  };
+  var REVENUE_LABELS = {
+    under5k: 'Menos de $5,000', '5k-15k': '$5,000 – $15,000', '15k-50k': '$15,000 – $50,000',
+    '50k-150k': '$50,000 – $150,000', '150k-500k': '$150,000 – $500,000',
+    '500k-1m': '$500,000 – $1M', over1m: 'Más de $1M', prefer_not: 'Prefiere no decir'
+  };
+  var TIMELEAK_LABELS = {
+    same_questions: 'Respondiendo las mismas preguntas', scheduling: 'Agendando o confirmando citas',
+    followups: 'Dando seguimiento a clientes', data_entry: 'Pasando datos de un lugar a otro',
+    invoicing: 'Cotizaciones o facturas', coordination: 'Coordinando al equipo',
+    reports: 'Haciendo reportes', other: 'Otra cosa'
+  };
+  var TOOL_LABELS = {
+    whatsapp: 'WhatsApp', excel: 'Excel / Google Sheets', accounting: 'Software de contabilidad',
+    pos: 'Punto de venta / POS', crm: 'CRM', booking: 'Sistema de citas / reservas',
+    paper: 'Papel / cuadernos', social: 'Redes sociales para vender'
+  };
+  function labelize(map, val) { return map[val] || val || '—'; }
+  function labelizeList(map, arr) {
+    if (!arr || !arr.length) return '—';
+    return arr.map(function(v) { return labelize(map, v); }).join(', ');
+  }
+
   var landingScreen, infoScreen, hookScreen;
   var progWrap, progBar, progText;
 
@@ -459,6 +497,67 @@
       submissions.push(submission);
       localStorage.setItem('ignea_submissions', JSON.stringify(submissions));
     } catch(e) {}
+
+    // Notify by email via Formspree (same endpoint as contact.html).
+    // Additive, never blocking: localStorage above is already the ops
+    // dashboard's source of truth and already saved by this point. This
+    // call runs fire-and-forget — goTo(6) below runs unconditionally,
+    // on success OR failure, so a prospect is never blocked on our
+    // network or on Formspree being briefly down.
+    //
+    // KNOWN LIMITATION, not solved here: Formspree's spam filtering
+    // (Formshield) can silently swallow a submission after returning a
+    // normal 200 — response.ok is proof the request was accepted, not
+    // proof a human will see it in their inbox. No client-side signal
+    // distinguishes "delivered" from "flagged as spam"; only checking
+    // the actual inbox does.
+    (function() {
+      var emailFields = {
+        _subject: 'Ignea — Diagnóstico: ' + (formData.company_name || 'Sin nombre') +
+                   ' (' + labelize(INDUSTRY_LABELS, formData.industry) + ')',
+        'Nombre': formData.first_name || '—',
+        'Email': formData.email || '—',
+        'Empresa': formData.company_name || '—',
+        'WhatsApp / Teléfono': formData.phone || '—',
+        'Sitio web': formData.website || '—',
+        'LinkedIn': formData.linkedin || '—',
+        'Industria': labelize(INDUSTRY_LABELS, formData.industry),
+        'Tamaño del equipo': formData.company_size || '—',
+        'Ingresos mensuales': labelize(REVENUE_LABELS, formData.revenue),
+        'Qué hacen / qué sistemas usan': answers.q2_business || '—',
+        'Dónde pierden más tiempo': labelizeList(TIMELEAK_LABELS, answers.q5_timeleaks),
+        'Herramientas que usan hoy': labelizeList(TOOL_LABELS, answers.q6_tools),
+        'Problema operativo más grande': answers.q4_headache || '—',
+        'Ya intentaron resolverlo antes': answers.q7_tried || '—',
+        'Áreas de automatización identificadas': String(opp),
+        'Horas/semana estimadas perdidas': String(hoursLost),
+        'Idioma': lang,
+        'Enviado': payload.created_at
+      };
+      var fd = new FormData();
+      for (var key in emailFields) fd.append(key, emailFields[key]);
+
+      function logFormspreeFailure(reason) {
+        if (typeof IgneaAnalytics !== 'undefined') {
+          IgneaAnalytics.track('diagnostic_formspree_failed', { reason: reason });
+        }
+        try {
+          var failures = JSON.parse(localStorage.getItem('ignea_formspree_failures') || '[]');
+          failures.push({ timestamp: new Date().toISOString(), reason: reason, submissionId: submission.id });
+          localStorage.setItem('ignea_formspree_failures', JSON.stringify(failures));
+        } catch (e) {}
+      }
+
+      fetch('https://formspree.io/f/xrenwoeo', {
+        method: 'POST',
+        body: fd,
+        headers: { 'Accept': 'application/json' }
+      }).then(function(response) {
+        if (!response.ok) logFormspreeFailure('http_' + response.status);
+      }).catch(function() {
+        logFormspreeFailure('network_error');
+      });
+    })();
 
     // Save to Supabase (best-effort)
     if (typeof IgneaSupabase !== 'undefined') {
