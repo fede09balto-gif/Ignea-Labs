@@ -12,6 +12,85 @@ touches customer-facing numbers.
 
 ## 1. WHERE THINGS STAND
 
+### `fix/diagnostic-enter-and-keyboard` — MERGED to `main` and DEPLOYED (most recent work)
+
+Two mobile defects on `/diagnostic`, both browser-verified before and after, then
+**tested by Fede on a real phone against a public preview** before merge.
+
+**The Enter bug — the severe one.** The Enter-to-advance handler in `js/diagnostic.js` was
+scoped `currentScreen >= 2 && currentScreen <= 5` with **no target check and no
+preventDefault**. Screens 2, 4 and 5 are open text, so a prospect pressing return to start a
+second line got bounced forward mid-sentence and the answer was silently truncated.
+
+**It was worse than that, and this is the part to remember: on screen 5, return SUBMITTED the
+form.** Screen 5's `.btn-next` *is* the submit button (`intake.submit` → `submitIntake()`),
+so `nextBtn.click()` fired the Formspree POST with the truncated text. Reproduced in a
+browser on the pre-fix code: `active` went to `hookScreen` and the POST was caught by the
+harness. The old handler did not just misroute an answer, it mailed one.
+
+**Two more with the same root cause**, both found while fixing it. The voice `.mic-card`
+(`tabindex=0`, Enter starts/stops recording) and the custom-select **trigger** (Enter
+opens/closes the dropdown) each handle Enter themselves and **neither calls
+`stopPropagation`** — so Enter on either also advanced, and on screen 5, submitted. The
+select's *search* and *other* inputs were already safe; they do stop propagation.
+
+**The fix** is `enterAdvances(el)`, a target check excluding `textarea`, `button`, `a`,
+`select`, contenteditable, `.custom-select` and `.mic-card`. `preventDefault()` fires only on
+the path that actually advances. Scope widened `2..5` → **`1..5`**, with screen 1 dispatching
+to `#infoNextBtn`.
+
+**No `e.isComposing` guard, deliberately.** Gboard keeps the current word in composition, so
+guarding on it risks return doing nothing on the exact screen the change exists to unblock.
+The audience is Spanish-language; IME candidate-selection-with-Enter is not a real conflict.
+
+**The keyboard-occlusion bug.** Screen 1 is eight fields deep and **its inline `.q-nav` is
+`display:none`** (`diagnostic.html` line ~91, all widths) — so the fixed `#qNavFixed` bar is
+the *only* Next button, and it lives in the last 74px of the viewport, exactly where an
+on-screen keyboard lands. `interactive-widget=resizes-content` was added to
+`diagnostic.html`'s viewport meta (and to `contact.html` for consistency — see below).
+
+Measured on screen 1 at 375px wide, assuming a 405px Gboard:
+
+| | layout viewport | Next bar | Siguiente | in view |
+|---|---|---|---|---|
+| No keyboard | 375×740 | y 666–740 | 163×49 @ y679 | yes |
+| **resizes-content** | 375×**335** | y **261–335** | 163×49 @ y274 | **yes** |
+| default `resizes-visual` | 375×740 | y 666–740, keyboard covers 335–740 | — | **occluded** |
+
+**The meta key changed no measured geometry in the harness, and that is expected** — headless
+Chromium never raises a virtual keyboard, so there is no interactive widget for the key to act
+on. The table above was produced by setting the layout viewport directly to the two sizes the
+key chooses between. Don't re-run it expecting a before/after delta; there isn't one to find.
+
+**iOS LIMITATION — do not forget this.** `interactive-widget` is Chrome 108+ / Firefox 132+.
+**WebKit has not implemented it** (WebKit/standards-positions#65), so on an iPhone the key is
+a no-op and **Enter-to-advance is the entire mitigation**. Any future claim that the keyboard
+problem is "fixed" is Android-only unless someone re-checks WebKit.
+
+**`contact.html` got the key too, with a correction on the record:** that page does **not**
+share the fixed-bottom-bar pattern. Its submit button is inline in the form flow and its only
+`position:fixed` element is the 52px `.wa-float`. The key is near a no-op there; its one
+visible effect is the float riding above the keyboard rather than behind it.
+
+**Verified.** Ten behavior checks pass (screen-1 Enter advances; textarea Enter newlines and
+does not advance on 2/4/5; screen-5 textarea and revenue-select Enter do not submit; mic-card
+Enter does not advance) — all ten failed before the fix. Formspree path not regressed: full
+funnel driven with the endpoint intercepted and stubbed 200, still `POST
+https://formspree.io/f/xrenwoeo` carrying the company field and both open-text answers,
+landing on `hookScreen`. Zero console errors and zero horizontal overflow at 375/768/1440.
+
+**How the preview got onto Fede's phone, because the SSO wall makes this recur.** Preview
+URLs are behind Vercel Authentication and he would not log into Vercel on his phone. The
+route that worked, without touching `ignea-labs-w8bp`'s protection settings: **on Hobby,
+Standard Protection covers previews but production domains stay public**, so the branch was
+deployed as the *production* deployment of a throwaway project (`ignea-kbtest`,
+`https://ignea-kbtest.vercel.app`) — public, no login, any network. Built from `git archive`
+of the branch (tracked files only, so `.env.local` cannot leak), with `api/`, `supabase/`,
+`scripts/`, `data/`, `ops.html` and the v4 prototypes stripped, plus `X-Robots-Tag: noindex,
+nofollow, noarchive` and a `Disallow: /` robots.txt. **Delete it when done:
+`vercel project rm ignea-kbtest`.** The per-deployment alternative, Deployment Protection
+Exceptions, is a $150/month Pro add-on.
+
 ### `feat/hero-cta-ticker-nav-ghost` — MERGED to `main` and DEPLOYED to production
 
 Fast-forward merge (zero conflicts), `main` = `1a4c87b`, deployed via `vercel --prod --yes`.
@@ -695,13 +774,30 @@ Spanish "Tu navegador no soporta entrada de voz" message shows, textarea stays t
 There is no "clear and redo"; a prospect with a bad take has to select-and-delete the text by
 hand. Not fixed — decide deliberately whether that matters.
 
-**ACCURACY ON OUR VOCABULARY IS UNMEASURED.** An attempt to measure it (real Spanish TTS of
-"proforma / existencia / varilla / quintal / Holcim / cotización" piped into Chromium as a
-fake mic) failed for an environmental reason, not a product one: `getUserMedia` delivered the
-audio correctly (1 track, peak level 255) but `SpeechRecognition` returned no transcript and
-no error, because Playwright's bundled Chromium is a non-branded build without Google's
-Speech API keys. **It needs a real-device test in real Chrome — ideally the mid-range Android
-a prospect actually uses — before anyone claims to a client that this feature works.**
+**ACCURACY CONFIRMED ON A REAL DEVICE — 2026-08-28, by Fede, on his own phone.**
+Real Android Chrome, against the public preview of `fix/diagnostic-enter-and-keyboard`.
+He drove the **full flow end to end**, the submission arrived, and **voice dictation captured
+connected Nicaraguan Spanish correctly in all three free-text fields** (Q2 business, Q4
+headache, Q7 tried-before). This supersedes the "UNMEASURED" note below — the feature works
+on the device class a prospect actually uses.
+
+**Scope of that test, stated honestly so nobody over-claims it:** one speaker, one device, one
+session, connected natural speech. It is *not* a measurement of our domain vocabulary
+specifically — nobody has yet confirmed "proforma / existencia / varilla / quintal / Holcim /
+cotización" transcribe correctly as isolated terms. Treat "voice input works" as supported;
+treat "voice input handles ferretería jargon" as still unverified.
+
+**The re-recording gap is still open and was NOT fixed.** `finalTranscript` is seeded from
+`field.value` at start, so a second tap of the mic **appends** to the existing text rather
+than replacing it. There is no "clear and redo" — a prospect with a bad take must
+select-and-delete by hand. Known, deliberate, unfixed; see the KNOWN GAP note above.
+
+**Superseded background, kept because the failure mode is worth knowing:** an earlier attempt
+to measure accuracy in CI (real Spanish TTS piped into Chromium as a fake mic) failed for an
+environmental reason, not a product one. `getUserMedia` delivered the audio correctly (1
+track, peak level 255) but `SpeechRecognition` returned no transcript and no error, because
+Playwright's bundled Chromium is a non-branded build without Google's Speech API keys.
+**Voice input cannot be tested in Playwright at all — it needs a real device.**
 
 ## 4. KNOWN ISSUES NOT BEING FIXED RIGHT NOW
 
