@@ -581,6 +581,33 @@ of the day. Re-open this only once real session data exists to size the ceiling 
 
 ## 3. STANDING RULES
 
+- **TEST DATA MUST NEVER IMPERSONATE A REAL PROSPECT. Mark it `ZZTEST` in the name AND the
+  company, always.** Never a real person's name, never a real business name, and **never a
+  real phone number** — use `8000-0000`. Emails stay `@example.com`.
+
+  **Why, because the rule is useless without the reason:** a test submission arrives through
+  *the same channel as real leads*, and it is convincing in exact proportion to how realistic
+  you made it. A test that impersonates a live prospect is therefore **worse than no test at
+  all** — it doesn't just fail to help, it actively corrupts the lead pipeline with something
+  indistinguishable from the real thing.
+
+  This happened. On 2026-08-27 a timing-measurement script submitted `Luis Herrera` /
+  `Ferreteria Roberto Leyva` / the real published WhatsApp `8935-9013` to production, and it
+  landed in Fede's inbox as an apparently-genuine lead from the live deal he was mid-
+  negotiation on. He nearly acted on it. The realism was the whole problem: the script used
+  real data *specifically* to make the measurement representative, and that is exactly what
+  made the resulting email indistinguishable from a real one. The measurement (character
+  count and pause length) would have been byte-identical with `ZZTEST Ferretería Ejemplo` and
+  a fake number. There was never a reason to use his.
+
+- **The test-data rule applies to anything that can reach a human — not just "production".**
+  The line is **not** "is this production?" but **"can this reach a person?"** That includes
+  Formspree or any email path, `wa.me` links, the Google Calendar booking page, and any API
+  that logs or notifies. A localhost page POSTing to a live endpoint still reaches a human;
+  a production page with the network intercepted does not. Judge by where the request lands,
+  not by which host served the page.
+
+
 - **Nothing on the public site states a result, timeline, or figure attributed to a client until there's a real one.** `thesis.html`'s aggregate Latin-America market statistics (region GDP, population served, consulting pricing) are explicitly fine — they describe the market, not our client outcomes. A full sweep of the live merged state found nothing beyond the three groups already cleaned, plus the ROI footnote now fixed.
 - Never print, echo, or ask for API keys/tokens in chat. Verify presence/scope via `vercel env ls` (names/scopes only), never values.
 - **Confirm `.vercel/project.json` says `ignea-labs-w8bp` before any Vercel CLI work** — not the dead `ignea-labs` decoy project.
