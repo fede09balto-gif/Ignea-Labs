@@ -57,7 +57,7 @@ var IgneaI18n = (function() {
       "ig.note": "Demostración — datos de ejemplo",
       "ig.cta": "Quiero uno para mi negocio",
       "ig.cta.wa": "Preguntar por WhatsApp",
-      "ig.cta.note": "Diagnóstico gratuito · 4 preguntas",
+      "ig.cta.note": "Diagnóstico gratuito · 5 preguntas",
 
       // ---- HOMEPAGE: CAPABILITY TICKER ----
       "tk.label": "Dónde se aplica",
@@ -194,7 +194,7 @@ var IgneaI18n = (function() {
       // ---- HOMEPAGE: PROCESS ----
       "process.tag": "// Proceso",
       "process.title": "Encontramos dónde la IA genera más valor — y lo construimos.",
-      "process.p1": "Cada proyecto comienza con nuestro diagnóstico: 11 preguntas diseñadas para revelar las ineficiencias ocultas en tus operaciones. Mapeamos tus flujos de trabajo, cuantificamos el desperdicio y desplegamos sistemas que lo eliminan permanentemente.",
+      "process.p1": "Cada proyecto comienza con nuestro diagnóstico: 5 preguntas diseñadas para revelar las ineficiencias ocultas en tus operaciones. Mapeamos tus flujos de trabajo, cuantificamos el desperdicio y desplegamos sistemas que lo eliminan permanentemente.",
       "process.p2": "Trabajamos con un número selecto de socios a la vez. Cada proyecto recibe toda nuestra atención.",
       "process.s1t": "Descubrimiento",
       "process.s1d": "Nos cuentas cómo trabajas hoy. Llegamos a la llamada listos con ideas específicas para tu operación.",
@@ -209,8 +209,8 @@ var IgneaI18n = (function() {
 
       // ---- HOMEPAGE: DIAGNOSTIC CTA ----
       "diag.title": "Descubre lo que realmente te cuestan tus operaciones.",
-      "diag.sub": "Once preguntas. Cada una diseñada para revelar lo que más importa — las ineficiencias escondidas a plena vista, los sistemas que deberían trabajar más, y las oportunidades que tu competencia aún no ha encontrado.",
-      "diag.c1": "11 preguntas",
+      "diag.sub": "Cinco preguntas. Cada una diseñada para revelar lo que más importa — las ineficiencias escondidas a plena vista, los sistemas que deberían trabajar más, y las oportunidades que tu competencia aún no ha encontrado.",
+      "diag.c1": "5 preguntas",
       "diag.c2": "10–15 min",
       "diag.c3": "Resultados inmediatos",
       "diag.btn": "Iniciar Diagnóstico &rarr;",
@@ -299,13 +299,13 @@ var IgneaI18n = (function() {
       // ---- DIAGNOSTIC PAGE (legacy — kept for ops dashboard) ----
       "dx.tag": "// Diagnóstico de Preparación Digital",
       "dx.title": 'Descubre lo que realmente te cuestan tus <em>operaciones.</em>',
-      "dx.sub": "Once preguntas. Cada una diseñada para revelar lo que más importa.",
+      "dx.sub": "Cinco preguntas. Cada una diseñada para revelar lo que más importa.",
       "dx.encrypt": "Tus respuestas están encriptadas de extremo a extremo. Existen únicamente para construir tu perfil de preparación personalizado.",
       "dx.start": "Comenzar Diagnóstico &rarr;",
 
       // ---- DIAGNOSTIC: LANDING & BEFORE ----
       "dx.landing.headline": "Descubre cuánto potencial tiene tu negocio bajo la superficie.",
-      "dx.landing.sub": "Once preguntas. Cada una diseñada para revelar lo que importa — las ineficiencias ocultas a simple vista, los sistemas que deberían funcionar mejor, y las oportunidades que tu competencia aún no ha encontrado.",
+      "dx.landing.sub": "Cinco preguntas. Cada una diseñada para revelar lo que importa — las ineficiencias ocultas a simple vista, los sistemas que deberían funcionar mejor, y las oportunidades que tu competencia aún no ha encontrado.",
       "dx.landing.note": "Tus respuestas quedan entre nosotros. Mientras más honesto seas, más preciso será tu diagnóstico.",
       "dx.landing.cta": "Comenzar Diagnóstico &rarr;",
       "dx.encrypted": "Diagnóstico Encriptado",
@@ -1314,7 +1314,7 @@ var IgneaI18n = (function() {
       "ig.note": "Demonstration — sample data",
       "ig.cta": "I want one for my business",
       "ig.cta.wa": "Ask on WhatsApp",
-      "ig.cta.note": "Free diagnostic · 4 questions",
+      "ig.cta.note": "Free diagnostic · 5 questions",
 
       // ---- HOMEPAGE: CAPABILITY TICKER ----
       "tk.label": "Where it applies",
@@ -1450,7 +1450,7 @@ var IgneaI18n = (function() {
       // ---- HOMEPAGE: PROCESS ----
       "process.tag": "// Process",
       "process.title": "We find where AI creates the most value — then we build it.",
-      "process.p1": "Every engagement starts with our diagnostic: 11 questions designed to surface the inefficiencies hiding in your operations. We map your workflows, quantify the waste, and deploy systems that permanently eliminate it.",
+      "process.p1": "Every engagement starts with our diagnostic: 5 questions designed to surface the inefficiencies hiding in your operations. We map your workflows, quantify the waste, and deploy systems that permanently eliminate it.",
       "process.p2": "We work with a select number of partners at a time. Every engagement gets our full attention.",
       "process.s1t": "Discovery",
       "process.s1d": "Tell us how you work today. We show up to the call ready with specific ideas for your operation.",
@@ -1465,8 +1465,8 @@ var IgneaI18n = (function() {
 
       // ---- HOMEPAGE: DIAGNOSTIC CTA ----
       "diag.title": "Discover what your operations are really costing you.",
-      "diag.sub": "Eleven questions. Each one designed to surface what matters most — the inefficiencies hiding in plain sight, the systems that should be working harder, and the opportunities your competitors haven't found yet.",
-      "diag.c1": "11 questions",
+      "diag.sub": "Five questions. Each one designed to surface what matters most — the inefficiencies hiding in plain sight, the systems that should be working harder, and the opportunities your competitors haven't found yet.",
+      "diag.c1": "5 questions",
       "diag.c2": "10–15 min",
       "diag.c3": "Instant results",
       "diag.btn": "Begin Diagnostic &rarr;",
@@ -1474,13 +1474,13 @@ var IgneaI18n = (function() {
       // ---- DIAGNOSTIC PAGE ----
       "dx.tag": "// Digital Readiness Diagnostic",
       "dx.title": 'Discover what your operations are really <em>costing you.</em>',
-      "dx.sub": "Eleven questions. Each one designed to surface what matters most.",
+      "dx.sub": "Five questions. Each one designed to surface what matters most.",
       "dx.encrypt": "Your responses are encrypted end-to-end. They exist solely to build your personalized readiness profile.",
       "dx.start": "Begin Diagnostic &rarr;",
 
       // ---- DIAGNOSTIC: LANDING & BEFORE ----
       "dx.landing.headline": "Discover how much potential lies beneath the surface of your business.",
-      "dx.landing.sub": "Eleven questions. Each one designed to surface what matters most — the inefficiencies hiding in plain sight, the systems that should be working harder, and the opportunities your competitors haven't found yet.",
+      "dx.landing.sub": "Five questions. Each one designed to surface what matters most — the inefficiencies hiding in plain sight, the systems that should be working harder, and the opportunities your competitors haven't found yet.",
       "dx.landing.note": "Your answers stay between us. The more honest you are, the sharper your results.",
       "dx.landing.cta": "Begin Diagnostic &rarr;",
       "dx.encrypted": "Encrypted Diagnostic",
@@ -2347,18 +2347,22 @@ var IgneaI18n = (function() {
     return translations[currentLang][key] || translations['es'][key] || key;
   }
 
-  function setLang(lang) {
-    currentLang = lang;
-    document.documentElement.lang = lang;
+  /* Writes `lang` into the DOM and reveals the elements the anti-flash
+     visibility guard hides.
 
+     Split out of setLang deliberately. init() must apply translations on
+     EVERY load — before this split it only did so when a saved language
+     differed from the 'es' default, which meant a first-time visitor read
+     the static HTML while a visitor who had toggled read the i18n value,
+     and on several keys those two say materially different things. This
+     function is the shared, side-effect-free half: no analytics event, no
+     localStorage write, no langchange dispatch. Those belong to setLang,
+     which is the user-initiated path. */
+  function applyTranslations(lang) {
     var esBtn = document.getElementById('langES');
     var enBtn = document.getElementById('langEN');
     if (esBtn) esBtn.classList.toggle('active', lang === 'es');
     if (enBtn) enBtn.classList.toggle('active', lang === 'en');
-
-    localStorage.setItem('ignea_lang', lang);
-
-    if (typeof IgneaAnalytics !== 'undefined') IgneaAnalytics.track('language_toggled', { language: lang });
 
     // Update text content
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
@@ -2399,21 +2403,32 @@ var IgneaI18n = (function() {
     document.querySelectorAll('[data-i18n],[data-i18n-html],[data-i18n-btn]').forEach(function(el) {
       el.style.visibility = 'visible';
     });
+  }
+
+  /* User-initiated language change: apply, persist, report, notify. */
+  function setLang(lang) {
+    currentLang = lang;
+    document.documentElement.lang = lang;
+
+    localStorage.setItem('ignea_lang', lang);
+
+    if (typeof IgneaAnalytics !== 'undefined') IgneaAnalytics.track('language_toggled', { language: lang });
+
+    applyTranslations(lang);
 
     // Fire custom event for page-specific handlers
     document.dispatchEvent(new CustomEvent('langchange', { detail: { lang: lang } }));
   }
 
   function init() {
+    // Always apply translations, whatever the language. The rendered text
+    // must be identical on a first visit and after a toggle — the static
+    // HTML is a fallback shell, never the thing a visitor is meant to read.
     var saved = localStorage.getItem('ignea_lang');
-    if (saved && saved !== currentLang) {
-      setLang(saved);
-    } else {
-      // Reveal hidden i18n elements even when language matches default
-      document.querySelectorAll('[data-i18n],[data-i18n-html],[data-i18n-btn]').forEach(function(el) {
-        el.style.visibility = 'visible';
-      });
-    }
+    var lang = (saved === 'en') ? 'en' : 'es';
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    applyTranslations(lang);
   }
 
   function getLang() {

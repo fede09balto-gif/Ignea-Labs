@@ -592,6 +592,44 @@ of the day. Re-open this only once real session data exists to size the ceiling 
 
 ---
 
+## 3b. VOICE INPUT ON /diagnostic — ALREADY BUILT AND LIVE, previously undocumented
+
+**This exists in production and always did. It was missing from this file, which caused a
+later sprint to plan it as new work.** Found by grepping for `SpeechRecognition` while
+researching whether to build it.
+
+Web Speech API voice-to-text on the three free-text screens (Q2 business description, Q4
+headache, Q5 tried-before) — never on name/email/phone or the checkbox screens. Implemented
+in `js/diagnostic.js` (`initVoiceInputs`), styled as `.mic-card` in `css/shared.css`, markup
+hook is `.voice-wrap` in `diagnostic.html`. i18n keys `voice_*` exist in **both** languages.
+
+Git trail:
+
+| Commit | What |
+|---|---|
+| `86e08d2` | feat: add voice-to-text input on diagnostic textareas via Web Speech API |
+| `ffd37f9` | fix: restyle sub-labels, move mic below textarea, enable continuous recording |
+| `20655b1` | feat: redesign voice recording as prominent full-width card with title + subtitle |
+| `98b2c09` | fix: SEO discoverability, dead stat counters, **voice failure states** |
+
+**Verified live** (production, Playwright): mic card renders at 335×128px (≥48px target),
+tap-to-start/tap-to-stop with an `MM:SS` timer, transcript lands in the textarea fully
+editable. With `SpeechRecognition` spoofed away it degrades correctly — no mic card, the
+Spanish "Tu navegador no soporta entrada de voz" message shows, textarea stays typeable.
+
+**KNOWN GAP — re-recording appends, it does not replace.** `finalTranscript` is seeded from
+`field.value` at start, so tapping the mic a second time concatenates onto the existing text.
+There is no "clear and redo"; a prospect with a bad take has to select-and-delete the text by
+hand. Not fixed — decide deliberately whether that matters.
+
+**ACCURACY ON OUR VOCABULARY IS UNMEASURED.** An attempt to measure it (real Spanish TTS of
+"proforma / existencia / varilla / quintal / Holcim / cotización" piped into Chromium as a
+fake mic) failed for an environmental reason, not a product one: `getUserMedia` delivered the
+audio correctly (1 track, peak level 255) but `SpeechRecognition` returned no transcript and
+no error, because Playwright's bundled Chromium is a non-branded build without Google's
+Speech API keys. **It needs a real-device test in real Chrome — ideally the mid-range Android
+a prospect actually uses — before anyone claims to a client that this feature works.**
+
 ## 4. KNOWN ISSUES NOT BEING FIXED RIGHT NOW
 
 - **`results.html` has never actually been browser-verified, and every sweep that claimed
