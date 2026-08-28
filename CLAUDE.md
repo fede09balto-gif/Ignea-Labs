@@ -74,8 +74,9 @@ code blocks, tables, the proforma, form frames, containers.
 
 # Where the real specs live
 - HANDOFF.md — current state, open work, decisions and their reasoning. Start here.
-- IGNEA_DIAGNOSTIC_SPEC_v3.md — diagnostic spec. The live form is the 4-question
-  intake, NOT this 11-question v3.
+- IGNEA_DIAGNOSTIC_SPEC_v3.md — diagnostic spec. The live form is a 5-step intake
+  (contact info + 4 question screens, `01/05`–`05/05` on screen), NOT this
+  11-question v3.
 - AUDIT_REPORT.md, QA_REPORT.md, LAUNCH_*.md — historical record. Do not "fix" them
   to match present state.
 
