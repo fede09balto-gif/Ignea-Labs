@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- interactive-widget=resizes-content: matches diagnostic.html. Note this
+     page has NO fixed bottom nav bar — its submit button is inline in the
+     form flow — so the key is near a no-op here. Its one visible effect is
+     that .wa-float rides above the keyboard instead of behind it. Applied
+     for consistency across the two form pages. Chrome 108+ / Firefox 132+,
+     no-op on iOS. -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>Contacto | Ignea Labs</title>
 <meta name="description" content="Trabajamos con un número selecto de organizaciones. Contáctanos para explorar lo que la IA puede hacer por tu negocio.">
 <meta property="og:title" content="Contacto | Ignea Labs">
