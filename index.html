@@ -230,9 +230,22 @@ footer{border-top:1px solid var(--border)}
   <div class="hero-divider"></div>
 
   <div class="cta">
-    <a class="cta__primary" href="diagnostic">
+    <!-- Primary = booking. This one said "Agenda tu llamada" while pointing
+         at /diagnostic — same mismatch as D6, missed on the first pass
+         because it uses .cta__primary rather than .btn-* classes. -->
+    <a class="cta__primary" href="https://calendar.app.google/E4dfYkm8epTzdsiT7" target="_blank" rel="noopener">
       <span data-i18n="hero.cta1">Agenda tu llamada gratis</span>
       <svg width="15" height="11" viewBox="0 0 15 11" fill="none" aria-hidden="true"><path d="M9 1l4.5 4.5L9 10M13 5.5H1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <!-- Secondary = the diagnostic. Promises the OUTPUT (what it would
+         cost) rather than a call, which is the real difference between the
+         two paths. NOTE: this string is in usted while the rest of the
+         diagnostic flow is in tú — that is the known D5 inconsistency,
+         left deliberately until register is fixed as its own sprint. -->
+    <a class="cta__link" href="diagnostic">
+      <span data-i18n="hero.cta.diagnostic">Ver qué le costaría</span>
+      <svg width="13" height="10" viewBox="0 0 15 11" fill="none" aria-hidden="true"><path d="M9 1l4.5 4.5L9 10M13 5.5H1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <small class="cta__note" data-i18n="hero.cta.diagnostic.note">5 preguntas</small>
     </a>
     <a class="cta__link" href="demo">
       <span data-i18n="hero.cta.secondary">Ver reporte de muestra</span>

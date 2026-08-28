@@ -592,6 +592,52 @@ of the day. Re-open this only once real session data exists to size the ceiling 
 
 ---
 
+## 3a. THE i18n FIRST-VISIT BUG — no Spanish first-time visitor ever saw the i18n layer
+
+**Fixed 2026-08-28. Read this before making any copy change.**
+
+**The bug.** `js/i18n.js`'s `init()` was:
+
+```js
+var saved = localStorage.getItem('ignea_lang');
+if (saved && saved !== currentLang) { setLang(saved); }
+else { /* only reveal the elements, do not translate */ }
+```
+
+`currentLang` initialises to `'es'`. So the translate branch fired **only** when a *saved*
+language differed from Spanish — i.e. only for `saved === 'en'`. For every Spanish visitor,
+first-time or returning, `setLang` was never called on load and the **static HTML in the
+markup is what rendered**. The ES values in `js/i18n.js` were applied only after someone
+actively clicked the ES toggle mid-session.
+
+**The implication, which is the part that matters:** **any copy correction made only in
+`js/i18n.js` was invisible in production to Spanish visitors.** A string could be fixed in
+the i18n file, verified by reading that file, and still never reach a single real user,
+because the stale static HTML kept rendering. Several corrections had drifted this way —
+23 strings across 5 pages rendered differently depending on whether the visitor had ever
+touched the language toggle.
+
+The worst example, found the same night: the homepage's `process.s1d` still rendered the dead
+v3 spec's *"11 preguntas que mapean tus brechas operativas…"* on a first visit, while the
+i18n value said something completely different. A prospect arriving cold read the wrong
+thing; a developer checking `i18n.js` read the right thing.
+
+**The fix.** The DOM work was split out of `setLang` into `applyTranslations(lang)`, and
+`init()` now **always** applies translations regardless of language. `setLang` keeps the
+user-initiated side effects it should own — `localStorage` write, the `language_toggled`
+analytics event, the `langchange` dispatch — so ordinary page loads no longer fire a
+spurious analytics event or a `langchange` on every visit. `applyTranslations` also does the
+anti-flash reveal, so both entry paths un-hide correctly.
+
+**Verified on production** as a genuine first visit (cleared `localStorage`, hard reload):
+first-visit and post-toggle render identically, elements visible, zero console errors.
+
+**Consequence for future sessions:** the static HTML in each page is now a **fallback shell
+only** — an SEO/no-JS backstop, never the thing a visitor reads. Copy changes belong in
+`js/i18n.js`, in both languages. Where a static string and its i18n value disagree, the i18n
+value is what ships. When correcting copy, updating the static HTML too is still good
+hygiene, but the i18n value is authoritative.
+
 ## 3b. VOICE INPUT ON /diagnostic — ALREADY BUILT AND LIVE, previously undocumented
 
 **This exists in production and always did. It was missing from this file, which caused a

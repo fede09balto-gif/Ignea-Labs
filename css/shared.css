@@ -777,3 +777,7 @@ html[lang="en"] .ig__esnote{display:block;font-family:var(--fm);font-size:10.5px
   .cap{opacity:1;transform:none}
   .caps.in .cap__dash,.cap__dash{width:16px}
 }
+
+/* Effort note on the hero's diagnostic link ("5 preguntas"). Muted and
+   smaller so the link reads as one phrase, not two competing labels. */
+.cta__note{font-family:var(--fm);font-size:11px;letter-spacing:.08em;color:var(--dimgray);margin-left:8px}
