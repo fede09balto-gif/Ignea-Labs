@@ -15,6 +15,7 @@
   // diagnostic.html; this is presentation-only, never sent to Supabase/
   // localStorage, which keep the raw codes.
   var INDUSTRY_LABELS = {
+    hardware: 'Ferretería / materiales de construcción', pharmacy: 'Farmacia',
     restaurant: 'Restaurante / alimentación', medical: 'Clínica médica o dental',
     legal: 'Servicios legales', hotel: 'Hotelería y turismo', retail: 'Comercio / retail',
     construction: 'Construcción', logistics: 'Logística y transporte',
