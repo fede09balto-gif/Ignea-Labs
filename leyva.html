@@ -49,6 +49,14 @@
 .wa__tick svg{display:block}
 .wa__tick[data-s="sent"],.wa__tick[data-s="deliv"]{color:#8696A0}
 .wa__tick[data-s="read"]{color:#53BDEB}
+.wa__doc{align-self:flex-end;background:#D9FDD3;border-radius:8px;padding:5px;max-width:82%;box-shadow:0 1px .5px rgba(11,20,26,.13);margin-top:7px;cursor:pointer}
+.wa__doc--in{align-self:flex-start;background:#fff}
+.wa__doc__c{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.045);border-radius:6px;padding:11px 12px}
+.wa__doc__i{width:32px;height:38px;background:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.wa__doc__i span{font-size:7.5px;font-weight:700;color:#D93025;letter-spacing:.04em}
+.wa__doc__t{min-width:0;flex:1}
+.wa__doc__n{font-size:13.4px;color:#111B21;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.wa__doc__s{font-size:11.5px;color:#667781;margin-top:2px}
 .wa__typing{align-self:flex-start;background:#fff;border-radius:8px;border-top-left-radius:1px;padding:10px 12px;display:flex;gap:4px;box-shadow:0 1px .5px rgba(11,20,26,.13);margin-top:7px}
 .wa__typing i{width:7px;height:7px;border-radius:50%;background:#9AA5AC;animation:waB 1.3s infinite}
 .wa__typing i:nth-child(2){animation-delay:.18s}
@@ -189,7 +197,9 @@ body.kiosk .kiosk-exit{display:block}
 </div>
 
 <script src="js/i18n.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="js/leyva-demo.js"></script>
+<script src="js/leyva-proforma.js"></script>
 <script src="js/leyva-chat.js"></script>
 </body>
 </html>

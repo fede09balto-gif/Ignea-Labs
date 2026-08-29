@@ -74,6 +74,33 @@
     return d;
   }
 
+  /* Document bubble. Only ever called with an order that LeyvaProforma
+     verified line-by-line against the catalog — see that file's header for
+     why an unverifiable order produces no document at all. */
+  function docBubble(order) {
+    var doc = LeyvaProforma.build(order, LeyvaProforma.next());
+    if (!doc) return false;                       // jsPDF absent -> no card, no error
+    var blob = doc.output('blob');
+    var kb = Math.max(1, Math.round(blob.size / 1024));
+    var name = LeyvaProforma.correlativo(LeyvaProforma.next() - 1) + '.pdf';
+    var url = URL.createObjectURL(blob);
+
+    lastSender = null;
+    var w = document.createElement('div');
+    w.className = 'wa__doc wa__doc--in';
+    w.innerHTML =
+      '<div class="wa__doc__c">' +
+        '<div class="wa__doc__i"><span>PDF</span></div>' +
+        '<div class="wa__doc__t"><div class="wa__doc__n"></div>' +
+        '<div class="wa__doc__s">PDF · 1 página · ' + kb + ' kB</div></div>' +
+      '</div>';
+    w.querySelector('.wa__doc__n').textContent = name;
+    w.addEventListener('click', function () { window.open(url, '_blank'); });
+    chat.appendChild(w);
+    scroll();
+    return true;
+  }
+
   function typing() {
     var d = document.createElement('div');
     d.className = 'wa__typing';
@@ -99,7 +126,21 @@
   function say(bubbles, done) {
     var i = 0;
     (function next() {
-      if (i >= bubbles.length) { setStatus('en línea'); if (done) done(); return; }
+      if (i >= bubbles.length) {
+        // A complete, verifiable order becomes a document the way it would on
+        // real WhatsApp: after the words, as a separate file message.
+        var order = (typeof LeyvaProforma !== 'undefined') ? LeyvaProforma.parse(bubbles.join('\n')) : null;
+        if (order) {
+          setStatus('escribiendo...');
+          setTimeout(function () {
+            docBubble(order);
+            setStatus('en línea');
+            if (done) done();
+          }, 900);
+          return;
+        }
+        setStatus('en línea'); if (done) done(); return;
+      }
       setStatus('escribiendo...');
       var t = typing();
       setTimeout(function () {
