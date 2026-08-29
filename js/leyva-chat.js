@@ -112,9 +112,33 @@
     })();
   }
 
-  function paintRail(steps, mode, ms) {
+  /* A rail step that carries a money figure may ONLY be shown if that exact
+     figure appears in the reply actually displayed. Enforced by construction,
+     because the alternative already bit us: the rail was painted from the
+     LOCAL responder's trace even when the model answered, so a model reply of
+     "Total: C$2513" sat next to a rail reading "Suma C$12,220" — the local
+     cotización branch's hardcoded 10 láminas + 2 puertas. A panel whose job
+     is to prove the answer is grounded cannot contradict the answer.
+
+     Steps with no figure (intent, "sin dato de existencia", escalation) stay
+     regardless: those describe the lookup, not the arithmetic, and are true
+     whichever responder replied. */
+  function railStepIsTruthful(step, replyText) {
+    var figures = step.match(/C\$\s?[\d,.]+/g);
+    if (!figures) return true;
+    for (var i = 0; i < figures.length; i++) {
+      var norm = figures[i].replace(/\s/g, '');
+      var bare = norm.replace(/[.,]/g, '');
+      var flat = replyText.replace(/\s/g, '');
+      if (flat.indexOf(norm) === -1 && flat.replace(/[.,]/g, '').indexOf(bare) === -1) return false;
+    }
+    return true;
+  }
+
+  function paintRail(steps, mode, ms, replyText) {
     if (!rail) return;
     rail.innerHTML = '';
+    steps = steps.filter(function (s) { return railStepIsTruthful(s, replyText || ''); });
     steps.forEach(function (s) {
       var d = document.createElement('div');
       d.className = 'lv-step' + (/SIN PRECIO|Sin dato|Sin inventario|Escalar|Sin coincidencia|Intento|Fuera de/.test(s) ? ' lv-step--flag' : '');
@@ -144,7 +168,7 @@
     var t0 = Date.now();
 
     function finish(bubbles, mode) {
-      paintRail(localAns.rail, mode, Date.now() - t0);
+      paintRail(localAns.rail, mode, Date.now() - t0, bubbles.join(' '));
       say(bubbles, function () {
         busy = false;
         sendBtn.disabled = !input.value.trim();
