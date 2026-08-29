@@ -1099,6 +1099,20 @@ var IgneaI18n = (function() {
       "ops.gate.denied": "// ACCESO DENEGADO",
       "ops.gate.terminated": "// CONEXIÓN TERMINADA. RECARGA LA PÁGINA.",
       "ops.gate.network_error": "No se pudo verificar la sesión.",
+      // ---- LEYVA PRIVATE DEMO (operator chrome only) ----
+      // The conversation and the six suggested questions are Spanish-only
+      // by approved exception (see HANDOFF.md) — they are the rendered
+      // content of a Nicaraguan ferretería's WhatsApp, not our chrome.
+      // Everything the OPERATOR reads is translated, like everywhere else.
+      "leyva.gate.title": "Demo privado — acceso restringido",
+      "leyva.title": "Asistente de WhatsApp — Ferretería Roberto Leyva",
+      "leyva.sub": "Demo privado",
+      "leyva.unver.tag": "Catálogo sin verificar",
+      "leyva.unver.body": "Los precios provienen de capturas de las publicaciones de Facebook del negocio. Ninguno está trazado a una publicación con fecha. No mostrar este demo al cliente hasta que cada precio tenga su fuente.",
+      "leyva.offline": "Modo sin conexión",
+      "leyva.reset": "Reiniciar",
+      "leyva.rail.title": "Qué está consultando",
+      "leyva.rail.idle": "Toque una pregunta para ver qué revisa el asistente antes de contestar.",
 
       // ---- OPS: SECTION TAGS ----
       "ops.calc.tag": "// Calculadora de propuesta",
@@ -2256,6 +2270,18 @@ var IgneaI18n = (function() {
       "ops.gate.denied": "// ACCESS DENIED",
       "ops.gate.terminated": "// CONNECTION TERMINATED. RELOAD PAGE.",
       "ops.gate.network_error": "Could not verify session.",
+      // ---- LEYVA PRIVATE DEMO (operator chrome only) ----
+      // See the Spanish block: the conversation and suggested questions are
+      // deliberately not translated.
+      "leyva.gate.title": "Private demo — restricted access",
+      "leyva.title": "WhatsApp assistant — Ferretería Roberto Leyva",
+      "leyva.sub": "Private demo",
+      "leyva.unver.tag": "Unverified catalog",
+      "leyva.unver.body": "Prices were transcribed from screenshots of the business's own Facebook posts. None is traced to a dated post. Do not show this demo to the client until every price has its source.",
+      "leyva.offline": "Offline mode",
+      "leyva.reset": "Reset",
+      "leyva.rail.title": "What it is checking",
+      "leyva.rail.idle": "Tap a question to see what the assistant checks before answering.",
 
       // ---- OPS: SECTION TAGS ----
       "ops.calc.tag": "// Proposal calculator",

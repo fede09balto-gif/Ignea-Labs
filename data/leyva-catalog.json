@@ -1,0 +1,349 @@
+{
+  "_UNVERIFIED": true,
+  "_README": [
+    "PRIVATE demo catalog for Ferretería Roberto Leyva (León, Nicaragua).",
+    "Consumed by the 'leyva' preset in api/claude.js. NOT used by /probalo.",
+    "",
+    "*** BLOCKING — NOTHING HERE IS VERIFIED. ***",
+    "Every price below was read off screenshots of the business's own Facebook",
+    "posts. No price has been traced to a specific post URL or a date. Until",
+    "source_url and source_date are filled for an item, that item's price is",
+    "an unsourced transcription, not a fact.",
+    "",
+    "Why this is worse than a generic demo: these are THEIR numbers. Showing a",
+    "ferretero a stale price from his own Facebook post reads as 'this system",
+    "is wrong about my own store', which is the exact opposite of the pitch.",
+    "",
+    "PRICE PROVENANCE:",
+    "  precio: <number>  + source_url: null  -> transcribed, UNSOURCED. Usable",
+    "                       only for internal rehearsal. Fill source_url +",
+    "                       source_date before this is shown to the client.",
+    "  precio: null      -> we have NO price. The prompt builder lists the item",
+    "                       by name and specs with an explicit no-price marker,",
+    "                       and the model is instructed to offer to confirm with",
+    "                       the mostrador. It must NEVER invent a figure.",
+    "",
+    "WHAT WE DELIBERATELY DO NOT HAVE — do not add these fields:",
+    "  · existencia / stock levels. We have no inventory data. There is no 'e'",
+    "    field on any item here, unlike data/ferreteria-catalog.json, so the",
+    "    prompt physically cannot state a stock number.",
+    "  · delivery policy, delivery cost, coverage, cutoff times.",
+    "  · business hours and accepted payment methods.",
+    "  Adding a plausible-looking value for any of these is inventing a fact",
+    "  about someone else's business. Don't.",
+    "",
+    "OWNER'S NAME: deliberately absent. Sources conflict between 'Roberto' and",
+    "'Carlos'. Use the business name only. Do not 'fix' this by picking one."
+  ],
+
+  "meta": {
+    "business": "Ferretería Roberto Leyva",
+    "city": "León, Nicaragua",
+    "currency": "NIO",
+    "symbol": "C$",
+    "verified": false,
+    "verifiedBy": null,
+    "verifiedOn": null,
+    "sourcedItems": 0,
+    "totalItems": 29
+  },
+
+  "contacto": {
+    "whatsapp": "8935-9013",
+    "telefonos": ["2315-1177", "2315-1610"],
+    "direccion": "Esq. Dr. Cayetano 25 vrs al Oeste, León",
+    "source": "business's own Facebook page",
+    "source_url": null,
+    "source_date": null
+  },
+
+  "no_disponible": {
+    "_comment": "Facts we do not have. The prompt builder turns each of these into an explicit prohibition plus an escalation path. Never populate.",
+    "existencia": "No tenemos datos de inventario. El asistente ofrece confirmar con el mostrador.",
+    "entrega": "No tenemos política ni costo de entrega. El asistente ofrece confirmar con el mostrador."
+  },
+
+  "items": {
+    "GYP-12-48": {
+      "n": "Lámina de gypsum 1/2\" x 4x8",
+      "precio": 370,
+      "precio_antes": 400,
+      "u": "lámina",
+      "cat": "construccion",
+      "promo": "Promoción patrias",
+      "source_url": null,
+      "source_date": null
+    },
+    "PTA-MET-3T-CAFE": {
+      "n": "Puerta metálica 3 tableros café",
+      "precio": 4260,
+      "precio_antes": 4761,
+      "u": "unidad, 90x210 o 80x210",
+      "cat": "puertas",
+      "promo": "Promoción patrias",
+      "source_url": null,
+      "source_date": null
+    },
+    "PTA-MET-6T-BLANCA": {
+      "n": "Puerta metálica blanca 6 tableros",
+      "precio": 4260,
+      "precio_antes": 4761,
+      "u": "unidad, 90x210 o 80x210",
+      "cat": "puertas",
+      "promo": "Promoción patrias",
+      "source_url": null,
+      "source_date": null
+    },
+    "PTA-MET-5T-CAOBA": {
+      "n": "Puerta metálica 5 tableros caoba",
+      "precio": 4140,
+      "precio_antes": 4792,
+      "u": "unidad, 90x210",
+      "cat": "puertas",
+      "promo": "Promoción patrias",
+      "source_url": null,
+      "source_date": null
+    },
+    "TAB-1X12X5": {
+      "n": "Tablas 1\" x 12 x 5\"",
+      "precio": 1050,
+      "precio_antes": 1150,
+      "u": "unidad",
+      "cat": "madera",
+      "promo": "Promoción patrias",
+      "source_url": null,
+      "source_date": null
+    },
+    "LAM-REV-KL8231": {
+      "n": "Lámina de revestimiento negra mármol KL8231-2",
+      "precio": null,
+      "precio_antes": 1512,
+      "u": "lámina",
+      "cat": "acabados",
+      "promo": "Promoción patrias",
+      "_nota": "Precio actual DESCONOCIDO. Solo se conoce el precio anterior. No cotizar.",
+      "source_url": null,
+      "source_date": null
+    },
+
+    "BON-PLUS-20": {
+      "n": "Bondex Plus Cemex",
+      "precio": 185,
+      "precio_antes": null,
+      "u": "saco de 20 kg",
+      "cat": "adhesivos",
+      "source_url": null,
+      "source_date": null
+    },
+    "BON-CER-PREM-20": {
+      "n": "Bondex Pega Cerámica Premium Cemex",
+      "precio": 230,
+      "precio_antes": null,
+      "u": "saco de 20 kg",
+      "cat": "adhesivos",
+      "source_url": null,
+      "source_date": null
+    },
+    "ACE-YAM-20W50": {
+      "n": "Aceite Yamalube 20W-50 4T",
+      "precio": 277,
+      "precio_antes": null,
+      "u": "litro",
+      "cat": "lubricantes",
+      "source_url": null,
+      "source_date": null
+    },
+    "BAT-KOBE-12N65L": {
+      "n": "Batería Kobe 12N6-5L-BS-GEL",
+      "precio": 663,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "baterias",
+      "source_url": null,
+      "source_date": null
+    },
+    "BAT-KOBE-12N74B": {
+      "n": "Batería Kobe 12N7-4B-GEL",
+      "precio": 816,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "baterias",
+      "source_url": null,
+      "source_date": null
+    },
+
+    "LLA-CST-C6571": {
+      "n": "Llanta CST C6571 2.75-17 6PR",
+      "precio": 1206,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "llantas",
+      "source_url": null,
+      "source_date": null
+    },
+    "LLA-CST-C180": {
+      "n": "Llanta CST C180 3.00-18",
+      "precio": 1205,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "llantas",
+      "source_url": null,
+      "source_date": null
+    },
+    "LLA-CST-C919": {
+      "n": "Llanta CST C919 2.75-18 TL",
+      "precio": 1132,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "llantas",
+      "source_url": null,
+      "source_date": null
+    },
+    "LLA-CST-C918": {
+      "n": "Llanta CST C918 90/90-17 TL",
+      "precio": 1626,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "llantas",
+      "source_url": null,
+      "source_date": null
+    },
+    "LLA-CST-C934": {
+      "n": "Llanta CST C934 90/90-17 TL",
+      "precio": 1626,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "llantas",
+      "source_url": null,
+      "source_date": null
+    },
+    "LLA-CST-C6520": {
+      "n": "Llanta CST C6520 90/90-18 TL",
+      "precio": 1626,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "llantas",
+      "source_url": null,
+      "source_date": null
+    },
+    "LLA-CST-C7204F": {
+      "n": "Llanta CST C7204F 3.00-18 TL",
+      "precio": 1445,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "llantas",
+      "source_url": null,
+      "source_date": null
+    },
+    "LLA-CST-C6559": {
+      "n": "Llanta CST C6559 110/90-17",
+      "precio": 2109,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "llantas",
+      "source_url": null,
+      "source_date": null
+    },
+
+    "CAT-DX519U": {
+      "n": "Cortadora de metales Caterpillar 14\" DX519U",
+      "precio": null,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "herramientas",
+      "specs": "14 pulgadas",
+      "source_url": null,
+      "source_date": null
+    },
+    "CAT-DX17U": {
+      "n": "Taladro de impacto Caterpillar DX17U",
+      "precio": null,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "herramientas",
+      "specs": "750 W",
+      "source_url": null,
+      "source_date": null
+    },
+    "CAT-DX161U": {
+      "n": "Taladro de impacto Caterpillar DX161U",
+      "precio": null,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "herramientas",
+      "specs": "850 W",
+      "source_url": null,
+      "source_date": null
+    },
+    "CAT-DX12": {
+      "n": "Taladro atornillador Caterpillar DX12",
+      "precio": null,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "herramientas",
+      "specs": "18 V",
+      "source_url": null,
+      "source_date": null
+    },
+    "CAT-DX15": {
+      "n": "Taladro atornillador Caterpillar DX15",
+      "precio": null,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "herramientas",
+      "specs": "12 V",
+      "source_url": null,
+      "source_date": null
+    },
+    "CAT-DX59U": {
+      "n": "Sierra circular Caterpillar DX59U",
+      "precio": null,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "herramientas",
+      "specs": "7-1/4 pulgadas, 1400 W",
+      "source_url": null,
+      "source_date": null
+    },
+    "CAT-DX21": {
+      "n": "Martillo giratorio Caterpillar SDS+ DX21",
+      "precio": null,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "herramientas",
+      "specs": "SDS+, 18 V",
+      "source_url": null,
+      "source_date": null
+    },
+    "CAT-DX27U": {
+      "n": "Martillo giratorio Caterpillar SDS+ DX27U",
+      "precio": null,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "herramientas",
+      "specs": "SDS+, 1500 W",
+      "source_url": null,
+      "source_date": null
+    },
+    "CAT-DX26U": {
+      "n": "Martillo giratorio Caterpillar DX26U",
+      "precio": null,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "herramientas",
+      "specs": "800 W",
+      "source_url": null,
+      "source_date": null
+    },
+    "CAT-DX461U": {
+      "n": "Lijadora orbital Caterpillar DX461U",
+      "precio": null,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "herramientas",
+      "specs": "5 pulgadas",
+      "source_url": null,
+      "source_date": null
+    }
+  }
+}

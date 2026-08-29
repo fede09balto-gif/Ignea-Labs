@@ -12,6 +12,96 @@ touches customer-facing numbers.
 
 ## 1. WHERE THINGS STAND
 
+### `feat/leyva-demo` — private live sales demo (branch, preview only, NOT merged)
+
+A private, admin-gated WhatsApp-assistant demo built on **their real catalog**, for
+Luis Velázquez to drive in person at Ferretería Roberto Leyva in León. `leyva.html`
++ `js/leyva-demo.js` + `data/leyva-catalog.json` + an additive preset on `api/claude.js`.
+
+**The brief's premise about /probalo was wrong, and correcting it shrank the job.**
+/probalo was described as "a scripted tree, no model". It is not: `api/tryit.js` is a
+real relay (Groq `llama-3.1-8b-instant`), with a catalog-grounded system prompt that
+already filters null-priced SKUs, the counter voice, the `|||` bubble sequencer, and a
+local `fallback()` responder that already runs on any non-2xx/degraded/timeout. **The
+"offline path" and the "null-price guard" were ports, not builds.** Anyone planning
+work here should read `api/tryit.js` before assuming something needs building.
+
+**Note there were already two relays** before this work: `api/claude.js` (Anthropic,
+Sonnet 5, ops-ai only) and `api/tryit.js` (Groq, probalo). The machinery lived on the
+Groq one; the Anthropic one was the sanctioned target. That tension was resolved by
+porting the machinery, not the relay.
+
+**`api/claude.js` — strictly additive `preset` field.** A request with no `preset`
+behaves exactly as before. With `preset: 'leyva'` the server **replaces** any
+client-supplied `system` with a catalog-grounded prompt built server-side, so the
+browser never receives the catalog and cannot strip the no-invented-price rules.
+Preset-scoped additions: `output_config: {effort: 'low'}` (Sonnet 5 defaults to `high`,
+pointless for a 15-word counter reply) and `cache_control` on the catalog block.
+**Both are preset-scoped deliberately** — a global `effort: low` would have quietly
+degraded ops-ai's proposals, which is invisible until someone generates one.
+
+**Regression-tested both ways.** Mocked-fetch harness asserts the no-preset path still
+sends the client's own system string, no `output_config`, plain-string `system`, model
+still `claude-sonnet-5`. Then a **live** no-preset call against the real model produced
+a correct proposal-style answer that respected the injected $2.09/hr rate.
+
+**What it must not invent, and how that is enforced structurally rather than by asking
+nicely.** `data/leyva-catalog.json` has **no `e`/stock field on any item** (unlike
+`data/ferreteria-catalog.json`) and no delivery terms, so the prompt builder physically
+cannot emit either. The prompt then adds explicit prohibitions plus an escalation path.
+`leyvaPriceLine()` is the single server-side chokepoint — the twin of
+`js/tryit-resolver.js`'s `price()`.
+
+**A trap worth recording:** the null-priced lámina de revestimiento has a *known*
+`precio_antes` of C$1,512. A price builder that reads `precio_antes` before checking
+`precio` would have leaked a stale price for an item we have no current price for.
+`leyvaPriceLine()` returns null before touching `precio_antes`; there is a test for it.
+
+**Measured on the live model (Sonnet 5, `vercel dev`, 8 real turns):**
+
+| | Value |
+|---|---|
+| System prompt | 4,809 chars / **~2,513 tokens** |
+| Input per turn (uncached) | ~2,530 |
+| Output per turn | 39–80 |
+| Round trip | 1.78–2.32 s |
+| Cost per ~8-turn demo | **~$0.015 cached / ~$0.05 uncached** |
+| A day of 20 demos | **~$0.30** |
+
+**Prompt caching cut cost ~3× and did NOT measurably improve latency** (1.86–1.96s
+cached vs 1.78–1.85s uncached — inside the noise). Kept for the cost, not the speed;
+don't expect it to fix a slow room.
+
+**Sonnet 5 pricing correction:** $2/$10 per MTok. The $3/$15 increase that was scheduled
+for 2026-09-01 **was cancelled** — Anthropic's pricing page now states $2/$10 is the
+standard price. Any older note saying "intro pricing through Aug 31" is stale.
+
+**Offline path verified with the network genuinely down** (Playwright
+`context.setOffline(true)`, toggle OFF): answered correctly from local data, no hang,
+no error text anywhere on the page, zero console errors. The forced-offline toggle was
+separately verified to make **zero** network calls.
+
+**A bug the browser pass caught that the unit tests missed:** "¿Cuántas láminas de
+gypsum tienen?" fell through the stock branch into the price branch and answered
+**C$370 to a stock question**. The stock regex required the verb adjacent to the
+quantifier; in real Spanish the product sits between them. Fixed and covered both
+directions (stock questions escalate, price questions still quote).
+
+**Known rough edge, not fixed:** asked for an off-catalog item (cemento Canal) the model
+offered Bondex Plus as "algo similar". Bondex is a tile adhesive, not cement — a poor
+substitution. It invents no price and breaks no rule, but it is a weak moment if Luis
+Herrera happens to ask for cement. Consider a prompt line restricting substitutions to
+the same category.
+
+**BLOCKING before this is shown to the client:** every price is transcribed from
+screenshots of the business's own Facebook posts, with `source_url: null` and
+`source_date: null` on all 29 items. **0 of 29 are sourced.** 11 are already unquotable
+by design (10 Caterpillar tools + the lámina de revestimiento) and drive the escalation
+demo. The other **18 carry prices with zero provenance** — if they cannot be traced to
+dated posts, the demo has nothing left to quote and is not shippable.
+
+---
+
 ### `fix/diagnostic-enter-and-keyboard` — MERGED to `main` and DEPLOYED (most recent work)
 
 Two mobile defects on `/diagnostic`, both browser-verified before and after, then
@@ -659,6 +749,44 @@ the demo quietly runs on keyword-matched fallback replies instead of the LLM for
 of the day. Re-open this only once real session data exists to size the ceiling against.
 
 ## 3. STANDING RULES
+
+- **WHATSAPP CONNECTION — STANDING DECISION, do not relitigate.** When we connect a
+  client's WhatsApp, it is the **official Meta Cloud API only**, priced into the
+  engagement from day one. Unofficial Baileys-based stacks (Evolution API, WAHA, and
+  friends) are acceptable **only on our own number, for our own demos, where we eat the
+  ban.** Never on a client's number.
+
+  **Why, because a future session reading only the Evolution API docs will not see it:**
+  [Evolution API](https://github.com/evolution-foundation/evolution-api) supports both
+  Baileys and the official Cloud API, and its Baileys path warns only that it "may have
+  limitations" — no ban disclaimer at all. The reality is much sharper. Reporting on
+  unofficial-API bans puts roughly **1 in 5 accounts banned within a year**, with
+  reverse-engineered stacks typically detected in **2–8 weeks**, and **the ban is
+  permanent with no appeal**
+  ([SporeSec](https://sporesec.com/en/blog/whatsapp-unofficial-api-ban-risk)).
+
+  Now apply that to a ferretería. Their WhatsApp number **is** the sales channel — it is
+  on their Facebook posts and orders arrive through it. A ban does not degrade the
+  assistant; it deletes the business's order pipeline, permanently, and **we** caused it.
+  That ends the client relationship and the referral market in León, which for a firm
+  this size is the entire market. The asymmetry is the whole argument: we save a few
+  dollars a month and risk their business.
+
+  The official [Cloud API](https://respond.io/blog/whatsapp-business-api-pricing) moved
+  to per-message billing in July 2025; Nicaragua falls under "Rest of Latin America",
+  and BSP markups add roughly $0.003–$0.010/message. Meta is also widening what is
+  chargeable — service and in-window utility messages become billable **2026-10-01**.
+  It costs real money and needs Business verification plus template approval. That
+  friction is the product working as intended, not a reason to route around it.
+
+- **LANGUAGE EXCEPTION #2 — `leyva.html` conversation and suggested questions are
+  Spanish-only.** Approved deliberately, alongside the existing wa-demo exception. The
+  reasoning is the same in both cases: that text is not our chrome, it is the **rendered
+  content of a Nicaraguan business's WhatsApp**, and an English "How much is the gypsum
+  sheet?" inside a WhatsApp mockup for a León ferretería would be incoherent. The
+  **operator chrome around it is fully i18n'd in both languages** — 9 `leyva.*` keys,
+  parity asserted in the build checks. Do not "fix" the Spanish-only strings by
+  translating them; that would break the demo's realism for no reader who exists.
 
 - **TEST DATA MUST NEVER IMPERSONATE A REAL PROSPECT. Mark it `ZZTEST` in the name AND the
   company, always.** Never a real person's name, never a real business name, and **never a
