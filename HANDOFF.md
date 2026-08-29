@@ -2,11 +2,122 @@
 
 Written at the end of a session that completed the entire previous handoff's §2 plan, then merged it to production. Everything in §1 is **live on www.ignealabs.com**; §2 is four approved-but-unbuilt work items. Read §1 and §2 before doing anything. The previous handoff's content is superseded — its plan is done.
 
+**§0 is the customer-memory spec. It was agreed verbally three times and never written
+down; it is written down now. Read it before touching `js/leyva-memory.js` or the
+`memory` field on `api/claude.js`.**
+
 **Start next session with §2.1 (Nicaragua cost model). It is now live and wrong on production.**
 
 **Since that was written:** §2.4 (Calendly -> Google Calendar + Formspree) is DONE and live —
 see §1b. `frame-ancestors 'none'` is also live. §2.1 is now the only thing left in §2 that
 touches customer-facing numbers.
+
+---
+
+## 0. CUSTOMER MEMORY — the spec, recorded because it kept getting lost
+
+**This section exists because this proposal was agreed verbally across three
+sessions and never once reached this file, so every session rebuilt its
+understanding of it from scratch. It is written down now. Do not summarise it
+away.** The safety model is the point; the feature is downstream of it.
+
+Memory is keyed on **phone number**. Two tiers, and *the distinction between them
+is the safety model*, not a storage convenience.
+
+### DECLARED — things the customer explicitly said
+
+`nombre`, `razón social`, `RUC`, `dirección de entrega`, `forma de pago`.
+
+Each carries a **`declared_at` timestamp**, so a razón social from eight months ago
+gets **confirmed rather than asserted**. These may be stated back to the customer
+**because he said them**. That is the entire warrant for repeating them.
+
+### DERIVED — computed from history
+
+`pedidos anteriores` (fecha, líneas, total, correlativo), `frecuencia`,
+`proformas abiertas sin cerrar`.
+
+These are **offered as questions, never asserted**. And they are **never stored as
+columns** — always computed fresh from the orders, so a derived summary can never
+drift away from the orders it summarises. (Implemented literally: a stored order
+holds `{sku, qty}` only. Every price, line total and order total is resolved from
+the catalog at read time. There is no price column to go stale.)
+
+### Nothing else
+
+No inferred income. No behavioral scoring. No notes about the person. If a field is
+not in one of the two lists above, it does not exist. This is not a v1 scope cut to
+be relaxed later — it is the boundary that makes the feature safe to sell to a
+business whose customer list *is* its business.
+
+### RULES
+
+- **The anti-invention guard extends to memory.** Never state a remembered fact we
+  do not have. No "como siempre" without an actual record behind it. This is the
+  same rule as the null-price guard, applied to a second class of fact.
+- **Null-guard extension.** A missing remembered field produces **a question**,
+  never a blank line in a document. A proforma with an empty RUC line is worse than
+  one with no RUC line: the empty one looks like a system that lost the data.
+- **Neutral greeting.** Not "¡Buenas, don Marvin!" on message one. **Phones get
+  shared in a cuadrilla, and greeting the wrong person by name in front of a buyer
+  is a memorable failure** — the kind that ends the demo. Instead put the name where
+  it is load-bearing:
+  *"Buenas. ¿Le hago la proforma a nombre de Constructora García, como la vez pasada?"*
+- **Ask for the name only when building a proforma**, because that is the moment it
+  is genuinely needed. Never as a greeting.
+- **"¿Es para empresa? Si me da el RUC se la hago a la razón social."**
+- **Repeat order.** *"lo mismo del mes pasado"* pulls the prior proforma, lists what
+  was on it, and asks whether the quantities are the same. **That single interaction
+  is the most valuable thing in the demo for a contractor** — it is the whole pitch
+  compressed into one message.
+- **Open-proforma follow-up — their stated pain #2.**
+  *"Quedó pendiente la PRO-2481 por C$X. ¿La activamos?"*
+- **"olvidá mis datos"** wipes the profile and confirms it. **It must actually
+  work** — not a scripted acknowledgement over a profile that is still there.
+
+### IMPLEMENTATION (as built on `feat/leyva-demo`)
+
+`js/leyva-memory.js`. Storage is **`localStorage` under `ignea_leyva_profiles`**.
+
+An **operator toggle lives in the rail — not in the phone** — switching between:
+
+| Mode | State |
+|---|---|
+| **Cliente nuevo** | empty profile |
+| **Cliente que vuelve** | seeded: Marvin García, Constructora García S.A., a **synthetic RUC clearly marked as fake**, and **one prior unconfirmed order so the open-proforma beat fires** |
+
+**The rail shows what came from memory versus what was asked** — the same grounding
+treatment prices already get. A demo that shows the answer without showing its
+provenance is asking to be believed; this one shows its work in both channels.
+
+**Two things a partner must be told plainly, and which are in the brief:**
+
+1. Memory here is **browser-local and dies with the browser**. The line is
+   *"así se comporta; en producción vive en la base de datos de ustedes"* —
+   the behaviour is real, the storage is a demo stand-in.
+2. Stale-price recovery, unchanged and still the most load-bearing answer in the
+   room: *"esos son los precios de su publicación de agosto, cargamos su catálogo
+   tal cual."*
+
+### Where the invariants are enforced (so a later session does not weaken them by accident)
+
+- **Client cannot inject prompt text.** The `memory` field on a `preset` request is
+  **structured, not prose**: a whitelist of five short string fields (length-capped,
+  character-filtered, newlines stripped) plus orders expressed as `{sku, qty}`.
+  The server renders the block from a fixed template. A demo token still cannot turn
+  `/api/claude` into a general model proxy — that property was the reason the
+  demo scope exists and it survives this change intact.
+- **Client cannot inject a price.** A stored order line names a SKU and a quantity.
+  The server looks the SKU up in `data/leyva-catalog.json`; **an unknown SKU, or one
+  with `precio: null`, is dropped from the block entirely.** Names, unit prices and
+  totals come from the catalog. There is no path by which a number in `localStorage`
+  reaches the model or a document.
+- **Prompt caching survives.** The system prompt is sent as **two blocks**: the
+  catalog prompt (stable, carries `cache_control`) and the memory block (varies per
+  customer, uncached). Concatenating them into one string would have silently
+  destroyed the ~3× cost saving measured earlier, and nothing would have failed
+  visibly.
+- **No-memory requests are byte-identical to before.** Regression-tested.
 
 ---
 
