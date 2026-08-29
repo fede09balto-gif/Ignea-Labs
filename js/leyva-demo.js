@@ -66,14 +66,56 @@ var LeyvaDemo = (function () {
   /* ---- the offline responder ---------------------------------------
      Returns an array of bubbles — the same shape the API path returns,
      so the sequencer downstream cannot tell them apart. */
+  /* Strip accents and collapse the spellings a real customer types on a
+     phone keyboard. The offline path is keyword-matched, so without this a
+     typo lands on "no lo manejo" — which is a lie about their stock, not a
+     graceful degradation. Phonetic variants are Nicaraguan-realistic:
+     gypsum is said "jipson", llanta is typed "yanta". */
+  function norm(s) {
+    return (s || '').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[¿?¡!.,;:]/g, ' ')
+      .replace(/\bjipso?n?\b|\bgipsum\b|\bgybsum\b|\byeso\b/g, 'gypsum')
+      .replace(/\byanta\b|\bllanta\b|\bllantas\b|\byantas\b/g, 'llanta')
+      .replace(/\bmetalika\b|\bmetalica\b|\bmetalik\b/g, 'metalica')
+      .replace(/\bbateria\b|\bbateria\b|\bbatteria\b/g, 'bateria')
+      .replace(/\bbondeks\b|\bbondex\b/g, 'bondex')
+      .replace(/\s+/g, ' ').trim();
+  }
+
   function local(text) {
-    var t = (text || '').toLowerCase();
+    var t = norm(text);
     var rail = [];
 
     function hit(msgs, trace) { rail = trace; return { bubbles: msgs, rail: rail }; }
 
+    // Prompt injection / instruction probing. A skeptical buyer WILL try this.
+    // Stay in character, do not acknowledge having instructions.
+    if (/ignora (tus|las) instruc|olvida (tus|las) instruc|system prompt|tus reglas|eres una ia|actua como|pretend|jailbreak|repite tus instruc/.test(t)) {
+      return hit(['Yo solo le puedo ayudar con lo de la ferretería.', '¿Qué anda buscando?'],
+        ['Intento de sacarlo de rol', 'Se mantiene en el mostrador']);
+    }
+
+    // Greeting.
+    if (/^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|que tal|saludos)\b/.test(t) && t.length < 30) {
+      return hit(['Buenas.', '¿Qué ocupa?'], ['Saludo', 'Abre la conversación']);
+    }
+
+    // English — answer in Spanish, do not switch. This is a Nicaraguan
+    // ferretería's WhatsApp; a bilingual counter would break the illusion.
+    if (/\b(how much|do you have|price|hello|hi there|what is|can i|i need|looking for)\b/.test(t)) {
+      return hit(['Disculpe, aquí le atiendo en español.', '¿Qué producto anda buscando?'],
+        ['Consulta en inglés', 'Responde en español']);
+    }
+
+    // Off-topic (politics, jokes, chit-chat) — deflect back to the counter.
+    if (/\b(chiste|broma|futbol|politica|presidente|ortega|clima|amor|novia|como estas|quien gano|cancion|pelicula)\b/.test(t)) {
+      return hit(['Jaja, de eso no sé.', 'Yo le ayudo con material, ¿qué ocupa?'],
+        ['Fuera de tema', 'Redirige al catálogo']);
+    }
+
     // Asked directly whether it's a bot — answer honestly, lightly, move on.
-    if (/\b(bot|robot|m[áa]quina|humano|persona real|es usted una persona|con qui[ée]n hablo)\b/.test(t)) {
+    if (/\b(bot|robot|maquina|humano|persona real|es usted una persona|con quien hablo|quien eres|quien es usted|eres real|sos un bot|sos real)\b/.test(t)) {
       return hit(['Soy el asistente de la ferretería, pero le resuelvo igual.', '¿Qué ocupa?'],
         ['Pregunta directa: ¿es un asistente?', 'Respuesta honesta, sin rodeos']);
     }
@@ -132,6 +174,31 @@ var LeyvaDemo = (function () {
         lines.map(function (l) { return l.q + ' ' + l.it.n + ' — ' + money(l.q * l.it.p); }).join('\n'),
         'Total ' + money(sub) + '. Entrega se la confirma el mostrador.'
       ], ['Consulta: cotización', '2 líneas con precio en sistema', 'Suma ' + money(sub), 'Entrega: sin dato → escalar']);
+    }
+
+    // Multi-product in one message — quote every priced match, not just the
+    // first. "gypsum y una puerta cafe, cuanto sale todo" must not answer
+    // about gypsum alone.
+    var multi = [];
+    if (/gypsum/.test(t)) multi.push(LOCAL_PRICES.gypsum);
+    if (/puerta/.test(t)) multi.push(/caoba|5 tablero/.test(t) ? LOCAL_PRICES.puerta5 : (/blanc|6 tablero/.test(t) ? LOCAL_PRICES.puerta6 : LOCAL_PRICES.puerta3));
+    if (/tabla|madera/.test(t)) multi.push(LOCAL_PRICES.tabla);
+    if (/bondex/.test(t)) multi.push(/premium|ceramica/.test(t) ? LOCAL_PRICES.bondexp : LOCAL_PRICES.bondex);
+    if (/llanta/.test(t)) multi.push(/90\/90|17 tl/.test(t) ? LOCAL_PRICES.llanta90 : LOCAL_PRICES.llanta17);
+    if (/bateria|kobe/.test(t)) multi.push(/12n7|\b7\b/.test(t) ? LOCAL_PRICES.bat74 : LOCAL_PRICES.bat65);
+    if (/aceite|yamalube|20w/.test(t)) multi.push(LOCAL_PRICES.aceite);
+    if (multi.length > 1) {
+      var tot = multi.reduce(function (a, x) { return a + x.p; }, 0);
+      return hit(['Va, le paso los precios.',
+        multi.map(function (x) { return x.n + ' — ' + money(x.p); }).join('\n'),
+        'Junto le sale ' + money(tot) + ', uno de cada uno. Dígame cantidades y se la afino.'],
+        ['Consulta con varios productos', multi.length + ' coincidencias', 'Suma ' + money(tot)]);
+    }
+
+    // Vague ask — do not guess a product. Ask what it is for.
+    if (/algo para|lo mas barato|lo mas economico|que me recomienda|no se que ocupo|algo que sirva/.test(t)) {
+      return hit(['Depende de para qué lo ocupa.', '¿Es para techo, pared, piso o moto?'],
+        ['Consulta vaga', 'Pide contexto antes de recomendar']);
     }
 
     // Priced lookups.

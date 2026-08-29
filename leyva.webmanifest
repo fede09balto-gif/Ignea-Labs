@@ -1,0 +1,14 @@
+{
+  "name": "Ferretería Roberto Leyva",
+  "short_name": "Ferretería",
+  "description": "Asistente de WhatsApp",
+  "start_url": "/leyva",
+  "scope": "/leyva",
+  "display": "standalone",
+  "background_color": "#EFE7DE",
+  "theme_color": "#075E54",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

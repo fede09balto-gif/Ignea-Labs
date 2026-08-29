@@ -2,65 +2,77 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<!-- interactive-widget=resizes-content: matches diagnostic.html and contact.html. -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <title>Demo privado — Ferretería Roberto Leyva</title>
 
-<!-- ============================================================
-     PRIVATE SALES DEMO. Not linked from anywhere, not in
-     sitemap.xml, disallowed in robots.txt, gated on IGNEA_OPS_TOKEN
-     via the existing /api/ops-auth endpoint.
-
-     Driven live by Luis Velázquez in front of a buyer. Two rules:
-
-     1. OFFLINE FIRST. js/leyva-demo.js computes a deterministic
-        local answer before any network call is attempted. The API
-        is a 4-second upgrade on top; every failure path falls back
-        silently. Nobody in the room sees a spinner or an error.
-
-     2. THE CATALOG IS UNVERIFIED. data/leyva-catalog.json carries
-        prices transcribed from the business's own Facebook posts
-        with no source URL and no date. The banner below is
-        deliberately loud and is visible ONLY to the operator —
-        never inside the phone mockup the buyer looks at.
-
-     LANGUAGE — deliberate exception to the both-languages rule,
-     approved and recorded in HANDOFF.md alongside the wa-demo one:
-     the conversation and the suggested questions are Spanish-only
-     because they are the rendered content of a Nicaraguan
-     ferretería's WhatsApp. The operator chrome around them is
-     i18n'd in both languages like everything else.
-     ============================================================ -->
+<!-- Chromeless launch. Android Chrome supports BOTH the manifest and the
+     Fullscreen API. iPhone Safari supports NEITHER on iPhone — the only
+     route to a chromeless screen there is Add to Home Screen with these
+     Apple meta tags. See HANDOFF.md for what each platform actually gets. -->
+<link rel="manifest" href="/leyva.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ferretería">
+<meta name="theme-color" content="#075E54">
 
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/shared.css">
 <style>
-.lv-wrap{max-width:1080px;margin:0 auto;padding:24px 20px 80px}
+.lv-wrap{max-width:1080px;margin:0 auto;padding:24px 20px 60px}
 .lv-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:6px}
 .lv-head h1{font-size:22px;letter-spacing:-.01em;margin:0}
 .lv-head .lv-sub{font-family:var(--fm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
-
-/* Operator-only. Never rendered inside .ig-screen. */
 .lv-unver{border:1px solid var(--red);background:var(--red-wash);padding:12px 14px;margin:14px 0 20px;font-size:13px;line-height:1.55;color:var(--ink)}
 .lv-unver b{font-family:var(--fm);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);display:block;margin-bottom:5px}
+.lv-grid{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:24px;align-items:start}
+@media(max-width:860px){.lv-grid{grid-template-columns:1fr}}
 
-.lv-grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:24px;align-items:start}
-@media(max-width:820px){.lv-grid{grid-template-columns:1fr}}
+.wa{--wa-green:#075E54;--wa-tick:#8696A0;--wa-blue:#53BDEB;--wa-paper:#EFE7DE;--wa-out:#D9FDD3;
+    display:flex;flex-direction:column;height:600px;background:var(--wa-paper);overflow:hidden}
+.wa__bar{background:var(--wa-green);color:#fff;display:flex;align-items:center;gap:10px;padding:9px 12px;flex-shrink:0}
+.wa__av{width:34px;height:34px;border-radius:50%;background:#128C7E;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:500;flex-shrink:0}
+.wa__id{min-width:0;flex:1}
+.wa__nm{font-size:15px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wa__st{font-size:11.5px;opacity:.82;line-height:1.3;min-height:15px}
+.wa__ico{display:flex;gap:16px;opacity:.9;flex-shrink:0}
+.wa__chat{flex:1;overflow-y:auto;padding:12px 9px 8px;display:flex;flex-direction:column;gap:2px;scroll-behavior:smooth}
+.wa__day{align-self:center;background:#fff;border-radius:7px;padding:4px 11px;font-size:11.5px;color:#54656F;box-shadow:0 1px 1px rgba(0,0,0,.06);margin-bottom:8px}
+.wa__b{max-width:82%;padding:6px 8px 5px;border-radius:8px;font-size:14.2px;line-height:1.4;color:#111B21;box-shadow:0 1px .5px rgba(11,20,26,.13);white-space:pre-wrap;word-wrap:break-word}
+.wa__b--in{align-self:flex-start;background:#fff}
+.wa__b--out{align-self:flex-end;background:var(--wa-out)}
+.wa__b--first{margin-top:7px}
+.wa__b--in.wa__b--first{border-top-left-radius:1px}
+.wa__b--out.wa__b--first{border-top-right-radius:1px}
+.wa__m{float:right;margin:6px -2px -2px 8px;font-size:10.5px;color:#667781;display:flex;align-items:center;gap:2px;line-height:1}
+.wa__tick svg{display:block}
+.wa__tick[data-s="sent"],.wa__tick[data-s="deliv"]{color:#8696A0}
+.wa__tick[data-s="read"]{color:#53BDEB}
+.wa__typing{align-self:flex-start;background:#fff;border-radius:8px;border-top-left-radius:1px;padding:10px 12px;display:flex;gap:4px;box-shadow:0 1px .5px rgba(11,20,26,.13);margin-top:7px}
+.wa__typing i{width:7px;height:7px;border-radius:50%;background:#9AA5AC;animation:waB 1.3s infinite}
+.wa__typing i:nth-child(2){animation-delay:.18s}
+.wa__typing i:nth-child(3){animation-delay:.36s}
+@keyframes waB{0%,60%,100%{opacity:.3}30%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.wa__typing i{animation:none;opacity:.6}}
+.wa__starters{display:flex;gap:6px;overflow-x:auto;padding:7px 9px 3px;flex-shrink:0;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.wa__starters::-webkit-scrollbar{display:none}
+.wa__chip{flex-shrink:0;background:#fff;border:1px solid #D6D0C8;color:#0A6E62;border-radius:15px;padding:7px 13px;font-size:13px;font-family:var(--ff);cursor:pointer;white-space:nowrap;min-height:34px}
+.wa__chip:active{background:#F0EDE8}
+.wa__inbar{display:flex;align-items:flex-end;gap:6px;padding:6px 7px 7px;flex-shrink:0}
+.wa__field{flex:1;display:flex;align-items:center;gap:7px;background:#fff;border-radius:21px;padding:7px 11px;min-height:42px}
+.wa__field svg{flex-shrink:0;color:#54656F;opacity:.85}
+.wa__in{flex:1;border:0;outline:0;font-family:var(--ff);font-size:15px;background:transparent;color:#111B21;min-width:0;resize:none;line-height:1.35;max-height:78px;padding:2px 0}
+.wa__in::placeholder{color:#8696A0}
+.wa__send{width:42px;height:42px;border-radius:50%;background:#075E54;border:0;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;cursor:pointer}
+.wa__send:disabled{opacity:.55;cursor:default}
 
-.lv-controls{display:flex;flex-direction:column;gap:10px}
-.lv-qbtn{display:block;width:100%;text-align:left;min-height:48px;padding:11px 14px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-family:var(--ff);font-size:14px;line-height:1.4;cursor:pointer;transition:border-color .15s var(--ease),background .15s var(--ease)}
-.lv-qbtn:hover:not(:disabled){border-color:var(--ink)}
-.lv-qbtn:disabled{opacity:.4;cursor:default}
-.lv-qbtn__k{display:block;font-family:var(--fm);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
-
-.lv-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.lv-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
 .lv-toggle{display:inline-flex;align-items:center;gap:9px;min-height:48px;padding:0 14px;border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:13.5px;user-select:none;background:var(--bg)}
 .lv-toggle input{width:17px;height:17px;accent-color:var(--red);cursor:pointer}
 .lv-toggle.on{border-color:var(--red);background:var(--red-wash)}
-.lv-reset{min-height:48px;padding:0 18px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-family:var(--ff);font-size:13.5px;cursor:pointer}
-.lv-reset:hover{border-color:var(--ink)}
-
+.lv-btn{min-height:48px;padding:0 18px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-family:var(--ff);font-size:13.5px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.lv-btn:hover{border-color:var(--ink)}
 .lv-rail{border:1px solid var(--line);background:var(--bg-tint);min-height:200px;padding:14px}
 .lv-rail__hd{font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);display:flex;justify-content:space-between;gap:10px;margin-bottom:11px}
 .lv-rail__mode{font-family:var(--fm);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase}
@@ -73,18 +85,28 @@
 .lv-step--flag{color:var(--ink)}
 .lv-rail__idle{font-size:12.5px;color:var(--ink-3);line-height:1.55}
 
-.lv-typing{align-self:flex-start;background:#FFF;border-radius:8px;border-top-left-radius:2px;padding:9px 11px;display:flex;gap:4px;box-shadow:0 1px 1px rgba(0,0,0,.07)}
-.lv-typing i{width:6px;height:6px;border-radius:50%;background:#9AA5AC;animation:lvBlink 1.25s infinite}
-.lv-typing i:nth-child(2){animation-delay:.18s}
-.lv-typing i:nth-child(3){animation-delay:.36s}
-@keyframes lvBlink{0%,60%,100%{opacity:.32}30%{opacity:1}}
-@media(prefers-reduced-motion:reduce){.lv-typing i{animation:none;opacity:.6}}
+/* ---- KIOSK ----------------------------------------------------------
+   All admin chrome disappears and the conversation goes edge to edge.
+   The UNVERIFIED banner is hidden here DELIBERATELY — Fede's explicit,
+   recorded decision (HANDOFF.md §3): the buyer is told verbally what
+   this is, and the operator keeps the banner on his own screen. */
+body.kiosk{background:#EFE7DE}
+body.kiosk .lv-wrap{max-width:none;margin:0;padding:0}
+body.kiosk .lv-head,body.kiosk .lv-unver,body.kiosk .lv-side{display:none!important}
+body.kiosk .lv-grid{display:block}
+body.kiosk .wa{height:100vh;height:100dvh}
+body.kiosk .wa__bar{padding-top:calc(9px + env(safe-area-inset-top))}
+body.kiosk .wa__inbar{padding-bottom:calc(7px + env(safe-area-inset-bottom))}
+/* Invisible exit: triple-tap the top-left corner. Non-obvious to the buyer,
+   trivial for the operator, no visible control to fat-finger mid-demo. */
+.kiosk-exit{position:fixed;top:0;left:0;width:64px;height:64px;z-index:99;display:none}
+body.kiosk .kiosk-exit{display:block}
 
-.lv-gate{max-width:380px;margin:16vh auto;text-align:center}
-.lv-gate input{width:100%;min-height:48px;padding:0 14px;border:1px solid var(--line);border-radius:8px;font-family:var(--fm);font-size:14px;text-align:center;letter-spacing:.1em}
+.lv-gate{max-width:380px;margin:16vh auto;text-align:center;padding:0 20px}
+.lv-gate input{width:100%;min-height:48px;padding:0 14px;border:1px solid var(--line);border-radius:8px;font-family:var(--fm);font-size:15px;text-align:center;letter-spacing:.1em}
 .lv-gate input:focus{border-color:var(--ink);outline:none}
-.lv-gate__msg{font-family:var(--fm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-top:12px;min-height:16px}
 .lv-gate__t{font-family:var(--fm);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:16px}
+.lv-gate__msg{font-family:var(--fm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-top:12px;min-height:16px}
 </style>
 </head>
 <body>
@@ -94,6 +116,8 @@
   <input type="password" id="lvToken" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Token">
   <div class="lv-gate__msg" id="lvGateMsg"></div>
 </div>
+
+<div class="kiosk-exit" id="kioskExit" aria-hidden="true"></div>
 
 <div class="lv-wrap" id="lvApp" style="display:none">
 
@@ -108,241 +132,64 @@
   </div>
 
   <div class="lv-grid">
-
     <div>
-      <div class="ig-phone">
-        <div class="ig-screen">
-          <div class="ig-status">
-            <span>9:12</span>
-            <span class="ig-status__i">
-              <svg width="15" height="10" viewBox="0 0 15 10" fill="currentColor" aria-hidden="true"><rect y="6" width="2.6" height="4" rx=".6"/><rect x="4" y="4" width="2.6" height="6" rx=".6"/><rect x="8" y="2" width="2.6" height="8" rx=".6"/><rect x="12" width="2.6" height="10" rx=".6" opacity=".45"/></svg>
-              <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true"><rect x=".5" y=".5" width="16" height="9" rx="2" stroke="currentColor"/><rect x="2" y="2" width="11" height="6" rx="1" fill="currentColor"/><rect x="18" y="3.5" width="1.6" height="3" rx=".7" fill="currentColor"/></svg>
-            </span>
+      <div class="wa" id="wa">
+        <div class="wa__bar">
+          <svg width="9" height="15" viewBox="0 0 9 15" fill="none" aria-hidden="true"><path d="M7.5 1L1.5 7.5 7.5 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <div class="wa__av">RL</div>
+          <div class="wa__id">
+            <div class="wa__nm">Ferretería Roberto Leyva</div>
+            <div class="wa__st" id="waStatus">en línea</div>
           </div>
-          <header class="ig-wahead">
-            <svg width="9" height="15" viewBox="0 0 9 15" fill="none" aria-hidden="true"><path d="M7.5 1L1.5 7.5 7.5 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            <div class="ig-wahead__av">RL</div>
-            <div class="ig-wahead__m"><div class="ig-wahead__n">Ferretería Roberto Leyva</div><div class="ig-wahead__s">en línea</div></div>
-            <svg width="4" height="16" viewBox="0 0 4 16" fill="currentColor" opacity=".85" aria-hidden="true"><circle cx="2" cy="2" r="1.7"/><circle cx="2" cy="8" r="1.7"/><circle cx="2" cy="14" r="1.7"/></svg>
-          </header>
-          <div class="ig-chat" id="lvChat" role="log" aria-live="polite" aria-label="Conversación"></div>
+          <span class="wa__ico">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1l-2.3 2.2z"/></svg>
+            <svg width="4" height="16" viewBox="0 0 4 16" fill="currentColor" aria-hidden="true"><circle cx="2" cy="2" r="1.7"/><circle cx="2" cy="8" r="1.7"/><circle cx="2" cy="14" r="1.7"/></svg>
+          </span>
+        </div>
+
+        <div class="wa__chat" id="waChat" role="log" aria-live="polite" aria-label="Conversación"></div>
+
+        <div class="wa__starters" id="waStarters"></div>
+
+        <div class="wa__inbar">
+          <div class="wa__field">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zM8.5 10a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm7 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zM12 17.5c-2.3 0-4.3-1.4-5.1-3.5h10.2c-.8 2.1-2.8 3.5-5.1 3.5z"/></svg>
+            <textarea class="wa__in" id="waIn" rows="1" placeholder="Mensaje" autocomplete="off" autocapitalize="sentences" aria-label="Mensaje"></textarea>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.5 6v11.5a4.5 4.5 0 0 1-9 0V5a3 3 0 0 1 6 0v10.5a1.5 1.5 0 0 1-3 0V6H9v9.5a3 3 0 0 0 6 0V5a4.5 4.5 0 0 0-9 0v12.5a6 6 0 0 0 12 0V6h-1.5z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.4 4l-1.2 2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-4.2l-1.2-2H9.4zM12 17a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>
+          </div>
+          <button class="wa__send" id="waSend" aria-label="Enviar" disabled>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.5 21l19-9-19-9v7l13 2-13 2v7z"/></svg>
+          </button>
         </div>
       </div>
     </div>
 
-    <div>
-      <div class="lv-controls" id="lvQuestions"></div>
-
+    <div class="lv-side">
       <div class="lv-bar">
         <label class="lv-toggle" id="lvOfflineWrap">
           <input type="checkbox" id="lvOffline">
           <span data-i18n="leyva.offline">Modo sin conexión</span>
         </label>
-        <button class="lv-reset" id="lvReset" data-i18n-btn="leyva.reset">Reiniciar</button>
-        <a class="lv-reset" href="/leyva-script" style="text-decoration:none;display:inline-flex;align-items:center" data-i18n="leyva.script">Guion</a>
+        <button class="lv-btn" id="lvReset" data-i18n-btn="leyva.reset">Reiniciar</button>
+        <button class="lv-btn" id="lvKiosk" data-i18n-btn="leyva.kiosk">Pantalla completa</button>
+        <a class="lv-btn" href="/leyva-script" data-i18n="leyva.script">Guion</a>
       </div>
 
-      <div class="lv-rail" style="margin-top:18px">
+      <div class="lv-rail">
         <div class="lv-rail__hd">
           <span data-i18n="leyva.rail.title">Qué está consultando</span>
           <span class="lv-rail__mode" id="lvMode"></span>
         </div>
-        <div id="lvRail"><div class="lv-rail__idle" data-i18n="leyva.rail.idle">Toque una pregunta para ver qué revisa el asistente antes de contestar.</div></div>
+        <div id="lvRail"><div class="lv-rail__idle" data-i18n="leyva.rail.idle">Escriba una pregunta para ver qué revisa el asistente antes de contestar.</div></div>
       </div>
     </div>
-
   </div>
 </div>
 
 <script src="js/i18n.js"></script>
 <script src="js/leyva-demo.js"></script>
-<script>
-(function () {
-  'use strict';
-
-  /* ---- suggested questions ------------------------------------------
-     ES-only by approved exception: these are the buyer-facing content,
-     not operator chrome. Six, each hitting a different capability so
-     Luis can drive the whole story from the buttons alone. */
-  var QUESTIONS = [
-    { k: 'Precio en promoción', q: '¿A cómo está la lámina de gypsum?' },
-    { k: 'Precio único',        q: '¿Cuánto vale el Bondex Plus de 20 kg?' },
-    { k: 'Sin precio en sistema', q: '¿Manejan taladro de impacto Caterpillar?' },
-    { k: 'Sin dato de existencia', q: '¿Cuántas láminas de gypsum tienen?' },
-    { k: 'Cotización',          q: 'Me arma una cotización de 10 láminas y 2 puertas' },
-    { k: 'Fuera de catálogo',   q: '¿Tienen cemento Canal?' },
-    // Deliberate seventh: "do you have cement" is the single most likely
-    // question at a hardware counter, and it is the one the catalog cannot
-    // answer. Steering around it made it a landmine; with the same-category
-    // substitution rule in the prompt it becomes another honesty beat.
-    { k: 'Producto que no manejan', q: '¿Tienen cemento?' }
-  ];
-
-  var chat, rail, modeEl, busy = false, history = [];
-
-  /* ---- gate: reuses /api/ops-auth, no second auth scheme ---- */
-  function gate() {
-    var input = document.getElementById('lvToken');
-    var msg = document.getElementById('lvGateMsg');
-    var saved = sessionStorage.getItem('ignea_ops_token');
-    if (saved) { verify(saved, true); return; }
-    input.focus();
-    input.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' && input.value) verify(input.value, false);
-    });
-  }
-
-  function verify(token, silent) {
-    var msg = document.getElementById('lvGateMsg');
-    fetch('/api/ops-auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: token })
-    }).then(function (r) {
-      if (r.ok) {
-        sessionStorage.setItem('ignea_ops_token', token);
-        boot();
-      } else {
-        sessionStorage.removeItem('ignea_ops_token');
-        // 401 and 403 are very different failures and used to look identical.
-        // 403 means the origin allowlist rejected this hostname — the password
-        // is fine and retyping it will never help. Cost a round trip once.
-        if (!silent) {
-          msg.textContent = r.status === 403
-            ? 'origen no permitido — avise a Fede'
-            : 'acceso denegado';
-        }
-        var i = document.getElementById('lvToken');
-        if (i) { i.value = ''; i.focus(); }
-      }
-    }).catch(function () {
-      if (!silent) msg.textContent = 'no se pudo verificar';
-    });
-  }
-
-  function boot() {
-    document.getElementById('lvGate').style.display = 'none';
-    document.getElementById('lvApp').style.display = '';
-    chat = document.getElementById('lvChat');
-    rail = document.getElementById('lvRail');
-    modeEl = document.getElementById('lvMode');
-
-    var wrap = document.getElementById('lvQuestions');
-    QUESTIONS.forEach(function (item) {
-      var b = document.createElement('button');
-      b.className = 'lv-qbtn';
-      b.innerHTML = '<span class="lv-qbtn__k"></span>';
-      b.querySelector('.lv-qbtn__k').textContent = item.k;
-      b.appendChild(document.createTextNode(item.q));
-      b.addEventListener('click', function () { ask(item.q); });
-      wrap.appendChild(b);
-    });
-
-    var off = document.getElementById('lvOffline');
-    off.addEventListener('change', function () {
-      document.getElementById('lvOfflineWrap').classList.toggle('on', off.checked);
-    });
-
-    document.getElementById('lvReset').addEventListener('click', reset);
-    reset();
-  }
-
-  function reset() {
-    history = [];
-    chat.innerHTML = '';
-    rail.innerHTML = '<div class="lv-rail__idle">' +
-      (window.IgneaI18n ? IgneaI18n.t('leyva.rail.idle') : '') + '</div>';
-    modeEl.textContent = '';
-    modeEl.removeAttribute('data-mode');
-    setBusy(false);
-  }
-
-  function setBusy(v) {
-    busy = v;
-    Array.prototype.forEach.call(document.querySelectorAll('.lv-qbtn'), function (b) { b.disabled = v; });
-  }
-
-  function bubble(text, out) {
-    var d = document.createElement('div');
-    d.className = 'ig-msg ' + (out ? 'ig-msg--out' : 'ig-msg--in');
-    d.textContent = text;
-    chat.appendChild(d);
-    chat.scrollTop = chat.scrollHeight;
-    return d;
-  }
-
-  function typing() {
-    var d = document.createElement('div');
-    d.className = 'lv-typing';
-    d.innerHTML = '<i></i><i></i><i></i>';
-    chat.appendChild(d);
-    chat.scrollTop = chat.scrollHeight;
-    return d;
-  }
-
-  /* Pause scaled to message length — one tidy paragraph reads as a
-     machine no matter how good the words are. Capped so a live demo
-     never stalls. */
-  function delayFor(text) { return Math.min(360 + text.length * 22, 1700); }
-
-  function paintRail(steps, mode, ms) {
-    rail.innerHTML = '';
-    steps.forEach(function (s) {
-      var d = document.createElement('div');
-      d.className = 'lv-step' + (/SIN PRECIO|Sin dato|Sin inventario|Escalar|Sin coincidencia/.test(s) ? ' lv-step--flag' : '');
-      d.textContent = s;
-      rail.appendChild(d);
-    });
-    modeEl.setAttribute('data-mode', mode);
-    modeEl.textContent = (mode === 'api' ? 'Modelo · ' : 'Local · ') + ms + ' ms';
-  }
-
-  function say(bubbles, i) {
-    i = i || 0;
-    if (i >= bubbles.length) { setBusy(false); return; }
-    var t = typing();
-    setTimeout(function () {
-      t.remove();
-      bubble(bubbles[i], false);
-      history.push({ role: 'assistant', content: bubbles[i] });
-      say(bubbles, i + 1);
-    }, delayFor(bubbles[i]));
-  }
-
-  function ask(text) {
-    if (busy) return;
-    setBusy(true);
-    bubble(text, true);
-    history.push({ role: 'user', content: text });
-
-    // The local answer is computed FIRST and unconditionally. Everything
-    // after this point can only improve on it, never block it.
-    var localAns = LeyvaDemo.local(text);
-    var forced = document.getElementById('lvOffline').checked;
-    var t0 = Date.now();
-
-    if (forced || !navigator.onLine) {
-      paintRail(localAns.rail, 'local', Date.now() - t0);
-      say(localAns.bubbles);
-      return;
-    }
-
-    LeyvaDemo.callApi(history.filter(function (m) { return m.role === 'user' || m.role === 'assistant'; }))
-      .then(function (res) {
-        var ms = Date.now() - t0;
-        if (res && res.bubbles) {
-          paintRail(localAns.rail, 'api', ms);
-          say(res.bubbles);
-        } else {
-          // Timeout, error, missing key, bad shape — all land here, silently.
-          paintRail(localAns.rail, 'local', ms);
-          say(localAns.bubbles);
-        }
-      });
-  }
-
-  document.addEventListener('DOMContentLoaded', gate);
-})();
-</script>
+<script src="js/leyva-chat.js"></script>
 </body>
 </html>

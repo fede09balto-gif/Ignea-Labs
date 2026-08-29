@@ -765,6 +765,21 @@ of the day. Re-open this only once real session data exists to size the ceiling 
 
 ## 3. STANDING RULES
 
+- **THE UNVERIFIED BANNER IS HIDDEN IN KIOSK MODE. Deliberate, and Fede's
+  explicit call — do not "fix" it.** The banner stays in operator mode and
+  disappears the moment kiosk mode is on. This is a conscious exception to the
+  honesty rule, made with the reasoning stated: the person holding the phone is
+  being told verbally what he is looking at, and the operator keeps the banner
+  on his own screen throughout. A red "CATÁLOGO SIN VERIFICAR" bar inside a
+  WhatsApp mockup destroys the illusion at the exact moment the demo is
+  supposed to land, and it protects nobody who is not already being told.
+
+  The honesty that matters here is enforced structurally elsewhere and is NOT
+  weakened by this: the assistant still cannot state a stock number, a delivery
+  cost, or a price it does not have. Hiding a banner from someone who has been
+  told out loud is a presentation decision; letting the model invent a figure
+  would be a lie. Only the first one is on the table.
+
 - **TWO credentials now, with different blast radii. Check the `scope`.**
   `/api/ops-auth` returns `{ok:true, scope:'ops'|'demo'}`.
 

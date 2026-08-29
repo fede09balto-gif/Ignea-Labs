@@ -1114,6 +1114,7 @@ var IgneaI18n = (function() {
       "leyva.rail.title": "Qué está consultando",
       "leyva.rail.idle": "Toque una pregunta para ver qué revisa el asistente antes de contestar.",
       "leyva.script": "Guion",
+      "leyva.kiosk": "Pantalla completa",
 
       // ---- OPS: SECTION TAGS ----
       "ops.calc.tag": "// Calculadora de propuesta",
@@ -2284,6 +2285,7 @@ var IgneaI18n = (function() {
       "leyva.rail.title": "What it is checking",
       "leyva.rail.idle": "Tap a question to see what the assistant checks before answering.",
       "leyva.script": "Script",
+      "leyva.kiosk": "Fullscreen",
 
       // ---- OPS: SECTION TAGS ----
       "ops.calc.tag": "// Proposal calculator",
