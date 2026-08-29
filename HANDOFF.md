@@ -765,6 +765,29 @@ of the day. Re-open this only once real session data exists to size the ceiling 
 
 ## 3. STANDING RULES
 
+- **CUSTOMER DATA: two standing decisions, adopted by Fede, not up for
+  reinterpretation.**
+
+  1. **The client owns their customer data; we are a processor.** We do not say
+     "es de ustedes" to any prospect until **written processing terms exist**
+     naming purpose, retention, no-secondary-use (including no training and no
+     reuse for another client), sub-processor disclosure (Anthropic and Meta
+     both process it), deletion/export on demand with a stated turnaround, and
+     breach notification. Saying it before those terms exist is a promise with
+     nothing behind it.
+  2. **No compliance claim until counsel confirms.** Nicaragua has a specific
+     regime — **Ley No. 787** (in force 2012-03-29) with **Decreto 36-2012** as
+     its reglamento and **DIPRODAP** as the authority; it carries consent, duty
+     to inform, and ARCO rights. What is **NOT verified** is DIPRODAP's current
+     database-registration and enforcement posture. Until a Nicaraguan lawyer
+     confirms it, the sales line describes **what the system does** (data stays
+     theirs, exportable, deletable) and never asserts "cumplimos con la ley de
+     datos".
+
+  The reason this is a standing rule and not a note: a leaked customer list in
+  León is not a fine, it is the end of the referral market — which at this
+  firm's size is the whole market.
+
 - **THE UNVERIFIED BANNER IS HIDDEN IN KIOSK MODE. Deliberate, and Fede's
   explicit call — do not "fix" it.** The banner stays in operator mode and
   disappears the moment kiosk mode is on. This is a conscious exception to the

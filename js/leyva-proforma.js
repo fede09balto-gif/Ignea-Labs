@@ -91,7 +91,15 @@ var LeyvaProforma = (function () {
 
   function correlativo(seq) { return 'PRO-' + String(seq).padStart(4, '0'); }
 
-  function build(order, seq) {
+  /* profile: {nombre, razon_social, ruc, direccion} — ANY field may be null.
+     Taken as a parameter from day one so customer memory later populates an
+     input that already exists rather than forcing a rewrite of this file.
+
+     NULL-GUARD EXTENSION (Fede's rule): a field we do not have produces NO
+     LINE. Never a blank, never a placeholder, never "N/A". A proforma with
+     an empty RUC line is worse than one with no RUC line, because the empty
+     one looks like a system that lost the data. */
+  function build(order, seq, profile) {
     var jsPDF = window.jspdf ? window.jspdf.jsPDF : null;
     if (!jsPDF) return null;
     var d = new jsPDF({ unit: 'mm', format: 'a4' });
@@ -109,12 +117,30 @@ var LeyvaProforma = (function () {
     var num_ = correlativo(seq);
     var hoy = new Date();
     var fmt = function (x) { return String(x.getDate()).padStart(2, '0') + '/' + String(x.getMonth() + 1).padStart(2, '0') + '/' + x.getFullYear(); };
-    var venc = new Date(hoy.getTime() + 8 * 86400000);
+    // NO validity line. We do not know their policy, and 8 days was a
+    // number carried over from the /probalo sample catalog — i.e. invented
+    // for a fictional store. Omitting it makes it a question the operator
+    // asks in the room, which beats printing someone else's number.
     d.text(num_, R, 25.5, { align: 'right' });
     d.text('Fecha: ' + fmt(hoy), R, 30.5, { align: 'right' });
-    d.text('Válida hasta: ' + fmt(venc), R, 35.5, { align: 'right' });
 
-    y = 46;
+    y = 44;
+    var pf = profile || {};
+    var who = [];
+    if (pf.nombre) who.push(['Cliente:', pf.nombre]);
+    if (pf.razon_social) who.push(['Razón social:', pf.razon_social]);
+    if (pf.ruc) who.push(['RUC:', pf.ruc]);
+    if (pf.direccion) who.push(['Dirección:', pf.direccion]);
+    if (who.length) {
+      d.setFontSize(8.5); d.setTextColor(90);
+      who.forEach(function (row) {
+        d.setFont('helvetica', 'normal'); d.text(row[0], L, y);
+        d.setFont('helvetica', 'bold'); d.setTextColor(0); d.text(String(row[1]), L + 26, y);
+        d.setTextColor(90); y += 4.6;
+      });
+      d.setTextColor(0); y += 2;
+    }
+
     d.setDrawColor(200); d.line(L, y, R, y); y += 6;
     d.setFont('helvetica', 'bold'); d.setFontSize(8.5);
     d.text('CANT.', L, y); d.text('DESCRIPCIÓN', L + 16, y);
@@ -138,13 +164,12 @@ var LeyvaProforma = (function () {
     y += 14;
     d.setFont('helvetica', 'normal'); d.setFontSize(7.5); d.setTextColor(110);
     // Deliberately says what the figure IS, and makes no tax claim either way.
-    d.text('Precios en córdobas, según catálogo vigente. Proforma no es factura.', L, y);
-    y += 4; d.text('Confirme disponibilidad y condiciones de entrega con el mostrador.', L, y);
+    d.text('Precios según publicación de Ferretería Roberto Leyva. Confirme con el mostrador.', L, y);
 
     return d;
   }
 
-  var seq = 1041;
+  var seq = 2480;   // first issued is PRO-2481 (Fede's format)
   function next() { return ++seq; }
 
   return {
