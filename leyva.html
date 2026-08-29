@@ -139,6 +139,7 @@
           <span data-i18n="leyva.offline">Modo sin conexión</span>
         </label>
         <button class="lv-reset" id="lvReset" data-i18n-btn="leyva.reset">Reiniciar</button>
+        <a class="lv-reset" href="/leyva-script" style="text-decoration:none;display:inline-flex;align-items:center" data-i18n="leyva.script">Guion</a>
       </div>
 
       <div class="lv-rail" style="margin-top:18px">
@@ -169,7 +170,12 @@
     { k: 'Sin precio en sistema', q: '¿Manejan taladro de impacto Caterpillar?' },
     { k: 'Sin dato de existencia', q: '¿Cuántas láminas de gypsum tienen?' },
     { k: 'Cotización',          q: 'Me arma una cotización de 10 láminas y 2 puertas' },
-    { k: 'Fuera de catálogo',   q: '¿Tienen cemento Canal?' }
+    { k: 'Fuera de catálogo',   q: '¿Tienen cemento Canal?' },
+    // Deliberate seventh: "do you have cement" is the single most likely
+    // question at a hardware counter, and it is the one the catalog cannot
+    // answer. Steering around it made it a landmine; with the same-category
+    // substitution rule in the prompt it becomes another honesty beat.
+    { k: 'Producto que no manejan', q: '¿Tienen cemento?' }
   ];
 
   var chat, rail, modeEl, busy = false, history = [];

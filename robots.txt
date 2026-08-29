@@ -5,4 +5,6 @@ Disallow: /results.html
 
 Sitemap: https://www.ignealabs.com/sitemap.xml
 Disallow: /leyva
+Disallow: /leyva-script
+Disallow: /leyva-script.html
 Disallow: /leyva.html

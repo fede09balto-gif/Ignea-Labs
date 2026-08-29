@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Guion de demo — Ferretería Roberto Leyva</title>
+
+<!-- ============================================================
+     Operating script for Luis Velázquez, read on a phone, one
+     handed, in the room. Same IGNEA_OPS_TOKEN gate as leyva.html.
+
+     Written in Spanish throughout because the reader is Nicaraguan
+     and presenting in Spanish — the same reasoning as the
+     conversation-language exception recorded in HANDOFF.md. This
+     is an operational document for one named person, not site
+     chrome, so it is not i18n'd.
+
+     Design constraints, deliberately: 17px base, generous line
+     height, one column, no element under 48px, nothing that needs
+     two hands or a second glance. He is holding a phone in front
+     of a buyer.
+     ============================================================ -->
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/shared.css">
+<style>
+.sc{max-width:640px;margin:0 auto;padding:20px 18px 90px;font-size:17px;line-height:1.62}
+.sc h1{font-size:23px;line-height:1.25;margin:0 0 4px}
+.sc .sc-sub{font-family:var(--fm);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:22px}
+
+.sc-pre{border:1px solid var(--red);background:var(--red-wash);padding:15px 16px;margin-bottom:26px;border-radius:0}
+.sc-pre h2{font-family:var(--fm);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin:0 0 10px}
+.sc-pre ol{margin:0;padding-left:20px}
+.sc-pre li{margin-bottom:9px}
+.sc-pre li:last-child{margin-bottom:0}
+
+.sc-beat{border-top:1px solid var(--line);padding:22px 0 4px}
+.sc-beat__n{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.sc-beat__i{font-family:var(--fm);font-size:12px;letter-spacing:.1em;color:var(--red);flex-shrink:0}
+.sc-beat__t{font-size:19px;font-weight:500;line-height:1.3}
+.sc-beat__s{font-family:var(--fm);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-left:auto;flex-shrink:0}
+
+.sc-tap{display:block;border:1px solid var(--ink);border-radius:8px;padding:13px 15px;margin:12px 0;font-size:16px;min-height:48px}
+.sc-tap b{font-family:var(--fm);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:4px}
+
+.sc-say{border-left:3px solid var(--red);padding:4px 0 4px 14px;margin:12px 0;font-style:italic;color:var(--ink)}
+.sc-say b{font-style:normal;font-family:var(--fm);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:5px}
+
+.sc-exp{background:var(--bg-tint);padding:12px 14px;margin:12px 0;font-size:15.5px;color:var(--ink-2)}
+.sc-exp b{font-family:var(--fm);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:5px}
+
+.sc-qa{border-top:1px solid var(--line);margin-top:30px;padding-top:22px}
+.sc-qa h2{font-size:19px;margin:0 0 6px}
+.sc-qa__lead{color:var(--ink-2);font-size:15.5px;margin-bottom:18px}
+.sc-q{border:1px solid var(--line);padding:14px 15px;margin-bottom:12px}
+.sc-q__q{font-weight:500;margin-bottom:8px}
+.sc-q__a{color:var(--ink-2);font-size:16px}
+.sc-q__a em{color:var(--ink);font-style:italic}
+.sc-q--key{border-color:var(--red)}
+.sc-q--key .sc-q__q{color:var(--red)}
+
+.sc-end{border-top:1px solid var(--line);margin-top:30px;padding-top:20px;font-size:15.5px;color:var(--ink-2)}
+.sc-back{display:inline-block;min-height:48px;line-height:48px;padding:0 20px;border:1px solid var(--line);border-radius:8px;text-decoration:none;color:var(--ink);font-size:15px;margin-top:16px}
+
+.lv-gate{max-width:380px;margin:16vh auto;text-align:center;padding:0 20px}
+.lv-gate input{width:100%;min-height:48px;padding:0 14px;border:1px solid var(--line);border-radius:8px;font-family:var(--fm);font-size:15px;text-align:center;letter-spacing:.1em}
+.lv-gate input:focus{border-color:var(--ink);outline:none}
+.lv-gate__t{font-family:var(--fm);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:16px}
+.lv-gate__msg{font-family:var(--fm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-top:12px;min-height:16px}
+</style>
+</head>
+<body>
+
+<div class="lv-gate" id="lvGate">
+  <div class="lv-gate__t">Guion privado — acceso restringido</div>
+  <input type="password" id="lvToken" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Token">
+  <div class="lv-gate__msg" id="lvGateMsg"></div>
+</div>
+
+<div class="sc" id="lvApp" style="display:none">
+
+  <h1>Guion de demo</h1>
+  <div class="sc-sub">Ferretería Roberto Leyva · 2 minutos · 4 momentos</div>
+
+  <div class="sc-pre">
+    <h2>Antes de entrar</h2>
+    <ol>
+      <li>Abra la página del demo y espere a que cargue completa.</li>
+      <li>Toque cualquier pregunta una vez para probar. Mire el panel de la derecha: si dice <b>Modelo</b>, hay señal. Si dice <b>Local</b>, no hay.</li>
+      <li>Si el wifi de la tienda es malo o no está seguro, active <b>Modo sin conexión</b> antes de entrar. Funciona igual de bien y nadie lo nota.</li>
+      <li>Toque <b>Reiniciar</b> para dejar la conversación limpia.</li>
+      <li>Suba el brillo de la pantalla al máximo.</li>
+    </ol>
+  </div>
+
+  <div class="sc-beat">
+    <div class="sc-beat__n">
+      <span class="sc-beat__i">01</span>
+      <span class="sc-beat__t">Que reconozca sus propios precios</span>
+      <span class="sc-beat__s">25 s</span>
+    </div>
+    <span class="sc-tap"><b>Toque</b>Precio en promoción</span>
+    <div class="sc-say"><b>Mientras escribe</b>Esto está leyendo el catálogo de ustedes. La promoción de patrias, la que publicaron.</div>
+    <div class="sc-exp"><b>Qué va a salir</b>El precio de la lámina de gypsum en C$370, y que antes andaba en C$400.</div>
+    <div class="sc-say"><b>Cuando salga el precio</b>Ese es su precio. No es uno inventado ni sacado de internet.</div>
+  </div>
+
+  <div class="sc-beat">
+    <div class="sc-beat__n">
+      <span class="sc-beat__i">02</span>
+      <span class="sc-beat__t">Que no invente lo que no sabe</span>
+      <span class="sc-beat__s">35 s</span>
+    </div>
+    <span class="sc-tap"><b>Toque</b>Sin precio en sistema</span>
+    <div class="sc-say"><b>Mientras escribe</b>Aquí está lo importante.</div>
+    <div class="sc-exp"><b>Qué va a salir</b>Nombra el taladro Caterpillar con sus especificaciones reales, dice que no tiene el precio, y ofrece confirmarlo con el mostrador.</div>
+    <div class="sc-say"><b>Después</b>No tenemos el precio de esa herramienta, entonces no se lo inventa. Le da las especificaciones que sí son ciertas y le pasa la consulta a ustedes. Un sistema que adivina precios le crea un problema con el cliente; este se lo devuelve al mostrador.</div>
+    <div class="sc-exp"><b>Señale</b>El panel de la derecha, donde dice <b>SIN PRECIO EN SISTEMA</b> en rojo.</div>
+  </div>
+
+  <div class="sc-beat">
+    <div class="sc-beat__n">
+      <span class="sc-beat__i">03</span>
+      <span class="sc-beat__t">Que reconozca sus límites</span>
+      <span class="sc-beat__s">25 s</span>
+    </div>
+    <span class="sc-tap"><b>Toque</b>Sin dato de existencia</span>
+    <div class="sc-exp"><b>Qué va a salir</b>Dice que confirma con el mostrador y pregunta cuántas ocupa. No da un número.</div>
+    <div class="sc-say"><b>Diga</b>Con inventario es igual. Hoy no está conectado al sistema de ustedes, entonces no promete nada. Cuando lo conectemos, esta pregunta la contesta solo.</div>
+  </div>
+
+  <div class="sc-beat">
+    <div class="sc-beat__n">
+      <span class="sc-beat__i">04</span>
+      <span class="sc-beat__t">Cierre: la proforma</span>
+      <span class="sc-beat__s">35 s</span>
+    </div>
+    <span class="sc-tap"><b>Toque</b>Cotización</span>
+    <div class="sc-exp"><b>Qué va a salir</b>Arma las líneas una por una con sus precios y da el total.</div>
+    <div class="sc-say"><b>Cuando termine</b>Eso le llegó al cliente en menos de un minuto. A las once de la noche, un domingo, sin que nadie del mostrador contestara.</div>
+    <div class="sc-exp"><b>Aquí</b>Entregue el teléfono. Déjelo escribir lo que quiera.</div>
+  </div>
+
+  <div class="sc-qa">
+    <h2>Si le preguntan</h2>
+    <p class="sc-qa__lead">Conteste corto y siga. Todas estas ya están resueltas — no improvise.</p>
+
+    <div class="sc-q sc-q--key">
+      <div class="sc-q__q">"Ese precio ya cambió" / "esa promoción ya se venció"</div>
+      <div class="sc-q__a">Es la respuesta más importante de la lista. No se disculpe ni lo tape.<br><em>"Correcto — esos son los precios de su publicación de agosto. Nosotros cargamos el catálogo tal cual nos lo dan. Ustedes lo actualizan y el asistente cambia con él, el mismo día."</em><br>Eso convierte el error en la demostración: el sistema refleja el catálogo que le den, ni más ni menos.</div>
+    </div>
+
+    <div class="sc-q">
+      <div class="sc-q__q">"¿Esto es un robot?"</div>
+      <div class="sc-q__a">Déjelo que le pregunte al asistente directamente. Contesta solo, y contesta bien: dice que es el asistente de la ferretería y sigue trabajando. No lo conteste usted.</div>
+    </div>
+
+    <div class="sc-q">
+      <div class="sc-q__q">"¿Y si el cliente pregunta algo que no está en el catálogo?"</div>
+      <div class="sc-q__a">Que lo pruebe. Toque <b>Producto que no manejan</b> o déjelo escribir. Dice que no lo maneja y ofrece pasar la consulta — nunca ofrece otra cosa por salir del paso.</div>
+    </div>
+
+    <div class="sc-q">
+      <div class="sc-q__q">"¿Esto contesta mi WhatsApp de verdad?"</div>
+      <div class="sc-q__a"><em>"Todavía no. Esto es el asistente funcionando con su catálogo. Conectarlo a su número es el siguiente paso y se hace con la conexión oficial de WhatsApp, que es la que no pone su número en riesgo."</em><br>No prometa fecha.</div>
+    </div>
+
+    <div class="sc-q">
+      <div class="sc-q__q">"¿Cuánto cuesta?"</div>
+      <div class="sc-q__a">No dé número en la reunión. <em>"Depende de qué tanto quiera conectar. Le mando la propuesta con el alcance ya definido."</em></div>
+    </div>
+
+    <div class="sc-q">
+      <div class="sc-q__q">Se cae el internet a media demo</div>
+      <div class="sc-q__a">No pasa nada y no se nota — sigue contestando. Si quiere estar seguro, active <b>Modo sin conexión</b> y siga como si nada. No lo mencione.</div>
+    </div>
+
+    <div class="sc-q">
+      <div class="sc-q__q">Contesta algo raro o fuera de lugar</div>
+      <div class="sc-q__a">Toque <b>Reiniciar</b> y vuelva a la pregunta anterior. No lo discuta con el asistente enfrente del cliente.</div>
+    </div>
+  </div>
+
+  <div class="sc-end">
+    <b>Lo único que no debe hacer:</b> prometer que el asistente sabe existencias, precios de las herramientas Caterpillar, o costo de entrega. Esos tres no los tenemos. Que el asistente los mande al mostrador es la función, no la falla.
+    <br>
+    <a class="sc-back" href="/leyva">&larr; Volver al demo</a>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+  function verify(token, silent) {
+    var msg = document.getElementById('lvGateMsg');
+    fetch('/api/ops-auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: token })
+    }).then(function (r) {
+      if (r.ok) {
+        sessionStorage.setItem('ignea_ops_token', token);
+        document.getElementById('lvGate').style.display = 'none';
+        document.getElementById('lvApp').style.display = '';
+      } else {
+        sessionStorage.removeItem('ignea_ops_token');
+        if (!silent) msg.textContent = 'acceso denegado';
+        var i = document.getElementById('lvToken');
+        if (i) { i.value = ''; i.focus(); }
+      }
+    }).catch(function () { if (!silent) msg.textContent = 'no se pudo verificar'; });
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var saved = sessionStorage.getItem('ignea_ops_token');
+    if (saved) { verify(saved, true); return; }
+    var input = document.getElementById('lvToken');
+    input.focus();
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && input.value) verify(input.value, false);
+    });
+  });
+})();
+</script>
+</body>
+</html>

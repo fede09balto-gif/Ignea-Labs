@@ -87,11 +87,26 @@ gypsum tienen?" fell through the stock branch into the price branch and answered
 quantifier; in real Spanish the product sits between them. Fixed and covered both
 directions (stock questions escalate, price questions still quote).
 
-**Known rough edge, not fixed:** asked for an off-catalog item (cemento Canal) the model
-offered Bondex Plus as "algo similar". Bondex is a tile adhesive, not cement — a poor
-substitution. It invents no price and breaks no rule, but it is a weak moment if Luis
-Herrera happens to ask for cement. Consider a prompt line restricting substitutions to
-the same category.
+**Cross-category substitution — found, then fixed in the prompt.** The model initially
+offered Bondex Plus (a tile adhesive) when asked for cement. It invented no price and
+broke no rule, but it reads as not knowing what the store sells. Fixed with a
+same-category-only substitution rule rather than by steering the operator away from the
+button — "¿tienen cemento?" is the single most likely question at a hardware counter and
+the buyer can ask it regardless of which button gets pressed. Verified live against
+cemento / arena / bloque / clavos / pintura: **all five escalate, zero substitutions.**
+The rule cost **250 tokens** (2,513 → 2,763), about $0.00005 per cached turn. The
+offline responder never substituted and needed no change.
+
+`¿Tienen cemento?` is now a deliberate **seventh** suggested question labelled "Producto
+que no manejan" — the path went from a landmine to a demonstration.
+
+**`leyva-script.html`** — the operating script for Luis Velázquez, same token gate,
+Spanish throughout (operational doc for one named person, not site chrome, so not
+i18n'd). Pre-flight checklist, four beats with what to tap / what to expect / what to
+say while it types, and a "si le preguntan" section. The load-bearing entry there is the
+price-staleness recovery: if a promo has expired, the answer is that these are the
+prices from their own August post and the assistant reflects whatever catalog it is
+given — which turns the stalest risk in the demo into the pitch.
 
 **BLOCKING before this is shown to the client:** every price is transcribed from
 screenshots of the business's own Facebook posts, with `source_url: null` and
