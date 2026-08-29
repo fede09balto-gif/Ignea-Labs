@@ -54,7 +54,21 @@ var OpsAuth = (function() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: value })
     }).then(function(res) {
+      // The demo credential (scope 'demo') must NOT open the back office.
+      // /api/ops-auth now returns a scope; anything but 'ops' is a denial
+      // here, treated exactly like a wrong token.
       if (res.ok) {
+        return res.json().then(function(data) {
+          if (!data || data.scope !== 'ops') { handleFailedAttempt(); return null; }
+          return data;
+        });
+      }
+      return res.status === 401 ? Promise.resolve(false) : Promise.resolve(undefined);
+    }).then(function(ok) {
+      if (ok === null) return;
+      if (ok === false) { handleFailedAttempt(); return; }
+      if (ok === undefined) { showNetworkError(); return; }
+      {
         var userData = {
           id: 'operator',
           name: 'Operador',
@@ -65,10 +79,6 @@ var OpsAuth = (function() {
         sessionStorage.setItem('ignea_ops_token', value);
         sessionStorage.setItem('ignea_ops_user', JSON.stringify(userData));
         showDashboard(userData);
-      } else if (res.status === 401) {
-        handleFailedAttempt();
-      } else {
-        showNetworkError();
       }
     }).catch(function() {
       // The verification endpoint is unreachable — fail closed rather than

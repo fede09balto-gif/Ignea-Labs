@@ -169,14 +169,35 @@ export default async function handler(req, res) {
     return res.status(429).json({ error: 'too many requests' });
   }
 
+  /* Two credentials, two capabilities — see api/ops-auth.js for the scopes.
+
+       ops  -> anything, including a client-supplied `system` prompt.
+       demo -> PRESET REQUESTS ONLY. A demo token cannot send its own system
+               prompt, so the worst a leaked demo credential can do is run the
+               catalog-grounded Leyva assistant. It cannot turn this endpoint
+               into a general-purpose model proxy on our Anthropic bill.
+
+     IGNEA_DEMO_TOKEN is optional; unset means only the ops token works and
+     behaviour is exactly as before. */
   var configuredToken = process.env.IGNEA_OPS_TOKEN;
+  var demoToken = process.env.IGNEA_DEMO_TOKEN;
   var suppliedToken = req.headers['x-ignea-ops-token'];
 
   if (!configuredToken) {
     return res.status(500).json({ error: 'server not configured' });
   }
-  if (!suppliedToken || !safeEqual(suppliedToken, configuredToken)) {
+
+  var authScope = null;
+  if (suppliedToken && safeEqual(suppliedToken, configuredToken)) authScope = 'ops';
+  else if (suppliedToken && demoToken && safeEqual(suppliedToken, demoToken)) authScope = 'demo';
+
+  if (!authScope) {
     return res.status(401).json({ error: 'unauthorized' });
+  }
+
+  var wantsPreset = req.body && req.body.preset !== undefined && req.body.preset !== null;
+  if (authScope === 'demo' && !wantsPreset) {
+    return res.status(403).json({ error: 'forbidden' });
   }
 
   if (!originOk(req)) {

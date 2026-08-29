@@ -68,13 +68,35 @@ export default async function handler(req, res) {
     return res.status(429).json({ error: 'too many requests' });
   }
 
-  var configuredToken = process.env.IGNEA_OPS_TOKEN;
-  if (!configuredToken) {
+  /* TWO credentials, TWO scopes.
+
+     IGNEA_OPS_TOKEN  -> scope 'ops'.  Full back office: /ops, the leads
+                         dashboard, and free-form prompts to /api/claude.
+     IGNEA_DEMO_TOKEN -> scope 'demo'. The Leyva sales demo pages ONLY, and
+                         on /api/claude only preset requests — it cannot send
+                         a system prompt of its own.
+
+     The demo token exists so the person running a demo in a client's shop
+     does not have to be handed the keys to the lead pipeline. Callers MUST
+     check the returned `scope`; js/ops-auth.js rejects anything but 'ops'.
+     IGNEA_DEMO_TOKEN is optional — unset simply means no demo credential
+     exists, and nothing else changes. */
+  var opsToken = process.env.IGNEA_OPS_TOKEN;
+  var demoToken = process.env.IGNEA_DEMO_TOKEN;
+  if (!opsToken) {
     return res.status(500).json({ error: 'server not configured' });
   }
 
   var supplied = (req.body && req.body.token) || '';
-  if (!supplied || !safeEqual(supplied, configuredToken)) {
+  if (!supplied) {
+    return res.status(401).json({ error: 'unauthorized' });
+  }
+
+  var scope = null;
+  if (safeEqual(supplied, opsToken)) scope = 'ops';
+  else if (demoToken && safeEqual(supplied, demoToken)) scope = 'demo';
+
+  if (!scope) {
     return res.status(401).json({ error: 'unauthorized' });
   }
 
@@ -82,5 +104,5 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'forbidden' });
   }
 
-  return res.status(200).json({ ok: true });
+  return res.status(200).json({ ok: true, scope: scope });
 }

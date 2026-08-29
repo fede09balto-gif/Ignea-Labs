@@ -765,6 +765,30 @@ of the day. Re-open this only once real session data exists to size the ceiling 
 
 ## 3. STANDING RULES
 
+- **TWO credentials now, with different blast radii. Check the `scope`.**
+  `/api/ops-auth` returns `{ok:true, scope:'ops'|'demo'}`.
+
+  | Credential | Opens | Cannot |
+  |---|---|---|
+  | `IGNEA_OPS_TOKEN` | everything — `/ops`, leads, free-form `/api/claude` | — |
+  | `IGNEA_DEMO_TOKEN` | `/leyva`, `/leyva-script`, and `/api/claude` **preset requests only** | `/ops`; sending its own `system` prompt (403) |
+
+  The demo credential exists so whoever runs a demo in a client's shop is not
+  handed the lead pipeline. **Any new caller of `/api/ops-auth` MUST check
+  `scope`** — a `200` alone no longer means back-office access.
+  `IGNEA_DEMO_TOKEN` is optional: unset, behaviour is exactly as before.
+
+  Because a demo token cannot supply a `system` prompt, the worst a leaked one
+  does is run the Leyva assistant on our Anthropic bill, rate-limited by the
+  existing per-IP/per-token caps. It cannot become a general model proxy.
+
+  **The demo value is weak on purpose (Fede's call) and that is only safe while
+  the pages are unreachable.** `robots.txt` carries `Disallow: /leyva`, which
+  *publishes* the path to anyone who reads the file. Today the pages exist only
+  on an SSO-walled preview, so this is fine. **Before any of this reaches
+  production, either set a strong `IGNEA_DEMO_TOKEN` or drop the robots lines
+  and rely on the `noindex` meta.** Do not merge the current pairing to prod.
+
 - **WHATSAPP CONNECTION — STANDING DECISION, do not relitigate.** When we connect a
   client's WhatsApp, it is the **official Meta Cloud API only**, priced into the
   engagement from day one. Unofficial Baileys-based stacks (Evolution API, WAHA, and
