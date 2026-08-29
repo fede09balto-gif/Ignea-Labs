@@ -206,7 +206,14 @@
         document.getElementById('lvApp').style.display = '';
       } else {
         sessionStorage.removeItem('ignea_ops_token');
-        if (!silent) msg.textContent = 'acceso denegado';
+        // 401 and 403 are very different failures and used to look identical.
+        // 403 means the origin allowlist rejected this hostname — the password
+        // is fine and retyping it will never help. Cost a round trip once.
+        if (!silent) {
+          msg.textContent = r.status === 403
+            ? 'origen no permitido — avise a Fede'
+            : 'acceso denegado';
+        }
         var i = document.getElementById('lvToken');
         if (i) { i.value = ''; i.focus(); }
       }
