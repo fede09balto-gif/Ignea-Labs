@@ -37,7 +37,7 @@ var LeyvaProforma = (function () {
   function money(n) { return 'C$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
   /* Every price the client is allowed to put on a document. Mirrors the
-     priced half of data/leyva-catalog.json — null-priced items are absent
+     priced half of api/_data/leyva-catalog.json — null-priced items are absent
      by construction, so they cannot be verified and therefore cannot
      appear on a line. */
   function catalogPrices() {

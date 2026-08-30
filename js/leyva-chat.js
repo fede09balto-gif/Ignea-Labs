@@ -272,6 +272,13 @@
     input.value = '';
     input.style.height = 'auto';
 
+    /* "escribiendo..." starts the moment the message is sent, not when the
+       reply comes back. The model call can take up to 4s, and for all of it
+       the header used to read "en línea" with nothing happening — which in
+       front of a buyer reads as the message not having gone through. Real
+       WhatsApp shows the indicator while the other side is thinking. */
+    setStatus('escribiendo...');
+
     // Local answer computed FIRST, unconditionally — unchanged contract.
     var localAns = LeyvaDemo.local(text);
     var forced = document.getElementById('lvOffline') && document.getElementById('lvOffline').checked;

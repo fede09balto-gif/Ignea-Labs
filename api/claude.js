@@ -1,5 +1,16 @@
 import crypto from 'crypto';
-import leyvaCatalog from '../data/leyva-catalog.json' with { type: 'json' };
+/* Lives under api/_data/, NOT data/.
+
+   Vercel serves the repo root as static files, so at data/leyva-catalog.json
+   this was a public download: every price, plus the _README stating the whole
+   catalog is unsourced, fetchable by anyone with the demo's URL. The entire
+   point of building the system prompt server-side is that the browser never
+   receives the catalog — and a static file quietly handed it over anyway.
+   Found by fetching it over the live preview once SSO came off.
+
+   Files under api/ whose name starts with `_` are excluded from function
+   builds and are not served as static assets. */
+import leyvaCatalog from './_data/leyva-catalog.json' with { type: 'json' };
 
 var ALLOWED_MODEL = 'claude-sonnet-5';
 var MAX_TOKENS_CAP = 4096;
@@ -113,7 +124,7 @@ function buildLeyvaSystem() {
      · orders expressed as {sku, qty} and nothing else.
 
    And the client cannot inject a PRICE either. A stored line names a
-   SKU; the SKU is looked up HERE, in data/leyva-catalog.json. An
+   SKU; the SKU is looked up HERE, in api/_data/leyva-catalog.json. An
    unknown SKU, or one with precio: null, is DROPPED. Every name, unit
    price and total in the rendered block comes from the catalog. There
    is no field in the wire format into which a number could be placed.

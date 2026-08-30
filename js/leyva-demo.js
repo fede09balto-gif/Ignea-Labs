@@ -35,11 +35,11 @@ var LeyvaDemo = (function () {
   var MAX_TOKENS = 200;        // counter replies are short
 
   /* ---- offline data ------------------------------------------------
-     A deliberate subset of data/leyva-catalog.json: priced items only.
+     A deliberate subset of api/_data/leyva-catalog.json: priced items only.
      Kept small on purpose — this is the "it must answer with no
      network" set, not a mirror of the catalog. Null-priced items are
      absent by design, never with a placeholder. */
-  /* `sku` is the join back to data/leyva-catalog.json. Customer memory stores
+  /* `sku` is the join back to api/_data/leyva-catalog.json. Customer memory stores
      an order as {sku, qty} and NOTHING ELSE, so every price on a remembered
      order is resolved through this table at read time. That is what makes a
      stored order incapable of carrying a stale price. Keep these in sync with
