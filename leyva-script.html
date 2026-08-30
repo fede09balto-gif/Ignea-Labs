@@ -29,6 +29,17 @@
 .sc h1{font-size:23px;line-height:1.25;margin:0 0 4px}
 .sc .sc-sub{font-family:var(--fm);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:22px}
 
+.sc-acc{border:1px solid var(--line);background:var(--bg-tint);padding:15px 16px;margin-bottom:20px}
+.sc-acc h2{font-family:var(--fm);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0 0 10px}
+.sc-acc dl{margin:0}
+.sc-acc dt{font-family:var(--fm);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-top:11px}
+.sc-acc dt:first-child{margin-top:0}
+.sc-acc dd{margin:3px 0 0;font-size:16px;line-height:1.45;word-break:break-all}
+.sc-acc code{font-family:var(--fm);font-size:14px;background:var(--bg);border:1px solid var(--line);padding:2px 5px}
+
+.sc-plain{border-left:3px solid var(--ink);padding:6px 0 6px 15px;margin:16px 0;font-size:16px;line-height:1.55}
+.sc-plain b{font-family:var(--fm);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:6px}
+
 .sc-pre{border:1px solid var(--red);background:var(--red-wash);padding:15px 16px;margin-bottom:26px;border-radius:0}
 .sc-pre h2{font-family:var(--fm);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin:0 0 10px}
 .sc-pre ol{margin:0;padding-left:20px}
@@ -81,18 +92,33 @@
 <div class="sc" id="lvApp" style="display:none">
 
   <h1>Guion de demo</h1>
-  <div class="sc-sub">Ferretería Roberto Leyva · 2 minutos · 4 momentos</div>
+  <div class="sc-sub">Ferretería Roberto Leyva · 3 minutos · 5 momentos</div>
+
+  <div class="sc-acc">
+    <h2>Acceso</h2>
+    <dl>
+      <dt>Dirección</dt>
+      <dd id="scUrl">—</dd>
+      <dt>Clave</dt>
+      <dd>La que le pasó Fede por aparte. No está escrita aquí ni en ningún otro lado de esta página.</dd>
+      <dt>Guarde el acceso</dt>
+      <dd>Ábralo <b>antes</b> de salir de su casa o de la oficina, con buena señal. La clave queda guardada en el navegador mientras no lo cierre.</dd>
+      <dt>En iPhone</dt>
+      <dd>Compartir → <b>Agregar a pantalla de inicio</b>. Ábralo desde ese ícono: así abre sin la barra de Safari.</dd>
+    </dl>
+  </div>
 
   <div class="sc-pre">
     <h2>Antes de entrar</h2>
     <ol>
-      <li>Abra la página del demo y espere a que cargue completa.</li>
-      <li>Toque cualquier pregunta una vez para probar. Mire el panel de la derecha: si dice <b>Modelo</b>, hay señal. Si dice <b>Local</b>, no hay.</li>
-      <li>Si el wifi de la tienda es malo o no está seguro, active <b>Modo sin conexión</b> antes de entrar. Funciona igual de bien y nadie lo nota.</li>
+      <li>Abra la página y espere a que cargue completa.</li>
+      <li>Toque cualquier pregunta una vez para probar. Mire el panel de la derecha (o de abajo, en el teléfono): si dice <b>Modelo</b>, hay señal. Si dice <b>Local</b>, no hay. Si dice <b>Determinista</b>, es una respuesta que nunca pasa por el modelo — eso es normal y es a propósito.</li>
+      <li><b>Confirme que diga «Modelo» antes de entrar.</b> Si dice «Local» sin que usted haya activado nada, es que la señal está mala. No es un problema, pero conviene saberlo antes que enfrente del cliente.</li>
+      <li>Si el wifi de la tienda es malo o no está seguro, active <b>Modo sin conexión</b> antes de entrar. Contesta igual de bien, más rápido, y nadie lo nota. Actívelo también si prefiere no depender de nada.</li>
+      <li>Ponga el interruptor de memoria en <b>Cliente nuevo</b> o en <b>Cliente que vuelve</b> según el momento que vaya a mostrar (ver el momento 04).</li>
       <li>Toque <b>Reiniciar</b> para dejar la conversación limpia.</li>
       <li>Suba el brillo de la pantalla al máximo.</li>
-      <li><b>Pantalla completa:</b> toque <b>Pantalla completa</b> antes de entregar el teléfono. Para salir, <b>toque tres veces la esquina superior izquierda</b> — no hay botón visible, a propósito.</li>
-      <li><b>En iPhone:</b> la barra de Safari no se puede quitar desde la página. Agregue el sitio a la pantalla de inicio y ábralo desde ese ícono; así abre sin barra.</li>
+      <li><b>Pantalla completa:</b> tóquela antes de entregar el teléfono. Para salir, <b>toque tres veces la esquina superior izquierda</b> — no hay botón visible, a propósito.</li>
     </ol>
   </div>
 
@@ -102,7 +128,7 @@
       <span class="sc-beat__t">Que reconozca sus propios precios</span>
       <span class="sc-beat__s">25 s</span>
     </div>
-    <span class="sc-tap"><b>Toque</b>Precio en promoción</span>
+    <span class="sc-tap"><b>Toque</b>¿A cómo está la lámina de gypsum?</span>
     <div class="sc-say"><b>Mientras escribe</b>Esto está leyendo el catálogo de ustedes. La promoción de patrias, la que publicaron.</div>
     <div class="sc-exp"><b>Qué va a salir</b>El precio de la lámina de gypsum en C$370, y que antes andaba en C$400.</div>
     <div class="sc-say"><b>Cuando salga el precio</b>Ese es su precio. No es uno inventado ni sacado de internet.</div>
@@ -114,11 +140,11 @@
       <span class="sc-beat__t">Que no invente lo que no sabe</span>
       <span class="sc-beat__s">35 s</span>
     </div>
-    <span class="sc-tap"><b>Toque</b>Sin precio en sistema</span>
+    <span class="sc-tap"><b>Toque</b>¿Manejan taladro Caterpillar?</span>
     <div class="sc-say"><b>Mientras escribe</b>Aquí está lo importante.</div>
     <div class="sc-exp"><b>Qué va a salir</b>Nombra el taladro Caterpillar con sus especificaciones reales, dice que no tiene el precio, y ofrece confirmarlo con el mostrador.</div>
     <div class="sc-say"><b>Después</b>No tenemos el precio de esa herramienta, entonces no se lo inventa. Le da las especificaciones que sí son ciertas y le pasa la consulta a ustedes. Un sistema que adivina precios le crea un problema con el cliente; este se lo devuelve al mostrador.</div>
-    <div class="sc-exp"><b>Señale</b>El panel de la derecha, donde dice <b>SIN PRECIO EN SISTEMA</b> en rojo.</div>
+    <div class="sc-exp"><b>Señale</b>El panel, donde dice <b>SIN PRECIO EN SISTEMA</b> en rojo.</div>
   </div>
 
   <div class="sc-beat">
@@ -127,7 +153,7 @@
       <span class="sc-beat__t">Que reconozca sus límites</span>
       <span class="sc-beat__s">25 s</span>
     </div>
-    <span class="sc-tap"><b>Toque</b>Sin dato de existencia</span>
+    <span class="sc-tap"><b>Toque</b>¿Cuántas láminas tienen?</span>
     <div class="sc-exp"><b>Qué va a salir</b>Dice que confirma con el mostrador y pregunta cuántas ocupa. No da un número.</div>
     <div class="sc-say"><b>Diga</b>Con inventario es igual. Hoy no está conectado al sistema de ustedes, entonces no promete nada. Cuando lo conectemos, esta pregunta la contesta solo.</div>
   </div>
@@ -135,13 +161,42 @@
   <div class="sc-beat">
     <div class="sc-beat__n">
       <span class="sc-beat__i">04</span>
+      <span class="sc-beat__t">Que se acuerde del cliente</span>
+      <span class="sc-beat__s">60 s</span>
+    </div>
+    <div class="sc-exp"><b>Este es el momento nuevo, y es el que más vale para un maestro de obra. Se muestra por contraste: primero sin memoria, después con memoria. El interruptor está en su panel — el cliente no lo ve.</b></div>
+
+    <span class="sc-tap"><b>1. Ponga</b>Cliente nuevo &nbsp;·&nbsp; luego toque <b>Lo mismo del mes pasado</b></span>
+    <div class="sc-exp"><b>Qué va a salir</b>«No tengo un pedido anterior suyo aquí. ¿Qué ocupa?»</div>
+    <div class="sc-say"><b>Diga</b>Con un cliente nuevo no inventa nada. No le dice «como siempre» si no hay un siempre.</div>
+
+    <span class="sc-tap"><b>2. Cambie a</b>Cliente que vuelve &nbsp;·&nbsp; toque <b>Reiniciar</b> &nbsp;·&nbsp; toque otra vez <b>Lo mismo del mes pasado</b></span>
+    <div class="sc-exp"><b>Qué va a salir</b>Saca la proforma anterior por su número, le lista las líneas que iban en ella, y le pregunta si van las mismas cantidades. Fíjese que <b>pregunta</b>, no supone.</div>
+    <div class="sc-say"><b>Diga</b>Eso que acaba de pasar es lo que su maestro de obra hace por teléfono en cinco mensajes. Aquí es uno.</div>
+    <div class="sc-say"><b>Conteste</b>«sí» &nbsp;→&nbsp; le pregunta a nombre de quién va la proforma. <b>Conteste «sí» otra vez</b> y le manda el PDF.</div>
+    <div class="sc-exp"><b>Señale</b>En su panel: <b>Memoria</b>, <b>Derivado</b> y <b>Preguntado</b>. Muestra de dónde salió cada dato — igual que con los precios.</div>
+    <div class="sc-say"><b>Lo importante de decir aquí</b>No lo saluda por nombre al entrar. Eso es a propósito: el teléfono se comparte entre la gente de la cuadrilla, y saludar al que no es por su nombre queda feo. El nombre lo usa donde hace falta, que es en la proforma.</div>
+
+    <span class="sc-tap"><b>3. Si quiere cerrar fuerte</b>Olvidá mis datos</span>
+    <div class="sc-exp"><b>Qué va a salir</b>Los borra y se lo confirma. Y los borra de verdad — si vuelve a preguntar «lo mismo del mes pasado», ya no tiene nada.</div>
+  </div>
+
+  <div class="sc-beat">
+    <div class="sc-beat__n">
+      <span class="sc-beat__i">05</span>
       <span class="sc-beat__t">Cierre: la proforma</span>
       <span class="sc-beat__s">35 s</span>
     </div>
-    <span class="sc-tap"><b>Toque</b>Cotización</span>
-    <div class="sc-exp"><b>Qué va a salir</b>Arma las líneas una por una con sus precios y da el total.</div>
-    <div class="sc-say"><b>Cuando termine</b>Eso le llegó al cliente en menos de un minuto. A las once de la noche, un domingo, sin que nadie del mostrador contestara.</div>
+    <span class="sc-tap"><b>Toque</b>Me arma una cotización</span>
+    <div class="sc-exp"><b>Qué va a salir</b>Arma las líneas una por una con sus precios, da el total, y <b>pregunta a nombre de quién va antes de mandar nada</b>. Cuando usted confirma, llega el PDF como archivo, igual que en WhatsApp.</div>
+    <div class="sc-say"><b>Cuando llegue el PDF</b>Eso le llegó al cliente en menos de un minuto. A las once de la noche, un domingo, sin que nadie del mostrador contestara.</div>
     <div class="sc-exp"><b>Aquí</b>Entregue el teléfono. Déjelo escribir lo que quiera.</div>
+  </div>
+
+  <div class="sc-plain">
+    <b>Dos cosas que conviene decir usted, antes de que las pregunten</b>
+    <p style="margin:0 0 12px">«La memoria en este demo vive en este navegador y se va con él. <b>Así se comporta; en producción vive en la base de datos de ustedes.</b>» — dígalo sin rodeos. Que quede claro que lo que está viendo es el comportamiento, no el almacenamiento definitivo.</p>
+    <p style="margin:0">Y si un precio ya cambió: <b>«Esos son los precios de su publicación de agosto. Cargamos su catálogo tal cual.»</b> No se disculpe. Es la respuesta más fuerte que tiene.</p>
   </div>
 
   <div class="sc-qa">
@@ -160,7 +215,7 @@
 
     <div class="sc-q">
       <div class="sc-q__q">"¿Y si el cliente pregunta algo que no está en el catálogo?"</div>
-      <div class="sc-q__a">Que lo pruebe. Toque <b>Producto que no manejan</b> o déjelo escribir. Dice que no lo maneja y ofrece pasar la consulta — nunca ofrece otra cosa por salir del paso.</div>
+      <div class="sc-q__a">Que lo pruebe. Toque <b>¿Tienen cemento?</b> o déjelo escribir. Dice que no lo maneja y ofrece pasar la consulta — nunca ofrece otra cosa por salir del paso.</div>
     </div>
 
     <div class="sc-q">
@@ -173,9 +228,29 @@
       <div class="sc-q__a">No dé número en la reunión. <em>"Depende de qué tanto quiera conectar. Le mando la propuesta con el alcance ya definido."</em></div>
     </div>
 
-    <div class="sc-q">
+    <div class="sc-q sc-q--key">
       <div class="sc-q__q">"¿Y esto se acuerda de mis clientes?"</div>
-      <div class="sc-q__a">Todavía no en este demo. Sea directo: <em>"Eso viene después — se guarda por número de WhatsApp. Hoy le estoy mostrando precios y proformas."</em> No prometa lo que no está en la pantalla.</div>
+      <div class="sc-q__a">Sí, y muéstreselo — es el momento 04.<br><em>"Se guarda por número de WhatsApp. Lo que el cliente le dijo — nombre, razón social, RUC — se lo puede repetir porque él se lo dijo. Lo que se calcula del historial, como el pedido anterior, se lo ofrece preguntando, nunca dándolo por hecho."</em></div>
+    </div>
+
+    <div class="sc-q">
+      <div class="sc-q__q">"¿Y dónde queda guardado eso?"</div>
+      <div class="sc-q__a">Diga la verdad, es más fuerte que cualquier promesa.<br><em>"En este demo vive en el navegador de este teléfono y se va con él. En producción vive en la base de datos de ustedes."</em><br>No diga que los datos "son de ellos" ni que "cumplimos con la ley de datos". Eso se pone por escrito en el contrato, no en una reunión.</div>
+    </div>
+
+    <div class="sc-q">
+      <div class="sc-q__q">"¿Y si un cliente quiere que borren sus datos?"</div>
+      <div class="sc-q__a">Que lo pruebe él mismo. Que escriba <b>olvidá mis datos</b>. Los borra y se lo confirma — y los borra de verdad: si después pregunta "lo mismo del mes pasado", ya no tiene nada.</div>
+    </div>
+
+    <div class="sc-q">
+      <div class="sc-q__q">"¿No me va a mandar una proforma con el nombre equivocado?"</div>
+      <div class="sc-q__a">No, porque siempre pregunta antes.<br><em>"Nunca manda un documento con un nombre que nadie le confirmó. Si tiene la razón social de hace meses, se la pregunta en vez de darla por buena. Y si le falta un dato, lo pregunta — no lo deja en blanco."</em></div>
+    </div>
+
+    <div class="sc-q">
+      <div class="sc-q__q">"¿Por qué no me saluda por mi nombre si ya me conoce?"</div>
+      <div class="sc-q__a">Si lo notan, es buena señal — está hecho a propósito.<br><em>"Porque el teléfono se comparte. Si contesta el ayudante y el asistente lo saluda a usted por su nombre, queda mal delante de quien sea que esté ahí. El nombre lo usa en la proforma, que es donde hace falta."</em></div>
     </div>
 
     <div class="sc-q">
@@ -191,6 +266,8 @@
 
   <div class="sc-end">
     <b>Lo único que no debe hacer:</b> prometer que el asistente sabe existencias, precios de las herramientas Caterpillar, o costo de entrega. Esos tres no los tenemos. Que el asistente los mande al mostrador es la función, no la falla.
+    <br><br>
+    <b>Y sobre la memoria:</b> no diga que los datos del cliente "son de ellos" ni que el sistema "cumple con la ley de datos de Nicaragua". Las dos cosas van por escrito en el contrato, revisadas por abogado, no habladas en una reunión. Lo que sí puede decir es <b>qué hace el sistema</b>: guarda por número, repite solo lo que el cliente dijo, pregunta lo demás, y borra cuando se lo piden.
     <br>
     <a class="sc-back" href="/leyva">&larr; Volver al demo</a>
   </div>
@@ -226,7 +303,17 @@
       }
     }).catch(function () { if (!silent) msg.textContent = 'no se pudo verificar'; });
   }
+  /* The brief prints the address it is being read from, so the partner never
+     has to be told a URL out loud or copy one from a message. Nothing here is
+     hardcoded — a preview URL pasted into a document goes stale the moment
+     the deployment moves. */
+  function showUrl() {
+    var el = document.getElementById('scUrl');
+    if (el) el.textContent = location.origin + '/leyva';
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    showUrl();
     var saved = sessionStorage.getItem('ignea_ops_token');
     if (saved) { verify(saved, true); return; }
     var input = document.getElementById('lvToken');
