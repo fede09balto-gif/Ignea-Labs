@@ -25,6 +25,14 @@
       "destination": "/probalo.html"
     },
     {
+      "source": "/leyva",
+      "destination": "/leyva.html"
+    },
+    {
+      "source": "/leyva-script",
+      "destination": "/leyva-script.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/404.html"
     }
