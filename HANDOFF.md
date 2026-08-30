@@ -123,7 +123,7 @@ provenance is asking to be believed; this one shows its work in both channels.
 
 ## 1. WHERE THINGS STAND
 
-### `feat/leyva-demo` — private live sales demo (branch, preview only, NOT merged)
+### `feat/leyva-demo` — private live sales demo (EARLIER SESSIONS; see the section above for current state)
 
 A private, admin-gated WhatsApp-assistant demo built on **their real catalog**, for
 Luis Velázquez to drive in person at Ferretería Roberto Leyva in León. `leyva.html`
@@ -225,6 +225,109 @@ screenshots of the business's own Facebook posts, with `source_url: null` and
 by design (10 Caterpillar tools + the lámina de revestimiento) and drive the escalation
 demo. The other **18 carry prices with zero provenance** — if they cannot be traced to
 dated posts, the demo has nothing left to quote and is not shippable.
+
+---
+
+### `feat/leyva-demo` — THIS SESSION: memory, the phone frame, the brief, and the gate verified live
+
+**The demo is now reachable without a Vercel account.** Branch alias, stable across
+redeploys:
+
+```
+https://ignea-labs-w8bp-git-feat-388915-fedebaltoinvest-7282s-projects.vercel.app/leyva
+```
+
+The brief at `/leyva-script` **prints that address itself** from `location.origin` —
+never hardcode a preview URL into a document, it goes stale the moment the deployment
+moves.
+
+**Deployment Protection was NOT actually off.** Fede reported having disabled it; the
+project still had `ssoProtection: {deploymentType: 'all_except_custom_domains'}` and
+every preview URL 302'd to `vercel.com/sso-api`. The setting had not saved. Turned off
+via `PATCH /v9/projects/{id}` with `{"ssoProtection": null}`. **Check the API, not the
+dashboard, when someone says protection is off** — the two disagreed here.
+
+**FOUND BY THE FIRST LIVE STRESS RUN, and it is the important finding of the session:
+`data/leyva-catalog.json` was a public download.** Vercel serves the repo root as
+static files, so the entire catalog — every price, plus the `_README` stating that all
+29 items are unsourced — was fetchable by anyone holding the demo URL, no token needed.
+The whole reason the system prompt is built server-side is that the browser never
+receives the catalog; a static file was handing it over anyway. **This was invisible
+while SSO was on and became live the instant it came off.** Moved to
+`api/_data/leyva-catalog.json` — Vercel neither builds `_`-prefixed files under `api/`
+as functions nor serves them. Verified 404 at all three plausible paths.
+
+**What IS deliberately client-side, audited and correct:** the 12 `LOCAL_PRICES` and
+the `CAT_TOOLS` names/wattages. The offline-first guarantee requires them, they are
+prices the business posted publicly, and the audit confirmed the invariant that
+matters: **all 15 price literals in the shipped JS are genuine current-or-previous
+prices of PRICED items, zero null-priced items appear on a line with any figure, and
+the C$1,512 `precio_antes` trap never leaves the server.** Re-run that audit if
+`LOCAL_PRICES` is ever edited.
+
+**Customer memory — see §0 for the spec.** `js/leyva-memory.js`, the `memory` field on
+`api/claude.js`, an operator toggle in the rail, and MEMORIA / DERIVADO / PREGUNTADO
+provenance channels alongside the existing catalog steps.
+
+**Deterministic routing is a product decision, not an implementation detail.** Any
+branch that writes a profile, deletes one, recalls a prior order's exact figures, or
+puts a customer's legal name on a PDF runs locally and **never reaches the model**. The
+rail labels these `Determinista` rather than `Local` so the operator can say it out
+loud — it is a selling point. A "borré sus datos" a buyer can check, and a name printed
+on a document he keeps, are not things to route through a probabilistic path.
+
+**Three bugs the harness caught that review would not have:**
+
+1. **The proforma gate had a hole.** Recalling a prior order produced bubbles that
+   itemised real lines with a matching total, so `LeyvaProforma.parse()` recognised a
+   complete order and **emitted a PDF before anyone had been asked whose name goes on
+   it** — bypassing the entire two-step naming flow. Recalling an order is a question
+   about quantities, not an instruction to issue a document. Fixed with `suppressDoc`
+   plus an explicit quantity-confirmation step.
+2. **The operator toggle was not idempotent.** `setMode('vuelve')` seeded only when the
+   profile was absent, so a profile mutated by the previous run-through survived the
+   toggle and the second demo of the day behaved differently from the first, with
+   nothing on screen to explain why. It now reseeds unconditionally.
+3. **`daysAgo()` used `toISOString()`.** After ~18:00 in Nicaragua (UTC-6) that stamps
+   a `declared_at` in the future, so a field declared seconds ago read as `ageDays: -1`.
+   Invisible before 6pm, guaranteed in an evening demo.
+
+**A UX fix worth keeping:** `escribiendo...` now starts the instant the message is
+sent, not when the model replies. For up to four seconds the header used to read
+`en línea` with nothing happening, which in front of a buyer reads as the message not
+having gone through.
+
+**Prompt caching survives memory** because the system field is TWO blocks: the catalog
+prompt (stable, carries `cache_control`) and the memory block (per-customer, uncached).
+Concatenating them would have invalidated the cache every turn and **nothing would have
+failed visibly** — the demo would just have started costing ~3x more, silently.
+
+**`robots.txt` no longer lists the leyva paths.** A `Disallow` publishes a path to
+anyone who reads the file, and the pages already carry `noindex` meta plus Vercel's
+`X-Robots-Tag: noindex`. Explicit rewrites added for `/leyva` and `/leyva-script` so
+the `/(.*) -> /404.html` catch-all cannot swallow them.
+
+**Live verification, all passing** (`scratchpad/stress.mjs`, real browser, real model):
+gate holds with no Vercel session; wrong token stays gated; correct demo token opens
+it; demo token + own `system` is 403; live model quotes C$370, escalates stock, invents
+no price for the Caterpillar tools (it quoted 750 W / 850 W, which ARE the catalog's
+real specs), refuses cross-category substitution, invents no freight cost, does not
+leak the prompt; all memory beats; **network genuinely down via
+`context.setOffline(true)` answers correctly in ~5s with no error text**; forced-offline
+toggle makes **zero** `/api` calls; kiosk hides the banner, the fake frame and the
+memory control, and triple-tap exits.
+
+**Two operational notes.**
+- **Vercel's automatic Security Checkpoint will trigger on rapid polling from one IP**
+  and returns `403` with a "Vercel Security Checkpoint" HTML body for everything,
+  including `/`. It looks exactly like a broken deployment. It cleared in ~8 minutes.
+  Poll slowly, and send a real browser User-Agent.
+- **The phone frame is REMOVED in kiosk mode, not restyled.** The buyer's real status
+  bar sits two millimetres above ours showing a different time and battery; that
+  mismatch is the first thing the eye lands on.
+
+**STILL BLOCKING before this is shown to the client:** the catalog provenance. 0 of 29
+items have `source_url`/`source_date`. Unchanged by this session.
 
 ---
 
