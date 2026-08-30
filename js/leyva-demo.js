@@ -108,8 +108,8 @@ var LeyvaDemo = (function () {
   /* Conversation state for the two-step proforma. Reset by leyva-chat.js's
      reset(). Deliberately NOT persisted: a half-finished naming question
      surviving a restart would put a stale name on the next document. */
-  var ST = { awaitingName: null, nudged: false };
-  function resetState() { ST.awaitingName = null; ST.nudged = false; }
+  var ST = { awaitingName: null, awaitingQty: null, nudged: false };
+  function resetState() { ST.awaitingName = null; ST.awaitingQty = null; ST.nudged = false; }
 
   function memLines(order) {
     return order.lines.map(function (l) {
@@ -247,6 +247,32 @@ var LeyvaDemo = (function () {
          (mm && mm.wiped()) ? 'Verificado: sin registro para este número' : 'ADVERTENCIA: el borrado no se pudo verificar'], true);
     }
 
+    /* Confirming the quantities on a recalled order. A "sí" here does NOT
+       produce a document — it advances to the naming question, which is the
+       only door a document comes through. */
+    if (ST.awaitingQty) {
+      var qa = parseNameAnswer(text);
+      if (qa.confirm) {
+        var qLines = ST.awaitingQty;
+        ST.awaitingQty = null;
+        var qTot = qLines.reduce(function (a, l) { return a + l.total; }, 0);
+        var qAsk = nameAsk();
+        ST.awaitingName = { lines: qLines, total: qTot };
+        return {
+          bubbles: ['Perfecto, las mismas cantidades.'].concat(qAsk.q),
+          rail: ['PRE|Cantidades confirmadas por el cliente',
+                 'Total ' + money(qTot) + ' — mismas líneas, precios de hoy'].concat(qAsk.rail)
+                .concat(['Documento: ruta determinista, sin modelo']),
+          localOnly: true,
+          suppressDoc: true
+        };
+      }
+      // Anything else means the quantities are changing. Drop the pending
+      // order rather than carrying stale numbers into a document, and let the
+      // message be handled as an ordinary question.
+      ST.awaitingQty = null;
+    }
+
     /* Answering the naming question. Only reachable while a proforma is
        actually being built — there is no other path into it, so a stray
        "sí" in an unrelated conversation cannot write a name to a profile. */
@@ -312,6 +338,18 @@ var LeyvaDemo = (function () {
         return hit(['No tengo un pedido anterior suyo aquí.', '¿Qué ocupa?'],
           ['Consulta: repetir pedido', 'Sin pedidos anteriores en memoria', 'Se pregunta en vez de suponer'], true);
       }
+      /* suppressDoc is LOAD-BEARING here, not a detail.
+
+         These bubbles itemise real lines with real totals, so the proforma
+         parser recognises them as a complete order and used to emit a PDF on
+         the spot — with a customer's proforma issued before anyone had been
+         asked whose name goes on it, which is the exact gate the two-step
+         flow exists to hold. Recalling an order is a QUESTION about
+         quantities; it is not an instruction to issue a document. */
+      ST.awaitingQty = last.lines.map(function (l) {
+        return { sku: l.sku, qty: l.qty, desc: l.n, unit: l.unit, total: l.total };
+      });
+      ST.awaitingName = null;
       return {
         bubbles: [
           'Va. El último fue la ' + last.correlativo + ', del ' + m3.fmtDate(last.fecha) + '.',
@@ -322,9 +360,11 @@ var LeyvaDemo = (function () {
           'DER|Pedido anterior ' + last.correlativo + ' del ' + m3.fmtDate(last.fecha),
           'DER|' + last.lines.length + ' líneas recuperadas por SKU',
           'Precios recalculados hoy contra el catálogo — no se guardan',
-          'Cantidades: se preguntan, no se asumen'
+          'Cantidades: se preguntan, no se asumen',
+          'Sin documento todavía — falta confirmar cantidades y nombre'
         ],
-        localOnly: true
+        localOnly: true,
+        suppressDoc: true
       };
     }
 

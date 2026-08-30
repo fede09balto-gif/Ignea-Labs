@@ -26,25 +26,102 @@
 .lv-head .lv-sub{font-family:var(--fm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
 .lv-unver{border:1px solid var(--red);background:var(--red-wash);padding:12px 14px;margin:14px 0 20px;font-size:13px;line-height:1.55;color:var(--ink)}
 .lv-unver b{font-family:var(--fm);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);display:block;margin-bottom:5px}
-.lv-grid{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:24px;align-items:start}
-@media(max-width:860px){.lv-grid{grid-template-columns:1fr}}
+.lv-grid{display:grid;grid-template-columns:minmax(0,392px) minmax(0,1fr);gap:28px;align-items:start}
+/* minmax(0,1fr), NOT 1fr. A bare 1fr carries an automatic min-content floor,
+   and the device frame's min-content is its full 392px — so at 375 the track
+   stayed 392 wide and the page scrolled sideways. The demo's own audience is
+   on a phone. */
+@media(max-width:860px){.lv-grid{grid-template-columns:minmax(0,1fr)}}
 
-.wa{--wa-green:#075E54;--wa-tick:#8696A0;--wa-blue:#53BDEB;--wa-paper:#EFE7DE;--wa-out:#D9FDD3;
-    display:flex;flex-direction:column;height:600px;background:var(--wa-paper);overflow:hidden}
+/* ==== DEVICE FRAME ===================================================
+   The conversation used to sit on a plain white card with a green header,
+   and it read as a web page pretending to be WhatsApp. A buyer holding
+   this is comparing it against the phone in his own hand, so the chrome
+   is not decoration — it is the difference between "a mockup" and "my
+   WhatsApp".
+
+   Everything here is CSS and inline SVG: no images to load, nothing that
+   can arrive late over a shop's wifi and shift the layout underneath a
+   demo. In KIOSK MODE the entire frame disappears (see the kiosk block
+   below) — the real phone supplies the real bezel, real status bar and
+   real island, and drawing our own on top of them looks broken. */
+.dev{position:relative;width:100%;max-width:392px;margin:0 auto;padding:11px;border-radius:58px;
+     /* Brushed titanium: the highlight bands sit where the rail curves away
+        from the viewer, which is what sells it as metal rather than grey. */
+     background:linear-gradient(100deg,#4A4A4E 0%,#8C8C90 6%,#DEDEE0 13%,#9C9CA0 22%,#6B6B70 40%,#7E7E83 50%,#6B6B70 60%,#9C9CA0 78%,#DEDEE0 87%,#8C8C90 94%,#4A4A4E 100%);
+     box-shadow:0 0 0 .5px rgba(255,255,255,.35) inset,0 26px 56px rgba(10,10,12,.24),0 4px 12px rgba(10,10,12,.14)}
+.dev__scr{position:relative;border-radius:47px;overflow:hidden;background:#000;box-shadow:0 0 0 2.5px #0C0C0E;min-width:0}
+/* On a narrow phone the rail thins and the corners tighten rather than the
+   frame overflowing — the proportions stay believable at 375. */
+@media(max-width:420px){
+  .dev{padding:8px;border-radius:44px}
+  .dev__scr{border-radius:37px}
+  .dev__island{top:9px;width:96px;height:27px}
+}
+
+/* Side buttons. Purely visual, aria-hidden, and outside every tap target —
+   nothing here is interactive, so nothing here can steal a touch. */
+.dev__btn{position:absolute;background:linear-gradient(90deg,#6E6E73,#B9B9BE 45%,#54545A);border-radius:2px;pointer-events:none}
+.dev__btn--act{left:-2px;top:112px;width:3px;height:26px}
+.dev__btn--vup{left:-2px;top:158px;width:3px;height:48px}
+.dev__btn--vdn{left:-2px;top:216px;width:3px;height:48px}
+.dev__btn--pwr{right:-2px;top:176px;width:3px;height:76px;background:linear-gradient(270deg,#6E6E73,#B9B9BE 45%,#54545A)}
+
+/* Dynamic Island, with the lens actually rendered — a flat black pill is
+   the tell that gives away a fake frame at arm's length. */
+.dev__island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:106px;height:30px;
+             border-radius:16px;background:#000;z-index:6;display:flex;align-items:center;justify-content:flex-end;padding-right:9px}
+.dev__lens{width:10px;height:10px;border-radius:50%;
+           background:radial-gradient(circle at 33% 30%,#3B4A63 0%,#16202E 46%,#05080D 100%);
+           box-shadow:0 0 0 1px rgba(120,150,190,.22),inset 0 0 2px rgba(150,180,220,.35)}
+
+/* iOS status bar. Tinted to the header so the two read as one surface, the
+   way WhatsApp actually looks on a phone. */
+.dev__status{background:var(--wa-green);color:#fff;height:52px;display:flex;align-items:flex-end;
+             justify-content:space-between;padding:0 26px 5px;flex-shrink:0;position:relative;z-index:5}
+.dev__time{font-family:-apple-system,'SF Pro Text','DM Sans',sans-serif;font-size:15px;font-weight:500;letter-spacing:-.01em;line-height:1}
+.dev__sysic{display:flex;align-items:center;gap:5px}
+.dev__sysic svg{display:block}
+
+/* Home indicator. */
+.dev__home{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:134px;height:5px;
+           border-radius:3px;background:rgba(0,0,0,.32);z-index:6;pointer-events:none}
+
+.wa{--wa-green:#075E54;--wa-tick:#8696A0;--wa-blue:#53BDEB;--wa-paper:#EFE7DE;--wa-out:#D9FDD3;--wa-send:#00A884;
+    display:flex;flex-direction:column;height:604px;background:var(--wa-paper);overflow:hidden}
 .wa__bar{background:var(--wa-green);color:#fff;display:flex;align-items:center;gap:10px;padding:9px 12px;flex-shrink:0}
 .wa__av{width:34px;height:34px;border-radius:50%;background:#128C7E;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:500;flex-shrink:0}
 .wa__id{min-width:0;flex:1}
 .wa__nm{font-size:15px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wa__st{font-size:11.5px;opacity:.82;line-height:1.3;min-height:15px}
 .wa__ico{display:flex;gap:16px;opacity:.9;flex-shrink:0}
-.wa__chat{flex:1;overflow-y:auto;padding:12px 9px 8px;display:flex;flex-direction:column;gap:2px;scroll-behavior:smooth}
-.wa__day{align-self:center;background:#fff;border-radius:7px;padding:4px 11px;font-size:11.5px;color:#54656F;box-shadow:0 1px 1px rgba(0,0,0,.06);margin-bottom:8px}
-.wa__b{max-width:82%;padding:6px 8px 5px;border-radius:8px;font-size:14.2px;line-height:1.4;color:#111B21;box-shadow:0 1px .5px rgba(11,20,26,.13);white-space:pre-wrap;word-wrap:break-word}
-.wa__b--in{align-self:flex-start;background:#fff}
-.wa__b--out{align-self:flex-end;background:var(--wa-out)}
+.wa__chat{flex:1;overflow-y:auto;padding:12px 9px 8px;display:flex;flex-direction:column;gap:2px;scroll-behavior:smooth;
+  /* WhatsApp's doodle wallpaper, authored as an inline SVG tile. Inline and
+     not a file on purpose: a wallpaper that arrives late over a shop's wifi
+     would repaint the conversation mid-demo. */
+  background-color:var(--wa-paper);
+  /* Tile scaled down to 168px: at its authored 260px the doodles read as
+     clip art sitting behind the conversation instead of as texture. */
+  background-size:168px 168px;
+  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Cg fill='none' stroke='%23C9BCA8' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round' opacity='.34'%3E%3Cpath d='M18 30c0-5 4-9 9-9s9 4 9 9-9 12-9 12-9-7-9-12z'/%3E%3Ccircle cx='84' cy='24' r='9'/%3E%3Cpath d='M80 22h.01M88 22h.01M80 28c1.6 1.8 6.4 1.8 8 0'/%3E%3Cpath d='M140 16h20v14h-20z'/%3E%3Cpath d='M144 16v-4h12v4'/%3E%3Cpath d='M206 30l6-16 6 16M208 25h8'/%3E%3Cpath d='M28 78h18v12H28zM32 78v-4h10v4'/%3E%3Cpath d='M96 70l5 10 11 1-8 8 2 11-10-5-10 5 2-11-8-8 11-1z'/%3E%3Cpath d='M158 72c6 0 10 4 10 9s-4 9-10 9h-12l-5 5v-5c-3-1-5-4-5-9 0-5 4-9 10-9z'/%3E%3Cpath d='M214 74h16M214 80h16M214 86h10'/%3E%3Cpath d='M22 138c0-6 5-11 11-11s11 5 11 11-11 15-11 15-11-9-11-15z'/%3E%3Cpath d='M88 130h22v18H88zM88 136h22'/%3E%3Ccircle cx='156' cy='139' r='10'/%3E%3Cpath d='M156 133v6l4 3'/%3E%3Cpath d='M204 148l8-20 8 20M206 142h12'/%3E%3Cpath d='M26 200h20l-4 16H30z'/%3E%3Cpath d='M32 200v-5h8v5'/%3E%3Cpath d='M92 194l6 12 13 2-9 9 2 13-12-6-12 6 2-13-9-9 13-2z'/%3E%3Cpath d='M150 196h20v16h-20zM154 212v5M166 212v5'/%3E%3Ccircle cx='214' cy='204' r='10'/%3E%3Cpath d='M210 200l8 8M218 200l-8 8'/%3E%3C/g%3E%3C/svg%3E")}
+/* margin-top:auto anchors a short conversation to the BOTTOM, the way a real
+   chat opens. Deliberately an auto margin on the first child rather than
+   justify-content:flex-end, which clips the top of the scroll area once the
+   conversation grows past the viewport — an auto margin resolves to 0 when
+   the content overflows. */
+.wa__day{align-self:center;margin-top:auto;background:#fff;border-radius:7px;padding:4px 11px;font-size:11.5px;color:#54656F;box-shadow:0 1px 1px rgba(0,0,0,.06);margin-bottom:8px}
+.wa__b{position:relative;max-width:80%;padding:6px 8px 5px;border-radius:8px;font-size:14.2px;line-height:1.4;color:#111B21;box-shadow:0 1px .5px rgba(11,20,26,.13);white-space:pre-wrap;word-wrap:break-word}
+.wa__b--in{align-self:flex-start;background:#fff;margin-left:8px}
+.wa__b--out{align-self:flex-end;background:var(--wa-out);margin-right:8px}
 .wa__b--first{margin-top:7px}
-.wa__b--in.wa__b--first{border-top-left-radius:1px}
-.wa__b--out.wa__b--first{border-top-right-radius:1px}
+/* Real tails on the first bubble of a run — the notched corner alone reads
+   as a rounding bug once the frame around it looks like a phone. Drawn with
+   clip-path so the tail inherits the bubble colour exactly. */
+.wa__b--first::after{content:'';position:absolute;top:0;width:9px;height:14px}
+.wa__b--in.wa__b--first{border-top-left-radius:0}
+.wa__b--in.wa__b--first::after{left:-8px;background:#fff;clip-path:polygon(100% 0,0 0,100% 62%)}
+.wa__b--out.wa__b--first{border-top-right-radius:0}
+.wa__b--out.wa__b--first::after{right:-8px;background:var(--wa-out);clip-path:polygon(0 0,100% 0,0 62%)}
 .wa__m{float:right;margin:6px -2px -2px 8px;font-size:10.5px;color:#667781;display:flex;align-items:center;gap:2px;line-height:1}
 .wa__tick svg{display:block}
 .wa__tick[data-s="sent"],.wa__tick[data-s="deliv"]{color:#8696A0}
@@ -67,13 +144,21 @@
 .wa__starters::-webkit-scrollbar{display:none}
 .wa__chip{flex-shrink:0;background:#fff;border:1px solid #D6D0C8;color:#0A6E62;border-radius:15px;padding:7px 13px;font-size:13px;font-family:var(--ff);cursor:pointer;white-space:nowrap;min-height:34px}
 .wa__chip:active{background:#F0EDE8}
-.wa__inbar{display:flex;align-items:flex-end;gap:6px;padding:6px 7px 7px;flex-shrink:0}
-.wa__field{flex:1;display:flex;align-items:center;gap:7px;background:#fff;border-radius:21px;padding:7px 11px;min-height:42px}
-.wa__field svg{flex-shrink:0;color:#54656F;opacity:.85}
+/* Input bar. 15px font is the floor on iOS — anything smaller makes Safari
+   zoom the page on focus, which on a handed-over phone looks like the demo
+   broke. Send button is 44px: the platform minimum, and the one control the
+   buyer will actually press. */
+.wa__inbar{display:flex;align-items:flex-end;gap:7px;padding:7px 8px calc(7px + 18px);flex-shrink:0}
+.wa__field{flex:1;display:flex;align-items:center;gap:8px;background:#fff;border-radius:23px;padding:7px 12px;min-height:44px;
+           box-shadow:0 1px 1px rgba(11,20,26,.07)}
+.wa__field svg{flex-shrink:0;color:#54656F;opacity:.9}
 .wa__in{flex:1;border:0;outline:0;font-family:var(--ff);font-size:15px;background:transparent;color:#111B21;min-width:0;resize:none;line-height:1.35;max-height:78px;padding:2px 0}
 .wa__in::placeholder{color:#8696A0}
-.wa__send{width:42px;height:42px;border-radius:50%;background:#075E54;border:0;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;cursor:pointer}
-.wa__send:disabled{opacity:.55;cursor:default}
+.wa__send{width:44px;height:44px;border-radius:50%;background:var(--wa-send);border:0;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;cursor:pointer;
+          box-shadow:0 1px 2px rgba(11,20,26,.18);transition:transform .12s var(--ease),opacity .12s var(--ease)}
+.wa__send:disabled{opacity:.45;cursor:default;box-shadow:none}
+.wa__send:not(:disabled):active{transform:scale(.94)}
+@media(prefers-reduced-motion:reduce){.wa__send{transition:none}.wa__send:not(:disabled):active{transform:none}}
 
 .lv-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
 .lv-toggle{display:inline-flex;align-items:center;gap:9px;min-height:48px;padding:0 14px;border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:13.5px;user-select:none;background:var(--bg)}
@@ -127,6 +212,17 @@ body.kiosk{background:#EFE7DE}
 body.kiosk .lv-wrap{max-width:none;margin:0;padding:0}
 body.kiosk .lv-head,body.kiosk .lv-unver,body.kiosk .lv-side{display:none!important}
 body.kiosk .lv-grid{display:block}
+
+/* THE DEVICE FRAME IS REMOVED IN KIOSK, not restyled. The buyer is holding
+   an actual phone with an actual bezel, status bar and island; drawing ours
+   inside his reads as a broken app, not a polished one. The fake status bar
+   goes with it — his real one is two millimetres above it showing a
+   different time and a different battery, and the mismatch is the first
+   thing the eye lands on. */
+body.kiosk .dev{max-width:none;padding:0;border-radius:0;background:none;box-shadow:none}
+body.kiosk .dev__scr{border-radius:0;box-shadow:none}
+body.kiosk .dev__btn,body.kiosk .dev__island,body.kiosk .dev__home,body.kiosk .dev__status{display:none}
+
 body.kiosk .wa{height:100vh;height:100dvh}
 body.kiosk .wa__bar{padding-top:calc(9px + env(safe-area-inset-top))}
 body.kiosk .wa__inbar{padding-bottom:calc(7px + env(safe-area-inset-bottom))}
@@ -166,7 +262,32 @@ body.kiosk .kiosk-exit{display:block}
 
   <div class="lv-grid">
     <div>
+      <!-- Device frame. Every element in here is aria-hidden and
+           pointer-events:none — it is a picture of a phone, not a control
+           surface, and none of it may intercept a tap meant for the chat.
+           It is removed entirely in kiosk mode; the real phone supplies the
+           real bezel. -->
+      <div class="dev" id="dev">
+        <span class="dev__btn dev__btn--act" aria-hidden="true"></span>
+        <span class="dev__btn dev__btn--vup" aria-hidden="true"></span>
+        <span class="dev__btn dev__btn--vdn" aria-hidden="true"></span>
+        <span class="dev__btn dev__btn--pwr" aria-hidden="true"></span>
+        <div class="dev__scr">
+          <div class="dev__island" aria-hidden="true"><span class="dev__lens"></span></div>
+          <div class="dev__home" aria-hidden="true"></div>
+
       <div class="wa" id="wa">
+        <div class="dev__status" aria-hidden="true">
+          <span class="dev__time" id="devTime">9:41</span>
+          <span class="dev__sysic">
+            <!-- signal -->
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+            <!-- wifi -->
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 11.2 6.1 9.1a2.8 2.8 0 0 1 3.8 0L8 11.2z"/><path d="M8 6.1c1.4 0 2.7.5 3.7 1.4l1.2-1.3A7.5 7.5 0 0 0 8 4.2c-1.9 0-3.6.7-4.9 2l1.2 1.3A5.4 5.4 0 0 1 8 6.1z"/><path d="M8 1.5c2.6 0 5 1 6.8 2.6L16 2.8A11.6 11.6 0 0 0 8 0C5 0 2.2 1 0 2.8l1.2 1.3A9.9 9.9 0 0 1 8 1.5z"/></svg>
+            <!-- battery -->
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".6" y=".6" width="21" height="10.8" rx="3" stroke="currentColor" stroke-opacity=".45" stroke-width="1.1"/><rect x="2.2" y="2.2" width="16" height="7.6" rx="1.8" fill="currentColor"/><path d="M23.2 4.2v3.6c.9-.3 1.4-.9 1.4-1.8s-.5-1.5-1.4-1.8z" fill="currentColor" fill-opacity=".45"/></svg>
+          </span>
+        </div>
         <div class="wa__bar">
           <svg width="9" height="15" viewBox="0 0 9 15" fill="none" aria-hidden="true"><path d="M7.5 1L1.5 7.5 7.5 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           <div class="wa__av">RL</div>
@@ -195,6 +316,8 @@ body.kiosk .kiosk-exit{display:block}
           <button class="wa__send" id="waSend" aria-label="Enviar" disabled>
             <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.5 21l19-9-19-9v7l13 2-13 2v7z"/></svg>
           </button>
+        </div>
+      </div>
         </div>
       </div>
     </div>

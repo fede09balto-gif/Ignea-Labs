@@ -447,7 +447,23 @@
     zone.addEventListener('touchstart', function (e) { e.preventDefault(); hit(); }, { passive: false });
   }
 
+  /* The fake status bar shows the REAL current time and re-syncs on the
+     minute. A frozen 9:41 next to the phone's own clock is the single
+     cheapest tell in the whole mockup. */
+  function startDeviceClock() {
+    var el = document.getElementById('devTime');
+    if (!el) return;
+    function tick() {
+      var d = new Date(), h = d.getHours(), m = d.getMinutes();
+      h = h % 12; if (h === 0) h = 12;
+      el.textContent = h + ':' + (m < 10 ? '0' : '') + m;
+    }
+    tick();
+    setInterval(tick, 20000);
+  }
+
   function boot() {
+    startDeviceClock();
     chat = document.getElementById('waChat');
     input = document.getElementById('waIn');
     sendBtn = document.getElementById('waSend');
