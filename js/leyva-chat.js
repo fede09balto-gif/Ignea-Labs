@@ -19,12 +19,18 @@
 (function () {
   'use strict';
 
+  /* The last two are the memory beats. 'Lo mismo del mes pasado' only has
+     anything to pull when the operator toggle is on 'Cliente que vuelve' —
+     with a new customer it correctly answers that it has no prior order,
+     which is the contrast the demo is built around. */
   var STARTERS = [
     '¿A cómo está la lámina de gypsum?',
     '¿Manejan taladro Caterpillar?',
     '¿Cuántas láminas tienen?',
     'Me arma una cotización',
-    '¿Tienen cemento?'
+    '¿Tienen cemento?',
+    'Lo mismo del mes pasado',
+    'Olvidá mis datos'
   ];
 
   var chat, input, sendBtn, statusEl, startersEl, rail, modeEl;
@@ -77,12 +83,18 @@
   /* Document bubble. Only ever called with an order that LeyvaProforma
      verified line-by-line against the catalog — see that file's header for
      why an unverifiable order produces no document at all. */
-  function docBubble(order) {
-    var doc = LeyvaProforma.build(order, LeyvaProforma.next());
+  /* `profile` carries the DECLARED fields for the header. Any field may be
+     null and a null field produces NO LINE — see leyva-proforma.js. The
+     sequence number is taken ONCE: calling next() twice here used to burn a
+     correlativo per document, so the numbers on the card and in the file name
+     agreed only by arithmetic accident. */
+  function docBubble(order, profile) {
+    var seq = LeyvaProforma.next();
+    var doc = LeyvaProforma.build(order, seq, profile);
     if (!doc) return false;                       // jsPDF absent -> no card, no error
     var blob = doc.output('blob');
     var kb = Math.max(1, Math.round(blob.size / 1024));
-    var name = LeyvaProforma.correlativo(LeyvaProforma.next() - 1) + '.pdf';
+    var name = LeyvaProforma.correlativo(seq) + '.pdf';
     var url = URL.createObjectURL(blob);
 
     lastSender = null;
@@ -98,6 +110,11 @@
     w.addEventListener('click', function () { window.open(url, '_blank'); });
     chat.appendChild(w);
     scroll();
+    // Record it as an OPEN order so a second run-through has a real prior
+    // proforma of its own. Stores {sku, qty} only — never the total.
+    if (typeof LeyvaMemory !== 'undefined' && order.lines && order.lines[0] && order.lines[0].sku) {
+      LeyvaMemory.registrarPedido(LeyvaProforma.correlativo(seq), order.lines);
+    }
     return true;
   }
 
@@ -123,17 +140,45 @@
 
   function setStatus(s) { statusEl.textContent = s; }
 
-  function say(bubbles, done) {
+  /* Assemble the DECLARED fields for the document header. Every field is
+     read through LeyvaMemory.declared(), which returns null for anything we
+     do not actually have — and leyva-proforma.js omits the line entirely for
+     a null. A blank "RUC:" line looks like a system that lost the data, which
+     is worse than no line at all. */
+  function memProfile(explicitName) {
+    if (typeof LeyvaMemory === 'undefined') return null;
+    function v(f) { var d = LeyvaMemory.declared(f); return d ? d.v : null; }
+    var razon = v('razon_social'), nombre = v('nombre');
+    var out = {
+      nombre: (explicitName && explicitName !== razon) ? explicitName : nombre,
+      razon_social: explicitName ? (explicitName === nombre ? null : explicitName) : razon,
+      ruc: v('ruc'),
+      direccion: v('direccion')
+    };
+    // A RUC only belongs on a document that carries a razón social.
+    if (!out.razon_social) out.ruc = null;
+    return (out.nombre || out.razon_social) ? out : null;
+  }
+
+  /* opts: {suppressDoc, order, profileName}
+       suppressDoc — the reply quoted lines but is still ASKING whose name
+                     goes on the document. No PDF yet, deliberately.
+       order       — a pre-verified order handed over by the naming branch,
+                     used instead of re-parsing the reply text. */
+  function say(bubbles, done, opts) {
+    opts = opts || {};
     var i = 0;
     (function next() {
       if (i >= bubbles.length) {
         // A complete, verifiable order becomes a document the way it would on
         // real WhatsApp: after the words, as a separate file message.
-        var order = (typeof LeyvaProforma !== 'undefined') ? LeyvaProforma.parse(bubbles.join('\n')) : null;
+        var order = opts.suppressDoc ? null
+                  : (opts.order || ((typeof LeyvaProforma !== 'undefined') ? LeyvaProforma.parse(bubbles.join('\n')) : null));
         if (order) {
+          var prof = memProfile(opts.profileName);
           setStatus('escribiendo...');
           setTimeout(function () {
-            docBubble(order);
+            docBubble(order, prof);
             setStatus('en línea');
             if (done) done();
           }, 900);
@@ -176,18 +221,42 @@
     return true;
   }
 
+  /* A step may carry a provenance prefix, which the rail renders as its own
+     visual channel — the same grounding treatment prices already get, applied
+     to memory:
+
+       MEM|  came from a DECLARED fact the customer previously said
+       DER|  was DERIVED from order history and is being offered as a question
+       PRE|  was asked for and answered IN THIS conversation
+       (none) describes the catalog lookup, as before
+
+     Showing an answer without showing which channel each part came from is
+     asking to be believed. This panel's whole job is not to be. */
+  var PROV = { MEM: 'Memoria', DER: 'Derivado', PRE: 'Preguntado' };
+
   function paintRail(steps, mode, ms, replyText) {
     if (!rail) return;
     rail.innerHTML = '';
     steps = steps.filter(function (s) { return railStepIsTruthful(s, replyText || ''); });
     steps.forEach(function (s) {
+      var kind = null, body = s;
+      var m = /^(MEM|DER|PRE)\|(.*)$/.exec(s);
+      if (m) { kind = m[1]; body = m[2]; }
       var d = document.createElement('div');
-      d.className = 'lv-step' + (/SIN PRECIO|Sin dato|Sin inventario|Escalar|Sin coincidencia|Intento|Fuera de/.test(s) ? ' lv-step--flag' : '');
-      d.textContent = s;
+      d.className = 'lv-step'
+        + (/SIN PRECIO|Sin dato|Sin inventario|Escalar|Sin coincidencia|Intento|Fuera de|ADVERTENCIA/.test(body) ? ' lv-step--flag' : '')
+        + (kind ? ' lv-step--' + kind.toLowerCase() : '');
+      if (kind) {
+        var tag = document.createElement('span');
+        tag.className = 'lv-step__tag';
+        tag.textContent = PROV[kind];
+        d.appendChild(tag);
+      }
+      d.appendChild(document.createTextNode(body));
       rail.appendChild(d);
     });
     modeEl.setAttribute('data-mode', mode);
-    modeEl.textContent = (mode === 'api' ? 'Modelo · ' : 'Local · ') + ms + ' ms';
+    modeEl.textContent = (mode === 'api' ? 'Modelo · ' : mode === 'det' ? 'Determinista · ' : 'Local · ') + ms + ' ms';
   }
 
   function send(text) {
@@ -208,12 +277,36 @@
     var forced = document.getElementById('lvOffline') && document.getElementById('lvOffline').checked;
     var t0 = Date.now();
 
-    function finish(bubbles, mode) {
-      paintRail(localAns.rail, mode, Date.now() - t0, bubbles.join(' '));
+    function finish(bubbles, mode, opts) {
+      var rails = (localAns.rail || []).slice();
+      var extra = null;
+      /* The open-proforma follow-up rides along on the FIRST substantive
+         reply of a returning-customer conversation, once. It is a question
+         ("¿La activamos?"), never a statement, and its figure is recomputed
+         from the catalog rather than read from storage. */
+      if (!localAns.suppressDoc) {
+        extra = LeyvaDemo.openProformaNudge(bubbles.join(' '));
+        if (extra) { bubbles = bubbles.concat(extra.bubbles); rails = rails.concat(extra.rail); }
+      }
+      paintRail(rails, mode, Date.now() - t0, bubbles.join(' '));
       say(bubbles, function () {
         busy = false;
         sendBtn.disabled = !input.value.trim();
-      });
+        renderMemPanel();
+      }, opts);
+    }
+
+    /* DETERMINISTIC BRANCHES NEVER REACH THE MODEL.
+       Anything that writes to a stored profile, deletes one, quotes a prior
+       order's exact figures, or puts a customer's legal name on a PDF runs
+       here and only here. A "borré sus datos" a buyer can check, and a name
+       printed on a document he keeps, are not things to route through a
+       probabilistic path — and saying that out loud in the room is a selling
+       point, which is why the rail labels it "Determinista" and not "Local". */
+    if (localAns.localOnly) {
+      localAns.bubbles.forEach(function (b) { history.push({ role: 'assistant', content: b }); });
+      finish(localAns.bubbles, 'det', { suppressDoc: localAns.suppressDoc, order: localAns.order, profileName: localAns.profileName });
+      return;
     }
 
     if (forced || !navigator.onLine) { finish(localAns.bubbles, 'local'); return; }
@@ -227,6 +320,66 @@
         finish(localAns.bubbles, 'local');
       }
     });
+  }
+
+  /* ---- the operator's memory panel ---------------------------------
+     LIVES IN THE RAIL, NEVER IN THE PHONE. The buyer holding the handset
+     must not see a control that reveals the profile was chosen — that is
+     the difference between "it remembered me" and "you set that up".
+
+     It shows the profile exactly as the two tiers define it: DECLARED
+     fields with the date the customer said them, DERIVED facts labelled as
+     derived and computed on every render. Nothing is shown here that the
+     assistant would not be entitled to use. */
+  function syncSeg() {
+    var m = LeyvaMemory.getMode();
+    document.querySelectorAll('.lv-seg__b').forEach(function (b) {
+      var on = b.getAttribute('data-mode') === m;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  function renderMemPanel() {
+    var host = document.getElementById('lvMem');
+    if (!host || typeof LeyvaMemory === 'undefined') return;
+    // A new customer who gives a name BECOMES a remembered one mid-conversation.
+    // The toggle has to follow that, or the panel and the control disagree.
+    syncSeg();
+    host.innerHTML = '';
+
+    var pr = LeyvaMemory.profile();
+    if (!pr) {
+      var e = document.createElement('div');
+      e.className = 'lv-mem__empty';
+      e.textContent = 'Sin perfil. El asistente no tiene nada que recordar de este número.';
+      host.appendChild(e);
+      return;
+    }
+
+    var ph = document.createElement('div');
+    ph.className = 'lv-mem__ph';
+    ph.textContent = pr.telefono + ' · número de ejemplo';
+    host.appendChild(ph);
+
+    LeyvaMemory.provenance().forEach(function (row) { host.appendChild(memRow('Declarado', row.text)); });
+    LeyvaMemory.derivedProvenance().forEach(function (row) { host.appendChild(memRow('Derivado', row.text)); });
+  }
+
+  function memRow(tag, text) {
+    var d = document.createElement('div');
+    d.className = 'lv-mem__row lv-mem__row--' + (tag === 'Derivado' ? 'der' : 'mem');
+    var t = document.createElement('span');
+    t.className = 'lv-mem__tag';
+    t.textContent = tag;
+    d.appendChild(t);
+    d.appendChild(document.createTextNode(text));
+    return d;
+  }
+
+  function setMemMode(m) {
+    LeyvaMemory.setMode(m);
+    renderMemPanel();
   }
 
   function reset() {
@@ -244,6 +397,16 @@
     }
     input.value = ''; sendBtn.disabled = true;
     setStatus('en línea');
+    // Clear the half-finished proforma naming question and the once-per-
+    // conversation open-proforma nudge. Neither may survive a restart: a
+    // stale pending name would land on the NEXT document.
+    if (LeyvaDemo.resetState) LeyvaDemo.resetState();
+    // Proforma numbering continues after whatever the profile already holds,
+    // so a seeded PRO-2481 is never issued twice with different contents.
+    if (typeof LeyvaMemory !== 'undefined' && LeyvaProforma.reseed) {
+      LeyvaProforma.reseed(LeyvaMemory.pedidos());
+    }
+    renderMemPanel();
   }
 
   /* ---- kiosk ----------------------------------------------------------
@@ -317,6 +480,12 @@
     if (off) off.addEventListener('change', function () {
       document.getElementById('lvOfflineWrap').classList.toggle('on', off.checked);
     });
+    LeyvaMemory.init();
+    document.querySelectorAll('.lv-seg__b').forEach(function (b) {
+      b.addEventListener('click', function () { setMemMode(b.getAttribute('data-mode')); reset(); });
+    });
+    setMemMode(LeyvaMemory.getMode());
+
     document.getElementById('lvReset').addEventListener('click', reset);
     document.getElementById('lvKiosk').addEventListener('click', kioskOn);
     wireKioskExit();

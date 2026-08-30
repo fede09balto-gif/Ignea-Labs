@@ -93,6 +93,31 @@
 .lv-step--flag{color:var(--ink)}
 .lv-rail__idle{font-size:12.5px;color:var(--ink-3);line-height:1.55}
 
+/* Provenance channels. A rail step is one of four kinds and the marker is
+   what distinguishes them at a glance: catalog lookup (default), MEMORIA,
+   DERIVADO, PREGUNTADO. Same treatment prices already get, applied to
+   memory — see js/leyva-chat.js's paintRail(). */
+.lv-step__tag{font-family:var(--fm);font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:2px}
+.lv-step--mem::before{background:var(--ink);border-radius:50%}
+.lv-step--der::before{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ink-3)}
+.lv-step--pre::before{background:var(--red);border-radius:50%}
+.lv-step--mem,.lv-step--der,.lv-step--pre{color:var(--ink)}
+
+.lv-mem{margin-top:14px}
+.lv-mem__key{font-family:var(--fm);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.lv-seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg);margin-bottom:12px}
+.lv-seg__b{flex:1;min-height:44px;border:0;background:transparent;font-family:var(--ff);font-size:12.5px;color:var(--ink-2);cursor:pointer;padding:0 8px}
+.lv-seg__b + .lv-seg__b{border-left:1px solid var(--line)}
+.lv-seg__b.on{background:var(--ink);color:var(--bg)}
+.lv-mem__ph{font-family:var(--fm);font-size:10px;letter-spacing:.08em;color:var(--ink-3);padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:2px}
+.lv-mem__row{font-size:12.5px;line-height:1.5;color:var(--ink);padding:7px 0;border-bottom:1px solid var(--line)}
+.lv-mem__row:last-of-type{border-bottom:0}
+.lv-mem__tag{font-family:var(--fm);font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;display:block;margin-bottom:2px}
+.lv-mem__row--mem .lv-mem__tag{color:var(--ink-3)}
+.lv-mem__row--der .lv-mem__tag{color:var(--red)}
+.lv-mem__empty{font-size:12.5px;color:var(--ink-3);line-height:1.55;padding:4px 0 2px}
+.lv-mem__note{font-size:11.5px;line-height:1.5;color:var(--ink-3);margin:12px 0 0;padding-top:11px;border-top:1px solid var(--line)}
+
 /* ---- KIOSK ----------------------------------------------------------
    All admin chrome disappears and the conversation goes edge to edge.
    The UNVERIFIED banner is hidden here DELIBERATELY — Fede's explicit,
@@ -192,6 +217,24 @@ body.kiosk .kiosk-exit{display:block}
         </div>
         <div id="lvRail"><div class="lv-rail__idle" data-i18n="leyva.rail.idle">Escriba una pregunta para ver qué revisa el asistente antes de contestar.</div></div>
       </div>
+
+      <!-- CUSTOMER MEMORY — OPERATOR SIDE ONLY.
+           This control and this panel live in the rail and must NEVER move
+           into the phone. The buyer holding the handset seeing a "Cliente que
+           vuelve" switch is the difference between "it remembered me" and
+           "you set that up". See HANDOFF.md §0. -->
+      <div class="lv-rail lv-mem">
+        <div class="lv-rail__hd">
+          <span data-i18n="leyva.mem.title">Memoria del cliente</span>
+          <span class="lv-mem__key" data-i18n="leyva.mem.key">por teléfono</span>
+        </div>
+        <div class="lv-seg" role="group" aria-label="Perfil del cliente">
+          <button type="button" class="lv-seg__b" data-mode="nuevo" aria-pressed="true" data-i18n-btn="leyva.mem.new">Cliente nuevo</button>
+          <button type="button" class="lv-seg__b" data-mode="vuelve" aria-pressed="false" data-i18n-btn="leyva.mem.ret">Cliente que vuelve</button>
+        </div>
+        <div id="lvMem"></div>
+        <p class="lv-mem__note" data-i18n="leyva.mem.note">En el demo la memoria vive en este navegador y se va con él. En producción vive en la base de datos del cliente.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -199,6 +242,7 @@ body.kiosk .kiosk-exit{display:block}
 <script src="js/i18n.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="js/leyva-demo.js"></script>
+<script src="js/leyva-memory.js"></script>
 <script src="js/leyva-proforma.js"></script>
 <script src="js/leyva-chat.js"></script>
 </body>

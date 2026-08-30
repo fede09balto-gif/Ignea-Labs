@@ -39,19 +39,25 @@ var LeyvaDemo = (function () {
      Kept small on purpose — this is the "it must answer with no
      network" set, not a mirror of the catalog. Null-priced items are
      absent by design, never with a placeholder. */
+  /* `sku` is the join back to data/leyva-catalog.json. Customer memory stores
+     an order as {sku, qty} and NOTHING ELSE, so every price on a remembered
+     order is resolved through this table at read time. That is what makes a
+     stored order incapable of carrying a stale price. Keep these in sync with
+     the catalog's keys — a typo here silently drops the line rather than
+     mispricing it, which is the failure direction we want. */
   var LOCAL_PRICES = {
-    gypsum:   { n: 'lámina de gypsum 1/2" x 4x8', p: 370, antes: 400 },
-    puerta3:  { n: 'puerta metálica 3 tableros café', p: 4260, antes: 4761 },
-    puerta6:  { n: 'puerta metálica blanca 6 tableros', p: 4260, antes: 4761 },
-    puerta5:  { n: 'puerta metálica 5 tableros caoba', p: 4140, antes: 4792 },
-    tabla:    { n: 'tabla 1" x 12 x 5"', p: 1050, antes: 1150 },
-    bondex:   { n: 'Bondex Plus Cemex de 20 kg', p: 185 },
-    bondexp:  { n: 'Bondex Pega Cerámica Premium de 20 kg', p: 230 },
-    aceite:   { n: 'Yamalube 20W-50 4T de litro', p: 277 },
-    bat65:    { n: 'batería Kobe 12N6-5L-BS-GEL', p: 663 },
-    bat74:    { n: 'batería Kobe 12N7-4B-GEL', p: 816 },
-    llanta17: { n: 'CST C6571 2.75-17 6PR', p: 1206 },
-    llanta90: { n: 'CST C918 90/90-17 TL', p: 1626 }
+    gypsum:   { sku: 'GYP-12-48',         n: 'lámina de gypsum 1/2" x 4x8', p: 370, antes: 400 },
+    puerta3:  { sku: 'PTA-MET-3T-CAFE',   n: 'puerta metálica 3 tableros café', p: 4260, antes: 4761 },
+    puerta6:  { sku: 'PTA-MET-6T-BLANCA', n: 'puerta metálica blanca 6 tableros', p: 4260, antes: 4761 },
+    puerta5:  { sku: 'PTA-MET-5T-CAOBA',  n: 'puerta metálica 5 tableros caoba', p: 4140, antes: 4792 },
+    tabla:    { sku: 'TAB-1X12X5',        n: 'tabla 1" x 12 x 5"', p: 1050, antes: 1150 },
+    bondex:   { sku: 'BON-PLUS-20',       n: 'Bondex Plus Cemex de 20 kg', p: 185 },
+    bondexp:  { sku: 'BON-CER-PREM-20',   n: 'Bondex Pega Cerámica Premium de 20 kg', p: 230 },
+    aceite:   { sku: 'ACE-YAM-20W50',     n: 'Yamalube 20W-50 4T de litro', p: 277 },
+    bat65:    { sku: 'BAT-KOBE-12N65L',   n: 'batería Kobe 12N6-5L-BS-GEL', p: 663 },
+    bat74:    { sku: 'BAT-KOBE-12N74B',   n: 'batería Kobe 12N7-4B-GEL', p: 816 },
+    llanta17: { sku: 'LLA-CST-C6571',     n: 'CST C6571 2.75-17 6PR', p: 1206 },
+    llanta90: { sku: 'LLA-CST-C918',      n: 'CST C918 90/90-17 TL', p: 1626 }
   };
 
   var CAT_TOOLS = {
@@ -83,11 +89,133 @@ var LeyvaDemo = (function () {
       .replace(/\s+/g, ' ').trim();
   }
 
+  /* ---- customer memory bridge ---------------------------------------
+     See js/leyva-memory.js and HANDOFF.md §0. Three things matter here:
+
+     1. DECLARED facts may be stated back; DERIVED facts are OFFERED AS
+        QUESTIONS. Every string below obeys that split — read them before
+        editing one.
+     2. NO GREETING BY NAME. Message one is "Buenas.", never
+        "¡Buenas, don Marvin!". Phones get shared in a cuadrilla.
+     3. Branches that touch a DOCUMENT or a STORED PROFILE are marked
+        `localOnly` and never reach the model. A customer's legal name on a
+        proforma, and a "borré sus datos" claim a buyer can check, are not
+        things to route through a probabilistic path. The rail labels these
+        "Determinista" rather than "Local" so the operator can say so out
+        loud — it is a selling point, not an apology. */
+  function M() { return (typeof LeyvaMemory !== 'undefined') ? LeyvaMemory : null; }
+
+  /* Conversation state for the two-step proforma. Reset by leyva-chat.js's
+     reset(). Deliberately NOT persisted: a half-finished naming question
+     surviving a restart would put a stale name on the next document. */
+  var ST = { awaitingName: null, nudged: false };
+  function resetState() { ST.awaitingName = null; ST.nudged = false; }
+
+  function memLines(order) {
+    return order.lines.map(function (l) {
+      return l.qty + ' ' + l.n + ' — ' + money(l.total);
+    }).join('\n');
+  }
+
+  /* The open-proforma follow-up (their stated pain #2). OFFERED, never
+     asserted, and fired at most once per conversation. The figure is
+     recomputed from the catalog on every call — it is never read from
+     storage, so it cannot be stale. */
+  function openProformaNudge(replyText) {
+    var m = M(); if (!m || ST.nudged) return null;
+    var open = m.abiertas()[0];
+    if (!open) return null;
+    // The repeat-order branch already lists this exact proforma. Appending
+    // "y quedó pendiente la PRO-2481" to a message that just itemised
+    // PRO-2481 reads as a system that is not listening to itself.
+    if (replyText && replyText.indexOf(open.correlativo) !== -1) return null;
+    ST.nudged = true;
+    return {
+      bubbles: ['Ah, y quedó pendiente la ' + open.correlativo + ' por ' + money(open.total) + '.', '¿La activamos?'],
+      rail: [
+        'MEM|Pedido abierto ' + open.correlativo + ' del ' + m.fmtDate(open.fecha),
+        'DER|Total ' + money(open.total) + ' recalculado hoy contra el catálogo',
+        'Se ofrece como pregunta, no como afirmación'
+      ]
+    };
+  }
+
+  /* The naming question. This is the ONLY place a remembered name is spoken,
+     because this is the only moment it is load-bearing. Staleness changes the
+     wording, not the fact that we ask: a razón social we have not heard in
+     eight months gets its age stated out loud. */
+  function nameAsk() {
+    var m = M();
+    var rs = m && m.declared('razon_social');
+    var nb = m && m.declared('nombre');
+    if (rs) {
+      if (rs.stale) {
+        return { q: ['¿Todavía a nombre de ' + rs.v + '?', 'La tengo declarada desde ' + m.fmtDate(rs.at) + ', por eso le confirmo.'],
+                 rail: ['MEM|Razón social: ' + rs.v + ' · declarada ' + m.fmtDate(rs.at),
+                        'Declarada hace ' + rs.ageDays + ' días → se confirma, no se afirma'] };
+      }
+      return { q: ['¿Se la hago a nombre de ' + rs.v + '?'],
+               rail: ['MEM|Razón social: ' + rs.v + ' · declarada ' + m.fmtDate(rs.at)] };
+    }
+    if (nb) {
+      return { q: ['¿Se la hago a nombre suyo, ' + nb.v + ', o a una razón social?', 'Si es para empresa y me da el RUC, se la hago a la razón social.'],
+               rail: ['MEM|Nombre: ' + nb.v + ' · declarado ' + m.fmtDate(nb.at),
+                      'Sin razón social en memoria → se pregunta'] };
+    }
+    return { q: ['¿A nombre de quién se la hago?', '¿Es para empresa? Si me da el RUC se la hago a la razón social.'],
+             rail: ['Sin datos del cliente en memoria', 'Se pregunta el nombre — no se deja en blanco'] };
+  }
+
+  /* Pull a name or a RUC out of the customer's answer to nameAsk(). Strict on
+     purpose: anything it does not recognise falls through to "no entendí" and
+     asks again, which is far better than writing a fragment of a sentence onto
+     a document as if it were a company name. */
+  var RUC_RE = /\b([JjEeGgNn]\d{13}|\d{3}-?\d{6}-?\d{4}[A-Za-z]?)\b/;
+
+  function parseNameAnswer(raw) {
+    var t = norm(raw);
+    var out = { ruc: null, razon: null, nombre: null, confirm: false, decline: false };
+
+    var rm = raw.match(RUC_RE);
+    if (rm) out.ruc = rm[1].toUpperCase();
+
+    if (/^(si|sii+|s|claro|dale|va|va pues|correcto|exacto|asi es|esa misma|la misma|el mismo|afirmativo|ok|okey|de acuerdo|asi mismo)\b/.test(t)) out.confirm = true;
+    if (/^(no|nel|negativo)\b/.test(t) && !/^no,? a nombre/.test(t)) out.decline = true;
+
+    // "a nombre de X", "a nombre mio", "para X", or a bare proper-noun answer.
+    var nm = raw.match(/a\s+nombre\s+de\s+(.+)$/i) || raw.match(/^\s*(?:p[oa]ra|es\s+para)\s+(.+)$/i);
+    var cand = nm ? nm[1] : null;
+    if (!cand && !out.confirm && !out.decline && !out.ruc) {
+      // A bare answer, e.g. "Constructora García S.A." — accept only if it
+      // looks like a name: 1-6 words, at least one capitalised, no verbs.
+      var bare = raw.trim();
+      if (bare && bare.split(/\s+/).length <= 6 && /[A-ZÁÉÍÓÚÑ]/.test(bare) && !/\?/.test(bare)) cand = bare;
+    }
+    if (/a\s+nombre\s+m[íi]o|es\s+para\s+m[íi]|a\s+mi\s+nombre|personal/i.test(raw)) {
+      out.nombre = true;
+      cand = null;
+    }
+    if (cand) {
+      // Strip trailing punctuation WITHOUT eating the final dot of an
+      // abbreviation: "Constructora Peña S.A." must not become "S.A".
+      cand = cand.replace(RUC_RE, '').replace(/\b(y|con|el|mi)\s+ruc\b.*$/i, '')
+                 .replace(/[,;]\s*$/, '')
+                 .replace(/(?<![A-ZÁÉÍÓÚÑ])\.\s*$/, '')
+                 .replace(/\s{2,}/g, ' ').trim();
+      if (cand) {
+        // A razón social, not a person, if it carries a company marker.
+        if (/\b(s\.?a\.?|s\.?a\.? de c\.?v\.?|cia|compa[nñ]ia|constructora|ferreter[íi]a|distribuidora|inversiones|grupo|corporaci[oó]n|import|comercial)\b/i.test(cand)) out.razon = cand;
+        else out.razon = cand;   // treated as the document name either way
+      }
+    }
+    return out;
+  }
+
   function local(text) {
     var t = norm(text);
     var rail = [];
 
-    function hit(msgs, trace) { rail = trace; return { bubbles: msgs, rail: rail }; }
+    function hit(msgs, trace, localOnly) { rail = trace; return { bubbles: msgs, rail: rail, localOnly: !!localOnly }; }
 
     // Prompt injection / instruction probing. A skeptical buyer WILL try this.
     // Stay in character, do not acknowledge having instructions.
@@ -96,10 +224,119 @@ var LeyvaDemo = (function () {
         ['Intento de sacarlo de rol', 'Se mantiene en el mostrador']);
     }
 
+    /* "olvidá mis datos" — wipe and confirm. DETERMINISTIC ON PURPOSE.
+       This is the single claim in the whole demo that a skeptical buyer can
+       actually check, so the answer is produced by the same code that does
+       the deleting, and the rail asserts the post-condition rather than the
+       intention. A scripted "listo, borré sus datos" over a profile still
+       sitting in storage would be the worst failure in this file. */
+    if (/\b(olvid|borr|elimin)\w*\b[^]*\b(mis\s+)?(datos|informacion|info|perfil|registro)\b/.test(t) ||
+        /\bno\s+guarde\s+(mis\s+)?(datos|nada)\b/.test(t) ||
+        /\bborr\w*\s+todo\s+lo\s+m[ií]o\b/.test(t)) {
+      var mm = M();
+      var had = !!(mm && mm.profile());
+      if (mm) mm.forget();
+      resetState();
+      if (!had) {
+        return hit(['No tengo datos suyos guardados.', '¿En qué le ayudo?'],
+          ['Solicitud: olvidar datos', 'No había perfil para este número'], true);
+      }
+      return hit(['Listo, borré sus datos.', 'No me queda nada suyo guardado.'],
+        ['Solicitud: olvidar datos',
+         'Perfil eliminado de memoria',
+         (mm && mm.wiped()) ? 'Verificado: sin registro para este número' : 'ADVERTENCIA: el borrado no se pudo verificar'], true);
+    }
+
+    /* Answering the naming question. Only reachable while a proforma is
+       actually being built — there is no other path into it, so a stray
+       "sí" in an unrelated conversation cannot write a name to a profile. */
+    if (ST.awaitingName) {
+      var m2 = M();
+      var ans = parseNameAnswer(text);
+      var ord = ST.awaitingName;
+      var rsMem = m2 && m2.declared('razon_social');
+      var nbMem = m2 && m2.declared('nombre');
+      var chosen = null, railM = [];
+
+      if (ans.ruc && m2) { m2.declare('ruc', ans.ruc); railM.push('PRE|RUC declarado ahora: ' + ans.ruc); }
+
+      if (ans.razon) {
+        if (m2) m2.declare('razon_social', ans.razon);
+        chosen = ans.razon;
+        railM.push('PRE|Razón social declarada ahora: ' + ans.razon);
+      } else if (ans.confirm && rsMem) {
+        chosen = rsMem.v;
+        railM.push('MEM|Razón social confirmada por el cliente: ' + rsMem.v);
+        if (m2) m2.declare('razon_social', rsMem.v);   // re-stamp declared_at: he just said it again
+      } else if ((ans.nombre || ans.decline) && nbMem) {
+        chosen = nbMem.v;
+        railM.push('MEM|A nombre personal: ' + nbMem.v);
+      } else if (ans.confirm && nbMem) {
+        chosen = nbMem.v;
+        railM.push('MEM|Nombre confirmado por el cliente: ' + nbMem.v);
+      }
+
+      if (!chosen) {
+        // NULL-GUARD: not understood -> ask again. Never guess a name onto a
+        // document, and never leave the line blank.
+        return hit(['No le entendí el nombre.', '¿Me lo escribe tal cual va en la proforma?'],
+          ['Respuesta no reconocida', 'Se vuelve a preguntar — no se escribe un nombre adivinado'], true);
+      }
+
+      ST.awaitingName = null;
+      var rucMem = m2 && m2.declared('ruc');
+      var dirMem = m2 && m2.declared('direccion');
+      // No double period after an abbreviation ("... S.A..").
+      var msgs = ['Va, se la mando a nombre de ' + chosen + (/\.$/.test(chosen) ? '' : '.')];
+      // NULL-GUARD EXTENSION: a field we do not have produces a QUESTION,
+      // never a blank line on the document. Dirección is deliberately absent
+      // from the seeded profile so this fires in the demo.
+      if (!dirMem) msgs.push('No tengo dirección suya para la proforma. Si me la pasa se la agrego.');
+      railM.push(rucMem ? ('MEM|RUC: ' + rucMem.v + (rucMem.fake ? ' (de ejemplo)' : '')) : 'Sin RUC en memoria → la proforma sale sin línea de RUC');
+      railM.push(dirMem ? ('MEM|Dirección: ' + dirMem.v) : 'Sin dirección en memoria → se pregunta, no se deja en blanco');
+      railM.push('Documento: ruta determinista, sin modelo');
+      return { bubbles: msgs, rail: railM, localOnly: true, order: ord, profileName: chosen };
+    }
+
+    /* Repeat order — "lo mismo del mes pasado". The single most valuable
+       interaction in this demo for a contractor: it collapses a five-message
+       exchange into one. The prior proforma is pulled by correlativo, its
+       lines are re-priced against TODAY's catalog (storage holds {sku, qty}
+       only), and the quantities are ASKED, not assumed. */
+    if (/\blo mismo\b|\blo de siempre\b|\bigual que la (vez|ves) pasada\b|\bel mismo pedido\b|\bcomo la (vez|ves) pasada\b|\blo del mes pasado\b|\brepet\w* el pedido\b|\blo de la otra vez\b|\blo mismo del mes pasado\b/.test(t)) {
+      var m3 = M();
+      var last = m3 && m3.ultimoPedido();
+      if (!last) {
+        // A remembered fact we do not have becomes a QUESTION. Never
+        // "como siempre" with nothing behind it.
+        return hit(['No tengo un pedido anterior suyo aquí.', '¿Qué ocupa?'],
+          ['Consulta: repetir pedido', 'Sin pedidos anteriores en memoria', 'Se pregunta en vez de suponer'], true);
+      }
+      return {
+        bubbles: [
+          'Va. El último fue la ' + last.correlativo + ', del ' + m3.fmtDate(last.fecha) + '.',
+          memLines(last),
+          'Eso da ' + money(last.total) + ' con los precios de hoy. ¿Van las mismas cantidades?'
+        ],
+        rail: [
+          'DER|Pedido anterior ' + last.correlativo + ' del ' + m3.fmtDate(last.fecha),
+          'DER|' + last.lines.length + ' líneas recuperadas por SKU',
+          'Precios recalculados hoy contra el catálogo — no se guardan',
+          'Cantidades: se preguntan, no se asumen'
+        ],
+        localOnly: true
+      };
+    }
+
     // Greeting.
     if (/^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|que tal|saludos)\b/.test(t) && t.length < 30) {
       return hit(['Buenas.', '¿Qué ocupa?'], ['Saludo', 'Abre la conversación']);
     }
+    // NOTE: the greeting above is NEUTRAL BY DESIGN and must stay that way.
+    // Never "¡Buenas, don Marvin!" — a phone shared in a cuadrilla makes
+    // greeting the wrong person by name a memorable failure in front of a
+    // buyer. The remembered name goes on the proforma question instead,
+    // where it is load-bearing. See HANDOFF.md §0.
 
     // English — answer in Spanish, do not switch. This is a Nicaraguan
     // ferretería's WhatsApp; a bilingual counter would break the illusion.
@@ -162,18 +399,40 @@ var LeyvaDemo = (function () {
         ['Consulta: lámina de revestimiento', 'Producto en catálogo', 'SIN PRECIO EN SISTEMA', 'Escalar al mostrador']);
     }
 
-    // Cotización — sum priced items only.
-    if (/cotiza|proforma|proform|proforma|proformar|presupuesto|me arma|s[úu]meme|cu[áa]nto me sale todo/.test(t)) {
+    /* Cotización — TWO STEPS, deliberately.
+
+       Step 1 (here) quotes the lines and ASKS WHOSE NAME goes on the
+       document. Step 2 is the ST.awaitingName branch above, which issues it.
+       The split is the rule "ask for the name only when building a proforma,
+       because that is when it is genuinely needed" made structural: the name
+       is never requested as a greeting, and a document is never produced with
+       a name nobody confirmed.
+
+       No document is emitted on this turn — `suppressDoc` tells the chat
+       layer not to render a PDF card from these lines yet. */
+    if (/cotiza|proforma|proform|proformar|presupuesto|me arma|s[úu]meme|cu[áa]nto me sale todo/.test(t)) {
       var lines = [
         { q: 10, it: LOCAL_PRICES.gypsum },
         { q: 2, it: LOCAL_PRICES.puerta3 }
       ];
       var sub = lines.reduce(function (a, l) { return a + l.q * l.it.p; }, 0);
-      return hit([
-        'Va pues, se la armo.',
-        lines.map(function (l) { return l.q + ' ' + l.it.n + ' — ' + money(l.q * l.it.p); }).join('\n'),
-        'Total ' + money(sub) + '. Entrega se la confirma el mostrador.'
-      ], ['Consulta: cotización', '2 líneas con precio en sistema', 'Suma ' + money(sub), 'Entrega: sin dato → escalar']);
+      var ask = nameAsk();
+      ST.awaitingName = {
+        lines: lines.map(function (l) { return { sku: l.it.sku, qty: l.q, desc: l.it.n, unit: l.it.p, total: l.q * l.it.p }; }),
+        total: sub
+      };
+      return {
+        bubbles: [
+          'Va pues, se la armo.',
+          lines.map(function (l) { return l.q + ' ' + l.it.n + ' — ' + money(l.q * l.it.p); }).join('\n'),
+          'Total ' + money(sub) + '.'
+        ].concat(ask.q),
+        rail: ['Consulta: cotización', '2 líneas con precio en sistema', 'Suma ' + money(sub),
+               'Entrega: sin dato → escalar'].concat(ask.rail)
+             .concat(['Documento: ruta determinista, sin modelo']),
+        localOnly: true,
+        suppressDoc: true
+      };
     }
 
     // Multi-product in one message — quote every priced match, not just the
@@ -249,7 +508,18 @@ var LeyvaDemo = (function () {
       // `preset` is what makes the server build the catalog-grounded
       // system prompt. No system prompt is sent from here on purpose —
       // the server would ignore it anyway.
-      body: JSON.stringify({ preset: 'leyva', max_tokens: MAX_TOKENS, messages: history }),
+      //
+      // `memory` is STRUCTURED, never prose: five short declared fields plus
+      // orders expressed as {sku, qty}. The server re-validates every field
+      // and re-derives every price from the catalog, so nothing here can
+      // inject prompt text or a price. That is what keeps a leaked demo token
+      // from becoming a general model proxy — see api/claude.js.
+      body: JSON.stringify({
+        preset: 'leyva',
+        max_tokens: MAX_TOKENS,
+        messages: history,
+        memory: (typeof LeyvaMemory !== 'undefined') ? LeyvaMemory.wire() : null
+      }),
       signal: ctrl.signal
     }).then(function (r) {
       if (!r.ok) return null;
@@ -270,6 +540,9 @@ var LeyvaDemo = (function () {
   return {
     local: local,
     callApi: callApi,
+    openProformaNudge: openProformaNudge,
+    resetState: resetState,
+    parseNameAnswer: parseNameAnswer,
     LOCAL_PRICES: LOCAL_PRICES,
     CAT_TOOLS: CAT_TOOLS,
     API_TIMEOUT_MS: API_TIMEOUT_MS

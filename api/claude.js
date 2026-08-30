@@ -96,6 +96,151 @@ function buildLeyvaSystem() {
   return L.join('\n');
 }
 
+/* ============================================================
+   CUSTOMER MEMORY BLOCK — see HANDOFF.md §0 for the spec.
+
+   THE THREAT THIS DEFENDS AGAINST, stated because it is not obvious
+   from the shape of the code: the whole reason a `demo` scope exists
+   is that a demo token CANNOT SUPPLY A SYSTEM PROMPT, so the worst a
+   leaked one does is run the Leyva assistant. Accepting a free-text
+   "memory" string from the client would have handed that property
+   straight back — the client would be writing into the system prompt
+   through a different door.
+
+   So `memory` is STRUCTURED, NEVER PROSE:
+     · five whitelisted declared fields, each length-capped and
+       character-filtered, newlines stripped;
+     · orders expressed as {sku, qty} and nothing else.
+
+   And the client cannot inject a PRICE either. A stored line names a
+   SKU; the SKU is looked up HERE, in data/leyva-catalog.json. An
+   unknown SKU, or one with precio: null, is DROPPED. Every name, unit
+   price and total in the rendered block comes from the catalog. There
+   is no field in the wire format into which a number could be placed.
+
+   Anything malformed is dropped silently rather than rejected: a demo
+   in a client's shop must degrade to "no memory" and keep answering,
+   never to a 400 in front of a buyer.
+   ============================================================ */
+
+var MEM_FIELDS = {
+  nombre: 'Nombre', razon_social: 'Razón social', ruc: 'RUC',
+  direccion: 'Dirección', forma_pago: 'Forma de pago'
+};
+var MEM_MAX_LEN = 60;
+var MEM_MAX_ORDERS = 3;
+var MEM_MAX_LINES = 12;
+
+// Letters, digits, spaces and the punctuation that appears in real Nicaraguan
+// company names and RUCs. Everything else — including every character used to
+// structure a prompt — is stripped.
+var MEM_ALLOWED = /[^\p{L}\p{N} .,&()\-\/#º°']/gu;
+
+function memClean(v) {
+  if (typeof v !== 'string') return null;
+  var out = v.replace(/[\r\n\t]+/g, ' ').replace(MEM_ALLOWED, '').replace(/\s+/g, ' ').trim();
+  if (!out) return null;
+  return out.slice(0, MEM_MAX_LEN);
+}
+
+function memDate(v) {
+  return (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) ? v : null;
+}
+
+function memFmtDate(iso) {
+  var p = iso.split('-');
+  return p[2] + '/' + p[1] + '/' + p[0];
+}
+
+function memDaysAgo(iso) {
+  return Math.floor((Date.now() - new Date(iso + 'T00:00:00Z').getTime()) / 86400000);
+}
+
+/* Resolve a stored order against the catalog. Names and prices come from
+   leyvaCatalog, never from the request. */
+function memResolveOrder(o) {
+  if (!o || typeof o !== 'object' || !Array.isArray(o.lines)) return null;
+  var corr = (typeof o.correlativo === 'string' && /^PRO-\d{4}$/.test(o.correlativo)) ? o.correlativo : null;
+  var fecha = memDate(o.fecha);
+  if (!corr || !fecha) return null;
+  var lines = [], total = 0;
+  o.lines.slice(0, MEM_MAX_LINES).forEach(function (l) {
+    if (!l || typeof l.sku !== 'string') return;
+    var it = leyvaCatalog.items[l.sku];
+    if (!it || it.precio === null || it.precio === undefined) return;   // unknown or unpriced -> dropped
+    var qty = parseInt(l.qty, 10);
+    if (!(qty > 0 && qty < 1000)) return;
+    lines.push('  · ' + qty + ' x ' + it.n + ' — C$' + (it.precio * qty));
+    total += it.precio * qty;
+  });
+  if (!lines.length) return null;
+  return {
+    correlativo: corr, fecha: fecha,
+    abierta: o.estado === 'abierta',
+    lines: lines, total: total
+  };
+}
+
+/* Returns null when there is nothing usable, and null means the prompt is
+   byte-identical to what it was before memory existed. */
+function buildLeyvaMemory(mem) {
+  if (!mem || typeof mem !== 'object') return null;
+
+  var declared = [];
+  if (mem.declared && typeof mem.declared === 'object') {
+    Object.keys(MEM_FIELDS).forEach(function (f) {
+      var d = mem.declared[f];
+      if (!d || typeof d !== 'object') return;
+      var v = memClean(d.v);
+      var at = memDate(d.at);
+      if (!v || !at) return;   // a field without a real declared_at cannot be repeated back
+      var age = memDaysAgo(at);
+      declared.push('- ' + MEM_FIELDS[f] + ': ' + v + ' (lo dijo el ' + memFmtDate(at) +
+        (age > 90 ? ', hace ' + age + ' días — CONFÍRMELO, no lo afirme' : '') + ')');
+    });
+  }
+
+  var orders = [];
+  if (Array.isArray(mem.orders)) {
+    mem.orders.slice(0, MEM_MAX_ORDERS).forEach(function (o) {
+      var r = memResolveOrder(o);
+      if (r) orders.push(r);
+    });
+  }
+
+  if (!declared.length && !orders.length) return null;
+
+  var L = ['', 'MEMORIA DE ESTE CLIENTE — reglas antes que datos:'];
+  L.push('- NO SALUDE POR NOMBRE. Nunca abra con "¡Buenas, don X!". El teléfono se comparte en la cuadrilla y saludar a la persona equivocada por su nombre delante de un comprador es un error que no se olvida. El primer mensaje es "Buenas." y nada más.');
+  L.push('- El nombre se usa SOLO cuando hace falta de verdad: al armar una proforma. En ningún otro momento.');
+  L.push('- Lo DECLARADO (abajo) el cliente se lo dijo, así que puede repetírselo. Si tiene más de 90 días, pregúntelo en vez de afirmarlo.');
+  L.push('- Lo DERIVADO del historial se OFRECE COMO PREGUNTA, jamás como afirmación. Nunca diga "como siempre" ni "lo de siempre" sin un pedido real detrás.');
+  L.push('- Si un dato no está abajo, NO LO TIENE. Pregúntelo. Nunca lo deje en blanco ni lo invente.');
+
+  if (declared.length) {
+    L.push('');
+    L.push('DECLARADO POR EL CLIENTE:');
+    L = L.concat(declared);
+  }
+
+  if (orders.length) {
+    L.push('');
+    L.push('DERIVADO DEL HISTORIAL (ofrézcalo preguntando):');
+    orders.forEach(function (o) {
+      L.push('- Proforma ' + o.correlativo + ' del ' + memFmtDate(o.fecha) +
+             (o.abierta ? ' — SIGUE ABIERTA, sin cerrar' : ' — cerrada') + ', total C$' + o.total + ':');
+      L = L.concat(o.lines);
+    });
+    var open = orders.filter(function (o) { return o.abierta; })[0];
+    if (open) {
+      L.push('- Si viene al caso, puede recordarle una sola vez: "Quedó pendiente la ' + open.correlativo +
+             ' por C$' + open.total + '.|||¿La activamos?" — preguntando, nunca dando por hecho.');
+    }
+  }
+
+  return L.join('\n');
+}
+
 var PRESETS = { leyva: buildLeyvaSystem() };
 
 var DEFAULT_ORIGINS = ['https://ignealabs.com', 'https://www.ignealabs.com'];
@@ -260,6 +405,21 @@ export default async function handler(req, res) {
       // that actually matters with a buyer watching. Array form is used ONLY
       // here — the ops-ai path keeps its plain-string system field.
       body.system = [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }];
+
+      /* Customer memory rides as a SECOND, UNCACHED block.
+
+         This split is not stylistic. The catalog block is identical on every
+         request and is what the ~3x cost saving is bought with; the memory
+         block changes per customer. Concatenating them into one string would
+         have invalidated the cache on every turn and NOTHING WOULD HAVE
+         FAILED VISIBLY — the demo would simply have started costing three
+         times as much, silently. Keep them separate.
+
+         Absent or unusable memory appends nothing, so a request without it
+         produces a byte-identical system field to the one before this
+         existed. Regression-tested. */
+      var memBlock = buildLeyvaMemory(incoming.memory);
+      if (memBlock) body.system.push({ type: 'text', text: memBlock });
     }
 
     var response = await fetch('https://api.anthropic.com/v1/messages', {

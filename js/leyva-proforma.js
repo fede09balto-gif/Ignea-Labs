@@ -169,13 +169,29 @@ var LeyvaProforma = (function () {
     return d;
   }
 
-  var seq = 2480;   // first issued is PRO-2481 (Fede's format)
+  var BASE = 2480;  // first issued is PRO-2481 (Fede's format)
+  var seq = BASE;
   function next() { return ++seq; }
+
+  /* Continue the numbering after whatever the customer's memory already
+     holds. Without this, a returning customer whose seeded open proforma is
+     PRO-2481 would be handed a SECOND, different PRO-2481 — two documents
+     with the same correlativo and different contents, which is precisely the
+     kind of error a contractor keeps in a folder and finds later. */
+  function reseed(orders) {
+    var hi = BASE;
+    (orders || []).forEach(function (o) {
+      var m = /^PRO-(\d{4})$/.exec(o.correlativo || '');
+      if (m) hi = Math.max(hi, parseInt(m[1], 10));
+    });
+    seq = hi;
+  }
 
   return {
     parse: parse,
     build: build,
     next: next,
+    reseed: reseed,
     correlativo: correlativo,
     BIZ: BIZ
   };

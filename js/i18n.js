@@ -1115,6 +1115,11 @@ var IgneaI18n = (function() {
       "leyva.rail.idle": "Toque una pregunta para ver qué revisa el asistente antes de contestar.",
       "leyva.script": "Guion",
       "leyva.kiosk": "Pantalla completa",
+      "leyva.mem.title": "Memoria del cliente",
+      "leyva.mem.key": "por teléfono",
+      "leyva.mem.new": "Cliente nuevo",
+      "leyva.mem.ret": "Cliente que vuelve",
+      "leyva.mem.note": "En el demo la memoria vive en este navegador y se va con él. En producción vive en la base de datos del cliente.",
 
       // ---- OPS: SECTION TAGS ----
       "ops.calc.tag": "// Calculadora de propuesta",
@@ -2286,6 +2291,11 @@ var IgneaI18n = (function() {
       "leyva.rail.idle": "Tap a question to see what the assistant checks before answering.",
       "leyva.script": "Script",
       "leyva.kiosk": "Fullscreen",
+      "leyva.mem.title": "Customer memory",
+      "leyva.mem.key": "keyed on phone",
+      "leyva.mem.new": "New customer",
+      "leyva.mem.ret": "Returning customer",
+      "leyva.mem.note": "In this demo memory lives in this browser and leaves with it. In production it lives in the client’s own database.",
 
       // ---- OPS: SECTION TAGS ----
       "ops.calc.tag": "// Proposal calculator",
