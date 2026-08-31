@@ -315,7 +315,21 @@ var LeyvaFamilies = {
       "material de techo": "Material de techo",
       "para el techo": "Material de techo"
     },
-    "aclaracion": "Las láminas que tengo son de gypsum y de revestimiento — esas son para cielo raso o pared, no para techo."
+    "aclaracion": "Las láminas que tengo son de gypsum y de revestimiento — esas son para cielo raso o pared, no para techo.",
+    "aclaracionTerms": [
+      "techo",
+      "techos",
+      "techar",
+      "techado",
+      "cubierta",
+      "lamina de techo",
+      "laminas de techo",
+      "lamina para techo",
+      "laminas para techo",
+      "zinc para techo",
+      "material de techo",
+      "para el techo"
+    ]
   },
   "cemento": {
     "label": "cemento",

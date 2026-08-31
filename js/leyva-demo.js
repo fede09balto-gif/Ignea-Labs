@@ -288,6 +288,16 @@ var LeyvaDemo = (function () {
     return n.slice(0, -1).join(', ') + ' y ' + n[n.length - 1];
   }
 
+  /* The aclaración is scoped to the terms where the confusion is real. Someone
+     who says "techo" in a shop that visibly sells láminas will assume we mean
+     roofing sheets; someone asking for a teja will not. Attaching it to every
+     roofing term put a gypsum disclaimer on a question about clay tiles. */
+  function useAclaracion(ask) {
+    if (!ask.fam.aclaracion) return false;
+    var scope = ask.fam.aclaracionTerms;
+    return !scope || scope.indexOf(ask.term) !== -1;
+  }
+
   function catalogGuard(t) {
     var ask = resolveAsk(t);
     if (!ask || !ask.absent) return null;
@@ -316,7 +326,7 @@ var LeyvaDemo = (function () {
     return {
       bubbles: [
         'Fíjese que ' + label.toLowerCase() + ' no manejamos.'
-      ].concat(ask.fam.aclaracion ? [ask.fam.aclaracion] : [])
+      ].concat(useAclaracion(ask) ? [ask.fam.aclaracion] : [])
        .concat(['¿Quiere que le pase la consulta al equipo del mostrador?']),
       rail: [
         'Consulta: ' + label,

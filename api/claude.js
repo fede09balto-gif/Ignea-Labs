@@ -149,6 +149,12 @@ function famList(f) {
    That is why this always returns two bubbles and the inventory bubble never
    carries a price. Collapsed into one sentence it becomes a substitution
    again. */
+function famUseAclaracion(f, term) {
+  if (!f.aclaracion) return false;
+  var scope = f.aclaracionTerms;
+  return !scope || scope.indexOf(term) !== -1;
+}
+
 function famRefusal(absentHit) {
   var f = leyvaFamilies.familias[absentHit.key];
   var label = f.etiquetas[absentHit.term] || absentHit.term;
@@ -160,7 +166,7 @@ function famRefusal(absentHit) {
      assume we mean roofing sheets. Naming them to RULE THEM OUT is not an
      offer — it is the opposite of one. */
   return 'Fíjese que ' + label.toLowerCase() + ' no manejamos.'
-       + (f.aclaracion ? '|||' + f.aclaracion : '')
+       + (famUseAclaracion(f, absentHit.term) ? '|||' + f.aclaracion : '')
        + '|||¿Quiere que le pase la consulta al equipo del mostrador?';
 }
 
