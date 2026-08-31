@@ -242,7 +242,10 @@ var LeyvaFamilies = {
       "esmeril",
       "pulidora",
       "compresor",
-      "soldadora"
+      "soldadora",
+      "herramienta",
+      "herramientas",
+      "herramientas electricas"
     ],
     "ausentes": [
       "esmeril",
@@ -273,7 +276,19 @@ var LeyvaFamilies = {
       "perlin",
       "perling",
       "clavador",
-      "canaleta"
+      "canaleta",
+      "techo",
+      "techos",
+      "techar",
+      "techado",
+      "cubierta",
+      "lamina de techo",
+      "laminas de techo",
+      "lamina para techo",
+      "laminas para techo",
+      "zinc para techo",
+      "material de techo",
+      "para el techo"
     ],
     "ausentes": [],
     "nombresCortos": [],
@@ -286,8 +301,21 @@ var LeyvaFamilies = {
       "perlin": "Perlín",
       "perling": "Perlín",
       "clavador": "Clavador",
-      "canaleta": "Canaleta"
-    }
+      "canaleta": "Canaleta",
+      "techo": "Material de techo",
+      "techos": "Material de techo",
+      "techar": "Material de techo",
+      "techado": "Material de techo",
+      "cubierta": "Material de cubierta",
+      "lamina de techo": "Lámina de techo",
+      "laminas de techo": "Lámina de techo",
+      "lamina para techo": "Lámina de techo",
+      "laminas para techo": "Lámina de techo",
+      "zinc para techo": "Lámina de zinc para techo",
+      "material de techo": "Material de techo",
+      "para el techo": "Material de techo"
+    },
+    "aclaracion": "Las láminas que tengo son de gypsum y de revestimiento — esas son para cielo raso o pared, no para techo."
   },
   "cemento": {
     "label": "cemento",

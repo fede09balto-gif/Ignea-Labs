@@ -257,8 +257,21 @@ var LeyvaDemo = (function () {
         if (!termHit(t, term)) return;
         var isAbsent = !f.presente || f.ausentes.indexOf(term) !== -1;
         if (isAbsent) {
-          // longest matching absent term wins: "lamina de zinc" over "zinc"
-          if (!offer || term.length > offer.term.length) offer = { key: k, fam: f, term: term };
+          /* Ranking, and the order matters more than it looks.
+
+             A family we stock NOTHING in outranks an absent variant of a
+             family we DO stock. "necesito láminas para el techo" hits both
+             `lamina`(zinc absent) and `techo`(nothing stocked); answering
+             from `lamina` would offer gypsum to a roofing question, which is
+             the original bug wearing a different phrasing. `techo` wins and
+             carries an aclaración saying our láminas are not roofing sheets.
+
+             Within the same rank, the longest term wins so "lamina de zinc"
+             beats a bare "zinc". */
+          var rank = f.presente ? 1 : 2;
+          if (!offer || rank > offer.rank || (rank === offer.rank && term.length > offer.term.length)) {
+            offer = { key: k, fam: f, term: term, rank: rank };
+          }
         } else if (!present || term.length > present.term.length) {
           present = { key: k, fam: f, term: term };
         }
@@ -302,9 +315,9 @@ var LeyvaDemo = (function () {
     // Family we do not carry at all. Refuse and escalate. List NOTHING.
     return {
       bubbles: [
-        'Fíjese que ' + label.toLowerCase() + ' no manejamos.',
-        '¿Quiere que le pase la consulta al equipo del mostrador?'
-      ],
+        'Fíjese que ' + label.toLowerCase() + ' no manejamos.'
+      ].concat(ask.fam.aclaracion ? [ask.fam.aclaracion] : [])
+       .concat(['¿Quiere que le pase la consulta al equipo del mostrador?']),
       rail: [
         'Consulta: ' + label,
         'Familia "' + ask.fam.label + '": NO LA MANEJA',
@@ -636,6 +649,19 @@ var LeyvaDemo = (function () {
         msgs.push('Le queda a ' + money(it.p) + '.');
       }
       return hit(msgs, ['Consulta: precio', 'Coincidencia en catálogo', it.antes ? 'Precio de promoción aplicado' : 'Precio único', 'Sin dato de existencia']);
+    }
+
+    /* Asked for a family we DO stock, but no specific product branch matched —
+       a bare "¿a cómo la lámina?" or "¿qué pegamento tienen?". Falling through
+       to "no lo manejo" here would be a FALSE STATEMENT ABOUT THEIR STOCK,
+       which is the same class of error as substituting, pointed the other way.
+       Answer with what the family actually contains and ask which one. */
+    var fam = resolveAsk(t);
+    if (fam && !fam.absent && fam.fam.presente) {
+      return hit(['En ' + fam.fam.label + ' tengo ' + listOf(fam.fam) + '.', '¿Cuál le sirve?'],
+        ['Consulta por familia: ' + fam.fam.label,
+         'Sin producto específico en la pregunta',
+         'Se lista lo de esa familia y se pregunta — no se elige por el cliente']);
     }
 
     // Off catalog.

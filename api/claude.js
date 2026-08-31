@@ -104,7 +104,13 @@ function famResolveAsk(raw) {
       if (!famTermHit(t, term)) return;
       var isAbsent = !f.presente || f.ausentes.indexOf(term) !== -1;
       if (isAbsent) {
-        if (!absentHit || term.length > absentHit.term.length) absentHit = { key: k, term: term };
+        // A family we stock NOTHING in outranks an absent variant of a family
+        // we DO stock — see the same note in js/leyva-demo.js. Within a rank,
+        // the longest term wins.
+        var rank = f.presente ? 1 : 2;
+        if (!absentHit || rank > absentHit.rank || (rank === absentHit.rank && term.length > absentHit.term.length)) {
+          absentHit = { key: k, term: term, rank: rank };
+        }
       } else if (presentKeys.indexOf(k) === -1) {
         presentKeys.push(k);
       }
@@ -149,7 +155,13 @@ function famRefusal(absentHit) {
   if (f.presente) {
     return label + ' no manejo.|||Lo que sí tengo en ' + f.label + ' es ' + famList(f) + '. Si le sirve alguna, me dice.';
   }
-  return 'Fíjese que ' + label.toLowerCase() + ' no manejamos.|||¿Quiere que le pase la consulta al equipo del mostrador?';
+  /* An aclaración exists only where NOT saying something would mislead: a
+     customer asking about a roof, in a shop that visibly sells láminas, will
+     assume we mean roofing sheets. Naming them to RULE THEM OUT is not an
+     offer — it is the opposite of one. */
+  return 'Fíjese que ' + label.toLowerCase() + ' no manejamos.'
+       + (f.aclaracion ? '|||' + f.aclaracion : '')
+       + '|||¿Quiere que le pase la consulta al equipo del mostrador?';
 }
 
 /* Fires when the model answered about a family nobody asked about. Replaces
