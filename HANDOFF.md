@@ -228,6 +228,95 @@ dated posts, the demo has nothing left to quote and is not shippable.
 
 ---
 
+### `feat/leyva-demo` — cross-category substitution, fixed in code (partner feedback)
+
+**The report:** *"puse lámina de zinc y me puso de gypsum."* Both are "láminas", so
+the swap survives right up to the line item — a roofing order quoted as drywall.
+
+**CAUSE, precisely. The rule was implemented and could not have worked.** The
+SUSTITUCIONES block has been in the prompt since the cemento fix. It failed because
+**the prompt never defined what a category IS**: `grep "it.cat" api/claude.js` returns
+nothing — the catalog's `cat` field is never emitted. The model received a flat list of
+names and prices and inferred category from the names, and the two products share a
+head noun. Reproduced live: **five phrasings of the same question, two substituted, one
+with C$370 attached.**
+
+**And `cat` could not have fixed it.** Gypsum is `construccion`; the revestimiento
+sheet is `acabados`. Two different catalog categories for two things a buyer would both
+call a lámina — a rule written against `cat` would have forbidden the exact reply we
+want. Hence a **separate form-factor axis**, `api/_data/leyva-families.json`: 17
+families, all 29 items assigned exactly once, no term collisions, validated by test.
+
+**THE FIX IS TWO GATES IN CODE. A prompt rule cannot hold a constraint with money
+behind it — that is the whole lesson here.**
+
+| | |
+|---|---|
+| **Inbound** | An off-catalog ask is answered deterministically and **never reaches the model** — client-side in `catalogGuard()`, server-side in the handler before the fetch. The response carries `x-ignea-family-gate: refused` so tests can see it fire. |
+| **Outbound** | A reply naming a family the customer did not ask about is **discarded and replaced**, whatever the prompt said. Header `x-ignea-family-gate: redirected:<family>`. |
+
+**Fail-closed:** any off-catalog term in the message makes the whole turn an off-catalog
+ask, so `¿lámina de gypsum o de zinc?` cannot answer about gypsum and silently drop the
+zinc.
+
+**Ranking:** a family we stock NOTHING in outranks an absent variant of a family we do
+stock. `necesito láminas para el techo` hits both `lamina`(zinc absent) and
+`techo`(nothing stocked); answering from `lamina` would offer gypsum to a roofing
+question. Within a rank, the longest term wins so `lamina de zinc` beats bare `zinc`.
+
+**THE NARROW LINE, and it is narrow.** Fede's rule: never present a different product as
+the answer, but you may state what the catalog holds in that family as a separate offer.
+Made structural — **the refusal is always the first bubble, the inventory is always a
+separate bubble, and the inventory bubble never carries a price.** Collapsed into one
+sentence it is a substitution again. Do not "tidy" these into one message.
+
+**`aclaracion`, scoped.** The techo family names our láminas *to rule them out* ("esas
+son para cielo raso o pared, no para techo") — in a shop that visibly sells láminas, NOT
+saying it is what misleads. Scoped to the 12 roofing-**intent** terms: someone asking for
+a teja or a nicalit gets a clean refusal, because nobody confuses those with gypsum.
+
+**Two more gaps the live transcript exposed, both now fixed:**
+1. `techo`/`techar` were not terms at all, so `algo para techar` resolved to no family,
+   the outbound gate had nothing to compare against, and the model offered gypsum.
+2. A bare family noun (`¿a cómo la lámina?`, `¿qué herramientas manejan?`) fell through
+   to "Uy, ese no lo manejo" — **a false statement about their stock, the same class of
+   error as substituting, pointed the other way.** It now lists the family and asks.
+
+**Verified: 26 live-model queries, zero cross-family substitutions, zero prices in an
+off-catalog reply**, asserted mechanically (first bubble is a refusal; no `C$` anywhere
+in an off-catalog reply; a stocked product may appear in a not-stocked family's reply
+only inside a negation). Plus 21 offline. Transcripts in the session log.
+
+**`js/leyva-families.js` is GENERATED** by `scripts/build-families.js` from the JSON.
+Never hand-edit it; `--check` asserts it is current and is part of the regression run. A
+term that resolved one way offline and another online would mean the demo behaved
+differently with and without signal.
+
+**RESIDUAL RISK, stated plainly:** coverage is lexical. A product term outside the 168
+in the lexicon resolves to no family, and the outbound gate only fires when the ask
+named at least one family we stock — with nothing to compare against, guessing would be
+worse than not gating. Adding a term is a one-line edit plus a regenerate.
+
+### Operator catalog — `api/leyva-catalog.js`
+
+The partner asked what is in the database so he does not ask for something we do not
+stock in front of the buyer. Gated by the same token, reading the **same files the system
+prompt is built from** — a hand-typed list in the brief would drift, and a brief that
+disagrees with the assistant is worse than none.
+
+Renders in `/leyva-script`: 29 items in 8 families with prices, the 11 null-priced ones
+marked **"sin precio en sistema — escala"**, per-family "de esta familia NO tiene", and
+the 9 not-stocked families as a "no manejan" list. Cached to `localStorage` after first
+load — this is read outside a shop on whatever signal exists. Print styles included.
+
+**A leak caught by testing the response body rather than the fields I remembered
+writing:** `leyvaCatalog.contacto` carries its own `source` / `source_url` /
+`source_date`, and passing the object through shipped them. Now projected to the three
+fields the brief needs. **When adding a field to any of these endpoints, assert on what
+comes back, not on what you think you wrote.**
+
+---
+
 ### `feat/leyva-demo` — THIS SESSION: memory, the phone frame, the brief, and the gate verified live
 
 **The demo is now reachable without a Vercel account.** Branch alias, stable across
