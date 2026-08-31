@@ -11,6 +11,7 @@ import crypto from 'crypto';
    Files under api/ whose name starts with `_` are excluded from function
    builds and are not served as static assets. */
 import leyvaCatalog from './_data/leyva-catalog.json' with { type: 'json' };
+import leyvaFamilies from './_data/leyva-families.json' with { type: 'json' };
 
 var ALLOWED_MODEL = 'claude-sonnet-5';
 var MAX_TOKENS_CAP = 4096;
@@ -49,6 +50,114 @@ function leyvaPriceLine(it) {
   var line = '- ' + it.n + ' (' + it.u + '): C$' + it.precio;
   if (it.precio_antes) line += ' (antes C$' + it.precio_antes + ', ' + (it.promo || 'promoción') + ')';
   return line;
+}
+
+/* ============================================================
+   FAMILY GATE — cross-category substitution, stopped in code
+   ------------------------------------------------------------
+   Asked for "lámina de zinc", the assistant answered lámina de gypsum at
+   C$370. Both are "láminas", so the swap survives right up to the line item:
+   a roofing order quoted as drywall.
+
+   The old defence was a same-category rule in the system prompt. It failed
+   for a structural reason: THE PROMPT NEVER DEFINED WHAT A CATEGORY IS. The
+   catalog's `cat` field was never emitted, so the model inferred category
+   from product names, and the two products share a head noun. Across five
+   phrasings of the same question, two substituted — one of them with a price
+   attached.
+
+   And `cat` could not have fixed it either: gypsum is 'construccion',
+   the revestimiento sheet is 'acabados'. Two different catalog categories for
+   two things a buyer would both call a lámina. Hence the separate
+   form-factor axis in _data/leyva-families.json.
+
+   THIS GATE RUNS ON THE MODEL'S OUTPUT. Whatever the prompt says, a reply
+   that names a product from a family the customer did not ask about is
+   DISCARDED and replaced. The constraint no longer depends on the model
+   choosing to honour it.
+   ============================================================ */
+
+function famNorm(s) {
+  return String(s || '').toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[¿?¡!.,;:()"']/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+
+function famTermHit(t, term) {
+  return new RegExp('(^|[^a-z0-9])' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '($|[^a-z0-9])').test(t);
+}
+
+/* Returns { absent, absentHit, presentKeys }.
+
+   FAIL-CLOSED: if the message names ANY off-catalog term, the turn is an
+   off-catalog ask even when it also names something we stock. "¿tiene lámina
+   de gypsum o de zinc?" must not answer about gypsum and silently drop the
+   zinc — that is the same failure wearing a different hat. */
+function famResolveAsk(raw) {
+  var t = famNorm(raw);
+  var F = leyvaFamilies.familias;
+  var absentHit = null, presentKeys = [];
+  Object.keys(F).forEach(function (k) {
+    var f = F[k];
+    f.terms.forEach(function (term) {
+      if (!famTermHit(t, term)) return;
+      var isAbsent = !f.presente || f.ausentes.indexOf(term) !== -1;
+      if (isAbsent) {
+        if (!absentHit || term.length > absentHit.term.length) absentHit = { key: k, term: term };
+      } else if (presentKeys.indexOf(k) === -1) {
+        presentKeys.push(k);
+      }
+    });
+  });
+  return { absent: !!absentHit, absentHit: absentHit, presentKeys: presentKeys };
+}
+
+/* Which families a REPLY names. Only non-absent terms count — those are the
+   words that name products the store actually has. */
+function famNamedIn(replyText) {
+  var t = famNorm(replyText);
+  var F = leyvaFamilies.familias, out = [];
+  Object.keys(F).forEach(function (k) {
+    var f = F[k];
+    if (!f.presente) return;
+    for (var i = 0; i < f.terms.length; i++) {
+      var term = f.terms[i];
+      if (f.ausentes.indexOf(term) !== -1) continue;
+      if (famTermHit(t, term)) { out.push(k); return; }
+    }
+  });
+  return out;
+}
+
+function famList(f) {
+  var n = f.nombresCortos || [];
+  if (n.length <= 1) return n[0] || '';
+  return n.slice(0, -1).join(', ') + ' y ' + n[n.length - 1];
+}
+
+/* The deterministic answer for an off-catalog ask.
+
+   THE NARROW LINE: never present a different product as the answer, but you
+   may state what the catalog holds in the same family as a SEPARATE offer.
+   That is why this always returns two bubbles and the inventory bubble never
+   carries a price. Collapsed into one sentence it becomes a substitution
+   again. */
+function famRefusal(absentHit) {
+  var f = leyvaFamilies.familias[absentHit.key];
+  var label = f.etiquetas[absentHit.term] || absentHit.term;
+  if (f.presente) {
+    return label + ' no manejo.|||Lo que sí tengo en ' + f.label + ' es ' + famList(f) + '. Si le sirve alguna, me dice.';
+  }
+  return 'Fíjese que ' + label.toLowerCase() + ' no manejamos.|||¿Quiere que le pase la consulta al equipo del mostrador?';
+}
+
+/* Fires when the model answered about a family nobody asked about. Replaces
+   the reply with something grounded and on-family. No price: this is a
+   statement of inventory, not a quote. */
+function famRedirect(presentKeys) {
+  var f = leyvaFamilies.familias[presentKeys[0]];
+  return 'Lo que tengo en ' + f.label + ' es ' + famList(f) + '.|||¿Cuál le sirve?';
 }
 
 function buildLeyvaSystem() {
@@ -103,6 +212,38 @@ function buildLeyvaSystem() {
   L.push('');
   L.push('PRODUCTOS QUE SÍ MANEJA PERO SIN PRECIO EN SISTEMA (nómbrelos, dé especificaciones, ofrezca confirmar precio — NUNCA invente una cifra):');
   L = L.concat(unpriced);
+
+  /* Families, stated explicitly. The old same-category rule referred to a
+     concept this prompt never defined — `cat` was never emitted, so the model
+     inferred category from product names and treated "lámina de gypsum" and
+     "lámina de zinc" as the same thing. This block gives the word a meaning.
+     It is defence in depth: famGate() below is what actually enforces it. */
+  var F = leyvaFamilies.familias;
+  var yes = [], no = [];
+  Object.keys(F).forEach(function (k) {
+    var f = F[k];
+    if (f.presente) {
+      // Dedupe: several spellings map to one label ("zinc", "lamina de zinc",
+      // "laminas de zinc" are all "Lámina de zinc"), and listing it three
+      // times reads as a broken prompt.
+      var aus = [];
+      f.ausentes.forEach(function (t) {
+        var lab = f.etiquetas[t] || t;
+        if (aus.indexOf(lab) === -1) aus.push(lab);
+      });
+      yes.push('- ' + f.label + ': ' + famList(f) + (aus.length ? '. NO maneja: ' + aus.join(', ') + '.' : '.'));
+    } else {
+      no.push('- ' + f.label);
+    }
+  });
+  L.push('');
+  L.push('FAMILIAS QUE SÍ MANEJA — y qué NO tiene dentro de cada una:');
+  L = L.concat(yes);
+  L.push('');
+  L.push('FAMILIAS QUE NO MANEJA EN ABSOLUTO. Si le piden algo de aquí, dígalo derecho y ofrezca pasar la consulta. NO ofrezca nada de otra familia:');
+  L = L.concat(no);
+  L.push('');
+  L.push('REGLA DURA: jamás nombre un producto de una familia distinta a la que le preguntaron. Si le piden lámina de zinc, la respuesta NO puede contener lámina de gypsum como si fuera lo pedido. Puede, aparte y sin precio, decir qué láminas sí tiene.');
 
   return L.join('\n');
 }
@@ -433,6 +574,27 @@ export default async function handler(req, res) {
       if (memBlock) body.system.push({ type: 'text', text: memBlock });
     }
 
+    /* ---- FAMILY GATE, inbound ----------------------------------------
+       An off-catalog product ask is settled here and NEVER REACHES THE
+       MODEL. Deterministic, free, and impossible to talk out of. The browser
+       already answers these locally, so this is the backstop for any other
+       caller and for a phrasing the client lexicon misses. */
+    var lastUser = null;
+    if (incoming.preset === 'leyva' && Array.isArray(incoming.messages)) {
+      for (var mi = incoming.messages.length - 1; mi >= 0; mi--) {
+        if (incoming.messages[mi] && incoming.messages[mi].role === 'user') { lastUser = String(incoming.messages[mi].content || ''); break; }
+      }
+    }
+    var ask = lastUser ? famResolveAsk(lastUser) : null;
+    if (ask && ask.absent) {
+      res.setHeader('x-ignea-family-gate', 'refused');
+      return res.status(200).json({
+        content: [{ type: 'text', text: famRefusal(ask.absentHit) }],
+        usage: { input_tokens: 0, output_tokens: 0 },
+        stop_reason: 'end_turn'
+      });
+    }
+
     var response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -448,6 +610,24 @@ export default async function handler(req, res) {
     if (!response.ok) {
       var message = (data && data.error && data.error.message) || 'upstream error';
       return res.status(response.status).json({ error: message });
+    }
+
+    /* ---- FAMILY GATE, outbound ---------------------------------------
+       THE STRUCTURAL GUARANTEE. Whatever the prompt said and whatever the
+       model decided, a reply that names a product from a family the customer
+       did not ask about is DISCARDED here and replaced with something
+       grounded and on-family.
+
+       Only fires when the ask named at least one family we stock — with no
+       product family in the question there is nothing to compare against, and
+       guessing would be worse than not gating. */
+    if (ask && !ask.absent && ask.presentKeys.length && data && data.content && data.content[0] && data.content[0].text) {
+      var named = famNamedIn(data.content[0].text);
+      var strayed = named.filter(function (k) { return ask.presentKeys.indexOf(k) === -1; });
+      if (strayed.length) {
+        res.setHeader('x-ignea-family-gate', 'redirected:' + strayed.join(','));
+        data.content[0].text = famRedirect(ask.presentKeys);
+      }
     }
 
     return res.status(200).json(data);

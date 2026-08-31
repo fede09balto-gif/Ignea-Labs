@@ -211,6 +211,111 @@ var LeyvaDemo = (function () {
     return out;
   }
 
+  /* ---- CATALOG GUARD — the cross-category substitution fix ------------
+     Read this before touching any product branch below.
+
+     THE BUG IT EXISTS TO STOP: asked for "lámina de zinc", the assistant
+     answered with lámina de gypsum at C$370. Both are "láminas", so the swap
+     reads as plausible right up until someone checks the line item — a
+     roofing order quoted as drywall, with money attached.
+
+     WHY THE OLD FIX FAILED: the same-category rule lived only in the system
+     prompt, and the prompt NEVER DEFINED WHAT A CATEGORY IS — the catalog's
+     `cat` field was never emitted, so the model inferred category from the
+     product name and "lámina de gypsum" / "lámina de zinc" share a head noun.
+     Measured across five phrasings of the same question, two substituted.
+     A probabilistic rule cannot hold a constraint that has money behind it.
+
+     WHAT REPLACES IT: family resolution in CODE, from data, on both sides.
+     An off-catalog ask is answered here, deterministically, and NEVER REACHES
+     THE MODEL. api/claude.js runs the same resolution on the way out as a
+     backstop for phrasings this lexicon misses.
+
+     THE NARROW LINE, and it is narrow:
+       · NEVER present a different product as an answer to what was asked.
+       · You MAY state what the catalog holds in the same family, as a
+         SEPARATE message, with NO PRICE, phrased as an offer.
+     That is why the reply below is always two bubbles and never one: the
+     refusal is the answer, the inventory is an aside. Collapsing them into
+     one sentence turns it back into a substitution. */
+  function FAM() { return (typeof LeyvaFamilies !== 'undefined') ? LeyvaFamilies : null; }
+
+  function termHit(t, term) {
+    return new RegExp('(^|[^a-z0-9])' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '($|[^a-z0-9])').test(t);
+  }
+
+  /* Fail-closed on purpose: if the message mentions ANY off-catalog term, the
+     whole turn is treated as an off-catalog ask, even when it also mentions
+     something we stock. "¿tiene lámina de gypsum o de zinc?" must not answer
+     about gypsum and quietly drop the zinc. */
+  function resolveAsk(t) {
+    var F = FAM(); if (!F) return null;
+    var offer = null, present = null;
+    Object.keys(F).forEach(function (k) {
+      var f = F[k];
+      f.terms.forEach(function (term) {
+        if (!termHit(t, term)) return;
+        var isAbsent = !f.presente || f.ausentes.indexOf(term) !== -1;
+        if (isAbsent) {
+          // longest matching absent term wins: "lamina de zinc" over "zinc"
+          if (!offer || term.length > offer.term.length) offer = { key: k, fam: f, term: term };
+        } else if (!present || term.length > present.term.length) {
+          present = { key: k, fam: f, term: term };
+        }
+      });
+    });
+    if (offer) return { absent: true, key: offer.key, fam: offer.fam, term: offer.term };
+    if (present) return { absent: false, key: present.key, fam: present.fam, term: present.term };
+    return null;
+  }
+
+  function listOf(fam) {
+    var n = fam.nombresCortos || [];
+    if (n.length <= 1) return n[0] || '';
+    return n.slice(0, -1).join(', ') + ' y ' + n[n.length - 1];
+  }
+
+  function catalogGuard(t) {
+    var ask = resolveAsk(t);
+    if (!ask || !ask.absent) return null;
+    var label = ask.fam.etiquetas[ask.term] || ask.term;
+
+    if (ask.fam.presente) {
+      // Family we DO carry, variant we do NOT. Refuse by name, then state the
+      // inventory as a separate offer. No price in the second bubble — a price
+      // would make it read as the answer.
+      return {
+        bubbles: [
+          label + ' no manejo.',
+          'Lo que sí tengo en ' + ask.fam.label + ' es ' + listOf(ask.fam) + '. Si le sirve alguna, me dice.'
+        ],
+        rail: [
+          'Consulta: ' + label,
+          'Familia "' + ask.fam.label + '": sí la maneja',
+          'Variante pedida: NO ESTÁ EN CATÁLOGO',
+          'Se niega el producto pedido y se ofrece el inventario aparte — sin precio',
+          'Sustitución bloqueada por código, no por instrucción al modelo'
+        ],
+        localOnly: true
+      };
+    }
+    // Family we do not carry at all. Refuse and escalate. List NOTHING.
+    return {
+      bubbles: [
+        'Fíjese que ' + label.toLowerCase() + ' no manejamos.',
+        '¿Quiere que le pase la consulta al equipo del mostrador?'
+      ],
+      rail: [
+        'Consulta: ' + label,
+        'Familia "' + ask.fam.label + '": NO LA MANEJA',
+        'Sin nada que ofrecer en esa familia — no se rellena con otra cosa',
+        'Escalar al mostrador',
+        'Sustitución bloqueada por código, no por instrucción al modelo'
+      ],
+      localOnly: true
+    };
+  }
+
   function local(text) {
     var t = norm(text);
     var rail = [];
@@ -367,6 +472,12 @@ var LeyvaDemo = (function () {
         suppressDoc: true
       };
     }
+
+    /* Off-catalog product asks are settled HERE, before any product branch and
+       before the model. This is the only place that decides whether we carry
+       something. */
+    var guarded = catalogGuard(t);
+    if (guarded) { rail = guarded.rail; return guarded; }
 
     // Greeting.
     if (/^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|que tal|saludos)\b/.test(t) && t.length < 30) {
@@ -581,6 +692,8 @@ var LeyvaDemo = (function () {
     local: local,
     callApi: callApi,
     openProformaNudge: openProformaNudge,
+    catalogGuard: catalogGuard,
+    resolveAsk: resolveAsk,
     resetState: resetState,
     parseNameAnswer: parseNameAnswer,
     LOCAL_PRICES: LOCAL_PRICES,
