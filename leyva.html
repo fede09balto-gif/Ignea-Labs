@@ -231,20 +231,44 @@ body.kiosk .wa__inbar{padding-bottom:calc(7px + env(safe-area-inset-bottom))}
 .kiosk-exit{position:fixed;top:0;left:0;width:64px;height:64px;z-index:99;display:none}
 body.kiosk .kiosk-exit{display:block}
 
-.lv-gate{max-width:380px;margin:16vh auto;text-align:center;padding:0 20px}
-.lv-gate input{width:100%;min-height:48px;padding:0 14px;border:1px solid var(--line);border-radius:8px;font-family:var(--fm);font-size:15px;text-align:center;letter-spacing:.1em}
+/* ---- ACCESS GATE ----------------------------------------------------
+   TOP-ANCHORED, not vertically centred. `interactive-widget=resizes-content`
+   is set on this page and does NOTHING on iOS Safari, which does not
+   implement it — the layout viewport stays full height when the keyboard
+   opens, so anything centred with vh units can sit underneath it. Keeping
+   the block short and near the top means the field, the button and the
+   error are all inside the visible strip. */
+.lv-gate{max-width:380px;margin:0 auto;text-align:center;
+         padding:max(56px,9vh) 20px calc(28px + env(safe-area-inset-bottom));
+         display:flex;flex-direction:column}
+body.kb-open .lv-gate{padding-top:16px}
+.lv-gate input{width:100%;min-height:52px;padding:0 14px;border:1px solid var(--line);border-radius:8px;font-family:var(--fm);font-size:16px;text-align:center;letter-spacing:.1em;background:var(--bg);color:var(--ink);-webkit-appearance:none}
 .lv-gate input:focus{border-color:var(--ink);outline:none}
-.lv-gate__t{font-family:var(--fm);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:16px}
-.lv-gate__msg{font-family:var(--fm);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-top:12px;min-height:16px}
+.lv-gate__t{font-family:var(--fm);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:16px;line-height:1.5}
+/* Reserved height so an arriving error never shifts the button out from
+   under a thumb that is already on its way down. */
+.lv-gate__msg{font-size:14px;line-height:1.45;color:var(--red);margin-top:12px;min-height:40px;text-align:left}
+.lv-gate__msg.on{padding:10px 12px;border:1px solid var(--red);background:var(--red-wash)}
+.lv-gate__btn{width:100%;min-height:52px;margin-top:12px;border:0;border-radius:8px;background:var(--red);color:#fff;font-family:var(--ff);font-size:16.5px;cursor:pointer;-webkit-appearance:none;transition:opacity .12s var(--ease)}
+.lv-gate__btn:disabled{opacity:.55;cursor:default}
+.lv-gate__btn:active:not(:disabled){opacity:.85}
+.lv-gate__show{margin-top:14px;background:none;border:0;color:var(--ink-3);font-family:var(--fm);font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;min-height:44px;padding:0 12px;align-self:center}
+.lv-gate__show:active{color:var(--ink)}
+@media(prefers-reduced-motion:reduce){.lv-gate__btn{transition:none}}
 </style>
 </head>
 <body>
 
-<div class="lv-gate" id="lvGate">
+<form class="lv-gate" id="lvGate" novalidate>
   <div class="lv-gate__t" data-i18n="leyva.gate.title">Demo privado — acceso restringido</div>
-  <input type="password" id="lvToken" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Token">
-  <div class="lv-gate__msg" id="lvGateMsg"></div>
-</div>
+  <input type="password" id="lvToken" name="token"
+         autocomplete="off" autocapitalize="off" autocorrect="off"
+         spellcheck="false" inputmode="text" enterkeyhint="go"
+         aria-label="Clave de acceso" aria-describedby="lvGateMsg">
+  <div class="lv-gate__msg" id="lvGateMsg" role="status" aria-live="polite"></div>
+  <button type="submit" class="lv-gate__btn" id="lvGateBtn" data-i18n-btn="leyva.gate.btn">Entrar</button>
+  <button type="button" class="lv-gate__show" id="lvGateShow" aria-pressed="false" data-i18n-btn="leyva.gate.show">Ver</button>
+</form>
 
 <div class="kiosk-exit" id="kioskExit" aria-hidden="true"></div>
 
@@ -364,6 +388,7 @@ body.kiosk .kiosk-exit{display:block}
 
 <script src="js/i18n.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="js/leyva-gate.js"></script>
 <script src="js/leyva-demo.js"></script>
 <script src="js/leyva-memory.js"></script>
 <script src="js/leyva-proforma.js"></script>

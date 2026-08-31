@@ -1105,6 +1105,14 @@ var IgneaI18n = (function() {
       // content of a Nicaraguan ferretería's WhatsApp, not our chrome.
       // Everything the OPERATOR reads is translated, like everywhere else.
       "leyva.gate.title": "Demo privado — acceso restringido",
+      "leyva.gate.btn": "Entrar",
+      "leyva.gate.btn.busy": "Entrando…",
+      "leyva.gate.show": "Ver",
+      "leyva.gate.hide": "Ocultar",
+      "leyva.gate.err.empty": "Escriba la clave.",
+      "leyva.gate.err.bad": "Clave incorrecta. Revise que no le haya quedado un espacio de más ni una mayúscula al inicio.",
+      "leyva.gate.err.origin": "Este enlace no está autorizado. Avísele a Fede — reescribir la clave no lo va a resolver.",
+      "leyva.gate.err.net": "No se pudo conectar. Revise la señal e intente otra vez.",
       "leyva.title": "Asistente de WhatsApp — Ferretería Roberto Leyva",
       "leyva.sub": "Demo privado",
       "leyva.unver.tag": "Catálogo sin verificar",
@@ -2281,6 +2289,14 @@ var IgneaI18n = (function() {
       // See the Spanish block: the conversation and suggested questions are
       // deliberately not translated.
       "leyva.gate.title": "Private demo — restricted access",
+      "leyva.gate.btn": "Enter",
+      "leyva.gate.btn.busy": "Entering…",
+      "leyva.gate.show": "Show",
+      "leyva.gate.hide": "Hide",
+      "leyva.gate.err.empty": "Type the key.",
+      "leyva.gate.err.bad": "Wrong key. Check for a trailing space or a capitalised first character.",
+      "leyva.gate.err.origin": "This link is not authorised. Tell Fede — retyping the key will not fix it.",
+      "leyva.gate.err.net": "Could not connect. Check the signal and try again.",
       "leyva.title": "WhatsApp assistant — Ferretería Roberto Leyva",
       "leyva.sub": "Private demo",
       "leyva.unver.tag": "Unverified catalog",

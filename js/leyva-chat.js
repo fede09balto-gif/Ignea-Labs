@@ -517,36 +517,12 @@
     try { if (sessionStorage.getItem('ignea_leyva_kiosk') === '1') document.body.classList.add('kiosk'); } catch (e) {}
   }
 
-  /* ---- gate (unchanged contract: /api/ops-auth, scope-agnostic here) ---- */
-  function verify(token, silent) {
-    var msg = document.getElementById('lvGateMsg');
-    fetch('/api/ops-auth', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: token })
-    }).then(function (r) {
-      if (r.ok) {
-        sessionStorage.setItem('ignea_ops_token', token);
-        document.getElementById('lvGate').style.display = 'none';
-        document.getElementById('lvApp').style.display = '';
-        boot();
-      } else {
-        sessionStorage.removeItem('ignea_ops_token');
-        if (!silent) {
-          msg.textContent = r.status === 403 ? 'origen no permitido — avise a Fede' : 'acceso denegado';
-        }
-        var i = document.getElementById('lvToken');
-        if (i) { i.value = ''; i.focus(); }
-      }
-    }).catch(function () { if (!silent) msg.textContent = 'no se pudo verificar'; });
-  }
-
+  /* ---- gate ---------------------------------------------------------
+     Lives in js/leyva-gate.js now, shared with leyva-script.html. It used to
+     be duplicated here and there, and the iPhone submit bug was in BOTH
+     copies — one <form>, one implementation, one place to fix it. */
   document.addEventListener('DOMContentLoaded', function () {
-    var saved = sessionStorage.getItem('ignea_ops_token');
-    if (saved) { verify(saved, true); return; }
-    var i = document.getElementById('lvToken');
-    i.focus();
-    i.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' && i.value) verify(i.value, false);
-    });
+    LeyvaGate.init({ onOk: boot });
   });
+
 })();
