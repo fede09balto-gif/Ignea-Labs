@@ -111,7 +111,16 @@ export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   return res.status(200).json({
     negocio: leyvaCatalog.meta.business,
-    contacto: leyvaCatalog.contacto,
+    /* PROJECTED, not passed through. The contacto block carries its own
+       source / source_url / source_date provenance fields, and spreading the
+       object shipped them to the browser — the exact metadata this endpoint
+       is written to withhold. Caught by asserting on the response body rather
+       than on the fields I remembered writing. */
+    contacto: {
+      whatsapp: leyvaCatalog.contacto.whatsapp,
+      telefonos: leyvaCatalog.contacto.telefonos,
+      direccion: leyvaCatalog.contacto.direccion
+    },
     resumen: { total: total, conPrecio: conPrecio, sinPrecio: total - conPrecio },
     grupos: grupos,
     noManeja: noManeja
