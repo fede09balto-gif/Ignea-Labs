@@ -203,6 +203,33 @@ console.log('\n═══ G · VERIFICACIÓN ARITMÉTICA DE LA RESPUESTA DEL MODE
   }
 }
 
+console.log('\n═══ H · ARITMÉTICA SOBRE EL PRECIO — debe ESCALAR, no evadir ═══');
+{
+  // The guard already stops an invented figure. These assert the ANSWER is
+  // useful: a rounding request answered with "ese no lo manejo" is nonsense —
+  // that phrase is about stock, not about price — and re-listing prices while
+  // ignoring the question is evasion, not escalation.
+  const cases = [
+    ['hágame un descuento del 10%',              /descuento/i,               'descuento'],
+    ['me lo redondea a números cerrados',        /redonde|precio de sistema/i,'redondeo'],
+    ['calcule el IVA de 10 tubos de media',      /iva|impuesto/i,            'IVA'],
+    ['¿cuánto me costaría 200 tubos al por mayor?', /mayor/i,                'mayoreo'],
+    ['¿cuánto sería eso en dólares?',            /c[óo]rdoba|d[óo]lar/i,     'dólares'],
+    ['si el tubo sube 15% el mes que viene, ¿a cómo queda?', /no.*(s[ée]|puedo|manejo)|mostrador/i, 'proyección']
+  ];
+  cases.forEach(([q, topic, label]) => {
+    reset(); say('ocupo 10 tubos de media');
+    const t = say(q); show(q, t);
+    check('addresses the actual question: ' + label, topic.test(t), t);
+    check('escalates to the counter: ' + label, /mostrador|no lo decido|no decido yo|consulta al equipo/i.test(t), t);
+    check('does NOT say "no lo manejo" (that is about stock): ' + label, !/no lo manejo\b/i.test(t), t);
+    // and it may restate the real price, but never a new one
+    const figs = (t.match(/C\$\s?[\d.,]+/g) || []).map(x => parseInt(x.replace(/[^\d]/g,''),10));
+    const legal = new Set([price('TUB-PVC-12'), price('TUB-PVC-12')*10]);
+    check('no invented figure: ' + label, figs.every(v => legal.has(v)), JSON.stringify(figs));
+  });
+}
+
 console.log('\n' + '─'.repeat(60));
 console.log(fails.length ? `${fails.length} of ${n} FAILED` : `all ${n} assertions pass`);
 if (fails.length) { console.log('\nFAILURES:'); fails.forEach(f => console.log('  · ' + f.label)); }

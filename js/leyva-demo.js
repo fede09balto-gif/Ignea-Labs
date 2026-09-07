@@ -347,6 +347,52 @@ var LeyvaDemo = (function () {
     };
   }
 
+  /* ---- ARITHMETIC *ON* THE PRICE — escalate, never compute --------------
+     Discounts, rounding, IVA, wholesale, currency, price projections. Every
+     one of these asks for a number that IS NOT IN THE CATALOG, and the guard
+     that discards an invented figure only stops the number — it does not
+     produce a useful answer. Without this branch the fallback said "Uy, ese no
+     lo manejo", which is a sentence about STOCK answering a question about
+     PRICE, and reads as the assistant not understanding Spanish.
+
+     These are also exactly the questions a buyer asks to test the thing. The
+     honest answer names the topic, says who decides, and restates the real
+     price — which is the one number we can stand behind. */
+  var PRICE_MATH = [
+    { re: /\bdescuent|\brebaj|\bme lo deja en\b|\bmejor precio\b|\bprecio especial\b|\bhaga un precio\b/,
+      say: 'De descuentos no decido yo, eso lo ve el mostrador.', tag: 'descuento' },
+    { re: /\bredonde/,
+      say: 'Redondear el precio no me toca a mí, se lo ve el mostrador.', tag: 'redondeo' },
+    { re: /\biva\b|\bimpuesto|\bretenci[oó]n\b|\bexonerad/,
+      say: 'Del IVA y los impuestos no llevo el cálculo aquí, eso se lo confirma el mostrador.', tag: 'impuesto' },
+    { re: /\bpor mayor\b|\bmayoreo\b|\bal mayor\b|\bmayorista\b|\bdocena\b/,
+      say: 'Precio por mayor no lo manejo en sistema, eso se lo cotiza el mostrador.', tag: 'mayoreo' },
+    { re: /\bd[oó]lar|\busd\b|\bdls\b|\btipo de cambio\b|\ben pesos\b/,
+      say: 'Nosotros trabajamos en córdobas; el cambio no lo manejo yo.', tag: 'moneda' },
+    { re: /\bsi (sube|suben|baja|bajan|aumenta)\b|\bel mes que viene\b|\bva a subir\b|\bproyecc/,
+      say: 'No le sé decir cómo va a quedar después; yo tengo el precio de hoy.', tag: 'proyección' }
+  ];
+
+  /* Restate the price we CAN stand behind: from what he has already asked for,
+     or from this same message. Computed, never phrased. */
+  function priceOfRecord(text) {
+    var src = ST.order.filter(function (l) { return l.qty; });
+    if (!src.length) {
+      var pr = LeyvaOrder.parse(text, { inheritSize: ST.lastSize });
+      src = pr.lines.filter(function (l) { return l.qty; });
+      if (!src.length) src = pr.lines;
+    }
+    if (!src.length) return null;
+    if (src.length === 1) {
+      var l = src[0];
+      return l.qty
+        ? 'El precio de sistema es ' + money(l.unit) + ' la ' + l.u + ', los ' + l.qty + ' en ' + money(l.qty * l.unit) + '.'
+        : 'El precio de sistema es ' + money(l.unit) + ' la ' + l.u + '.';
+    }
+    var tot = src.reduce(function (a, l) { return a + (l.total || 0); }, 0);
+    return 'El precio de sistema es ' + money(tot) + ' por lo que me pidió.';
+  }
+
   /* ---- rule A: unit AND total, always ---------------------------------
      "Nunca un total sin el unitario. El ferretero tiene que poder verificar la
      cuenta mentalmente." Both numbers, every time, and the total is computed
@@ -720,6 +766,21 @@ var LeyvaDemo = (function () {
         localOnly: true,
         suppressDoc: true
       };
+    }
+
+    /* Price arithmetic runs BEFORE the product parser: "calcule el IVA de 10
+       tubos" contains a perfectly parseable order, and answering it with the
+       price alone ignores the question that was actually asked. */
+    for (var pm = 0; pm < PRICE_MATH.length; pm++) {
+      if (!PRICE_MATH[pm].re.test(t)) continue;
+      var rec = priceOfRecord(text);
+      var pmOut = [PRICE_MATH[pm].say];
+      if (rec) pmOut.push(rec);
+      pmOut.push('¿Le paso la consulta al mostrador?');
+      return hit(pmOut, ['Consulta: ' + PRICE_MATH[pm].tag,
+                         'Pide una cifra que NO está en el catálogo',
+                         'Se escala — no se calcula ni se estima',
+                         rec ? 'Se repite el precio de sistema, calculado' : 'Sin pedido en curso que citar'], true);
     }
 
     /* ---- CHANGE OF MIND -------------------------------------------------
