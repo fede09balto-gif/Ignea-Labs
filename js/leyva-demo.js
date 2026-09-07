@@ -388,9 +388,10 @@ var LeyvaDemo = (function () {
     if (!src.length) return null;
     if (src.length === 1) {
       var l = src[0];
+      // uart(), not a hardcoded "la" — same gender bug as before, new code path.
       return l.qty
-        ? 'El precio de sistema es ' + money(l.unit) + ' la ' + l.u + ', los ' + l.qty + ' en ' + money(l.qty * l.unit) + '.'
-        : 'El precio de sistema es ' + money(l.unit) + ' la ' + l.u + '.';
+        ? 'El precio de sistema es ' + money(l.unit) + ' ' + uart(l) + l.u + ', los ' + l.qty + ' en ' + money(l.qty * l.unit) + '.'
+        : 'El precio de sistema es ' + money(l.unit) + ' ' + uart(l) + l.u + '.';
     }
     var tot = src.reduce(function (a, l) { return a + (l.total || 0); }, 0);
     return 'El precio de sistema es ' + money(tot) + ' por lo que me pidió.';

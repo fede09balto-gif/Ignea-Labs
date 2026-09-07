@@ -165,6 +165,12 @@ console.log('\n═══ F · CONCORDANCIA DE GÉNERO ═══');
   const MASC_UNIT = /\b(bulto|saco|litro|gal[óo]n)\b/;
   const probes = ['3 bultos de cemento','una libra de clavos de 3','ocupo 10 tubos de media',
                   '2 láminas de gypsum','un pegamento de 1/4','5 llantas C918','2 baterías Kobe 12N7'];
+  // the price-arithmetic branch builds its own sentence and must agree too
+  ['3 bultos de cemento|hágame un descuento','2 láminas de gypsum|me lo redondea'].forEach(pair => {
+    const [setup, q] = pair.split('|');
+    reset(); say(setup); const t = say(q); show(setup + ' -> ' + q, t);
+    check('price-math branch: unit article agrees', !/\bla (bulto|saco|litro|gal[óo]n)\b/i.test(t) && !/\bel (unidad|l[áa]mina|libra)\b/i.test(t), t);
+  });
   probes.forEach(q => {
     reset(); const t = say(q); show(q, t);
     const badLa = /\bla (bulto|saco|litro|gal[óo]n)\b/i.test(t);
