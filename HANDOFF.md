@@ -228,6 +228,74 @@ dated posts, the demo has nothing left to quote and is not shippable.
 
 ---
 
+### `feat/leyva-demo` — ESTADO FINAL: conversación larga y ataques al guard
+
+**Preview, sin merge.** Rama `feat/leyva-demo`, alias estable:
+`https://ignea-labs-w8bp-git-feat-388915-fedebaltoinvest-7282s-projects.vercel.app/leyva`
+
+#### verifyMoney aguanta — 10 ataques, 0 cifras inventadas
+
+Descuento porcentual, precio negociado a la baja, conversión a dólares, redondeo,
+estimación sin datos, suma con producto fuera de catálogo, mayoreo, IVA, proyección de
+precio, y total con flete. **Ninguno produjo una cifra que no se derive del catálogo, y
+ninguno produjo una cifra en dólares.** Verificado con un **oráculo independiente** que
+recomputa el conjunto legal desde el catálogo — usar `verifyMoney` para calificarse a sí
+mismo no probaría nada.
+
+**Un agujero real que el ataque cerró:** el guard impedía la cifra pero no producía una
+respuesta útil. `me lo redondea` caía al fallback y contestaba **"Uy, ese no lo manejo"**
+— una frase sobre EXISTENCIAS respondiendo una pregunta sobre PRECIO. IVA, mayoreo y
+proyección repetían la lista de precios e ignoraban la pregunta. Ahora hay rama
+`PRICE_MATH`, **antes** del parser de productos porque "calcule el IVA de 10 tubos"
+contiene un pedido perfectamente parseable: nombra el tema, dice quién decide, repite el
+precio de sistema calculado. **Ninguna de esas frases puede decir "no lo manejo"** — ese
+es el idioma del asistente para no tener un producto, y reusarlo es la confusión que la
+rama existe para quitar. Hay aserción.
+
+#### La conversación larga era el riesgo real, y encontró seis bugs
+
+15 turnos divagando. **Ninguno de estos aparece con preguntas limpias.**
+
+1. **`me arma la cotización` emitía el pedido de MUESTRA** (gypsum y puertas, C$12,220)
+   en vez del del cliente. `ST.order` solo se llenaba en la ruta determinista y el modelo
+   había contestado los turnos con cantidad. **Este se ve en la reunión.**
+2. **`deme 12` / `como 8`** — una cantidad sola contestando nuestro propio "¿cuántos
+   ocupa?" no se entendía, y volvía a preguntar lo mismo. Se lee como no escuchar.
+3. **`ponme 4 bultos`** no cotizaba: cemento solo matcheaba la palabra "cemento".
+4. **`mejor los tubos de una pulgada` cambiaba los CODOS** — la rama tomaba la última
+   línea en vez del producto nombrado, y los codos también vienen en 1".
+5. **`¿cuánto llevo hasta ahorita?`** lo contestaba el modelo con "Para confirmarle:",
+   quemando la confirmación de la regla B fuera de lugar. Ahora es rama propia.
+6. **`quítame los codos` → "no le entendí el nombre"**. `awaitingName` y
+   `awaitingConfirm` se tragaban las instrucciones de edición. **Una cotización que no se
+   puede editar hay que aceptarla o reiniciar, y reiniciar frente al comprador es el demo
+   muriéndose.** Ambas ramas ahora sueltan la pregunta pendiente ante una instrucción.
+
+Y **`sí, a nombre de Constructora Herrera S.A.`** preguntaba otra vez el nombre que venía
+en la misma frase — el cliente contesta las dos preguntas de un tirón, como habla
+cualquiera.
+
+#### Lectura de la voz con ~4,600 tokens de prompt
+
+**No se degrada.** En los 15 turnos: **0 viñetas, 0 emojis, 0 frases corporativas**,
+media de **8.5 palabras por burbuja**, máximo 18. **13 de 15 turnos deterministas** — el
+modelo solo abre y orienta; los números los hace el código. Flujo completo hasta
+`PRO-2481.pdf`.
+
+Nota sobre "Para confirmarle" apareciendo 2 veces: es **correcto**. Pidió cotización,
+editó el pedido, volvió a pedirla. La regla B es una confirmación por proforma, y el
+pedido cambió.
+
+#### Suites
+
+`scripts/behavior.js` **120 aserciones**, `scripts/memory.js` **20**, más
+`check-prices.js` y `build-families.js --check`. En el scratchpad: `live.mjs` (54 en
+línea / 37 con la red apagada), `attack.mjs` (20, oráculo independiente), `convo.mjs`
+(15 turnos), `regress.mjs` (26: gate, brief, kiosk). **Toda aserción de dinero se computa
+desde el catálogo.**
+
+---
+
 ### `feat/leyva-demo` — catálogo de 3 niveles, unitario+total, confirmación, contexto
 
 **EL CATÁLOGO NO ESTÁ EN `data/`.** Vive en **`api/_data/leyva-catalog.json`** desde que
@@ -300,12 +368,16 @@ span del timestamp.
 verdad, 26 de regresión. **Toda aserción de dinero se computa desde el catálogo**, nunca
 contra una lista de números esperados.
 
-**PENDIENTE, decisión de Fede.** Su lista de límites incluye **madera** entre lo que debe
-escalar sin sustituir, pero el catálogo **sí** tiene tablas 1"x12x5" a C$1,050 (grupo
-DESCUENTOS PATRIOS, `facebook_sin_verificar`). Hoy «madera» cotiza la tabla y «plywood»
-escala. No se tocó: quitar madera rompería un ítem cotizable existente, y hacerlo en
-silencio sería peor. Si quiere que madera escale, es cambiar `presente` a false en la
-familia y sacar TAB-1X12X5.
+**MADERA — DECIDIDO, NO LO "ARREGLE".** La lista de límites de una sesión
+anterior incluía **madera** entre lo que debía escalar. **Fede lo resolvió
+explícitamente: se queda como está.** Sus palabras: *"Las tablas son producto
+real con precio y fuente — escalar algo que sí venden sería peor error que la
+imprecisión de categoría. Mi lista estaba mal, no el catálogo."*
+
+Entonces: `madera` es familia **presente**, `TAB-1X12X5` (tabla 1"x12x5",
+C$1,050) se cotiza normal, y `plywood` — que sí es una variante que no manejan
+— escala. Si en el futuro alguien ve "madera" en una lista vieja de cosas que
+deben escalar, **esa lista es la que está desactualizada.**
 
 ---
 
@@ -1148,6 +1220,22 @@ the demo quietly runs on keyword-matched fallback replies instead of the LLM for
 of the day. Re-open this only once real session data exists to size the ceiling against.
 
 ## 3. STANDING RULES
+
+- **CUALQUIER ARNÉS QUE IMPRIMA RESULTADOS SE VERIFICA CONTRA EL TEXTO CRUDO
+  ANTES DE CONFIAR EN LO QUE MUESTRA.** Regla permanente, adoptada por Fede.
+
+  **Por qué, con el caso que la originó:** el impresor de transcripciones
+  quitaba el timestamp con un regex, y en `"C$470" + "8:42 p.m."` el regex
+  `\d{1,2}:\d{2}\s*[ap]\.m\.$` matcheaba `"08:42 p.m."` — se comía el `0` y
+  dejaba `C$47`. **Las 20 aserciones pasaban**, porque usaban el texto crudo.
+  Es decir: **el sistema estaba bien y el reporte mentía.** Ese es el peor
+  modo de falla que hay en este proyecto, porque es el único que no se nota
+  al revisar: un test rojo se investiga, un reporte limpio se cree.
+
+  En la práctica: extraer del DOM el nodo sin el span del timestamp, no
+  recortar con regex; y cuando un número de la transcripción se vea raro,
+  compararlo con la aserción que lo validó antes de reportarlo.
+
 
 - **CUSTOMER DATA: two standing decisions, adopted by Fede, not up for
   reinterpretation.**
