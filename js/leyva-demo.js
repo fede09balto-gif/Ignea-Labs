@@ -358,6 +358,9 @@ var LeyvaDemo = (function () {
      These are also exactly the questions a buyer asks to test the thing. The
      honest answer names the topic, says who decides, and restates the real
      price — which is the one number we can stand behind. */
+  /* NOTE ON WORDING: none of these may say "no lo manejo". That phrase is the
+     assistant's idiom for NOT CARRYING A PRODUCT, and reusing it for a price
+     question is the exact confusion this branch exists to remove. Asserted. */
   var PRICE_MATH = [
     { re: /\bdescuent|\brebaj|\bme lo deja en\b|\bmejor precio\b|\bprecio especial\b|\bhaga un precio\b/,
       say: 'De descuentos no decido yo, eso lo ve el mostrador.', tag: 'descuento' },
@@ -366,9 +369,9 @@ var LeyvaDemo = (function () {
     { re: /\biva\b|\bimpuesto|\bretenci[oó]n\b|\bexonerad/,
       say: 'Del IVA y los impuestos no llevo el cálculo aquí, eso se lo confirma el mostrador.', tag: 'impuesto' },
     { re: /\bpor mayor\b|\bmayoreo\b|\bal mayor\b|\bmayorista\b|\bdocena\b/,
-      say: 'Precio por mayor no lo manejo en sistema, eso se lo cotiza el mostrador.', tag: 'mayoreo' },
+      say: 'Precio por mayor no lo tengo en sistema, eso se lo cotiza el mostrador.', tag: 'mayoreo' },
     { re: /\bd[oó]lar|\busd\b|\bdls\b|\btipo de cambio\b|\ben pesos\b/,
-      say: 'Nosotros trabajamos en córdobas; el cambio no lo manejo yo.', tag: 'moneda' },
+      say: 'Nosotros trabajamos en córdobas; del tipo de cambio se encarga el mostrador.', tag: 'moneda' },
     { re: /\bsi (sube|suben|baja|bajan|aumenta)\b|\bel mes que viene\b|\bva a subir\b|\bproyecc/,
       say: 'No le sé decir cómo va a quedar después; yo tengo el precio de hoy.', tag: 'proyección' }
   ];
