@@ -228,6 +228,87 @@ dated posts, the demo has nothing left to quote and is not shippable.
 
 ---
 
+### `feat/leyva-demo` — catálogo de 3 niveles, unitario+total, confirmación, contexto
+
+**EL CATÁLOGO NO ESTÁ EN `data/`.** Vive en **`api/_data/leyva-catalog.json`** desde que
+resultó ser una descarga pública. Cualquier instrucción que diga `data/` está
+desactualizada.
+
+**42 ítems. `fuente` obligatorio en todos, tres niveles:**
+
+| `fuente` | n | Qué es |
+|---|---|---|
+| `estimado` | 13 | Precio NUESTRO de mercado nicaragüense. **No es el precio de la ferretería.** El socio confirmó que sí los venden; la cifra la pusimos nosotros. Si el ferretero dice otra, tiene razón él. |
+| `facebook` | 9 | Trazado a publicación con URL y fecha — todas 2025-10-10, campaña PROMOCION DE INTRODUCCION. **Un precio con URL no es un precio vigente:** eso es de hace casi un año. |
+| `facebook_sin_verificar` | 20 | Transcrito de capturas, sin enlace. Incluye DESCUENTOS PATRIOS (gypsum, puertas, tablas), que casi seguro venció, y también Bondex, baterías y las Caterpillar. |
+
+**Los tres se cotizan igual — la distinción es nuestra.** Deliberadamente NO llega al
+prompt: darle al modelo un matiz de "este es solo estimado" produce exactamente el
+precio dubitativo que la voz de mostrador existe para evitar. Vive en el catálogo y en
+el brief del operador, con etiquetas EST / FB / FB?. `precio: null` sigue siendo
+incotizable en las dos rutas: 11 ítems.
+
+**Familias que cambiaron a `presente: true`:** `plomeria` (tubo PVC, codos, T, pegamento
+PVC), `cemento` (el bulto), `fijacion` (clavos). Lo que dentro de esas familias NO se
+maneja pasó a `ausentes` — llave de chorro, manguera, inodoro, mortero, concreto, cal,
+tornillos, pernos, brocas. Siguen ausentes por completo: techo, arena/agregados, bloque,
+pintura, eléctrico, varilla.
+
+**LAS TRES REGLAS, en el respondedor sin conexión Y en el prompt.**
+
+**A · unitario y total.** `js/leyva-order.js` es nuevo y es donde vive la aritmética.
+**El total lo calcula ese archivo, nunca lo redacta un modelo.** Sin cantidad: unitario y
+se pregunta cuántos. Con cantidad: unitario y total. En varias líneas cada línea lleva su
+unitario y su importe, y al final la suma. Cuando hay varias medidas y no dicen cuál, se
+dan todas con su precio y **se pregunta** — elegir la más barata sería inventarle algo
+que no pidió, la misma clase de error que sustituir.
+
+**B · confirmación una sola vez**, ligada al momento en que se pide el documento, no a
+cada turno. `ST.awaitingConfirm` → `ST.awaitingName` → PDF.
+
+**C · contexto.** `ST.uso` se detecta una vez y se menciona una vez. Un cambio de opinión
+(«mejor de una pulgada») **conserva la cantidad** — hacérsela repetir es lo que convierte
+un asistente en un formulario.
+
+**Y LA ARITMÉTICA DEL MODELO SE VERIFICA, NO SE LEE.** `LeyvaDemo.verifyMoney()`: toda
+cifra en una respuesta del modelo tiene que derivarse del catálogo y de las cantidades en
+juego — precio de lista, cantidad×precio, o suma de esos productos. Un total redondeado,
+un unitario inventado o una suma que no cuadra hacen que la respuesta se **descarte** y se
+use la cuenta determinista que ya se había calculado antes de salir el request. Los
+multiplicadores se restringen a las cantidades realmente mencionadas; permitir 1..999
+dejaría pasar un total equivocado que casualmente sea producto de dos números del catálogo.
+
+**Tres bugs que los tests encontraron y que leer el código no habría encontrado:**
+1. **«2 láminas de gypsum» perdía la cantidad.** `qtyBefore` retrocedía con lista blanca
+   de conectores; el match era sobre «gypsum» y «láminas» no estaba en la lista, así que
+   el retroceso se detenía. Contestaba «¿cuántos ocupa?» a quien acababa de decir dos.
+   Ahora la cantidad es **el primer número a la IZQUIERDA** del sustantivo; lo que va
+   después de «de» es medida, nunca cantidad.
+2. **«la bulto», «El lámina».** Género gramatical, ahora dato en la tabla, no adivinanza
+   por terminación.
+3. **La confirmación decía «10 tubo PVC de 1/2» en singular.** Formas cortas + plural del
+   sustantivo cabeza.
+
+**Un cuarto, en el arnés y no en el producto, que vale registrar:** el impresor de
+transcripciones se comía un dígito («C$470» + «8:42 p.m.» → el regex de timestamp
+matcheaba «08:42 p.m.» y dejaba «C$47»). Las aserciones pasaban porque usaban el texto
+crudo. **Una transcripción equivocada es peor que ninguna** — ahora se lee el nodo sin el
+span del timestamp.
+
+**Suites** (`scripts/behavior.js`, `scripts/memory.js`, y en el scratchpad `live.mjs` /
+`regress.mjs`): 79 + 20 offline, 54 en vivo contra el modelo, 37 con la red apagada de
+verdad, 26 de regresión. **Toda aserción de dinero se computa desde el catálogo**, nunca
+contra una lista de números esperados.
+
+**PENDIENTE, decisión de Fede.** Su lista de límites incluye **madera** entre lo que debe
+escalar sin sustituir, pero el catálogo **sí** tiene tablas 1"x12x5" a C$1,050 (grupo
+DESCUENTOS PATRIOS, `facebook_sin_verificar`). Hoy «madera» cotiza la tabla y «plywood»
+escala. No se tocó: quitar madera rompería un ítem cotizable existente, y hacerlo en
+silencio sería peor. Si quiere que madera escale, es cambiar `presente` a false en la
+familia y sacar TAB-1X12X5.
+
+---
+
 ### `feat/leyva-demo` — cross-category substitution, fixed in code (partner feedback)
 
 **The report:** *"puse lámina de zinc y me puso de gypsum."* Both are "láminas", so
