@@ -236,6 +236,47 @@ console.log('\n═══ H · ARITMÉTICA SOBRE EL PRECIO — debe ESCALAR, no e
   });
 }
 
+console.log('\n═══ I · CONVERSACIÓN LARGA (replay del guion de 15 turnos) ═══');
+{
+  reset();
+  const t = q => { const r = say(q); show(q, r); return r; };
+  t('Buenas');
+  t('ando viendo para una instalación de agua en una casa');
+  t('¿a cómo el tubo de media?');
+  const r4 = t('deme 12');
+  check('bare quantity answers the "¿cuántos ocupa?" it just asked', has(r4, price('TUB-PVC-12')*12), 'computed ' + money(price('TUB-PVC-12')*12));
+  const r5 = t('ah y también ocupo codos, como 8');
+  check('"como 8" is read as a quantity', has(r5, price('CODO-PVC-12')*8), 'computed ' + money(price('CODO-PVC-12')*8));
+  const r6 = t('mejor los tubos de una pulgada, la presión es alta');
+  check('change of mind keeps the 12', has(r6, price('TUB-PVC-1')*12), 'computed ' + money(price('TUB-PVC-1')*12));
+  const r7 = t('¿ustedes tienen arena?');
+  check('off-catalog mid-conversation still escalates', /no manejamos/i.test(r7), r7);
+  t('ok. ¿y el cemento a cómo?');
+  const r9 = t('ponme 4 bultos');
+  check('"ponme 4 bultos" priced', has(r9, price('CEM-BULTO-25')*4), 'computed ' + money(price('CEM-BULTO-25')*4));
+  const r10 = t('perá, mi ayudante dice que son 6 bultos');
+  check('quantity correction replaces, not adds', has(r10, price('CEM-BULTO-25')*6) && !has(r10, price('CEM-BULTO-25')*10), 'computed ' + money(price('CEM-BULTO-25')*6));
+  const r11 = t('¿cuánto llevo hasta ahorita?');
+  const running = price('TUB-PVC-1')*12 + price('CODO-PVC-12')*8 + price('CEM-BULTO-25')*6;
+  check('running total = ' + money(running), has(r11, running), 'computed ' + money(running));
+  check('running total is NOT a "Para confirmarle"', !/para confirmarle/i.test(r11), r11);
+  const r12 = t('me arma la cotización');
+  // The confirmation repeats QUANTITIES, not money — that is the spec. What
+  // matters is that it is HIS order and not the canned sample.
+  check('cotización uses the REAL order, not the canned sample',
+    /12 tubos/.test(r12) && /6 bultos/.test(r12) && !/gypsum|puerta/i.test(r12), r12);
+  check('cotización confirms once', /para confirmarle/i.test(r12), r12);
+  const r13 = t('no, quitame los codos mejor');
+  const afterRemove = price('TUB-PVC-1')*12 + price('CEM-BULTO-25')*6;
+  check('removal understood while awaiting an answer', !/No le entendí el nombre/i.test(r13), r13);
+  check('removal recomputes the total = ' + money(afterRemove), has(r13, afterRemove), 'computed ' + money(afterRemove));
+  const r14 = t('ahora sí, arma la cotización');
+  check('re-quote reflects the removal', !/codo/i.test(r14) && /12 tubos/.test(r14) && /6 bultos/.test(r14), r14);
+  const r15 = t('sí');
+  const r16 = t('a nombre de Constructora Herrera S.A.');
+  check('name accepted after the edit', /Constructora Herrera S\.A\./.test(r16), r16);
+}
+
 console.log('\n' + '─'.repeat(60));
 console.log(fails.length ? `${fails.length} of ${n} FAILED` : `all ${n} assertions pass`);
 if (fails.length) { console.log('\nFAILURES:'); fails.forEach(f => console.log('  · ' + f.label)); }

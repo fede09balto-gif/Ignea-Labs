@@ -98,7 +98,8 @@ var LeyvaOrder = (function () {
     { kind:'codo',      re:/\bcodos?\b/ },
     { kind:'tee',       re:/\b(tee?s?|t) (de |pvc)|\bte pvc\b|\bt pvc\b/ },
     { kind:'pegamento', re:/\bpegamentos?\b|\bpega pvc\b/ },
-    { kind:'cemento',   re:/\bcementos?\b|\bbultos? de cemento\b/ },
+    { kind:'cemento',   re:/\bcementos?\b|\bbultos?\b/ },   // cemento is the ONLY product sold by bulto
+
     { kind:'clavo',     re:/\bclavos?\b/ },
     { kind:'gypsum',    re:/\bgypsum\b|\bgipsum\b|\bjipson\b|\byeso\b/ },
     { kind:'puerta',    re:/\bpuertas?\b/ },
@@ -165,7 +166,7 @@ var LeyvaOrder = (function () {
     var segs = segments(t);
     var lines = [], ambiguous = [], inheritedSize = opts.inheritSize || null;
 
-    segs.forEach(function (seg) {
+    segs.forEach(function (seg, segIdx) {
       KIND.forEach(function (k) {
         if (!k.re.test(seg)) return;
         if (lines.some(function (l) { return l.seg === seg; })) return;
@@ -192,10 +193,29 @@ var LeyvaOrder = (function () {
 
         if (!match) { ambiguous.push({ kind: k.kind, qty: qty, options: opts2 }); return; }
         if (!inheritedSize && (k.kind === 'tubo') && match.size) inheritedSize = match.size;
-        lines.push({ seg: seg, sku: match.sku, n: match.n, u: match.u, unit: match.p,
+        lines.push({ seg: seg, segIdx: segIdx, sku: match.sku, n: match.n, u: match.u, unit: match.p,
                      antes: match.antes || null, qty: qty, inferido: match.inferido || null,
                      total: qty === null ? null : match.p * qty });
       });
+    });
+
+    /* "ocupo codos, como 8" — the product and its quantity land in different
+       comma segments, which is ordinary Nicaraguan phrasing. A trailing
+       segment that is nothing but a number belongs to the last line still
+       missing one. Without this the 8 is silently dropped and every total
+       downstream is short by the codos. */
+    segs.forEach(function (seg, segIdx) {
+      if (lines.some(function (l) { return l.segIdx === segIdx; })) return;
+      if (KIND.some(function (k) { return k.re.test(seg); })) return;
+      var m = seg.match(/^\s*(?:como|unos|unas|serían|serian|son|van|y)?\s*(\d{1,3}|un|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|quince|veinte|treinta)\s*$/);
+      if (!m) return;
+      var q = /^\d+$/.test(m[1]) ? parseInt(m[1], 10) : WORDNUM[m[1]];
+      if (!(q > 0)) return;
+      for (var i = lines.length - 1; i >= 0; i--) {
+        if (lines[i].qty === null && lines[i].segIdx < segIdx) {
+          lines[i].qty = q; lines[i].total = lines[i].unit * q; break;
+        }
+      }
     });
 
     var sum = lines.reduce(function (a, l) { return a + (l.total || 0); }, 0);

@@ -113,10 +113,12 @@ var LeyvaDemo = (function () {
      what the proforma is built from. `uso` is the job he told us about; rule C
      says to use it instead of answering generically. */
   var ST = { awaitingName: null, awaitingQty: null, awaitingConfirm: null,
-             nudged: false, order: [], uso: null, usoDicho: false, lastSize: null };
+             nudged: false, order: [], uso: null, usoDicho: false, lastSize: null,
+             pendingQty: null };
   function resetState() {
     ST.awaitingName = null; ST.awaitingQty = null; ST.awaitingConfirm = null;
     ST.nudged = false; ST.order = []; ST.uso = null; ST.usoDicho = false; ST.lastSize = null;
+    ST.pendingQty = null;
   }
 
   function memLines(order) {
@@ -347,6 +349,42 @@ var LeyvaDemo = (function () {
     };
   }
 
+  /* ---- answering our own "¿Cuántos ocupa?" ----------------------------
+     The assistant asks how many, and the customer replies "deme 12" or
+     "como 8" — a bare quantity with no product in it. Without this the reply
+     parses to nothing and it asks the SAME question again, which in a room
+     reads as not listening. ST.pendingQty remembers what we just asked about. */
+  var BAREQTY = /^\s*(?:ah\s+)?(?:y\s+)?(?:tambi[ée]n\s+)?(?:me\s+)?(?:deme|dame|ponme|p[oó]ngame|mande|quiero|ocupo|son|serían|serian|como|unos|unas|van|ll[ée]veme)?\s*(\d{1,3}|un|una|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|veinte|treinta)\b/;
+
+  function bareQty(t) {
+    var m = t.match(BAREQTY);
+    if (!m) return null;
+    // must not also name a product — that is an ordinary order, not an answer
+    for (var i = 0; i < LeyvaOrder.KIND.length; i++) if (LeyvaOrder.KIND[i].re.test(t)) return null;
+    var w = m[1];
+    var WN = { un:1, una:1, uno:1, dos:2, tres:3, cuatro:4, cinco:5, seis:6, siete:7, ocho:8, nueve:9,
+               diez:10, once:11, doce:12, trece:13, catorce:14, quince:15, veinte:20, treinta:30 };
+    var q = /^\d+$/.test(w) ? parseInt(w, 10) : WN[w];
+    return q > 0 ? q : null;
+  }
+
+  function lineFor(sku, qty) {
+    var r = LeyvaOrder.bySku(sku);
+    return { sku: sku, n: r.n, u: r.u, unit: r.p, qty: qty, total: qty === null ? null : r.p * qty };
+  }
+
+  /* Remember what we just asked about, so the next bare number lands somewhere. */
+  function armPendingQty(lines) {
+    var noQty = lines.filter(function (l) { return l.qty === null || l.qty === undefined; });
+    ST.pendingQty = noQty.length === 1 ? noQty[0].sku : null;
+  }
+
+  function runningTotal() {
+    var acc = ST.order.filter(function (l) { return l.qty; });
+    if (!acc.length) return null;
+    return { lines: acc, sum: acc.reduce(function (a, l) { return a + l.total; }, 0) };
+  }
+
   /* ---- ARITHMETIC *ON* THE PRICE — escalate, never compute --------------
      Discounts, rounding, IVA, wholesale, currency, price projections. Every
      one of these asks for a number that IS NOT IN THE CATALOG, and the guard
@@ -507,6 +545,16 @@ var LeyvaDemo = (function () {
        document comes through. The confirmation is cleared whatever the answer,
        so it is never asked twice. */
     if (ST.awaitingConfirm) {
+      /* Same trap as awaitingName: "no, quítame los codos" is not an answer to
+         "¿así está bien?", it is the EDIT that answer implies. Swallowing it
+         made the assistant ask what to change and then forget it had been
+         told. An edit instruction drops the pending confirmation and is
+         handled by the branch that actually knows how to do it. */
+      if (/\bqu[íi]t|\bquita|\bsaca|\belimin|\bya no (quiero|ocupo|va)|\bagrega|\bagregue|\bsuma(le)?\b|\bcambia/.test(t)) {
+        ST.awaitingConfirm = null;
+      }
+    }
+    if (ST.awaitingConfirm) {
       var cLines = ST.awaitingConfirm;
       ST.awaitingConfirm = null;
       var ca = parseNameAnswer(text);
@@ -559,6 +607,17 @@ var LeyvaDemo = (function () {
     /* Answering the naming question. Only reachable while a proforma is
        actually being built — there is no other path into it, so a stray
        "sí" in an unrelated conversation cannot write a name to a profile. */
+    if (ST.awaitingName) {
+      /* An answer to "¿a nombre de quién?" is not the only thing he can say
+         next. "quítame los codos" used to be parsed as a NAME and answered
+         "no le entendí el nombre", which is the assistant refusing to hear a
+         correction to the document it is about to issue. Anything that is
+         plainly an instruction drops the pending question and is handled
+         normally. */
+      if (/\bqu[íi]t|\bquita|\bsaca|\belimin|\bya no (quiero|ocupo|va)|\bmejor no|\bagrega|\bagregue|\bsuma|\bcambia|\bcotiza|\bcu[áa]nto (llevo|va|tengo)/.test(t)) {
+        ST.awaitingName = null;
+      }
+    }
     if (ST.awaitingName) {
       var m2 = M();
       var ans = parseNameAnswer(text);
@@ -772,6 +831,61 @@ var LeyvaDemo = (function () {
       };
     }
 
+    /* ---- REMOVING A LINE ------------------------------------------------
+       "quítame los codos". A quote he cannot edit is a quote he has to accept
+       or restart, and restarting in front of a buyer is the demo dying. */
+    if (/\bqu[íi]t|\bquita|\bsaca(me|le)?\b|\belimin|\bya no (quiero|ocupo|va)|\bmejor no/.test(t) && ST.order.length) {
+      var kill = null;
+      for (var ki = 0; ki < LeyvaOrder.KIND.length; ki++) {
+        if (!LeyvaOrder.KIND[ki].re.test(t)) continue;
+        var kk = LeyvaOrder.KIND[ki].kind;
+        kill = ST.order.filter(function (l) { return LeyvaOrder.bySku(l.sku).kind === kk; });
+        if (kill.length) break;
+      }
+      if (kill && kill.length) {
+        ST.order = ST.order.filter(function (l) { return kill.indexOf(l) === -1; });
+        ST.awaitingConfirm = null;
+        var rt = runningTotal();
+        var rmOut = ['Va, le quito ' + LeyvaOrder.plural(LeyvaOrder.bySku(kill[0].sku).corto, 2) + '.'];
+        if (rt) { rmOut.push(orderLines(rt.lines)); rmOut.push('Queda en ' + money(rt.sum) + '.'); }
+        else rmOut.push('Con eso no me queda nada en la lista. ¿Qué le pongo?');
+        return hit(rmOut, ['PRE|El cliente quitó ' + kill.length + ' línea(s)',
+                           rt ? 'Nuevo total ' + money(rt.sum) + ' — recalculado' : 'Pedido vacío',
+                           'Se recalcula, no se ajusta a mano'], true);
+      }
+    }
+
+    /* ---- RUNNING TOTAL --------------------------------------------------
+       "¿cuánto llevo hasta ahorita?" is NOT the confirmation. Rule B says the
+       confirmation happens once, before the proforma; answering this with
+       "Para confirmarle:" (which the model did) burns it early and then it
+       either repeats or is missing where it belongs. */
+    if (/\bcu[áa]nto (llevo|va|vamos|tengo|es en total|ser[íi]a en total)\b|\bc[óo]mo va (la cuenta|eso)\b|\bel total hasta\b|\bcu[áa]nto suma\b/.test(t)) {
+      var rt2 = runningTotal();
+      if (rt2) {
+        return hit(['Hasta ahorita lleva:', orderLines(rt2.lines), 'Suma ' + money(rt2.sum) + '. ¿Le agrego algo más?'],
+          ['Consulta: total en curso', rt2.lines.length + ' líneas acumuladas',
+           'Suma ' + money(rt2.sum) + ' — calculada desde el catálogo',
+           'NO es la confirmación: esa va una sola vez, antes de la proforma'], true);
+      }
+      return hit(['Todavía no llevamos nada apuntado.', '¿Qué le voy poniendo?'],
+        ['Consulta: total en curso', 'Sin líneas acumuladas'], true);
+    }
+
+    /* ---- A BARE QUANTITY ANSWERING OUR OWN QUESTION ---------------------- */
+    if (ST.pendingQty) {
+      var bq = bareQty(t);
+      if (bq) {
+        var bl = lineFor(ST.pendingQty, bq);
+        ST.pendingQty = null;
+        mergeOrder(bl);
+        return hit(unitAndTotal(bl),
+          ['PRE|Cantidad dada en respuesta a "¿cuántos ocupa?": ' + bq,
+           'Unitario ' + money(bl.unit) + ' · ' + bq + ' x ' + money(bl.unit) + ' = ' + money(bl.total),
+           'Aritmética calculada, no redactada'], true);
+      }
+    }
+
     /* Price arithmetic runs BEFORE the product parser: "calcule el IVA de 10
        tubos" contains a perfectly parseable order, and answering it with the
        price alone ignores the question that was actually asked. */
@@ -792,19 +906,38 @@ var LeyvaDemo = (function () {
        QUANTITY CARRIES OVER — he already told us how many, and making him say
        it again is the thing that makes an assistant feel like a form. */
     var chg = t.match(/\b(mejor|mejor dicho|cambi[eé]|cambio|en realidad|no,? mejor)\b/);
+    if (chg && !ST.order.length && ST.pendingQty) {
+      // He is changing his mind about the thing we just quoted but had no
+      // quantity for yet. Keep it addressable rather than starting over.
+      ST.order.push(lineFor(ST.pendingQty, null));
+    }
     if (chg && ST.order.length) {
       var newSize = null;
       for (var si = 0; si < LeyvaOrder.SIZEWORDS.length; si++) {
         if (LeyvaOrder.SIZEWORDS[si].re.test(LeyvaOrder.norm(text))) { newSize = LeyvaOrder.SIZEWORDS[si].size; break; }
       }
       if (newSize) {
-        var lastL = ST.order[ST.order.length - 1];
+        /* Target the product he NAMED, not blindly the last line. "mejor los
+           tubos de una pulgada" after ordering tubos AND codos was changing
+           the codos, because codos also come in 1" — it silently re-priced the
+           wrong line and the customer would never have seen why. */
+        var lastL = null;
+        for (var ci = 0; ci < LeyvaOrder.KIND.length; ci++) {
+          if (!LeyvaOrder.KIND[ci].re.test(t)) continue;
+          var ck2 = LeyvaOrder.KIND[ci].kind;
+          for (var cj = ST.order.length - 1; cj >= 0; cj--) {
+            if (LeyvaOrder.bySku(ST.order[cj].sku).kind === ck2) { lastL = ST.order[cj]; break; }
+          }
+          if (lastL) break;
+        }
+        if (!lastL) lastL = ST.order[ST.order.length - 1];
         var alt = LeyvaOrder.byKind(LeyvaOrder.bySku(lastL.sku).kind)
                     .filter(function (x) { return x.size === newSize; })[0];
+        var lastIdx = ST.order.indexOf(lastL);
         if (alt) {
           var nl = { sku: alt.sku, n: alt.n, u: alt.u, unit: alt.p, qty: lastL.qty,
                      total: lastL.qty === null ? null : alt.p * lastL.qty };
-          ST.order[ST.order.length - 1] = nl;
+          ST.order[lastIdx] = nl;
           var msgs = ['Ah, entonces mejor el de ' + prettySize(newSize) + '.'];
           msgs = msgs.concat(unitAndTotal(nl));
           return hit(msgs, ['PRE|Cambio de opinión: ' + prettySize(newSize),
@@ -828,6 +961,7 @@ var LeyvaDemo = (function () {
       var out = [], trace = [];
 
       // one product, nothing ambiguous — the common case, kept short
+      armPendingQty(parsed.lines);
       if (parsed.lines.length === 1 && !parsed.ambiguous.length) {
         var l0 = parsed.lines[0];
         if (ST.uso && !ST.usoDicho) { out.push(usoLead(ST.uso, l0)); ST.usoDicho = true; }
