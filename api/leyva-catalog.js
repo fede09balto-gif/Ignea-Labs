@@ -99,14 +99,23 @@ export default async function handler(req, res) {
           // one is the single worst thing this project can put on a screen.
           precio: (it.precio === null || it.precio === undefined) ? null : it.precio,
           precio_antes: (it.precio !== null && it.precio !== undefined && it.precio_antes) ? it.precio_antes : null,
+          /* The three provenance levels. OPERATOR-ONLY: all three quote
+             identically to the customer, but Luis has to know which numbers he
+             can defend as the ferretería's own and which are ours. */
+          fuente: it.fuente || null,
+          source_url: it.source_url || null,
+          source_date: it.source_date || null,
           promo: (it.precio !== null && it.precio !== undefined && it.promo) ? it.promo : null
         };
       }).filter(Boolean)
     });
   });
 
-  var total = 0, conPrecio = 0;
-  grupos.forEach(function (g) { g.items.forEach(function (i) { total++; if (i.precio !== null) conPrecio++; }); });
+  var total = 0, conPrecio = 0, porFuente = {};
+  grupos.forEach(function (g) { g.items.forEach(function (i) {
+    total++; if (i.precio !== null) conPrecio++;
+    porFuente[i.fuente] = (porFuente[i.fuente] || 0) + 1;
+  }); });
 
   res.setHeader('Cache-Control', 'no-store');
   return res.status(200).json({
@@ -121,7 +130,7 @@ export default async function handler(req, res) {
       telefonos: leyvaCatalog.contacto.telefonos,
       direccion: leyvaCatalog.contacto.direccion
     },
-    resumen: { total: total, conPrecio: conPrecio, sinPrecio: total - conPrecio },
+    resumen: { total: total, conPrecio: conPrecio, sinPrecio: total - conPrecio, porFuente: porFuente },
     grupos: grupos,
     noManeja: noManeja
   });

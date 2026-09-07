@@ -319,6 +319,19 @@
     if (forced || !navigator.onLine) { finish(localAns.bubbles, 'local'); return; }
 
     LeyvaDemo.callApi(history.slice()).then(function (res) {
+      /* ARITHMETIC IS VERIFIED, NEVER READ. The model writes the prose; every
+         money figure it produced is checked against the catalog and the
+         quantities actually in play. A rounded total or an invented unit price
+         is discarded and the deterministic answer — already computed before
+         the request went out — is used instead. The buyer sees a correct
+         number; the operator sees why in the rail. */
+      if (res && res.bubbles && !LeyvaDemo.verifyMoney(res.bubbles.join(' '), text)) {
+        localAns.rail = (localAns.rail || []).concat(['ARITMÉTICA DEL MODELO NO VERIFICABLE — respuesta descartada',
+                                                      'Se usa la cuenta calculada desde el catálogo']);
+        localAns.bubbles.forEach(function (b) { history.push({ role: 'assistant', content: b }); });
+        finish(localAns.bubbles, 'local');
+        return;
+      }
       if (res && res.bubbles) {
         res.bubbles.forEach(function (b) { history.push({ role: 'assistant', content: b }); });
         finish(res.bubbles, 'api');

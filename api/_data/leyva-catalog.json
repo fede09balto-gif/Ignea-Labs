@@ -33,9 +33,34 @@
     "  about someone else's business. Don't.",
     "",
     "OWNER'S NAME: deliberately absent. Sources conflict between 'Roberto' and",
-    "'Carlos'. Use the business name only. Do not 'fix' this by picking one."
+    "'Carlos'. Use the business name only. Do not 'fix' this by picking one.",
+    "",
+    "*** TRES NIVELES DE PROCEDENCIA. EL CAMPO `fuente` ES OBLIGATORIO. ***",
+    "",
+    "  fuente: 'estimado'",
+    "      Precio NUESTRO, de mercado nicaragüense. NO es el precio de la",
+    "      ferretería. El socio confirmó que sí venden el producto; la cifra la",
+    "      pusimos nosotros. Si el ferretero dice que su precio es otro, tiene",
+    "      razón él — el nuestro es una estimación de mercado, no su lista.",
+    "",
+    "  fuente: 'facebook'",
+    "      Trazado a una publicación con URL y fecha. Todas son del 2025-10-10,",
+    "      campaña 'PROMOCION DE INTRODUCCION'. OJO: eso es de octubre de 2025,",
+    "      casi un año. Un precio con URL no es un precio vigente.",
+    "",
+    "  fuente: 'facebook_sin_verificar'",
+    "      Transcrito de capturas, SIN URL. Incluye el grupo 'DESCUENTOS",
+    "      PATRIOS' (gypsum C$370, puertas C$4,260, tablas C$1,050), que casi",
+    "      con certeza YA VENCIÓ, y también Bondex, baterías y las herramientas",
+    "      Caterpillar, que tampoco tienen URL.",
+    "",
+    "LOS TRES NIVELES SE COTIZAN IGUAL. La distinción es NUESTRA, para saber qué",
+    "defendemos y qué no; el cliente ve un precio y ya. Lo que NO cambia: precio",
+    "null sigue siendo incotizable, en las dos rutas.",
+    "",
+    "Si un precio ya cambió, esa es la respuesta buena y no una disculpa:",
+    "cargamos el catálogo tal cual; ustedes lo actualizan y el asistente cambia."
   ],
-
   "meta": {
     "business": "Ferretería Roberto Leyva",
     "city": "León, Nicaragua",
@@ -44,25 +69,30 @@
     "verified": false,
     "verifiedBy": null,
     "verifiedOn": null,
-    "sourcedItems": 0,
-    "totalItems": 29
+    "sourcedItems": 9,
+    "totalItems": 42,
+    "fuentes": {
+      "facebook_sin_verificar": 20,
+      "facebook": 9,
+      "estimado": 13
+    }
   },
-
   "contacto": {
     "whatsapp": "8935-9013",
-    "telefonos": ["2315-1177", "2315-1610"],
+    "telefonos": [
+      "2315-1177",
+      "2315-1610"
+    ],
     "direccion": "Esq. Dr. Cayetano 25 vrs al Oeste, León",
     "source": "business's own Facebook page",
     "source_url": null,
     "source_date": null
   },
-
   "no_disponible": {
     "_comment": "Facts we do not have. The prompt builder turns each of these into an explicit prohibition plus an escalation path. Never populate.",
     "existencia": "No tenemos datos de inventario. El asistente ofrece confirmar con el mostrador.",
     "entrega": "No tenemos política ni costo de entrega. El asistente ofrece confirmar con el mostrador."
   },
-
   "items": {
     "GYP-12-48": {
       "n": "Lámina de gypsum 1/2\" x 4x8",
@@ -72,7 +102,8 @@
       "cat": "construccion",
       "promo": "Promoción patrias",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "PTA-MET-3T-CAFE": {
       "n": "Puerta metálica 3 tableros café",
@@ -82,7 +113,8 @@
       "cat": "puertas",
       "promo": "Promoción patrias",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "PTA-MET-6T-BLANCA": {
       "n": "Puerta metálica blanca 6 tableros",
@@ -92,7 +124,8 @@
       "cat": "puertas",
       "promo": "Promoción patrias",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "PTA-MET-5T-CAOBA": {
       "n": "Puerta metálica 5 tableros caoba",
@@ -102,7 +135,8 @@
       "cat": "puertas",
       "promo": "Promoción patrias",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "TAB-1X12X5": {
       "n": "Tablas 1\" x 12 x 5\"",
@@ -112,7 +146,8 @@
       "cat": "madera",
       "promo": "Promoción patrias",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "LAM-REV-KL8231": {
       "n": "Lámina de revestimiento negra mármol KL8231-2",
@@ -123,9 +158,9 @@
       "promo": "Promoción patrias",
       "_nota": "Precio actual DESCONOCIDO. Solo se conoce el precio anterior. No cotizar.",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
-
     "BON-PLUS-20": {
       "n": "Bondex Plus Cemex",
       "precio": 185,
@@ -133,7 +168,8 @@
       "u": "saco de 20 kg",
       "cat": "adhesivos",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "BON-CER-PREM-20": {
       "n": "Bondex Pega Cerámica Premium Cemex",
@@ -142,7 +178,8 @@
       "u": "saco de 20 kg",
       "cat": "adhesivos",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "ACE-YAM-20W50": {
       "n": "Aceite Yamalube 20W-50 4T",
@@ -150,8 +187,10 @@
       "precio_antes": null,
       "u": "litro",
       "cat": "lubricantes",
-      "source_url": null,
-      "source_date": null
+      "source_url": "https://www.facebook.com/photo/?fbid=1366315678834209",
+      "source_date": "2025-10-10",
+      "fuente": "facebook",
+      "campana": "PROMOCION DE INTRODUCCION"
     },
     "BAT-KOBE-12N65L": {
       "n": "Batería Kobe 12N6-5L-BS-GEL",
@@ -160,7 +199,8 @@
       "u": "unidad",
       "cat": "baterias",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "BAT-KOBE-12N74B": {
       "n": "Batería Kobe 12N7-4B-GEL",
@@ -169,17 +209,19 @@
       "u": "unidad",
       "cat": "baterias",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
-
     "LLA-CST-C6571": {
       "n": "Llanta CST C6571 2.75-17 6PR",
       "precio": 1206,
       "precio_antes": null,
       "u": "unidad",
       "cat": "llantas",
-      "source_url": null,
-      "source_date": null
+      "source_url": "https://www.facebook.com/photo/?fbid=1366295718836205",
+      "source_date": "2025-10-10",
+      "fuente": "facebook",
+      "campana": "PROMOCION DE INTRODUCCION"
     },
     "LLA-CST-C180": {
       "n": "Llanta CST C180 3.00-18",
@@ -187,8 +229,10 @@
       "precio_antes": null,
       "u": "unidad",
       "cat": "llantas",
-      "source_url": null,
-      "source_date": null
+      "source_url": "https://www.facebook.com/photo/?fbid=1366295658836211",
+      "source_date": "2025-10-10",
+      "fuente": "facebook",
+      "campana": "PROMOCION DE INTRODUCCION"
     },
     "LLA-CST-C919": {
       "n": "Llanta CST C919 2.75-18 TL",
@@ -196,8 +240,10 @@
       "precio_antes": null,
       "u": "unidad",
       "cat": "llantas",
-      "source_url": null,
-      "source_date": null
+      "source_url": "https://www.facebook.com/photo/?fbid=1366295638836213",
+      "source_date": "2025-10-10",
+      "fuente": "facebook",
+      "campana": "PROMOCION DE INTRODUCCION"
     },
     "LLA-CST-C918": {
       "n": "Llanta CST C918 90/90-17 TL",
@@ -205,8 +251,10 @@
       "precio_antes": null,
       "u": "unidad",
       "cat": "llantas",
-      "source_url": null,
-      "source_date": null
+      "source_url": "https://www.facebook.com/photo/?fbid=1366295628836214",
+      "source_date": "2025-10-10",
+      "fuente": "facebook",
+      "campana": "PROMOCION DE INTRODUCCION"
     },
     "LLA-CST-C934": {
       "n": "Llanta CST C934 90/90-17 TL",
@@ -214,8 +262,10 @@
       "precio_antes": null,
       "u": "unidad",
       "cat": "llantas",
-      "source_url": null,
-      "source_date": null
+      "source_url": "https://www.facebook.com/photo/?fbid=1366295535502890",
+      "source_date": "2025-10-10",
+      "fuente": "facebook",
+      "campana": "PROMOCION DE INTRODUCCION"
     },
     "LLA-CST-C6520": {
       "n": "Llanta CST C6520 90/90-18 TL",
@@ -223,8 +273,10 @@
       "precio_antes": null,
       "u": "unidad",
       "cat": "llantas",
-      "source_url": null,
-      "source_date": null
+      "source_url": "https://www.facebook.com/photo/?fbid=1366295515502892",
+      "source_date": "2025-10-10",
+      "fuente": "facebook",
+      "campana": "PROMOCION DE INTRODUCCION"
     },
     "LLA-CST-C7204F": {
       "n": "Llanta CST C7204F 3.00-18 TL",
@@ -232,8 +284,10 @@
       "precio_antes": null,
       "u": "unidad",
       "cat": "llantas",
-      "source_url": null,
-      "source_date": null
+      "source_url": "https://www.facebook.com/photo/?fbid=1366295542169556",
+      "source_date": "2025-10-10",
+      "fuente": "facebook",
+      "campana": "PROMOCION DE INTRODUCCION"
     },
     "LLA-CST-C6559": {
       "n": "Llanta CST C6559 110/90-17",
@@ -241,10 +295,11 @@
       "precio_antes": null,
       "u": "unidad",
       "cat": "llantas",
-      "source_url": null,
-      "source_date": null
+      "source_url": "https://www.facebook.com/photo/?fbid=1366295548836222",
+      "source_date": "2025-10-10",
+      "fuente": "facebook",
+      "campana": "PROMOCION DE INTRODUCCION"
     },
-
     "CAT-DX519U": {
       "n": "Cortadora de metales Caterpillar 14\" DX519U",
       "precio": null,
@@ -253,7 +308,8 @@
       "cat": "herramientas",
       "specs": "14 pulgadas",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "CAT-DX17U": {
       "n": "Taladro de impacto Caterpillar DX17U",
@@ -263,7 +319,8 @@
       "cat": "herramientas",
       "specs": "750 W",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "CAT-DX161U": {
       "n": "Taladro de impacto Caterpillar DX161U",
@@ -273,7 +330,8 @@
       "cat": "herramientas",
       "specs": "850 W",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "CAT-DX12": {
       "n": "Taladro atornillador Caterpillar DX12",
@@ -283,7 +341,8 @@
       "cat": "herramientas",
       "specs": "18 V",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "CAT-DX15": {
       "n": "Taladro atornillador Caterpillar DX15",
@@ -293,7 +352,8 @@
       "cat": "herramientas",
       "specs": "12 V",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "CAT-DX59U": {
       "n": "Sierra circular Caterpillar DX59U",
@@ -303,7 +363,8 @@
       "cat": "herramientas",
       "specs": "7-1/4 pulgadas, 1400 W",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "CAT-DX21": {
       "n": "Martillo giratorio Caterpillar SDS+ DX21",
@@ -313,7 +374,8 @@
       "cat": "herramientas",
       "specs": "SDS+, 18 V",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "CAT-DX27U": {
       "n": "Martillo giratorio Caterpillar SDS+ DX27U",
@@ -323,7 +385,8 @@
       "cat": "herramientas",
       "specs": "SDS+, 1500 W",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "CAT-DX26U": {
       "n": "Martillo giratorio Caterpillar DX26U",
@@ -333,7 +396,8 @@
       "cat": "herramientas",
       "specs": "800 W",
       "source_url": null,
-      "source_date": null
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
     },
     "CAT-DX461U": {
       "n": "Lijadora orbital Caterpillar DX461U",
@@ -342,6 +406,144 @@
       "u": "unidad",
       "cat": "herramientas",
       "specs": "5 pulgadas",
+      "source_url": null,
+      "source_date": null,
+      "fuente": "facebook_sin_verificar"
+    },
+    "TUB-PVC-12": {
+      "n": "Tubo PVC potable 1/2\"",
+      "precio": 168,
+      "precio_antes": null,
+      "u": "tubo de 6 m",
+      "cat": "plomeria",
+      "specs": "1/2 pulgada, 6 metros",
+      "fuente": "estimado",
+      "source_url": null,
+      "source_date": null
+    },
+    "TUB-PVC-1": {
+      "n": "Tubo PVC potable 1\"",
+      "precio": 310,
+      "precio_antes": null,
+      "u": "tubo de 6 m",
+      "cat": "plomeria",
+      "specs": "1 pulgada, 6 metros",
+      "fuente": "estimado",
+      "source_url": null,
+      "source_date": null
+    },
+    "TUB-PVC-2": {
+      "n": "Tubo PVC potable 2\"",
+      "precio": 740,
+      "precio_antes": null,
+      "u": "tubo de 6 m",
+      "cat": "plomeria",
+      "specs": "2 pulgadas, 6 metros",
+      "fuente": "estimado",
+      "source_url": null,
+      "source_date": null
+    },
+    "CEM-BULTO-25": {
+      "n": "Bulto de cemento 25 kg",
+      "precio": 235,
+      "precio_antes": null,
+      "u": "bulto de 25 kg",
+      "cat": "cemento",
+      "fuente": "estimado",
+      "source_url": null,
+      "source_date": null
+    },
+    "CODO-PVC-12": {
+      "n": "Codo PVC 1/2\" 90°",
+      "precio": 14,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "plomeria",
+      "specs": "1/2 pulgada, 90 grados",
+      "fuente": "estimado",
+      "source_url": null,
+      "source_date": null
+    },
+    "CODO-PVC-1": {
+      "n": "Codo PVC 1\" 90°",
+      "precio": 32,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "plomeria",
+      "specs": "1 pulgada, 90 grados",
+      "fuente": "estimado",
+      "source_url": null,
+      "source_date": null
+    },
+    "TEE-PVC-12": {
+      "n": "T PVC 1/2\"",
+      "precio": 18,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "plomeria",
+      "specs": "1/2 pulgada",
+      "fuente": "estimado",
+      "source_url": null,
+      "source_date": null
+    },
+    "TEE-PVC-1": {
+      "n": "T PVC 1\"",
+      "precio": 42,
+      "precio_antes": null,
+      "u": "unidad",
+      "cat": "plomeria",
+      "specs": "1 pulgada",
+      "fuente": "estimado",
+      "source_url": null,
+      "source_date": null
+    },
+    "CLA-2": {
+      "n": "Clavo de 2\"",
+      "precio": 34,
+      "precio_antes": null,
+      "u": "libra",
+      "cat": "fijacion",
+      "fuente": "estimado",
+      "source_url": null,
+      "source_date": null
+    },
+    "CLA-3": {
+      "n": "Clavo de 3\"",
+      "precio": 33,
+      "precio_antes": null,
+      "u": "libra",
+      "cat": "fijacion",
+      "fuente": "estimado",
+      "source_url": null,
+      "source_date": null
+    },
+    "CLA-4": {
+      "n": "Clavo de 4\"",
+      "precio": 35,
+      "precio_antes": null,
+      "u": "libra",
+      "cat": "fijacion",
+      "fuente": "estimado",
+      "source_url": null,
+      "source_date": null
+    },
+    "PEG-PVC-18": {
+      "n": "Pegamento PVC industrial 1/8 galón",
+      "precio": 165,
+      "precio_antes": null,
+      "u": "1/8 galón",
+      "cat": "plomeria",
+      "fuente": "estimado",
+      "source_url": null,
+      "source_date": null
+    },
+    "PEG-PVC-14": {
+      "n": "Pegamento PVC industrial 1/4 galón",
+      "precio": 285,
+      "precio_antes": null,
+      "u": "1/4 galón",
+      "cat": "plomeria",
+      "fuente": "estimado",
       "source_url": null,
       "source_date": null
     }

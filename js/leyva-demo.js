@@ -108,8 +108,16 @@ var LeyvaDemo = (function () {
   /* Conversation state for the two-step proforma. Reset by leyva-chat.js's
      reset(). Deliberately NOT persisted: a half-finished naming question
      surviving a restart would put a stale name on the next document. */
-  var ST = { awaitingName: null, awaitingQty: null, nudged: false };
-  function resetState() { ST.awaitingName = null; ST.awaitingQty = null; ST.nudged = false; }
+  /* Conversation state. `order` is what the customer has actually asked for,
+     accumulated across turns — it is what the confirmation repeats back and
+     what the proforma is built from. `uso` is the job he told us about; rule C
+     says to use it instead of answering generically. */
+  var ST = { awaitingName: null, awaitingQty: null, awaitingConfirm: null,
+             nudged: false, order: [], uso: null, usoDicho: false, lastSize: null };
+  function resetState() {
+    ST.awaitingName = null; ST.awaitingQty = null; ST.awaitingConfirm = null;
+    ST.nudged = false; ST.order = []; ST.uso = null; ST.usoDicho = false; ST.lastSize = null;
+  }
 
   function memLines(order) {
     return order.lines.map(function (l) {
@@ -339,6 +347,75 @@ var LeyvaDemo = (function () {
     };
   }
 
+  /* ---- rule A: unit AND total, always ---------------------------------
+     "Nunca un total sin el unitario. El ferretero tiene que poder verificar la
+     cuenta mentalmente." Both numbers, every time, and the total is computed
+     here — never a figure a model wrote. */
+  function art(l)  { return (LeyvaOrder.bySku(l.sku) || {}).g === 'f' ? 'La ' : 'El '; }
+  function uart(l) { return LeyvaOrder.unitGender(l.u) === 'm' ? 'el ' : 'la '; }
+  function cuantos(l) { return (LeyvaOrder.bySku(l.sku) || {}).g === 'f' ? '¿Cuántas ocupa?' : '¿Cuántos ocupa?'; }
+
+  function unitAndTotal(l) {
+    if (l.qty === null || l.qty === undefined) {
+      return [art(l) + l.n + ' anda a ' + money(l.unit) + ' ' + uart(l) + l.u + '.', cuantos(l)];
+    }
+    return [art(l) + l.n + ' le queda a ' + money(l.unit) + ' ' + uart(l) + l.u + '.',
+            'Por ' + l.qty + ' son ' + money(l.qty * l.unit) + '.'];
+  }
+
+  /* Multi-line: every line shows its own unit price next to its own total, so
+     each line is checkable on its own and so is the sum. */
+  function orderLines(lines) {
+    return lines.map(function (l) {
+      if (l.qty === null || l.qty === undefined) return l.n + ' — ' + money(l.unit) + ' ' + uart(l) + l.u;
+      return l.qty + ' x ' + l.n + ' a ' + money(l.unit) + ' c/u — ' + money(l.qty * l.unit);
+    }).join('\n');
+  }
+
+  function humanList(a) {
+    if (a.length <= 1) return a[0] || '';
+    return a.slice(0, -1).join(', ') + ' y ' + a[a.length - 1];
+  }
+
+  function prettySize(sz) {
+    return sz === '1/2' ? '1/2' : sz === '1' ? '1 pulgada' : sz === '2' ? '2 pulgadas'
+         : sz === '1/8' ? '1/8' : sz === '1/4' ? '1/4' : sz;
+  }
+
+  /* An ambiguous kind is ASKED ABOUT, never resolved. Picking the cheapest or
+     the first would be the same class of error as substituting across a
+     category — a number the customer did not ask for. Both options carry their
+     unit price so the question is answerable in one reply. */
+  function ambiguousAsk(a) {
+    var opts = a.options.map(function (o) { return o.n + ' a ' + money(o.p); });
+    return 'Del ' + a.kind + ' tengo ' + humanList(opts) + '. ¿Cuál le sirve?';
+  }
+
+  /* Rule C: use what he told us. Detected once and mentioned once — repeating
+     "para su instalación de agua" every turn is the corporate tic the voice
+     rules already ban. */
+  var USOS = [
+    { re: /instalaci[oó]n de agua|agua potable|tuber[ií]a de agua|para agua|meter agua/, uso: 'la instalación de agua' },
+    { re: /para el ba[nñ]o|del ba[nñ]o/, uso: 'el baño' },
+    { re: /para la pila|de la pila/, uso: 'la pila' },
+    { re: /cielo raso|cieloraso/, uso: 'el cielo raso' },
+    { re: /para la moto|de la moto/, uso: 'la moto' }
+  ];
+  function rememberUse(t) {
+    if (ST.uso) return;
+    for (var i = 0; i < USOS.length; i++) if (USOS[i].re.test(t)) { ST.uso = USOS[i].uso; return; }
+  }
+  function usoLead(uso, l) { return 'Para ' + uso + ', el ' + l.n + ' es el que ocupa.'; }
+
+  /* Accumulate what he has actually asked for. Same SKU twice replaces rather
+     than adds — "10 tubos" then "mejor 15 tubos" is a correction, not 25. */
+  function mergeOrder(l) {
+    for (var i = 0; i < ST.order.length; i++) {
+      if (ST.order[i].sku === l.sku) { ST.order[i] = l; return; }
+    }
+    ST.order.push(l);
+  }
+
   function local(text) {
     var t = norm(text);
     var rail = [];
@@ -373,6 +450,34 @@ var LeyvaDemo = (function () {
         ['Solicitud: olvidar datos',
          'Perfil eliminado de memoria',
          (mm && mm.wiped()) ? 'Verificado: sin registro para este número' : 'ADVERTENCIA: el borrado no se pudo verificar'], true);
+    }
+
+    /* Answering the ONE confirmation. A "sí" here does not produce a document
+       either — it advances to the naming question, which stays the only door a
+       document comes through. The confirmation is cleared whatever the answer,
+       so it is never asked twice. */
+    if (ST.awaitingConfirm) {
+      var cLines = ST.awaitingConfirm;
+      ST.awaitingConfirm = null;
+      var ca = parseNameAnswer(text);
+      if (!ca.confirm) {
+        // Anything but a yes means the order is being edited. Drop it and let
+        // the message be handled as an ordinary request rather than carrying
+        // quantities he just disputed onto a document.
+        return hit(['Ah, va — dígame cómo queda entonces.', '¿Qué le cambio?'],
+          ['Cantidades NO confirmadas', 'Se descarta el pedido pendiente', 'Se vuelve a preguntar'], true);
+      }
+      var cTot = cLines.reduce(function (a, l) { return a + l.total; }, 0);
+      var cAsk = nameAsk();
+      ST.awaitingName = { lines: cLines, total: cTot };
+      return {
+        bubbles: ['Perfecto.'].concat(cAsk.q),
+        rail: ['PRE|Cantidades confirmadas por el cliente',
+               'Total ' + money(cTot) + ' — calculado desde el catálogo'].concat(cAsk.rail)
+              .concat(['Documento: ruta determinista, sin modelo']),
+        localOnly: true,
+        suppressDoc: true
+      };
     }
 
     /* Confirming the quantities on a recalled order. A "sí" here does NOT
@@ -573,93 +678,118 @@ var LeyvaDemo = (function () {
         ['Consulta: lámina de revestimiento', 'Producto en catálogo', 'SIN PRECIO EN SISTEMA', 'Escalar al mostrador']);
     }
 
-    /* Cotización — TWO STEPS, deliberately.
-
-       Step 1 (here) quotes the lines and ASKS WHOSE NAME goes on the
-       document. Step 2 is the ST.awaitingName branch above, which issues it.
-       The split is the rule "ask for the name only when building a proforma,
-       because that is when it is genuinely needed" made structural: the name
-       is never requested as a greeting, and a document is never produced with
-       a name nobody confirmed.
-
-       No document is emitted on this turn — `suppressDoc` tells the chat
-       layer not to render a PDF card from these lines yet. */
+    /* ---- COTIZACIÓN: confirm the quantities ONCE, then the name ---------
+       Fede's rule B: "Una sola vez, antes de la proforma, repitiendo
+       cantidades. No después de cada mensaje — eso cansa y suena a
+       formulario." So the confirmation is bound to the moment the document is
+       requested, not to every turn that touches a product. */
     if (/cotiza|proforma|proform|proformar|presupuesto|me arma|s[úu]meme|cu[áa]nto me sale todo/.test(t)) {
-      var lines = [
-        { q: 10, it: LOCAL_PRICES.gypsum },
-        { q: 2, it: LOCAL_PRICES.puerta3 }
+      var acc = ST.order.filter(function (l) { return l.qty; });
+      if (acc.length) {
+        ST.awaitingConfirm = acc.slice();
+        return {
+          bubbles: [
+            'Para confirmarle: ' + humanList(acc.map(function (l) {
+              var r = LeyvaOrder.bySku(l.sku);
+              return l.qty + ' ' + LeyvaOrder.plural((r && r.corto) || l.n, l.qty);
+            })) + '.',
+            '¿Así está bien?'
+          ],
+          rail: ['Consulta: cotización',
+                 'PRE|' + acc.length + ' líneas tomadas de lo que pidió el cliente',
+                 'Total ' + money(acc.reduce(function (a, l) { return a + l.total; }, 0)),
+                 'Se confirman las cantidades UNA vez antes del documento'],
+          localOnly: true,
+          suppressDoc: true
+        };
+      }
+      /* No accumulated order — the demo's own opening beat, where the operator
+         taps "Me arma una cotización" cold. Keeps the sample so beat 05 of the
+         brief still works. */
+      var sample = [
+        { sku: 'GYP-12-48', n: LeyvaOrder.bySku('GYP-12-48').n, unit: 370, qty: 10, total: 3700, u: 'lámina' },
+        { sku: 'PTA-MET-3T-CAFE', n: LeyvaOrder.bySku('PTA-MET-3T-CAFE').n, unit: 4260, qty: 2, total: 8520, u: 'unidad' }
       ];
-      var sub = lines.reduce(function (a, l) { return a + l.q * l.it.p; }, 0);
-      var ask = nameAsk();
-      ST.awaitingName = {
-        lines: lines.map(function (l) { return { sku: l.it.sku, qty: l.q, desc: l.it.n, unit: l.it.p, total: l.q * l.it.p }; }),
-        total: sub
-      };
+      var sub = sample.reduce(function (a, l) { return a + l.total; }, 0);
+      var ask0 = nameAsk();
+      ST.awaitingName = { lines: sample, total: sub };
       return {
-        bubbles: [
-          'Va pues, se la armo.',
-          lines.map(function (l) { return l.q + ' ' + l.it.n + ' — ' + money(l.q * l.it.p); }).join('\n'),
-          'Total ' + money(sub) + '.'
-        ].concat(ask.q),
+        bubbles: ['Va pues, se la armo.', orderLines(sample), 'Total ' + money(sub) + '.'].concat(ask0.q),
         rail: ['Consulta: cotización', '2 líneas con precio en sistema', 'Suma ' + money(sub),
-               'Entrega: sin dato → escalar'].concat(ask.rail)
-             .concat(['Documento: ruta determinista, sin modelo']),
+               'Entrega: sin dato → escalar'].concat(ask0.rail).concat(['Documento: ruta determinista, sin modelo']),
         localOnly: true,
         suppressDoc: true
       };
     }
 
-    // Multi-product in one message — quote every priced match, not just the
-    // first. "gypsum y una puerta cafe, cuanto sale todo" must not answer
-    // about gypsum alone.
-    var multi = [];
-    if (/gypsum/.test(t)) multi.push(LOCAL_PRICES.gypsum);
-    if (/puerta/.test(t)) multi.push(/caoba|5 tablero/.test(t) ? LOCAL_PRICES.puerta5 : (/blanc|6 tablero/.test(t) ? LOCAL_PRICES.puerta6 : LOCAL_PRICES.puerta3));
-    if (/tabla|madera/.test(t)) multi.push(LOCAL_PRICES.tabla);
-    if (/bondex/.test(t)) multi.push(/premium|ceramica/.test(t) ? LOCAL_PRICES.bondexp : LOCAL_PRICES.bondex);
-    if (/llanta/.test(t)) multi.push(/90\/90|17 tl/.test(t) ? LOCAL_PRICES.llanta90 : LOCAL_PRICES.llanta17);
-    if (/bateria|kobe/.test(t)) multi.push(/12n7|\b7\b/.test(t) ? LOCAL_PRICES.bat74 : LOCAL_PRICES.bat65);
-    if (/aceite|yamalube|20w/.test(t)) multi.push(LOCAL_PRICES.aceite);
-    if (multi.length > 1) {
-      var tot = multi.reduce(function (a, x) { return a + x.p; }, 0);
-      return hit(['Va, le paso los precios.',
-        multi.map(function (x) { return x.n + ' — ' + money(x.p); }).join('\n'),
-        'Junto le sale ' + money(tot) + ', uno de cada uno. Dígame cantidades y se la afino.'],
-        ['Consulta con varios productos', multi.length + ' coincidencias', 'Suma ' + money(tot)]);
-    }
-
-    // Vague ask — do not guess a product. Ask what it is for.
-    if (/algo para|lo mas barato|lo mas economico|que me recomienda|no se que ocupo|algo que sirva/.test(t)) {
-      return hit(['Depende de para qué lo ocupa.', '¿Es para techo, pared, piso o moto?'],
-        ['Consulta vaga', 'Pide contexto antes de recomendar']);
-    }
-
-    // Priced lookups.
-    var key = null;
-    if (/gypsum|gipsum|yeso/.test(t)) key = 'gypsum';
-    else if (/puerta/.test(t) && /caoba|5 tablero/.test(t)) key = 'puerta5';
-    else if (/puerta/.test(t) && /blanc|6 tablero/.test(t)) key = 'puerta6';
-    else if (/puerta/.test(t)) key = 'puerta3';
-    else if (/tabla|madera/.test(t)) key = 'tabla';
-    else if (/bondex/.test(t) && /premium|cer[áa]mica/.test(t)) key = 'bondexp';
-    else if (/bondex|pega/.test(t)) key = 'bondex';
-    else if (/aceite|yamalube|20w/.test(t)) key = 'aceite';
-    else if (/bater[íi]a|kobe/.test(t) && /7|12n7/.test(t)) key = 'bat74';
-    else if (/bater[íi]a|kobe/.test(t)) key = 'bat65';
-    else if (/llanta|neum[áa]tico|rin/.test(t) && /90\/90|17 tl/.test(t)) key = 'llanta90';
-    else if (/llanta|neum[áa]tico|rin/.test(t)) key = 'llanta17';
-
-    if (key) {
-      var it = LOCAL_PRICES[key];
-      var msgs = ['Fíjese que sí, esa la tenemos.'];
-      if (it.antes) {
-        msgs.push('Le queda a ' + money(it.p) + ', andaba en ' + money(it.antes) + '.');
-        msgs.push('Está en promoción patrias.');
-      } else {
-        msgs.push('Le queda a ' + money(it.p) + '.');
+    /* ---- CHANGE OF MIND -------------------------------------------------
+       "10 de media" ... "mejor de una pulgada". Rule C: reconocerlo. The
+       QUANTITY CARRIES OVER — he already told us how many, and making him say
+       it again is the thing that makes an assistant feel like a form. */
+    var chg = t.match(/\b(mejor|mejor dicho|cambi[eé]|cambio|en realidad|no,? mejor)\b/);
+    if (chg && ST.order.length) {
+      var newSize = null;
+      for (var si = 0; si < LeyvaOrder.SIZEWORDS.length; si++) {
+        if (LeyvaOrder.SIZEWORDS[si].re.test(LeyvaOrder.norm(text))) { newSize = LeyvaOrder.SIZEWORDS[si].size; break; }
       }
-      return hit(msgs, ['Consulta: precio', 'Coincidencia en catálogo', it.antes ? 'Precio de promoción aplicado' : 'Precio único', 'Sin dato de existencia']);
+      if (newSize) {
+        var lastL = ST.order[ST.order.length - 1];
+        var alt = LeyvaOrder.byKind(LeyvaOrder.bySku(lastL.sku).kind)
+                    .filter(function (x) { return x.size === newSize; })[0];
+        if (alt) {
+          var nl = { sku: alt.sku, n: alt.n, u: alt.u, unit: alt.p, qty: lastL.qty,
+                     total: lastL.qty === null ? null : alt.p * lastL.qty };
+          ST.order[ST.order.length - 1] = nl;
+          var msgs = ['Ah, entonces mejor el de ' + prettySize(newSize) + '.'];
+          msgs = msgs.concat(unitAndTotal(nl));
+          return hit(msgs, ['PRE|Cambio de opinión: ' + prettySize(newSize),
+                            'Cantidad anterior (' + (lastL.qty || 's/c') + ') se conserva',
+                            'Unitario ' + money(nl.unit) + (nl.total ? ' · total ' + money(nl.total) : ''),
+                            'Aritmética calculada, no redactada'], true);
+        }
+      }
     }
+
+    /* ---- PRICED ANSWERS: unit AND total, always -------------------------
+       Rule A. Every priced reply carries the unit price and, when a quantity
+       was given, the computed total. The ferretero has to be able to check the
+       arithmetic in his head; a total he cannot verify is worse than none. */
+    var parsed = LeyvaOrder.parse(text, { inheritSize: ST.lastSize });
+    if (parsed.lines.length || parsed.ambiguous.length) {
+      rememberUse(t);
+      if (parsed.inheritedSize) ST.lastSize = parsed.inheritedSize;
+      parsed.lines.forEach(function (l) { if (l.qty) mergeOrder(l); });
+
+      var out = [], trace = [];
+
+      // one product, nothing ambiguous — the common case, kept short
+      if (parsed.lines.length === 1 && !parsed.ambiguous.length) {
+        var l0 = parsed.lines[0];
+        if (ST.uso && !ST.usoDicho) { out.push(usoLead(ST.uso, l0)); ST.usoDicho = true; }
+        out = out.concat(unitAndTotal(l0));
+        trace = ['Consulta: precio', 'Coincidencia en catálogo: ' + l0.sku,
+                 'Unitario ' + money(l0.unit) + (l0.total ? ' · ' + l0.qty + ' x ' + money(l0.unit) + ' = ' + money(l0.total) : ' · sin cantidad'),
+                 l0.total ? 'Aritmética calculada, no redactada' : 'Se pregunta la cantidad',
+                 'Sin dato de existencia'];
+        if (ST.uso) trace.unshift('PRE|Uso declarado por el cliente: ' + ST.uso);
+      } else {
+        if (ST.uso && !ST.usoDicho) { out.push('Para ' + ST.uso + ', le paso los precios.'); ST.usoDicho = true; }
+        else out.push('Va, le paso los precios.');
+        if (parsed.lines.length) out.push(orderLines(parsed.lines));
+        var allQty = parsed.lines.length && parsed.lines.every(function (l) { return l.qty; });
+        if (allQty && parsed.lines.length > 1) out.push('Todo junto: ' + money(parsed.sum) + '.');
+        var inf = parsed.lines.filter(function (l) { return l.inferido; });
+        if (inf.length) out.push('Los ' + inf[0].n.split(' ')[0] + 's se los puse de ' + prettySize(inf[0].inferido) + ', como los tubos — si son de otra medida me dice.');
+        parsed.ambiguous.forEach(function (a) { out.push(ambiguousAsk(a)); });
+        trace = ['Consulta con varios productos',
+                 parsed.lines.length + ' líneas con precio en sistema'];
+        parsed.lines.forEach(function (l) { trace.push('  ' + (l.qty || 's/c') + ' x ' + money(l.unit) + (l.total ? ' = ' + money(l.total) : '')); });
+        if (allQty && parsed.lines.length > 1) trace.push('Suma ' + money(parsed.sum) + ' — calculada, no redactada');
+        parsed.ambiguous.forEach(function (a) { trace.push('AMBIGUO: ' + a.kind + ' → se pregunta, no se elige'); });
+      }
+      return hit(out, trace, true);
+    }
+
 
     /* Asked for a family we DO stock, but no specific product branch matched —
        a bare "¿a cómo la lámina?" or "¿qué pegamento tienen?". Falling through
@@ -677,6 +807,59 @@ var LeyvaDemo = (function () {
     // Off catalog.
     return hit(['Uy, ese no lo manejo.', '¿Quiere que le pase la consulta al equipo por WhatsApp?'],
       ['Consulta fuera de catálogo', 'Sin coincidencia', 'Ofrecer pasar al equipo']);
+  }
+
+  /* ---- ARITHMETIC VERIFICATION OF THE MODEL'S REPLY -------------------
+     Fede's rule: "Toda aritmética se verifica calculándola, no leyéndola."
+     That applies to the model too. It writes the prose; it is not trusted
+     with the numbers.
+
+     Every money figure in a model reply must be derivable from the catalog:
+       · a catalog unit price, or a precio_antes;
+       · a quantity actually mentioned in this turn, times a catalog price;
+       · a sum of such products (any subset, ≤8 lines).
+     Anything else — a rounded total, an invented unit, a sum that does not
+     add up — fails, and the caller falls back to the deterministic answer
+     that was already computed before the request went out.
+
+     Restricting multipliers to the quantities ACTUALLY MENTIONED is what
+     makes this tight. Allowing any 1..999 would let a wrong total land on
+     some unrelated product of two catalog numbers. */
+  function verifyMoney(replyText, userText) {
+    var figs = String(replyText).match(/C\$\s?[\d.,]+/g);
+    if (!figs) return true;                      // no numbers, nothing to verify
+
+    var prices = [], antes = [];
+    LeyvaOrder.P.forEach(function (r) { prices.push(r.p); if (r.antes) antes.push(r.antes); });
+
+    // Quantities in play this turn: whatever either side wrote.
+    var qs = {};
+    (String(userText) + ' ' + String(replyText)).replace(/C\$\s?[\d.,]+/g, ' ')
+      .replace(/\b(\d{1,3})\b/g, function (_, d) { qs[parseInt(d, 10)] = 1; return ' '; });
+    var qtys = Object.keys(qs).map(Number).filter(function (q) { return q > 0 && q < 1000; });
+    qtys.push(1);
+
+    var legal = {};
+    prices.concat(antes).forEach(function (p) { legal[p] = 1; });
+    var products = [];
+    prices.forEach(function (p) {
+      qtys.forEach(function (q) { legal[p * q] = 1; products.push(p * q); });
+    });
+
+    var val = function (f) { return parseInt(String(f).replace(/[^\d]/g, ''), 10); };
+    var seen = figs.map(val).filter(function (v) { return isFinite(v); });
+
+    // Subset sums of the line totals that actually appear, so "Todo junto"
+    // is checked against the lines printed above it rather than assumed.
+    var lineVals = seen.filter(function (v) { return products.indexOf(v) !== -1; }).slice(0, 8);
+    var sums = { 0: 1 };
+    lineVals.forEach(function (v) {
+      Object.keys(sums).forEach(function (k) { sums[Number(k) + v] = 1; });
+    });
+    Object.keys(sums).forEach(function (k) { if (Number(k) > 0) legal[k] = 1; });
+
+    for (var i = 0; i < seen.length; i++) if (!legal[seen[i]]) return false;
+    return true;
   }
 
   /* ---- API path ------------------------------------------------------
@@ -728,6 +911,7 @@ var LeyvaDemo = (function () {
     local: local,
     callApi: callApi,
     openProformaNudge: openProformaNudge,
+    verifyMoney: verifyMoney,
     catalogGuard: catalogGuard,
     resolveAsk: resolveAsk,
     resetState: resetState,

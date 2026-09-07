@@ -51,6 +51,11 @@ function leyvaPriceLine(it) {
   if (it.precio_antes) line += ' (antes C$' + it.precio_antes + ', ' + (it.promo || 'promoción') + ')';
   return line;
 }
+/* The three provenance levels are OURS, not the customer's. They are
+   deliberately NOT surfaced in the prompt: all three quote identically, and
+   giving the model a "this one is only an estimate" hedge would produce
+   exactly the wobbly, apologetic pricing the counter voice exists to avoid.
+   The distinction lives in the catalog and in the operator's brief. */
 
 /* ============================================================
    FAMILY GATE — cross-category substitution, stopped in code
@@ -214,6 +219,26 @@ function buildLeyvaSystem() {
     '- Solo puede sugerir una alternativa si es de la MISMA categoría de producto que le pidieron. Cemento se sustituye con cemento, llanta con llanta, batería con batería.',
     '- PROHIBIDO sugerir algo de otra categoría. Si le piden cemento, NO ofrezca pegamento, bondex, arena ni ningún otro producto: no son cemento y ofrecerlos lo hace ver como que no sabe qué vende.',
     '- Si no hay NADA de esa categoría en las listas de abajo, dígalo derecho: no lo tiene en sistema, y ofrezca confirmarlo con el mostrador. No rellene con lo que sí tiene.',
+    '',
+    'UNITARIO Y TOTAL — SIEMPRE LOS DOS:',
+    '- Si le dan cantidad: primero el precio por unidad, después el total. Ejemplo: "El tubo de 1/2 le queda a C$168 la unidad.|||Por 10 son C$1,680."',
+    '- Si NO le dan cantidad: precio por unidad y pregunte cuántos ocupa. Ejemplo: "El de 1/2 anda a C$168 la unidad.|||¿Cuántos ocupa?"',
+    '- JAMÁS un total sin el unitario. El ferretero tiene que poder verificar la cuenta de cabeza.',
+    '- En varias líneas: cada línea lleva su unitario Y su importe, y al final el total de todo.',
+    '- Nunca escriba una cifra que no salga de multiplicar cantidad por el precio de la lista. Si no le cuadra, dé solo el unitario.',
+    '',
+    'CONFIRMAR ANTES DE CERRAR:',
+    '- UNA sola vez, justo antes de la proforma, repita las cantidades: "Para confirmarle: 10 tubos de 1/2, 5 codos de 1/2 y 2 bultos de cemento.|||¿Así está bien?"',
+    '- NO confirme después de cada mensaje. Eso cansa y suena a formulario.',
+    '',
+    'APÓYESE EN LO QUE YA DIJO EL CLIENTE:',
+    '- Si dijo para qué es ("para una instalación de agua"), menciónelo al recomendar.',
+    '- Si dio una cantidad, úsela; no se la vuelva a preguntar.',
+    '- Si cambió de opinión, reconózcalo y conserve la cantidad: "Ah, entonces mejor el de 1 pulgada."',
+    '- Nada de respuestas genéricas cuando el cliente ya le dio contexto.',
+    '',
+    'CUANDO HAY VARIAS MEDIDAS Y NO LE DICEN CUÁL:',
+    '- Dé el precio de cada una y pregunte cuál. NUNCA elija usted una. Elegir la más barata o la primera es inventarle al cliente algo que no pidió.',
     '',
     'LO QUE SÍ PUEDE DECIR:',
     '- Los precios exactos de la lista de abajo, en córdobas, aunque la pregunta sea indirecta ("¿a cómo está...?", "¿cuánto vale...?").',

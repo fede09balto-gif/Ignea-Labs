@@ -333,16 +333,27 @@ var LeyvaFamilies = {
   },
   "cemento": {
     "label": "cemento",
-    "presente": false,
-    "skus": [],
+    "presente": true,
+    "skus": [
+      "CEM-BULTO-25"
+    ],
     "terms": [
       "cemento",
       "mortero",
       "concreto",
+      "cal",
+      "bulto de cemento",
+      "bulto",
+      "bultos"
+    ],
+    "ausentes": [
+      "mortero",
+      "concreto",
       "cal"
     ],
-    "ausentes": [],
-    "nombresCortos": [],
+    "nombresCortos": [
+      "bulto de cemento de 25 kg"
+    ],
     "etiquetas": {
       "cemento": "Cemento",
       "mortero": "Mortero",
@@ -402,8 +413,12 @@ var LeyvaFamilies = {
   },
   "fijacion": {
     "label": "clavos y tornillos",
-    "presente": false,
-    "skus": [],
+    "presente": true,
+    "skus": [
+      "CLA-2",
+      "CLA-3",
+      "CLA-4"
+    ],
     "terms": [
       "clavo",
       "clavos",
@@ -417,8 +432,20 @@ var LeyvaFamilies = {
       "tuerca",
       "broca"
     ],
-    "ausentes": [],
-    "nombresCortos": [],
+    "ausentes": [
+      "tornillo",
+      "tornillos",
+      "perno",
+      "pernos",
+      "alcayata",
+      "grapa",
+      "arandela",
+      "tuerca",
+      "broca"
+    ],
+    "nombresCortos": [
+      "clavos de 2\", 3\" y 4\" por libra"
+    ],
     "etiquetas": {
       "clavo": "Clavos",
       "clavos": "Clavos",
@@ -468,8 +495,18 @@ var LeyvaFamilies = {
   },
   "plomeria": {
     "label": "plomería",
-    "presente": false,
-    "skus": [],
+    "presente": true,
+    "skus": [
+      "TUB-PVC-12",
+      "TUB-PVC-1",
+      "TUB-PVC-2",
+      "CODO-PVC-12",
+      "CODO-PVC-1",
+      "TEE-PVC-12",
+      "TEE-PVC-1",
+      "PEG-PVC-18",
+      "PEG-PVC-14"
+    ],
     "terms": [
       "tubo pvc",
       "tubo de pvc",
@@ -481,10 +518,30 @@ var LeyvaFamilies = {
       "inodoro",
       "lavamanos",
       "cinta teflon",
+      "sifon",
+      "tubo",
+      "tubos",
+      "codos",
+      "tee",
+      "te pvc",
+      "t pvc",
+      "pegamento pvc",
+      "pegamento industrial",
+      "pegamento del industrial"
+    ],
+    "ausentes": [
+      "llave de chorro",
+      "manguera",
+      "inodoro",
+      "lavamanos",
+      "cinta teflon",
       "sifon"
     ],
-    "ausentes": [],
-    "nombresCortos": [],
+    "nombresCortos": [
+      "tubo PVC potable de 1/2\", 1\" y 2\"",
+      "codos y T de PVC",
+      "pegamento PVC industrial"
+    ],
     "etiquetas": {
       "tubo pvc": "Tubo PVC",
       "tubo de pvc": "Tubo PVC",

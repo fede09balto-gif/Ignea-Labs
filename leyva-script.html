@@ -84,6 +84,10 @@
 .sc-it:last-child{border-bottom:0}
 .sc-it__n{flex:1;min-width:0}
 .sc-it__u{display:block;font-size:12.5px;color:var(--ink-3);margin-top:1px}
+.sc-src{display:inline-block;font-family:var(--fm);font-size:8.5px;letter-spacing:.1em;padding:1px 4px;margin-top:3px;border:1px solid var(--line);color:var(--ink-3)}
+.sc-src--estimado{border-color:var(--ink-3);color:var(--ink)}
+.sc-src--facebook{border-color:#1877F2;color:#1877F2}
+.sc-src--facebook_sin_verificar{border-color:var(--red);color:var(--red)}
 .sc-it__p{font-family:var(--fm);font-size:15px;white-space:nowrap;text-align:right}
 .sc-it__was{display:block;font-size:11.5px;color:var(--ink-3);text-decoration:line-through;margin-top:2px}
 .sc-it--nop .sc-it__p{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);white-space:normal;max-width:104px;line-height:1.35;text-align:right}
@@ -324,6 +328,7 @@ body.kb-open .lv-gate{padding-top:16px}
     <h2>Qué hay en la base de datos</h2>
     <p class="sc-cat__lead">Todo lo que el asistente puede cotizar. Si no está aquí, no lo tiene — y va a decir que no lo maneja.</p>
     <div class="sc-cat__sum" id="scCatSum">Cargando…</div>
+    <div class="sc-cat__sum" id="scCatLeg" style="text-transform:none;letter-spacing:0;font-size:12px;line-height:1.6"></div>
     <div id="scCatBody"></div>
     <div id="scCatNo"></div>
     <p class="sc-cat__stale">Estos precios salen de las publicaciones de Facebook del negocio, de agosto. Si el cliente dice que alguno ya cambió, esa es la respuesta buena: <b>«cargamos su catálogo tal cual; ustedes lo actualizan y el asistente cambia con él»</b>.</p>
@@ -357,8 +362,14 @@ body.kb-open .lv-gate{padding-top:16px}
   }
 
   function render(d) {
+    var pf = d.resumen.porFuente || {};
     document.getElementById('scCatSum').textContent =
       d.resumen.total + ' productos · ' + d.resumen.conPrecio + ' con precio · ' + d.resumen.sinPrecio + ' sin precio en sistema';
+    var leg = document.getElementById('scCatLeg');
+    if (leg) leg.innerHTML =
+      '<b>EST</b> ' + (pf.estimado || 0) + ' precio nuestro de mercado, no de la ferretería &nbsp;·&nbsp; ' +
+      '<b>FB</b> ' + (pf.facebook || 0) + ' publicación del 10/10/2025 con enlace &nbsp;·&nbsp; ' +
+      '<b>FB?</b> ' + (pf.facebook_sin_verificar || 0) + ' transcrito sin enlace, pudo vencer';
 
     var body = document.getElementById('scCatBody');
     body.innerHTML = '';
@@ -370,6 +381,15 @@ body.kb-open .lv-gate{padding-top:16px}
         var n = el('div', 'sc-it__n');
         n.appendChild(document.createTextNode(it.n));
         if (it.u || it.specs) n.appendChild(el('span', 'sc-it__u', [it.u, it.specs].filter(Boolean).join(' · ')));
+        /* Provenance, operator-only. The customer sees a price either way; Luis
+           needs to know which numbers are the ferretería's own and which are
+           ours, because only one of those he can defend if challenged. */
+        if (it.fuente) {
+          var F = { estimado: ['EST', 'precio nuestro de mercado, no de ellos'],
+                    facebook: ['FB', 'publicación del 10/10/2025 con enlace'],
+                    facebook_sin_verificar: ['FB?', 'transcrito, sin enlace — pudo vencer'] }[it.fuente];
+          if (F) { var tg = el('span', 'sc-src sc-src--' + it.fuente, F[0]); tg.title = F[1]; n.appendChild(tg); }
+        }
         row.appendChild(n);
         var pr = el('div', 'sc-it__p');
         if (it.precio === null) {
