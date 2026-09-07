@@ -566,8 +566,16 @@ var LeyvaDemo = (function () {
           ['Cantidades NO confirmadas', 'Se descarta el pedido pendiente', 'Se vuelve a preguntar'], true);
       }
       var cTot = cLines.reduce(function (a, l) { return a + l.total; }, 0);
-      var cAsk = nameAsk();
       ST.awaitingName = { lines: cLines, total: cTot };
+
+      /* "sí, a nombre de Constructora Herrera S.A." answers BOTH questions in
+         one breath, the way anyone actually talks. Asking for the name he just
+         gave, in the same sentence, is the single most irritating thing a
+         system can do — it proves it is matching keywords, not listening.
+         Hand the message straight to the naming branch instead. */
+      if (ca.razon || ca.ruc || ca.nombre) return local(text);
+
+      var cAsk = nameAsk();
       return {
         bubbles: ['Perfecto.'].concat(cAsk.q),
         rail: ['PRE|Cantidades confirmadas por el cliente',

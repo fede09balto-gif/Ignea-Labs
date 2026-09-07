@@ -272,9 +272,11 @@ console.log('\n═══ I · CONVERSACIÓN LARGA (replay del guion de 15 turnos
   check('removal recomputes the total = ' + money(afterRemove), has(r13, afterRemove), 'computed ' + money(afterRemove));
   const r14 = t('ahora sí, arma la cotización');
   check('re-quote reflects the removal', !/codo/i.test(r14) && /12 tubos/.test(r14) && /6 bultos/.test(r14), r14);
-  const r15 = t('sí');
-  const r16 = t('a nombre de Constructora Herrera S.A.');
-  check('name accepted after the edit', /Constructora Herrera S\.A\./.test(r16), r16);
+  // He answers both questions in one breath, the way anyone does.
+  const r15 = t('sí, a nombre de Constructora Herrera S.A.');
+  check('confirm + name in one message is not re-asked',
+    !/¿A nombre de qui[ée]n/i.test(r15), r15);
+  check('name taken from the same message', /Constructora Herrera S\.A\./.test(r15), r15);
 }
 
 console.log('\n' + '─'.repeat(60));
