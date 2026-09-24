@@ -123,6 +123,94 @@ provenance is asking to be believed; this one shows its work in both channels.
 
 ## 1. WHERE THINGS STAND
 
+### `feat/leyva-demo` — CARRITO PERSISTENTE (2026-09-24) — LEE ESTO PRIMERO
+
+**La causa raíz de las dos fallas frente al prospecto no era el parser: no había carrito.**
+El sistema cotizaba lo que parseó en el turno actual y olvidaba el resto. Pedido de muestra
+en frío, líneas que desaparecían, confirmación armada del último turno, "¿qué le cambio?"
+sobre algo dicho tres mensajes arriba — todo sale de ahí.
+
+**Arquitectura, en una línea por pieza:**
+- `js/leyva-cart.js` — `extract(text)`: TODAS las menciones de un mensaje, cada una con
+  cantidad y medida; lo que no resuelve lo devuelve igual (ambiguo / medida que no manejan)
+  para que se pregunte POR SU NOMBRE. Y el carrito `[{sku, nombre, cantidad,
+  precio_unitario, turno_de_entrada}]`: arranca vacío, se actualiza, nunca se reconstruye.
+- `js/leyva-demo.js` `cartTurn()` — todo lo que toca el pedido pasa por aquí y es
+  determinista. Estado de conversación en `ST`: `pendSize` (pidió con cantidad y falta la
+  medida — persiste y bloquea la proforma), `pendQty`/`stockAsk` (valen UN turno),
+  `removed` (para "vuelva a ponerme" sin preguntar), `named` (lo que el cliente nombró —
+  cualquier otro producto es fantasma), `docWanted`, `issued`.
+- **La proforma sale del carrito y de ningún otro lado**: `LeyvaDemo.documentFor()`.
+  `leyva-chat.js` ya NO parsea el texto de la respuesta para armar PDFs (así salían
+  proformas que nadie pidió, a veces con líneas faltantes).
+- **El modelo ya no lleva el pedido.** Contesta saludos, entrega, fuera de tema. Compuerta
+  de salida `modelReplyAllowed()`: sin totales ni productos, sin "Para confirmarle"/"le
+  apunto", sin productos que el cliente no nombró. Existencia pasó a determinista (el
+  modelo le preguntaba "¿cuántos tubos ocupa?" a quien tenía 20 en el pedido).
+- **Sin carrito no hay documento — hay pregunta.** "Me arma una cotización" en frío
+  contesta "Todavía no tengo nada apuntado. ¿Qué le pongo?". El guion del operador
+  (`/leyva-script`, beat 05) se reescribió: el cierre ahora es el pedido real que falló.
+
+**Reglas que ahora son código (no redacción):**
+- Una PREGUNTA en medio de "¿así está bien?" o "¿a nombre de quién?" se contesta y la
+  pregunta pendiente se vuelve a hacer. Solo una EDICIÓN la suelta — y vuelve la
+  confirmación del carrito COMPLETO.
+- Rango de cantidad ("5 o 6") → se pregunta. Codo de 45° → se niega (el catálogo es 90°).
+  "de 1/2 y de 3/4, 4 de cada uno" → el 3/4 se niega por nombre, la cantidad se reparte.
+- Herencia de medida para codos/T: del mismo mensaje, o del carrito si todos sus tubos son
+  de UNA medida — y siempre se dice en voz alta.
+
+**Cómo se prueba — y por qué así.** La suite anterior muestreaba formas de pregunta y el
+bug sobrevivió a una corrida verde. Ahora:
+- `scripts/convo-gen.js` — generador de CONVERSACIONES (4–20 turnos, caminata sobre arcos
+  de mostrador) con su propio modelo del pedido, independiente del código. `--hard` agrega
+  gramáticas que NO se usaron para afinar (cantidad al final, "x5", "par/docena", typos,
+  dictado todo con "y", rangos, 45°, "de cada uno", "para"). Determinista por semilla.
+- `scripts/convo-oracle.js` — aserciones contra el catálogo: carrito exacto, fantasmas,
+  omitidos, aritmética derivable, total rotulado = carrito, "no entendió → pregunta", no
+  pedir repetir, confirmación con el carrito completo, PDF = carrito.
+- `scripts/convo-run.js N [--from S] [--hard] [--seed S]` — camino determinista en Node
+  (= sin red, y = todo turno de pedido con red). Emula lo que `docBubble` hace en memoria.
+- `scripts/convo-browser.mjs` — la página real contra el preview; `--offline` apaga la red
+  de verdad (`context.setOffline`). Lee el texto CRUDO del DOM y los BYTES del PDF.
+  Necesita `LEYVA_TOKEN` (el token de demo es solo de Preview) y `PLAYWRIGHT_PATH`.
+- Siguen: `behavior.js` (120), `memory.js` (20), `check-prices.js`, `build-families.js --check`.
+
+**Resultado final, commit 06353cf, semillas que nunca se usaron para afinar:**
+- Node, gramáticas duras: 50,000 conversaciones / 598,010 turnos, 0 fallas. Cobertura: 688
+  rasgos (gramática + arcos); 99% a las 7,000 conversaciones, último rasgo nuevo en la 19,600.
+- Node, normal: 20,000 / 239,575 turnos, 0 fallas; 488 rasgos, último nuevo en la 15,000.
+- Navegador contra el preview, CON red (modelo real): 301 / 3,611 turnos, 0 fallas; el
+  modelo contestó 137 turnos, 1 respuesta descartada por la compuerta; 234 PDFs leídos en bytes.
+- Navegador SIN red (`setOffline`): 301 / 3,690 turnos, 0 fallas, 0 llamadas a la API;
+  253 PDFs leídos en bytes. Mismas reglas en los dos modos.
+- La línea base (código anterior, 9627333) fallaba en 2,965 de 3,000.
+
+**Un 0 no prueba nada si la suite no muerde.** Mutaciones verificadas: carrito que se vacía
+cada turno (989/1000 fallan), "de 1" ambiguo otra vez (509/1000), PDF leído del texto
+(531/1000), pedido de muestra reinstalado (64/1000, como FANTASMA), PDF que omite la última
+línea (lo agarra la lectura de bytes del PDF).
+
+**Pendiente, dicho sin adornos:**
+- La cobertura es la de MI generador. La primera vez que agregué gramáticas nuevas falló
+  el 67%; la siguiente gramática que diga un cliente real puede romper algo. Lo que sí
+  cambió: lo no entendido ahora termina en PREGUNTA ("No le entendí cuál producto es",
+  "¿de cuál son?"), no en silencio ni en un total. Sinónimos fuera del léxico ("caños",
+  "adaptador") → pregunta; no se probó el dictado real de iOS.
+- Nunca se corrió en el teléfono de Luis ni con el wifi de la ferretería: Chromium
+  headless con viewport de iPhone, red completa o red apagada; no red intermitente real.
+- "¿La activamos?" (recordatorio de proforma pendiente en "cliente que vuelve") no tiene
+  manejo de la respuesta "sí". Preexistente.
+- El catálogo sigue con 13 precios `estimado` y 20 `facebook_sin_verificar` (ver arriba).
+- **El repo es PÚBLICO.** `api/_data/leyva-catalog.json` se sacó del sitio para que no se
+  descargara, pero se lee en GitHub; y `js/leyva-order.js` (público por diseño, offline)
+  trae los 31 precios.
+- Esta sesión usó el nombre real del contacto como dato de prueba en `convo-gen.js`
+  (commits 2918743…e4c0885, ya publicados). No llegó a ninguna persona; corregido a
+  ZZTEST en ef19af3. El historial no se reescribió — decisión de Fede.
+
+---
+
 ### `feat/leyva-demo` — private live sales demo (EARLIER SESSIONS; see the section above for current state)
 
 A private, admin-gated WhatsApp-assistant demo built on **their real catalog**, for
