@@ -455,7 +455,7 @@ function Gen(seed, opts) {
     const sku = pick(opts2);
     const sz = pick(SKUS[sku].size);
     let text;
-    const lastWasQtyQ = turns.length && (turns[turns.length - 1].act === 'price_query' || turns[turns.length - 1].interrupt === 'stock');
+    const lastWasQtyQ = turns.length && (['price_query', 'qty_range'].includes(turns[turns.length - 1].act) || turns[turns.length - 1].interrupt === 'stock');
     if (S.pendSize.length === 1 && chance(0.6) && !(lastWasQtyQ && /^(\d|una?|uno|dos|tres|cuatro)\b/.test(sz))) {
       text = pick(['de ', V[p.kind].fem ? 'las de ' : 'los de ', '', 'que sean de ']) + sz;
       F('answer:bare-size');
@@ -497,6 +497,43 @@ function Gen(seed, opts) {
       const ex = S.pendSize.find(p => p.kind === kind);
       if (ex) ex.qty = q; else S.pendSize.push({ kind, qty: q });
       push(text, 'answer_stock_qty', { mentions: [{ kind, qty: q, needs: 'size' }] });
+    }
+  }
+
+  /* Grammars found by hand OUTSIDE the generator, added so they are
+     measured and not just patched: a quantity range, a 45° codo, "de cada
+     uno", and a use after "para". */
+  function actHardSpecial() {
+    const k = pick(['range', 'angle', 'cada', 'para']);
+    if (k === 'range') {
+      const sku = pick(HOT.filter(x => SKUS[x].size && SKUS[x].sizePos !== 'adj'));
+      const a = 2 + Math.floor(r() * 8), b = a + 1 + Math.floor(r() * 3);
+      const v = V[SKUS[sku].kind];
+      const text = pick(['unos ', 'como ', 'deme ', '']) + a + ' o ' + b + ' ' + pick(v.plural.filter(x => !/^de |^\d/.test(x))) + ' de ' + pick(SKUS[sku].size).replace(/^una$/, 'una pulgada');
+      F('hard:qty-range'); S.named.add(SKUS[sku].kind); S.pendQty = sku;
+      push(text, 'qty_range', { mentions: [{ sku, qty: null, kind: SKUS[sku].kind, needs: 'qty' }] });
+    } else if (k === 'angle') {
+      const q = randQty();
+      const text = pick(PREFIX).replace(/unos $/, '') + q + ' codos de 45' + pick([' de media', ' de 1/2', ' de 1 pulgada', '']);
+      F('hard:codo-45'); S.named.add('codo');
+      const ex = S.pendSize.find(p => p.kind === 'codo');
+      if (ex) ex.qty = q; else S.pendSize.push({ kind: 'codo', qty: q });
+      if (S.phase !== 'free') S.phase = 'free';
+      push(text, 'offsize', { mentions: [{ kind: 'codo', qty: q, needs: 'size' }] });
+    } else if (k === 'cada') {
+      const kind = pick(['tubo', 'codo', 'tee', 'clavo', 'pegamento']);
+      const [s1, s2] = kindsOf(kind).sort(() => r() - 0.5);
+      const q = randQty(); const np = pick(V[kind].plural.filter(x => !/^de |^\d| de \d|de 1x12/.test(x)));
+      const sz = x => pick(SKUS[x].size).replace(/^una$/, 'una pulgada');
+      const text = np + ' de ' + sz(s1) + ' y de ' + sz(s2) + ', ' + qtyWord(q) + pick([' de cada uno', ' de cada una', ' de cada uno por favor']);
+      F('hard:de-cada-uno');
+      [s1, s2].forEach(x => { S.cart.set(x, q); S.removed.delete(x); S.lastSku = x; }); S.named.add(kind);
+      const reconf = maybeReconfirm();
+      push(text, 'add_many', { mentions: [{ sku: s1, qty: q, kind }, { sku: s2, qty: q, kind }], expectConfirm: reconf });
+    } else {
+      const text = pick(['¿a cómo la pega para tubo?', '¿qué pega tienen para pvc?', '¿cuánto vale la pega para tubería?']);
+      F('hard:para-uso'); S.named.add('pegamento');
+      push(text, 'price_query_kind', { mentions: [{ kind: 'pegamento', qty: null, needs: 'size' }] });
     }
   }
 
@@ -647,7 +684,7 @@ function Gen(seed, opts) {
     const lastT = turns[turns.length - 1];
     if (S.stockAsk && S.phase === 'free' && lastT && lastT.interrupt === 'stock' && chance(0.5)) { actAnswerStockQty(); continue; }
     S.stockAsk = null;
-    if (S.pendQty && chance(0.6) && turns[turns.length - 1].act === 'price_query') { actAnswerQty(); continue; }
+    if (S.pendQty && chance(0.6) && ['price_query', 'qty_range'].includes(turns[turns.length - 1].act)) { actAnswerQty(); continue; }
     S.pendQty = null;
     if (S.pendSize.length && chance(0.6)) { actAnswerSize(); continue; }
 
@@ -657,7 +694,8 @@ function Gen(seed, opts) {
       ['size', hasCart ? 4 : 0], ['partial', 6], ['mixedPartial', 5], ['price', 6],
       ['recall', hasCart ? 6 : 0], ['total', hasCart ? 5 : 1], ['doc', hasCart || S.pendSize.length ? 10 : 2],
       ['interrupt', 9], ['mixedOff', 3],
-      ['sizeBare', canBareSize() ? 5 : 0]
+      ['sizeBare', canBareSize() ? 5 : 0],
+      ['hardSpecial', HARD ? 5 : 0]
     ];
     const tot = w.reduce((a, x) => a + x[1], 0);
     let x = r() * tot, a = null;
@@ -680,6 +718,7 @@ function Gen(seed, opts) {
       case 'interrupt': actInterrupt(); break;
       case 'mixedOff': actMixedOffcat(); break;
       case 'sizeBare': actChangeSizeBare(); break;
+      case 'hardSpecial': actHardSpecial(); break;
     }
   }
   // Every conversation ends by asking for the running total, so the final

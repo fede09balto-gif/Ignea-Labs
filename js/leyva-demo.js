@@ -579,7 +579,7 @@ var LeyvaDemo = (function () {
     carry = carry || {};
     var turn = C().tick();
     var out = [], rail = [], asks = [], notes = [];
-    var updated = [], removedNow = [], recalled = [], quotes = [], moved = null, inCartQuote = {}, incBy = {};
+    var updated = [], removedNow = [], recalled = [], quotes = [], moved = null, inCartQuote = {}, incBy = {}, rangeAsk = [];
     var changed = false;
 
     function upd(sku, qty, how) {
@@ -597,6 +597,9 @@ var LeyvaDemo = (function () {
       var ex0 = null;
       for (var i = 0; i < ST.pendSize.length; i++) if (ST.pendSize[i].kind === kind) ex0 = ST.pendSize[i];
       var p = { kind: kind, qty: qty, options: m.options || LeyvaOrder.byKind(kind), none: m.none || null, turn: turn };
+      // a bare price question never overwrites something he ordered WITH a
+      // quantity — the 15 pegamentos waiting for a size stay waiting
+      if (ex0 && ex0.qty && !qty) { asks.push(ex0); return; }
       if (ex0) ST.pendSize[ST.pendSize.indexOf(ex0)] = p; else ST.pendSize.push(p);
       asks.push(p);
       rail.push('SIN RESOLVER: ' + (qty ? qty + ' ' : '') + kw(kind, qty || 2) + ' — se pregunta cuál, no se elige');
@@ -690,6 +693,12 @@ var LeyvaDemo = (function () {
         return;
       }
 
+      if (m.range && m.sku) {
+        rangeAsk.push({ sku: m.sku, range: m.range });
+        rail.push('Cantidad dada como rango (' + m.range.join(' o ') + ') — se pregunta, no se elige');
+        return;
+      }
+      if (m.range && !m.sku) { pend(m.kind, null, m); return; }
       if (m.qty === null) {
         if (ex.readd) {
           var back = Object.keys(ST.removed).filter(function (s) { return m.sku ? s === m.sku : kindMatch(m.kind, LeyvaOrder.bySku(s).kind); });
@@ -717,6 +726,8 @@ var LeyvaDemo = (function () {
           return;
         }
         var mine = m.sku ? inCart.filter(function (l) { return l.sku === m.sku; }) : inCart;
+        // "¿cuánto vale la pega?" asks for PRICES, even with some already in the cart
+        if (!m.sku && PRICEQ_RE.test(t)) { pend(m.kind, null, m); return; }
         if (mine.length && m.sku && PRICEQ_RE.test(t)) {
           quotes.push(m.sku); inCartQuote[m.sku] = mine[0].qty;
           return;
@@ -818,6 +829,12 @@ var LeyvaDemo = (function () {
     }
     if (openAsks.length && ST.uso && !ST.usoDicho) { out.push('Para ' + ST.uso + ', le paso las medidas.'); ST.usoDicho = true; }
     openAsks.forEach(function (p) { out.push(pendingAsk(p)); });
+    rangeAsk.forEach(function (ra) {
+      var rl = quoteLine(ra.sku);
+      out.push(art(rl) + rl.n + ' anda a ' + money(rl.unit) + ' ' + uart(rl) + rl.u + '.');
+      out.push('¿Le pongo ' + ra.range[0] + ' o ' + ra.range[1] + '?');
+    });
+    if (rangeAsk.length === 1 && !openAsks.length) ST.pendQty = rangeAsk[0].sku;
     ST.pendSize = ST.pendSize.filter(function (p) { return p.qty || p.turn === turn; });   // a bare price question does not linger
 
     if (quotes.length && !openAsks.length && !updated.length && !quotes.some(function (q) { return inCartQuote[q]; })) {
@@ -847,7 +864,7 @@ var LeyvaDemo = (function () {
         out = out.concat(confirmBubbles());
         rail.push('Confirmación UNA vez, con el carrito COMPLETO (' + all.length + ' líneas)');
       }
-    } else if (changed && !openAsks.length && all.length >= 2 && !totReq) {
+    } else if (changed && !openAsks.length && !rangeAsk.length && all.length >= 2 && !totReq) {
       out.push('Lleva ' + money(C().total()) + ' en total.');
     }
 

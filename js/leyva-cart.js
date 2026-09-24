@@ -192,7 +192,12 @@ var LeyvaCart = (function () {
   function sizeFor(kind, right, left) {
     var r = ' ' + right.join(' ') + ' ', l = ' ' + (left || []).join(' ') + ' ', both = l + r;
     switch (kind) {
-      case 'tubo': case 'codo': case 'tee': return pipeSize(right);
+      case 'codo':
+        // the catalog codo is 90°. A 45° is a different part: refuse it by
+        // name, never quote the 90° as if it were the one asked for.
+        if (/ (de |a )?45( grados)? /.test(r)) return { none: '45°' };
+        return pipeSize(right);
+      case 'tubo': case 'tee': return pipeSize(right);
       case 'clavo': {
         var m = r.match(/ (?:de )?(2|3|4|dos|tres|cuatro)(?: pulg)? /);
         if (!m) { var mm = r.match(/ (?:de )?(\d)(?: pulg)? /); return mm ? { none: mm[1] + '"' } : null; }
@@ -263,7 +268,10 @@ var LeyvaCart = (function () {
       if (!k && isTee(tk, i)) k = 'tee';
       if (!k) mk = measureKind(w);
       if (!k && !mk) for (var s = 0; s < SINPRECIO.length; s++) if (SINPRECIO[s][0].test(w)) sp = SINPRECIO[s][1];
-      if (w === 'pega' && tk[i + 1] === 'pvc') { k = 'pegamento'; mk = null; }
+      if (w === 'pega' && /^(pvc|para|de)$/.test(tk[i + 1] || '') && !/^ceramica/.test(tk[i + 2] || '')) { k = 'pegamento'; mk = null; }
+      // "pega para tubo", "codos para el tubo de media": the noun after "para" is what it is FOR
+      if ((k || mk) && (tk[i - 1] === 'para' || (/^(el|la|los|las)$/.test(tk[i - 1] || '') && tk[i - 2] === 'para')) &&
+          anchors.length && !anchors[anchors.length - 1].sinprecio) { continue; }
       if (w === 'pega' && /^ceramica/.test(tk[i + 1] || '')) k = 'bondex';
       if (mk && tk[i + 1] === 'de' && /^[a-z]{3,}$/.test(tk[i + 2] || '') && tk[i + 2] !== 'pvc' &&
           !nounKind(tk[i + 2]) && !/^(revestimiento|marmol|galon|la|las|los|el)$/.test(tk[i + 2])) {
@@ -327,6 +335,11 @@ var LeyvaCart = (function () {
           if (tk[q - 1] === 'un' && tk[q] === 'par') qty = 2;
         }
       }
+      var range = null;
+      for (var rq = 0; rq + 2 < left.length; rq++) {
+        if (numOf(left[rq]) !== null && left[rq + 1] === 'o' && numOf(left[rq + 2]) !== null) range = [numOf(left[rq]), numOf(left[rq + 2])];
+      }
+      if (range) qty = null;
       // "un par de codos", "media docena de tubos", "una docena de T"
       var lj = ' ' + left.join(' ') + ' ';
       if (/ (un )?par (de )?$/.test(lj)) qty = 2;
@@ -375,7 +388,7 @@ var LeyvaCart = (function () {
         if (a.kind === null && a.measure) res = { options: O.byKind('cemento').concat(O.byKind('bondex')), bolsa: true };
         mentions.push({ kind: a.kind || 'bolsa', sku: res.sku || null, qty: qty, size: (size && !size.none && !size.dim) ? size : null,
                         none: res.none || null, options: res.options || null, lamina: !!res.lamina,
-                        start: a.i, end: a.end + rightSpan, mas: markMas, ref: refForm,
+                        start: a.i, end: a.end + rightSpan, mas: markMas, ref: refForm, range: range,
                         leftWords: left, rightWords: right });
       }
       bound = nextQtyAt !== -1 ? nextQtyAt : Math.min(cut, a.end + 1 + rightSpan);
@@ -397,17 +410,23 @@ var LeyvaCart = (function () {
       mentions.forEach(function (mn) { if (mn.start < sg.s && mn.kind && !mn.sinprecio && (!prevM || mn.start > prevM.start)) prevM = mn; });
       if (!prevM) return;
       var w = sg.w.filter(function (x) { return !/^(me|deme|dame|pongame|y|otros?|otras?|unos|unas|mas|los|las|el|la)$/.test(x); });
-      if (w.length < 2 || numOf(w[0]) === null) return;
-      var rest = w.slice(1);
+      var eqty = null, rest;
+      if (w.length >= 2 && numOf(w[0]) !== null) { eqty = numOf(w[0]); rest = w.slice(1); }
+      else if (w.length >= 2 && w[0] === 'de') { rest = w; }           // "y de 3/4": a size, quantity said elsewhere
+      else return;
       if (rest[0] !== 'de' && !/^(1\/2|media|pulg|1\/8|1\/4)$/.test(rest[0])) return;
       var sz = sizeFor(prevM.kind, rest, rest);
       if (!sz) return;
       var rs = resolve(prevM.kind, sz);
-      mentions.push({ kind: prevM.kind, sku: rs.sku || null, qty: numOf(w[0]), size: sz.none ? null : sz, none: rs.none || null,
+      mentions.push({ kind: prevM.kind, sku: rs.sku || null, qty: eqty, size: sz.none ? null : sz, none: rs.none || null,
                       options: rs.options || null, start: sg.s, end: sg.s + sg.w.length - 1, ellipsis: true,
                       mas: /(^| )mas( |$)/.test(sg.w.join(' ')), leftWords: [], rightWords: rest });
     });
     mentions.sort(function (x, y) { return x.start - y.start; });
+    var cada = (' ' + tk.join(' ') + ' ').match(/ (\S+) (de )?cada (uno|una)s? /);
+    if (cada && numOf(cada[1]) !== null) {
+      mentions.forEach(function (x) { if (x.qty === null && !x.range && !x.sinprecio) { x.qty = numOf(cada[1]); x.cada = true; } });
+    }
 
     /* Same-message diameter inheritance for fittings: "10 tubos de media y
        5 codos" — the codos are read as 1/2 too, and the reply SAYS so. Only
