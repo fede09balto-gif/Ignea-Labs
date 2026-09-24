@@ -268,7 +268,8 @@ var LeyvaCart = (function () {
       if (!k && isTee(tk, i)) k = 'tee';
       if (!k) mk = measureKind(w);
       if (!k && !mk) for (var s = 0; s < SINPRECIO.length; s++) if (SINPRECIO[s][0].test(w)) sp = SINPRECIO[s][1];
-      if (w === 'pega' && /^(pvc|para|de)$/.test(tk[i + 1] || '') && !/^ceramica/.test(tk[i + 2] || '')) { k = 'pegamento'; mk = null; }
+      // "pega" is the glue unless it is the verb ("se pega") or the tile adhesive ("pega cerámica")
+      if (w === 'pega' && !/^(se|me|te|le|lo|nos|no)$/.test(tk[i - 1] || '') && !/^ceramica/.test(tk[i + 1] || '') && !/^ceramica/.test(tk[i + 2] || '')) { k = 'pegamento'; mk = null; }
       // "pega para tubo", "codos para el tubo de media": the noun after "para" is what it is FOR
       if ((k || mk) && (tk[i - 1] === 'para' || (/^(el|la|los|las)$/.test(tk[i - 1] || '') && tk[i - 2] === 'para')) &&
           anchors.length && !anchors[anchors.length - 1].sinprecio) { continue; }

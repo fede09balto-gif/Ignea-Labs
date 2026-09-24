@@ -543,6 +543,7 @@ var LeyvaDemo = (function () {
   var DOC_RE = /\b(cotiz\w*|cotic\w*|proforma\w*|presupuesto|me arma\w*|armeme|armame|hagame la cuenta|mandeme la cuenta|cuanto me sale todo)\b/;
   var TOTAL_RE = /\bcu[áa]nto (llevo|va|vamos|tengo|es en total|ser[íi]a en total|es todo|suma)\b|\bc[óo]mo va (la cuenta|eso)\b|\bel total hasta\b|\bcu[áa]nto suma\b|\bs[úu]meme\b/;
   var STOCK_RE = /\b(existencia|inventario|stock|hay en bodega)\b|\bhay\b[^?]*\ben (existencia|bodega|stock)\b|\bcu[áa]nt[oa]s?\b[^?]*\b(hay|tiene|tienen|quedan|le quedan|disponibles?)\b|\b(tiene|tienen|queda|quedan)\b[^?]*\ben (existencia|bodega|stock)\b/;
+  var FAMQ_RE = /\bque\s+(\w+\s+){0,2}(tienen|tiene|manejan|maneja|hay|venden)\b/;
   var PRICEQ_RE = /\b(a como|cuanto vale|cuanto cuesta|cuanto sale|que precio|en cuanto (esta|sale)|precio (de|del|tiene))\b/;
   var DELIVERY_RE = /\b(env[íi]o|entrega|flete|domicilio|reparto|mandan|llevan)\b/;
   // "súmele" edits; "¿cuánto suma?" asks. Bare "suma" is not an edit.
@@ -727,7 +728,8 @@ var LeyvaDemo = (function () {
         }
         var mine = m.sku ? inCart.filter(function (l) { return l.sku === m.sku; }) : inCart;
         // "¿cuánto vale la pega?" asks for PRICES, even with some already in the cart
-        if (!m.sku && PRICEQ_RE.test(t)) { pend(m.kind, null, m); return; }
+        // "¿qué pega tienen?" too: the family, with prices, and which one
+        if (!m.sku && (PRICEQ_RE.test(t) || FAMQ_RE.test(t))) { pend(m.kind, null, m); return; }
         if (mine.length && m.sku && PRICEQ_RE.test(t)) {
           quotes.push(m.sku); inCartQuote[m.sku] = mine[0].qty;
           return;
