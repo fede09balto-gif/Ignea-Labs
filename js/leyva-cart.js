@@ -167,7 +167,8 @@ var LeyvaCart = (function () {
     if (!/^(t|te|tee|tees|tes|ts)$/.test(w)) return false;
     var prev = tk[i - 1], next = tk[i + 1], next2 = tk[i + 2];
     if (w === 'te' && !(prev && numOf(prev) !== null)) return false;       // "te doy" is not a part
-    if (prev && (numOf(prev) !== null || /^(las|los|la|el|otras?|otros?)$/.test(prev))) return true;
+    if (/^(tees|tes)$/.test(w)) return true;                                // plural: only ever the part here
+    if (prev && (numOf(prev) !== null || /^(las|los|la|el|otras?|otros?|cuantos|cuantas|hay|unas|unos|de|tienen|tiene|manejan|maneja|venden|vende)$/.test(prev))) return true;
     if (next === 'pvc') return true;
     if (next === 'de' && next2 && /^(1\/2|media|medio|1|una|uno|2|dos|3\/4|pvc)$/.test(next2)) return true;
     return false;

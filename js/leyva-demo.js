@@ -127,11 +127,11 @@ var LeyvaDemo = (function () {
                     again. */
   var ST = { awaitingName: false, awaitingQty: null, awaitingConfirm: false, nudged: false,
              uso: null, usoDicho: false, pendSize: [], pendQty: null, removed: {}, named: {},
-             docWanted: false, lastSku: null, issued: {} };
+             docWanted: false, lastSku: null, issued: {}, pendingName: null, stockAsk: null };
   function resetState() {
     ST.awaitingName = false; ST.awaitingQty = null; ST.awaitingConfirm = false;
     ST.nudged = false; ST.uso = null; ST.usoDicho = false;
-    ST.pendSize = []; ST.pendQty = null; ST.removed = {}; ST.named = {}; ST.docWanted = false; ST.lastSku = null; ST.issued = {};
+    ST.pendSize = []; ST.pendQty = null; ST.removed = {}; ST.named = {}; ST.docWanted = false; ST.lastSku = null; ST.issued = {}; ST.pendingName = null; ST.stockAsk = null;
     if (C()) C().clear();
   }
 
@@ -545,7 +545,16 @@ var LeyvaDemo = (function () {
   var STOCK_RE = /\b(existencia|inventario|stock|hay en bodega)\b|\bhay\b[^?]*\ben (existencia|bodega|stock)\b|\bcu[áa]nt[oa]s?\b[^?]*\b(hay|tiene|tienen|quedan|le quedan|disponibles?)\b|\b(tiene|tienen|queda|quedan)\b[^?]*\ben (existencia|bodega|stock)\b/;
   var PRICEQ_RE = /\b(a como|cuanto vale|cuanto cuesta|cuanto sale|que precio|en cuanto (esta|sale)|precio (de|del|tiene))\b/;
   var DELIVERY_RE = /\b(env[íi]o|entrega|flete|domicilio|reparto|mandan|llevan)\b/;
-  var EDIT_RE = /\bqu[íi]t|\bquita|\bsaca|\bsaque|\belimin|\bborr|\bya no (quiero|ocupo|va)|\bmejor no|\bagreg|\bsuma(le)?\b|\bs[úu]mele\b|\bcambi|\bmejor\b|\bvuelva a\b|\botra vez\b/;
+  // "súmele" edits; "¿cuánto suma?" asks. Bare "suma" is not an edit.
+  var EDIT_RE = /\bqu[íi]t|\bquita|\bsaca|\bsaque|\belimin|\bborr|\bya no (quiero|ocupo|va)|\bmejor no|\bagreg|\bs[úu]m[ae]le\b|\bcambi|\bmejor\b|\bvuelva a\b|\botra vez\b|\brebaj/;
+  var SIDE_RE = /\b(chiste|broma|futbol|partido|politica|presidente|ortega|clima|calor|amor|novia|como esta|como estas|quien gano|cancion|pelicula|bot|robot|maquina|humano|persona real|con quien hablo|quien eres|hola|buenas|gracias|a que hora|horario|cierran|abren|donde quedan|donde estan)\b/;
+  /* Something said in the middle of "¿así está bien?" or "¿a nombre de
+     quién?" that is NOT an answer to it: a question, a remark, a total. It
+     is answered, and the pending question is asked again — never dropped. */
+  function sideQuestion(t, text, totReq) {
+    return /\?/.test(text) || totReq || STOCK_RE.test(t) || DELIVERY_RE.test(t) || SIDE_RE.test(t) ||
+           PRICE_MATH.some(function (p) { return p.re.test(t); });
+  }
 
   /* Split the raw message into clauses, so an off-catalog item next to a
      stocked one is refused BY NAME instead of taking the whole message down
@@ -566,7 +575,8 @@ var LeyvaDemo = (function () {
      Everything a customer says about his order goes through here, every
      product in the message, every turn. Returns null when the message has
      nothing to do with the order. */
-  function cartTurn(text, t, ex, docReq, totReq) {
+  function cartTurn(text, t, ex, docReq, totReq, carry) {
+    carry = carry || {};
     var turn = C().tick();
     var out = [], rail = [], asks = [], notes = [];
     var updated = [], removedNow = [], recalled = [], quotes = [], moved = null, inCartQuote = {}, incBy = {};
@@ -602,10 +612,16 @@ var LeyvaDemo = (function () {
     /* 1. Answers to our own questions, with no product named. */
     if (!mentions.length) {
       var bq = C().bareQty(text);
-      if (bq && ST.pendQty) {
-        upd(ST.pendQty, bq, 'set');
+      if (bq && carry.pendQty) {
+        upd(carry.pendQty, bq, 'set');
         rail.push('PRE|Cantidad dada a "¿cuántos ocupa?": ' + bq);
-        ST.pendQty = null; consumed = true;
+        consumed = true;
+      } else if (bq && carry.stockAsk) {
+        // the answer to "¿cuántas ocupa?" after a stock question: that product
+        if (carry.stockAsk.sku) upd(carry.stockAsk.sku, bq, 'set');
+        else pend(carry.stockAsk.kind, bq, { options: LeyvaOrder.byKind(carry.stockAsk.kind) });
+        rail.push('PRE|Cantidad dada a la pregunta de existencia: ' + bq);
+        consumed = true;
       } else if (ST.pendSize.length) {
         var bs = C().bareSize(text);
         if (bs) {
@@ -627,7 +643,10 @@ var LeyvaDemo = (function () {
          and nothing pending is a change of mind about the line he just
          touched. The quantity carries over — making him say it again is
          what turns an assistant into a form. */
-      if (!consumed && !ST.pendSize.length && ST.lastSku && C().find(ST.lastSku)) {
+      // only with a change marker ("mejor de 1 pulgada", "que sean de 2") —
+      // a bare "3" is a quantity with no product, and gets a question
+      if (!consumed && !ST.pendSize.length && ST.lastSku && C().find(ST.lastSku) &&
+          (ex.change || /^\s*(de|del|la de|el de|los de|las de)\b/.test(t))) {
         var bs2 = C().bareSize(text);
         var lk = LeyvaOrder.bySku(ST.lastSku).kind;
         var sz2 = bs2 ? C().sizeFor(lk, bs2.raw, bs2.raw) : null;
@@ -644,12 +663,10 @@ var LeyvaDemo = (function () {
           }
         }
       }
-      if (bq && !consumed && !ST.pendQty && !docReq && !totReq) {
-        ST.pendQty = null;
+      if (bq && !consumed && !docReq && !totReq) {
         return { bubbles: ['¿' + bq + ' de cuál producto?'], rail: ['Cantidad sin producto', 'Se pregunta — no se adivina'], localOnly: true, suppressDoc: true };
       }
     }
-    if (!consumed) ST.pendQty = null;
 
     /* 2. Every product the message names. */
     mentions.forEach(function (m) {
@@ -792,7 +809,7 @@ var LeyvaDemo = (function () {
     notes.filter(function (n) { return !/^(inferido|inc):/.test(n); }).forEach(function (n) { out.push(n); });
     refusals.forEach(function (r) { out.push(r); });
 
-    if (DELIVERY_RE.test(t)) out.push('De la entrega le confirmo con el mostrador.');
+    if (DELIVERY_RE.test(t) && mentions.length) out.push('De la entrega le confirmo con el mostrador.');
 
     var openAsks = asks.slice();
     if (docReq || (ST.docWanted && changed)) {
@@ -875,10 +892,22 @@ var LeyvaDemo = (function () {
          (mm && mm.wiped()) ? 'Verificado: sin registro para este número' : 'ADVERTENCIA: el borrado no se pudo verificar'], true);
     }
 
+    /* "¿Cuántos ocupa?" is answered on the NEXT message or not at all. A
+       quantity two turns later ("¿a cómo los codos?" … "¿hay baterías?" …
+       "2") belongs to the last thing asked about, never to the codos. */
+    var carry = { pendQty: ST.pendQty, stockAsk: ST.stockAsk };
+    ST.pendQty = null; ST.stockAsk = null;
+
     var ex = C().extract(text);
     ex.mentions.forEach(function (m) { if (m.kind) ST.named[m.kind] = true; });
     var docReq = DOC_RE.test(t), totReq = TOTAL_RE.test(t);
-    var isEdit = ex.mentions.length > 0 || ex.remove || EDIT_RE.test(t) || docReq || totReq;
+    // An EDIT changes the order, so a pending confirmation or name question
+    // is dropped and the confirmation comes back after it. A QUESTION
+    // ("¿cuánto llevo?", "¿hacen entrega?") does not change the order: it is
+    // answered and the pending question is asked again — never dropped.
+    var askOnly = STOCK_RE.test(t) || PRICEQ_RE.test(t) || /\?/.test(text);
+    var isEdit = ex.mentions.some(function (m) { return m.qty !== null || m.op === 'remove'; }) || ex.remove ||
+                 (ex.mentions.length > 0 && !askOnly) || EDIT_RE.test(t) || docReq;
 
     /* Answering the ONE confirmation. A "sí" advances to the naming question,
        which stays the only door a document comes through. An EDIT is not an
@@ -893,6 +922,7 @@ var LeyvaDemo = (function () {
            in one breath. Asking for the name he just gave proves the system
            is matching keywords, not listening. */
         if (ca.razon || ca.ruc || ca.nombre) return local(text);
+        if (ST.pendingName) { var pn = ST.pendingName; ST.pendingName = null; return local('a nombre de ' + pn); }
         var cAsk = nameAsk();
         return {
           bubbles: ['Perfecto.'].concat(cAsk.q),
@@ -903,6 +933,14 @@ var LeyvaDemo = (function () {
         };
       }
       if (isEdit) ST.awaitingConfirm = false;
+      else if (!ca.decline && !ca.razon && sideQuestion(t, text, totReq)) {
+        ST.awaitingConfirm = false;
+        var side2 = local(text);
+        ST.awaitingConfirm = true;
+        return { bubbles: side2.bubbles.concat(['¿Le confirmo el pedido así?']),
+                 rail: (side2.rail || []).concat(['Pregunta en medio de la confirmación: se contesta y la confirmación sigue en pie']),
+                 localOnly: true, suppressDoc: true };
+      }
       else if (ca.decline) {
         ST.awaitingConfirm = false;
         return hit(['Va. ¿Qué le quito o le cambio?'], ['Cantidades NO confirmadas', 'El carrito se conserva; se espera la corrección'], true);
@@ -934,6 +972,15 @@ var LeyvaDemo = (function () {
        name: it drops the question and goes to the cart, and the confirmation
        comes back after it. */
     if (ST.awaitingName && isEdit) ST.awaitingName = false;
+    if (ST.awaitingName && sideQuestion(t, text, totReq) && !/a\s+nombre\s+de/i.test(text)) {
+      var nameQ = nameAsk().q[0];
+      ST.awaitingName = false;
+      var side = local(text);
+      ST.awaitingName = true;
+      return { bubbles: side.bubbles.concat(['Y la proforma, ' + nameQ.replace(/^¿(.)/, function (m0, c) { return '¿' + c.toLowerCase(); })]),
+               rail: (side.rail || []).concat(['Pregunta en medio del nombre: se contesta y se vuelve a preguntar el nombre']),
+               localOnly: true, suppressDoc: true };
+    }
     if (ST.awaitingName) {
       var m2 = M();
       var ans = parseNameAnswer(text);
@@ -1040,8 +1087,21 @@ var LeyvaDemo = (function () {
     // Stock — we have no inventory. Escalate, never invent. Only when no
     // quantity was given: "¿cuántos codos tienen?" is stock, "5 codos" is an order.
     if (STOCK_RE.test(t) && !ex.mentions.some(function (m) { return m.qty; })) {
-      return hit(['Déjeme confirmarlo con el mostrador antes de prometerle.', '¿Cuántas ocupa?'],
-        ['Consulta: existencia', 'Sin inventario en sistema', 'Escalar al mostrador']);
+      /* DETERMINISTIC: the model, asked "¿cuántos tubos tienen?", answered
+         "¿Cuántos tubos ocupa?" to a customer with 20 tubos already in the
+         order — asking him for what he already said. If what he asks about
+         is in the cart, say so instead of asking. */
+      var sm = ex.mentions.filter(function (m) { return m.kind; })[0] || null;
+      var have = sm ? cartLines().filter(function (l) { return kindMatch(sm.kind, LeyvaOrder.bySku(l.sku).kind) && (!sm.sku || l.sku === sm.sku); }) : [];
+      if (have.length) {
+        return hit(['Déjeme confirmarlo con el mostrador antes de prometerle.',
+                    'Le confirmo ' + humanList(have.map(function (l) { return (KIND_FEM[LeyvaOrder.bySku(l.sku).kind] ? 'las ' : 'los ') + l.qty + ' ' + corto(l); })) + ' que lleva apuntad' + (have.length === 1 && KIND_FEM[LeyvaOrder.bySku(have[0].sku).kind] ? 'as' : 'os') + '.'],
+          ['Consulta: existencia', 'Sin inventario en sistema', 'Escalar al mostrador', 'PRE|Ya está en el pedido: no se le pregunta cuántos'], true);
+      }
+      if (sm) ST.stockAsk = { kind: sm.kind, sku: sm.sku || null };
+      var fem = sm ? KIND_FEM[sm.kind] : true;
+      return hit(['Déjeme confirmarlo con el mostrador antes de prometerle.', fem ? '¿Cuántas ocupa?' : '¿Cuántos ocupa?'],
+        ['Consulta: existencia', 'Sin inventario en sistema', 'Escalar al mostrador'], true);
     }
 
     /* Off-catalog product asks with NOTHING stocked in the message are
@@ -1055,7 +1115,7 @@ var LeyvaDemo = (function () {
     // THE ORDER. Anything that names a product, answers our question about
     // one, edits the list, asks for the running total or for the document.
     rememberUse(t);
-    var ct = cartTurn(text, t, ex, docReq, totReq);
+    var ct = cartTurn(text, t, ex, docReq, totReq, carry);
     if (ct) return ct;
 
     // Greeting.
@@ -1123,6 +1183,20 @@ var LeyvaDemo = (function () {
         ['Consulta por familia: ' + fam.fam.label,
          'Sin producto específico en la pregunta',
          'Se lista lo de esa familia y se pregunta — no se elige por el cliente']);
+    }
+
+    /* "a nombre de X" with no proforma in progress. Never "no lo manejo":
+       he is telling us whose name goes on the document. With an order,
+       confirm it and carry the name; without one, ask what to put on it. */
+    var outName = parseNameAnswer(text);
+    if (/a\s+nombre\s+de\s+/i.test(text) && outName.razon) {
+      if (C().list().length) {
+        ST.docWanted = true; ST.pendingName = outName.razon;
+        return { bubbles: ['Va, a nombre de ' + outName.razon + (/\.$/.test(outName.razon) ? '' : '.')].concat(confirmBubbles()),
+                 rail: ['PRE|Nombre para la proforma: ' + outName.razon, 'Confirmación del carrito completo antes del documento'],
+                 localOnly: true, suppressDoc: true };
+      }
+      return hit(['Todavía no tengo nada apuntado para la proforma.', '¿Qué le pongo?'], ['Nombre sin pedido: se pregunta el pedido'], true);
     }
 
     /* A number with no product we recognise is an order we did not

@@ -197,7 +197,7 @@ function Gen(seed, opts) {
   }
 
   // ---- expected state (the spec model) ----
-  const S = { cart: new Map(), removed: new Map(), pendSize: [], pendQty: null, phase: 'free', lastSku: null,
+  const S = { cart: new Map(), removed: new Map(), pendSize: [], pendQty: null, phase: 'free', lastSku: null, stockAsk: null,
               docWanted: false, named: new Set(), docs: 0, mode: opts.mode || 'nuevo' };
   const turns = [];
   const cartSnap = () => Array.from(S.cart.entries()).map(([sku, qty]) => ({ sku, qty }));
@@ -455,7 +455,7 @@ function Gen(seed, opts) {
     const sku = pick(opts2);
     const sz = pick(SKUS[sku].size);
     let text;
-    const lastWasQtyQ = turns.length && turns[turns.length - 1].act === 'price_query';
+    const lastWasQtyQ = turns.length && (turns[turns.length - 1].act === 'price_query' || turns[turns.length - 1].interrupt === 'stock');
     if (S.pendSize.length === 1 && chance(0.6) && !(lastWasQtyQ && /^(\d|una?|uno|dos|tres|cuatro)\b/.test(sz))) {
       text = pick(['de ', V[p.kind].fem ? 'las de ' : 'los de ', '', 'que sean de ']) + sz;
       F('answer:bare-size');
@@ -481,6 +481,23 @@ function Gen(seed, opts) {
     const q = S.cart.get(from); S.cart.delete(from); S.cart.set(to, (S.cart.get(to) || 0) + q); S.removed.delete(to); S.lastSku = to;
     const reconf = maybeReconfirm();
     push(text, 'change_size_bare', { mentions: [{ sku: to, qty: S.cart.get(to), kind }], expectConfirm: reconf });
+  }
+
+  function actAnswerStockQty() {
+    const kind = S.stockAsk; S.stockAsk = null;
+    const q = randQty();
+    const text = pick(['', 'unos ', 'como ', 'deme ']) + qtyWord(q);
+    F('answer:stock-qty');
+    const skus = kindsOf(kind);
+    if (skus.length === 1) {
+      S.cart.set(skus[0], q); S.removed.delete(skus[0]); S.lastSku = skus[0];
+      const reconf = maybeReconfirm();
+      push(text, 'answer_stock_qty', { mentions: [{ sku: skus[0], qty: q, kind }], expectConfirm: reconf });
+    } else {
+      const ex = S.pendSize.find(p => p.kind === kind);
+      if (ex) ex.qty = q; else S.pendSize.push({ kind, qty: q });
+      push(text, 'answer_stock_qty', { mentions: [{ kind, qty: q, needs: 'size' }] });
+    }
   }
 
   function actPriceQuery() {
@@ -514,9 +531,10 @@ function Gen(seed, opts) {
     push(text, 'recall', { recallKind: kind, mentions: [] });
   }
 
-  function actTotal() {
+  function actTotal(pending) {
     const text = pick(['¿cuánto llevo?', '¿cuánto va?', '¿cómo va la cuenta?', '¿cuánto llevo hasta ahorita?', 'cuanto es todo', '¿cuánto suma?']);
-    push(text, 'total', { mentions: [] });
+    if (pending) F('interrupt-during:' + pending);
+    push(text, 'total', { mentions: [], reask: pending || null });
   }
 
   function actDoc() {
@@ -548,19 +566,24 @@ function Gen(seed, opts) {
     S.phase = 'free'; S.docWanted = false; S.docs++;
   }
 
-  function actInterrupt() {
-    const [kind, tpls] = pick(INTERRUPT);
+  function actInterrupt(pending) {
+    let [kind, tpls] = pick(INTERRUPT);
+    if (pending && kind === 'offcat') [kind, tpls] = INTERRUPT[1];      // keep it a question, not a product
     let t = pick(tpls);
     let off = null;
+    let askKind = null, askSku = null;
     if (/\{k\}/.test(t)) {
       const inCart = Array.from(S.cart.keys());
-      const sku = inCart.length ? pick(inCart) : pick(HOT);
+      const sku = inCart.length && chance(0.6) ? pick(inCart) : pick(HOT);
+      askKind = SKUS[sku].kind; askSku = sku;
       t = t.replace('{k}', pick(V[SKUS[sku].kind].plural.filter(x => !/^\d| de \d|de 1x12|20w50|de 25/.test(x))));
       S.named.add(SKUS[sku].kind);
     }
     if (/\{o\}/.test(t)) { off = pick(OFFCAT); t = t.replace('{o}', off[0]); }
     F('interrupt:' + kind);
-    push(t, 'interrupt', { interrupt: kind, offcat: off ? off[1] : null, mentions: [] });
+    if (pending) F('interrupt-during:' + pending);
+    push(t, 'interrupt', { interrupt: kind, offcat: off ? off[1] : null, mentions: [], reask: pending || null, askKind });
+    S.stockAsk = (!pending && kind === 'stock' && askKind && !Array.from(S.cart.keys()).some(x => SKUS[x].kind === askKind)) ? askKind : null;
   }
 
   function actMixedOffcat() {
@@ -607,14 +630,24 @@ function Gen(seed, opts) {
     if (S.phase === 'repeatq') { actRepeatYes(); continue; }
     if (S.phase === 'confirm') {
       const x = r();
+      // a question in the middle of the confirmation: answered, and the
+      // confirmation must still be standing afterwards
+      if (chance(0.15)) { actInterrupt('confirm'); continue; }
       if (x < 0.65) actConfirm();
       else if (x < 0.8 && hasCart) actRemove();
       else if (x < 0.9) actAdd(1, 'set');
       else if (hasCart) actSetQty(); else actConfirm();
       continue;
     }
-    if (S.phase === 'name') { actName(); continue; }
-    if (S.pendQty && chance(0.6)) { actAnswerQty(); continue; }
+    if (S.phase === 'name') {
+      if (chance(0.2)) { if (chance(0.4)) actTotal('name'); else actInterrupt('name'); continue; }
+      actName(); continue;
+    }
+    // the stock question's "¿cuántos ocupa?" is answered on the very next turn or not at all
+    const lastT = turns[turns.length - 1];
+    if (S.stockAsk && S.phase === 'free' && lastT && lastT.interrupt === 'stock' && chance(0.5)) { actAnswerStockQty(); continue; }
+    S.stockAsk = null;
+    if (S.pendQty && chance(0.6) && turns[turns.length - 1].act === 'price_query') { actAnswerQty(); continue; }
     S.pendQty = null;
     if (S.pendSize.length && chance(0.6)) { actAnswerSize(); continue; }
 

@@ -148,6 +148,19 @@ function judge(turn, reply, ctx) {
     });
   });
   if (/¿qu[ée] ocupa\?/i.test(txt) && (turn.mentions || []).length) fail('repetir', '"¿Qué ocupa?" a un mensaje que nombró productos');
+  // "¿Cuántas ocupa?" with no noun is about what he just asked about
+  if (turn.askKind && cartKinds.has(turn.askKind) && /¿cu[áa]nt[oa]s\b/i.test(txt)) {
+    fail('repetir', 'preguntó por existencia de "' + turn.askKind + '" que ya está en el pedido y le pregunta cuántos');
+  }
+
+  // ---- a question in the middle of a pending question must not kill it ----
+  if (turn.reask === 'confirm' && !/¿le confirmo el pedido as[ií]\?|¿as[ií] est[aá] bien\?/i.test(txt)) {
+    fail('confirmacion', 'una pregunta en medio de la confirmación y la confirmación no se retoma');
+  }
+  if (turn.reask === 'name' && !/nombre de qui[eé]n|¿se la hago a nombre|¿todav[ií]a a nombre|a nombre suyo/i.test(txt)) {
+    fail('documento', 'una pregunta en medio del nombre y el nombre no se vuelve a pedir');
+  }
+  if (turn.act === 'interrupt' && /no le entend[ií] el nombre/i.test(txt)) fail('repetir', 'contestó "no le entendí el nombre" a una pregunta');
 
   // ---- confirmación: the WHOLE cart, once, before the document ----
   const wantConfirm = turn.expect === 'confirm' || turn.expectConfirm;
