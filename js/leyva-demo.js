@@ -127,11 +127,11 @@ var LeyvaDemo = (function () {
                     again. */
   var ST = { awaitingName: false, awaitingQty: null, awaitingConfirm: false, nudged: false,
              uso: null, usoDicho: false, pendSize: [], pendQty: null, removed: {}, named: {},
-             docWanted: false, lastSku: null };
+             docWanted: false, lastSku: null, issued: {} };
   function resetState() {
     ST.awaitingName = false; ST.awaitingQty = null; ST.awaitingConfirm = false;
     ST.nudged = false; ST.uso = null; ST.usoDicho = false;
-    ST.pendSize = []; ST.pendQty = null; ST.removed = {}; ST.named = {}; ST.docWanted = false; ST.lastSku = null;
+    ST.pendSize = []; ST.pendQty = null; ST.removed = {}; ST.named = {}; ST.docWanted = false; ST.lastSku = null; ST.issued = {};
     if (C()) C().clear();
   }
 
@@ -147,7 +147,11 @@ var LeyvaDemo = (function () {
      storage, so it cannot be stale. */
   function openProformaNudge(replyText) {
     var m = M(); if (!m || ST.nudged) return null;
-    var open = m.abiertas()[0];
+    /* Never an order THIS conversation issued. The document just sent is
+       registered as open (so a later visit can follow up on it); reminding
+       him of it one message later, with its figure, reads as the system not
+       knowing what it just did. Found by the browser harness. */
+    var open = m.abiertas().filter(function (o) { return !ST.issued[o.correlativo]; })[0];
     if (!open) return null;
     // The repeat-order branch already lists this exact proforma. Appending
     // "y quedó pendiente la PRO-2481" to a message that just itemised
@@ -1271,12 +1275,14 @@ var LeyvaDemo = (function () {
   }
 
   function cart() { return C().list(); }
+  function noteIssued(correlativo) { ST.issued[correlativo] = true; }
 
   return {
     local: local,
     documentFor: documentFor,
     modelReplyAllowed: modelReplyAllowed,
     cart: cart,
+    noteIssued: noteIssued,
     callApi: callApi,
     openProformaNudge: openProformaNudge,
     verifyMoney: verifyMoney,

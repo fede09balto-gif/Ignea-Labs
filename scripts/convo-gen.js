@@ -212,8 +212,9 @@ function Gen(seed, opts) {
     // An edit while a document is in progress goes straight back to a
     // confirmation of the WHOLE cart — never to "¿qué le cambio?".
     if (S.docWanted && !S.pendSize.length && S.cart.size) { S.phase = 'confirm'; return true; }
-    // everything removed: the document request lapses with it
-    if (!S.cart.size) { S.phase = 'free'; S.docWanted = false; }
+    // everything removed AND nothing pending: the document request lapses.
+    // With something still pending, the order is not empty — it stands.
+    if (!S.cart.size) { S.phase = 'free'; if (!S.pendSize.length) S.docWanted = false; }
     return false;
   }
 

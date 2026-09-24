@@ -115,6 +115,7 @@
     if (typeof LeyvaMemory !== 'undefined' && order.lines && order.lines[0] && order.lines[0].sku) {
       LeyvaMemory.registrarPedido(LeyvaProforma.correlativo(seq), order.lines);
     }
+    LeyvaDemo.noteIssued(LeyvaProforma.correlativo(seq));   // never nudged about in this same conversation
     return true;
   }
 

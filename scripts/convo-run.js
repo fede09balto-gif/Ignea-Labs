@@ -72,6 +72,15 @@ function runConvo(c) {
       if (nudge) bubbles = bubbles.concat(nudge.bubbles);
     }
     const doc = docFor(ans, bubbles);
+    /* What leyva-chat.js docBubble() does with an issued document: take a
+       correlativo, register it as an OPEN order in memory, note it as issued
+       in this conversation. Not emulating this hid a bug only the browser
+       found (the nudge citing the document just sent). */
+    if (doc) {
+      const corr = PF.correlativo(PF.next());
+      if (doc.lines[0] && doc.lines[0].sku) LeyvaMemory.registrarPedido(corr, doc.lines);
+      if (D.noteIssued) D.noteIssued(corr);
+    }
     const reply = { bubbles, doc: doc ? { lines: doc.lines.map(l => ({ sku: l.sku, desc: l.desc || l.n, qty: l.qty, unit: l.unit, total: l.total })), total: doc.total } : null,
                     cart: D.cart ? D.cart().map(l => ({ sku: l.sku, qty: l.cantidad })) : null };
     if (t.act === 'repeat_order') allowKinds = seeded.lines.map(l => G.SKUS[l.sku].kind);

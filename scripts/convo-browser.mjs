@@ -102,9 +102,11 @@ async function sendTurn(page, text) {
     return t;
   }), before);
   const docsAfter = await page.$$eval('#waChat .wa__doc', n => n.length);
+  // why a model reply was not used, as the operator rail states it
+  const why = await page.$$eval('#lvRail .lv-step', ns => ns.map(n => n.textContent).filter(t => /DESCARTADA|NO VERIFICABLE/.test(t)));
   let pdf = null;
   if (docsAfter > docsBefore) pdf = await page.evaluate(async () => window.__lastPdf ? await window.__lastPdf.text() : null);
-  return { detail, bubbles, docCard: docsAfter > docsBefore, pdf };
+  return { detail, bubbles, docCard: docsAfter > docsBefore, pdf, why };
 }
 
 async function runConvo(w, c) {
@@ -142,7 +144,7 @@ async function runConvo(w, c) {
         if (lineCount !== 2 * (t.cart || []).length + 1) f.push({ cls: 'documento', msg: 'el PDF trae ' + lineCount + ' cifras; el carrito exige ' + (2 * (t.cart || []).length + 1) });
       }
     }
-    log.push({ i, user: t.text, act: t.act, mode: d.mode, bot: r.bubbles, doc, fails: f });
+    log.push({ i, user: t.text, act: t.act, mode: d.mode, bot: r.bubbles, doc, fails: f, why: r.why });
     f.forEach(x => fails.push(Object.assign({ turn: i, act: t.act }, x)));
     prevCart = t.cart;
   }
@@ -154,6 +156,7 @@ function transcript(r) {
   r.log.forEach(l => {
     out.push('CLIENTE: ' + l.user + '   [' + l.act + ']');
     l.bot.forEach(b => out.push('   BOT(' + (l.mode || '?') + '): ' + b.replace(/\n/g, '\n        ')));
+    (l.why || []).forEach(w => out.push('   ~~~ ' + w));
     if (l.doc) out.push('   >>> PDF: ' + l.doc.lines.map(x => x.qty + ' x ' + x.sku + ' = C$' + x.total).join(' | ') + ' · TOTAL C$' + l.doc.total);
     l.fails.forEach(f => out.push('   !!! [' + f.cls + '] ' + f.msg));
   });
@@ -164,7 +167,7 @@ const convos = ONLY === 'screenshot' ? [G.screenshot()] : [G.screenshot()];
 if (ONLY !== 'screenshot') for (let s = FROM; s < FROM + N; s++) convos.push(G.Gen(s, { mode: s % 4 === 0 ? 'vuelve' : 'nuevo', seedOrder: SEED_ORDER, hard: HARD }));
 
 const browser = await chromium.launch();
-const results = []; let turns = 0; const modes = {}; let apiTotal = 0; const pageErrors = [];
+const results = []; let turns = 0; const modes = {}; const discards = {}; let apiTotal = 0; const pageErrors = [];
 let next = 0;
 async function worker() {
   let w = await newPage(browser);
@@ -179,7 +182,7 @@ async function worker() {
     }
     results.push(r);
     turns += r.log.length;
-    r.log.forEach(l => { modes[l.mode] = (modes[l.mode] || 0) + 1; });
+    r.log.forEach(l => { modes[l.mode] = (modes[l.mode] || 0) + 1; (l.why || []).forEach(w => { const k = w.replace(/:.*/, ''); discards[k] = (discards[k] || 0) + 1; }); });
     process.stdout.write(r.fails.length ? 'F' : '.');
   }
   apiTotal += w.apiCalls.n; pageErrors.push(...w.errors);
@@ -195,10 +198,11 @@ console.log('\n' + (OFFLINE ? 'SIN RED (context.setOffline)' : 'CON RED') + ' ·
 console.log('conversaciones: ' + results.length + ' (' + turns + ' turnos) · con falla: ' + failing.length);
 console.log('fallas por clase: ' + JSON.stringify(byClass));
 console.log('quién respondió cada turno: ' + JSON.stringify(modes) + ' · llamadas a /api/claude: ' + apiTotal);
+console.log('respuestas del modelo descartadas por la compuerta: ' + JSON.stringify(discards) + ' (el resto de "local" con red = timeout/error de red)');
 console.log('errores de página: ' + pageErrors.length + (pageErrors.length ? ' — ' + pageErrors.slice(0, 3).join(' | ') : ''));
 const shot = results.find(r => r.seed === 'screenshot');
 if (shot) console.log('\n' + transcript(shot));
 if (failing.length) console.log('\nprimera falla:\n' + transcript(failing[0]));
 if (OUT) fs.writeFileSync(OUT, JSON.stringify({ base: BASE, offline: OFFLINE, n: results.length, turns, byClass, modes, apiTotal, pageErrors,
-  transcripts: results.map(transcript), failing: failing.map(transcript) }, null, 1));
+  discards, transcripts: results.map(transcript), failing: failing.map(transcript) }, null, 1));
 process.exit(failing.length || pageErrors.length ? 1 : 0);
