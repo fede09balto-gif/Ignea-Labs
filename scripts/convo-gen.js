@@ -587,7 +587,7 @@ function Gen(seed, opts) {
 
   function actConfirm() {
     if (chance(0.3)) {
-      const name = pick(['Constructora Herrera S.A.', 'Luis Herrera', 'Ferretería El Progreso', 'Construcciones Díaz']);
+      const name = pick(['ZZTEST Constructora S.A.', 'ZZTEST Cliente', 'ZZTEST Ferretería Ejemplo', 'ZZTEST Construcciones']);
       push(pick(['sí, a nombre de ', 'correcto, a nombre de ', 'dale, a nombre de ']) + name, 'confirm_named', { expectDoc: true, name });
       S.phase = 'free'; S.docWanted = false; S.docs++;
       F('act:confirm_named');
@@ -598,7 +598,7 @@ function Gen(seed, opts) {
   }
 
   function actName() {
-    const name = pick(['a nombre de Luis Herrera', 'a nombre de Constructora Herrera S.A.', 'Ferretería El Progreso', 'a nombre de Construcciones Díaz']);
+    const name = pick(['a nombre de ZZTEST Cliente', 'a nombre de ZZTEST Constructora S.A.', 'ZZTEST Ferretería Ejemplo', 'a nombre de ZZTEST Construcciones']);
     push(name, 'give_name', { expectDoc: true });
     S.phase = 'free'; S.docWanted = false; S.docs++;
   }
@@ -745,7 +745,7 @@ function screenshot() {
         { mentions: [{ sku: 'TUB-PVC-12', qty: 3, kind: 'tubo' }, { sku: 'TUB-PVC-1', qty: 2, kind: 'tubo' }, { sku: 'CEM-BULTO-25', qty: 5, kind: 'cemento' }] }),
       T('ok, dame la proforma de todo', 'doc', { expect: 'confirm' }),
       T('sí', 'confirm_yes'),
-      T('a nombre de Luis Herrera', 'give_name', { expectDoc: true }),
+      T('a nombre de ZZTEST Cliente', 'give_name', { expectDoc: true }),   // never a real person — HANDOFF test-data rule
       T('y los tubos de pvc', 'recall', { recallKind: 'tubo' })
     ],
     finalCart: [{ sku: 'TUB-PVC-12', qty: 3 }, { sku: 'TUB-PVC-1', qty: 2 }, { sku: 'CEM-BULTO-25', qty: 5 }]
