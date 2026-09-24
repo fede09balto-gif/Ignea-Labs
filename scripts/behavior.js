@@ -13,6 +13,7 @@ global.localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (
 global.sessionStorage = { getItem: k => (k in ss ? ss[k] : null), setItem: (k, v) => { ss[k] = String(v); }, removeItem: k => { delete ss[k]; } };
 global.LeyvaFamilies = require(ROOT + '/js/leyva-families.js');
 try { global.LeyvaOrder = require(ROOT + '/js/leyva-order.js'); } catch (e) { global.LeyvaOrder = null; }
+global.LeyvaCart = require(ROOT + '/js/leyva-cart.js');
 const D = require(ROOT + '/js/leyva-demo.js');
 try { global.LeyvaMemory = require(ROOT + '/js/leyva-memory.js'); } catch (e) {}
 

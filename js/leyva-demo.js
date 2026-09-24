@@ -105,20 +105,34 @@ var LeyvaDemo = (function () {
         loud — it is a selling point, not an apology. */
   function M() { return (typeof LeyvaMemory !== 'undefined') ? LeyvaMemory : null; }
 
-  /* Conversation state for the two-step proforma. Reset by leyva-chat.js's
-     reset(). Deliberately NOT persisted: a half-finished naming question
-     surviving a restart would put a stale name on the next document. */
-  /* Conversation state. `order` is what the customer has actually asked for,
-     accumulated across turns — it is what the confirmation repeats back and
-     what the proforma is built from. `uso` is the job he told us about; rule C
-     says to use it instead of answering generically. */
-  var ST = { awaitingName: null, awaitingQty: null, awaitingConfirm: null,
-             nudged: false, order: [], uso: null, usoDicho: false, lastSize: null,
-             pendingQty: null };
+  /* Conversation state. Reset by leyva-chat.js's reset(). Deliberately NOT
+     persisted: a half-finished naming question surviving a restart would put
+     a stale name on the next document.
+
+     THE ORDER ITSELF IS NOT HERE. It lives in LeyvaCart (js/leyva-cart.js),
+     which is updated every turn and never rebuilt from one. What lives here
+     is only the conversation around it:
+       pendSize   — things he ordered WITH a quantity but whose size we could
+                    not resolve. They persist until answered, and a proforma
+                    cannot be issued while one is open: a document without
+                    the thing he asked for is the original bug.
+       pendQty    — the one product we just quoted without a quantity; a bare
+                    "deme 12" on the NEXT turn lands on it, and only then.
+       removed    — sku -> the quantity it had, so "vuelva a ponerme el
+                    cemento" restores his number instead of asking for it.
+       named      — every product kind the customer has named. Anything the
+                    assistant says about a kind NOT in here is a phantom.
+       docWanted  — he asked for the document; once nothing is pending, the
+                    confirmation follows on its own instead of making him ask
+                    again. */
+  var ST = { awaitingName: false, awaitingQty: null, awaitingConfirm: false, nudged: false,
+             uso: null, usoDicho: false, pendSize: [], pendQty: null, removed: {}, named: {},
+             docWanted: false, lastSku: null };
   function resetState() {
-    ST.awaitingName = null; ST.awaitingQty = null; ST.awaitingConfirm = null;
-    ST.nudged = false; ST.order = []; ST.uso = null; ST.usoDicho = false; ST.lastSize = null;
-    ST.pendingQty = null;
+    ST.awaitingName = false; ST.awaitingQty = null; ST.awaitingConfirm = false;
+    ST.nudged = false; ST.uso = null; ST.usoDicho = false;
+    ST.pendSize = []; ST.pendQty = null; ST.removed = {}; ST.named = {}; ST.docWanted = false; ST.lastSku = null;
+    if (C()) C().clear();
   }
 
   function memLines(order) {
@@ -349,40 +363,88 @@ var LeyvaDemo = (function () {
     };
   }
 
-  /* ---- answering our own "¿Cuántos ocupa?" ----------------------------
-     The assistant asks how many, and the customer replies "deme 12" or
-     "como 8" — a bare quantity with no product in it. Without this the reply
-     parses to nothing and it asks the SAME question again, which in a room
-     reads as not listening. ST.pendingQty remembers what we just asked about. */
-  var BAREQTY = /^\s*(?:ah\s+)?(?:y\s+)?(?:tambi[ée]n\s+)?(?:me\s+)?(?:deme|dame|ponme|p[oó]ngame|mande|quiero|ocupo|son|serían|serian|como|unos|unas|van|ll[ée]veme)?\s*(\d{1,3}|un|una|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|veinte|treinta)\b/;
+  /* ---- the cart, as the responder sees it ------------------------------
+     Every line here is read from LeyvaCart, whose prices come from
+     LeyvaOrder.P (catalog parity asserted by scripts/check-prices.js). */
+  var _cart = null;
+  function C() {
+    if (typeof LeyvaCart !== 'undefined') return LeyvaCart;
+    if (!_cart && typeof require === 'function') _cart = require('./leyva-cart.js');   // node suites
+    return _cart;
+  }
+  /* "las láminas" / "los sacos" name the only priced things sold that way. */
+  function kindMatch(said, k) {
+    return said === k || (said === 'lamina' && k === 'gypsum') || (said === 'bolsa' && (k === 'cemento' || k === 'bondex'));
+  }
+  function toLine(it) {
+    var r = LeyvaOrder.bySku(it.sku);
+    return { sku: it.sku, n: r.n, u: r.u, unit: it.precio_unitario, qty: it.cantidad, total: it.precio_unitario * it.cantidad };
+  }
+  function cartLines() { return C().list().map(toLine); }
+  function quoteLine(sku) { var r = LeyvaOrder.bySku(sku); return { sku: sku, n: r.n, u: r.u, unit: r.p, qty: null, total: null }; }
 
-  function bareQty(t) {
-    var m = t.match(BAREQTY);
-    if (!m) return null;
-    // must not also name a product — that is an ordinary order, not an answer
-    for (var i = 0; i < LeyvaOrder.KIND.length; i++) if (LeyvaOrder.KIND[i].re.test(t)) return null;
-    var w = m[1];
-    var WN = { un:1, una:1, uno:1, dos:2, tres:3, cuatro:4, cinco:5, seis:6, siete:7, ocho:8, nueve:9,
-               diez:10, once:11, doce:12, trece:13, catorce:14, quince:15, veinte:20, treinta:30 };
-    var q = /^\d+$/.test(w) ? parseInt(w, 10) : WN[w];
-    return q > 0 ? q : null;
+  function corto(l, qty) {
+    var r = LeyvaOrder.bySku(l.sku);
+    return LeyvaOrder.plural((r && r.corto) || l.n, qty === undefined ? l.qty : qty);
   }
 
-  function lineFor(sku, qty) {
-    var r = LeyvaOrder.bySku(sku);
-    return { sku: sku, n: r.n, u: r.u, unit: r.p, qty: qty, total: qty === null ? null : r.p * qty };
+  /* How a kind is spoken about when we do not know which one yet. */
+  var KIND_WORD = { tubo: ['tubo', 'tubos'], codo: ['codo', 'codos'], tee: ['T', 'T'], pegamento: ['pegamento', 'pegamentos'],
+                    clavo: ['libra de clavo', 'libras de clavo'], puerta: ['puerta', 'puertas'], bondex: ['saco de Bondex', 'sacos de Bondex'],
+                    bateria: ['batería', 'baterías'], llanta: ['llanta', 'llantas'], lamina: ['lámina', 'láminas'],
+                    bolsa: ['bolsa', 'bolsas'], cemento: ['bulto de cemento', 'bultos de cemento'], gypsum: ['lámina de gypsum', 'láminas de gypsum'],
+                    tabla: ['tabla', 'tablas'], aceite: ['litro de aceite', 'litros de aceite'] };
+  var KIND_FEM = { tee: 1, puerta: 1, bateria: 1, llanta: 1, lamina: 1, bolsa: 1, gypsum: 1, tabla: 1, clavo: 1 };
+  function kw(kind, qty) { var w = KIND_WORD[kind] || [kind, kind + 's']; return qty === 1 ? w[0] : w[1]; }
+
+  /* The one question for something he asked for but we could not pin down.
+     It names the product and lists every option WITH its price, so it is
+     answerable in one message — never "¿me lo repite?". */
+  function pendingAsk(p) {
+    var opts = (p.options || []).map(function (o) { return o.n + ' a ' + money(o.p); });
+    var list = humanList(opts);
+    if (p.none) {
+      return kw(p.kind, 1).charAt(0).toUpperCase() + kw(p.kind, 1).slice(1) + ' de ' + p.none + ' no manejo. ' +
+             (opts.length ? 'Tengo ' + list + '. ¿Le sirve alguno?' : '¿Le paso la consulta al mostrador?');
+    }
+    if (p.kind === 'lamina') {
+      return 'De lámina tengo la de gypsum a ' + money(LeyvaOrder.bySku('GYP-12-48').p) +
+             '; la de revestimiento el precio lo confirma el mostrador. ' + (p.qty ? '¿Las ' + p.qty + ' son de gypsum?' : '¿Cuál le sirve?');
+    }
+    if (p.qty) {
+      return (KIND_FEM[p.kind] ? 'De las ' : 'De los ') + p.qty + ' ' + kw(p.kind, p.qty) + ' no me dijo cuál: tengo ' + list + '. ¿De cuál son?';
+    }
+    return (KIND_FEM[p.kind] ? 'De ' + kw(p.kind, 1) : 'Del ' + kw(p.kind, 1)) + ' tengo ' + list + '. ¿Cuál le sirve?';
   }
 
-  /* Remember what we just asked about, so the next bare number lands somewhere. */
-  function armPendingQty(lines) {
-    var noQty = lines.filter(function (l) { return l.qty === null || l.qty === undefined; });
-    ST.pendingQty = noQty.length === 1 ? noQty[0].sku : null;
+  function confirmBubbles() {
+    var ls = cartLines();
+    ST.awaitingConfirm = true;
+    return ['Para confirmarle: ' + humanList(ls.map(function (l) { return l.qty + ' ' + corto(l); })) +
+            '. Total ' + money(C().total()) + '.', '¿Así está bien?'];
   }
 
-  function runningTotal() {
-    var acc = ST.order.filter(function (l) { return l.qty; });
-    if (!acc.length) return null;
-    return { lines: acc, sum: acc.reduce(function (a, l) { return a + l.total; }, 0) };
+  function listBubble(ls) { return orderLines(ls); }
+
+  /* Restate the price we CAN stand behind, from the cart. Computed, never
+     phrased. */
+  function priceOfRecord(text) {
+    var src = cartLines();
+    if (!src.length) {
+      var ex = C().extract(text);
+      src = ex.mentions.filter(function (m) { return m.sku; }).map(function (m) {
+        var l = quoteLine(m.sku); if (m.qty) { l.qty = m.qty; l.total = l.unit * m.qty; } return l;
+      });
+    }
+    if (!src.length) return null;
+    if (src.length === 1) {
+      var l = src[0];
+      return l.qty
+        ? 'El precio de sistema es ' + money(l.unit) + ' ' + uart(l) + l.u + ', los ' + l.qty + ' en ' + money(l.qty * l.unit) + '.'
+        : 'El precio de sistema es ' + money(l.unit) + ' ' + uart(l) + l.u + '.';
+    }
+    var tot = src.reduce(function (a, l) { return a + (l.total || 0); }, 0);
+    return 'El precio de sistema es ' + money(tot) + ' por lo que me pidió.';
   }
 
   /* ---- ARITHMETIC *ON* THE PRICE — escalate, never compute --------------
@@ -413,27 +475,6 @@ var LeyvaDemo = (function () {
     { re: /\bsi (sube|suben|baja|bajan|aumenta)\b|\bel mes que viene\b|\bva a subir\b|\bproyecc/,
       say: 'No le sé decir cómo va a quedar después; yo tengo el precio de hoy.', tag: 'proyección' }
   ];
-
-  /* Restate the price we CAN stand behind: from what he has already asked for,
-     or from this same message. Computed, never phrased. */
-  function priceOfRecord(text) {
-    var src = ST.order.filter(function (l) { return l.qty; });
-    if (!src.length) {
-      var pr = LeyvaOrder.parse(text, { inheritSize: ST.lastSize });
-      src = pr.lines.filter(function (l) { return l.qty; });
-      if (!src.length) src = pr.lines;
-    }
-    if (!src.length) return null;
-    if (src.length === 1) {
-      var l = src[0];
-      // uart(), not a hardcoded "la" — same gender bug as before, new code path.
-      return l.qty
-        ? 'El precio de sistema es ' + money(l.unit) + ' ' + uart(l) + l.u + ', los ' + l.qty + ' en ' + money(l.qty * l.unit) + '.'
-        : 'El precio de sistema es ' + money(l.unit) + ' ' + uart(l) + l.u + '.';
-    }
-    var tot = src.reduce(function (a, l) { return a + (l.total || 0); }, 0);
-    return 'El precio de sistema es ' + money(tot) + ' por lo que me pidió.';
-  }
 
   /* ---- rule A: unit AND total, always ---------------------------------
      "Nunca un total sin el unitario. El ferretero tiene que poder verificar la
@@ -495,13 +536,303 @@ var LeyvaDemo = (function () {
   }
   function usoLead(uso, l) { return 'Para ' + uso + ', el ' + l.n + ' es el que ocupa.'; }
 
-  /* Accumulate what he has actually asked for. Same SKU twice replaces rather
-     than adds — "10 tubos" then "mejor 15 tubos" is a correction, not 25. */
-  function mergeOrder(l) {
-    for (var i = 0; i < ST.order.length; i++) {
-      if (ST.order[i].sku === l.sku) { ST.order[i] = l; return; }
+  var DOC_RE = /\b(cotiz\w*|cotic\w*|proforma\w*|presupuesto|me arma\w*|armeme|armame|hagame la cuenta|mandeme la cuenta|cuanto me sale todo)\b/;
+  var TOTAL_RE = /\bcu[áa]nto (llevo|va|vamos|tengo|es en total|ser[íi]a en total|es todo|suma)\b|\bc[óo]mo va (la cuenta|eso)\b|\bel total hasta\b|\bcu[áa]nto suma\b|\bs[úu]meme\b/;
+  var STOCK_RE = /\b(existencia|inventario|stock|hay en bodega)\b|\bhay\b[^?]*\ben (existencia|bodega|stock)\b|\bcu[áa]nt[oa]s?\b[^?]*\b(hay|tiene|tienen|quedan|le quedan|disponibles?)\b|\b(tiene|tienen|queda|quedan)\b[^?]*\ben (existencia|bodega|stock)\b/;
+  var PRICEQ_RE = /\b(a como|cuanto vale|cuanto cuesta|cuanto sale|que precio|en cuanto (esta|sale)|precio (de|del|tiene))\b/;
+  var DELIVERY_RE = /\b(env[íi]o|entrega|flete|domicilio|reparto|mandan|llevan)\b/;
+  var EDIT_RE = /\bqu[íi]t|\bquita|\bsaca|\bsaque|\belimin|\bborr|\bya no (quiero|ocupo|va)|\bmejor no|\bagreg|\bsuma(le)?\b|\bs[úu]mele\b|\bcambi|\bmejor\b|\bvuelva a\b|\botra vez\b/;
+
+  /* Split the raw message into clauses, so an off-catalog item next to a
+     stocked one is refused BY NAME instead of taking the whole message down
+     with it. "5 codos de media y una manguera" quotes the codos AND says the
+     manguera is not carried — silence about either half is the bug. */
+  function clauses(t) { return t.split(/\s*,\s*|\s+y\s+|\s+tambi[ée]n\s+|\s*\+\s*|\s+m[áa]s\s+(?=\d)|\n/).filter(Boolean); }
+
+  function issueDoc(chosen, railM) {
+    var ls = cartLines();
+    var order = { lines: ls.map(function (l) { return { sku: l.sku, desc: l.n, qty: l.qty, unit: l.unit, total: l.total }; }),
+                  total: C().total() };
+    ST.docWanted = false; ST.awaitingName = false; ST.awaitingConfirm = false;
+    railM.push('Proforma armada del CARRITO: ' + ls.length + ' líneas, ' + money(order.total));
+    return order;
+  }
+
+  /* ---- THE CART TURN ------------------------------------------------------
+     Everything a customer says about his order goes through here, every
+     product in the message, every turn. Returns null when the message has
+     nothing to do with the order. */
+  function cartTurn(text, t, ex, docReq, totReq) {
+    var turn = C().tick();
+    var out = [], rail = [], asks = [], notes = [];
+    var updated = [], removedNow = [], recalled = [], quotes = [], moved = null, inCartQuote = {}, incBy = {};
+    var changed = false;
+
+    function upd(sku, qty, how) {
+      var had = C().find(sku);
+      var it = how === 'inc' ? C().add(sku, qty) : C().set(sku, qty);
+      if (!it) return;
+      if (how === 'inc' && had) incBy[sku] = (incBy[sku] || 0) + qty;
+      ST.lastSku = sku;
+      changed = true;
+      updated = updated.filter(function (u) { return u !== sku; }); updated.push(sku);
+      delete ST.removed[sku];
+      rail.push('PRE|' + (how === 'inc' ? 'Suma ' + qty + ' a ' : 'Carrito: ') + sku + ' → ' + it.cantidad + ' (turno ' + it.turno_de_entrada + ')');
     }
-    ST.order.push(l);
+    function pend(kind, qty, m) {
+      var ex0 = null;
+      for (var i = 0; i < ST.pendSize.length; i++) if (ST.pendSize[i].kind === kind) ex0 = ST.pendSize[i];
+      var p = { kind: kind, qty: qty, options: m.options || LeyvaOrder.byKind(kind), none: m.none || null, turn: turn };
+      if (ex0) ST.pendSize[ST.pendSize.indexOf(ex0)] = p; else ST.pendSize.push(p);
+      asks.push(p);
+      rail.push('SIN RESOLVER: ' + (qty ? qty + ' ' : '') + kw(kind, qty || 2) + ' — se pregunta cuál, no se elige');
+    }
+    function takePending(kind) {
+      for (var i = 0; i < ST.pendSize.length; i++) if (ST.pendSize[i].kind === kind) return ST.pendSize.splice(i, 1)[0];
+      return null;
+    }
+
+    var mentions = ex.mentions;
+    var consumed = false;
+
+    /* 1. Answers to our own questions, with no product named. */
+    if (!mentions.length) {
+      var bq = C().bareQty(text);
+      if (bq && ST.pendQty) {
+        upd(ST.pendQty, bq, 'set');
+        rail.push('PRE|Cantidad dada a "¿cuántos ocupa?": ' + bq);
+        ST.pendQty = null; consumed = true;
+      } else if (ST.pendSize.length) {
+        var bs = C().bareSize(text);
+        if (bs) {
+          ST.pendSize.slice().reverse().forEach(function (p) {
+            var sz = C().sizeFor(p.kind === 'lamina' ? 'gypsum' : p.kind, bs.raw, bs.raw);
+            if (p.kind === 'lamina' && /gypsum|jipson|yeso|si/.test(bs.raw.join(' '))) sz = 'x';
+            if (!sz || sz.none) return;
+            var rs = p.kind === 'lamina' ? { sku: 'GYP-12-48' } : C().resolve(p.kind, sz);
+            if (!rs.sku) return;
+            ST.pendSize.splice(ST.pendSize.indexOf(p), 1);
+            var q = p.qty || bs.qty;
+            if (q) { upd(rs.sku, q, p.qty ? 'inc' : 'set'); rail.push('PRE|Medida dada ahora; cantidad (' + q + ') tomada de lo que ya había dicho'); }
+            else { quotes.push(rs.sku); }
+            consumed = true;
+          });
+        }
+      }
+      /* "10 tubos de media" … "mejor de una pulgada": a size with no product
+         and nothing pending is a change of mind about the line he just
+         touched. The quantity carries over — making him say it again is
+         what turns an assistant into a form. */
+      if (!consumed && !ST.pendSize.length && ST.lastSku && C().find(ST.lastSku)) {
+        var bs2 = C().bareSize(text);
+        var lk = LeyvaOrder.bySku(ST.lastSku).kind;
+        var sz2 = bs2 ? C().sizeFor(lk, bs2.raw, bs2.raw) : null;
+        if (sz2 && !sz2.none) {
+          var rs2 = C().resolve(lk, sz2);
+          if (rs2.sku && rs2.sku !== ST.lastSku) {
+            var fromL = C().find(ST.lastSku), q2 = fromL.cantidad;
+            C().remove(ST.lastSku);
+            moved = { to: rs2.sku, from: fromL.sku };
+            // if he already had some of the new size, these join them — never replace them
+            upd(rs2.sku, q2, 'inc');
+            rail.push('PRE|Cambio de medida sobre la última línea: ' + fromL.sku + ' → ' + rs2.sku + ', cantidad (' + q2 + ') conservada');
+            consumed = true;
+          }
+        }
+      }
+      if (bq && !consumed && !ST.pendQty && !docReq && !totReq) {
+        ST.pendQty = null;
+        return { bubbles: ['¿' + bq + ' de cuál producto?'], rail: ['Cantidad sin producto', 'Se pregunta — no se adivina'], localOnly: true, suppressDoc: true };
+      }
+    }
+    if (!consumed) ST.pendQty = null;
+
+    /* 2. Every product the message names. */
+    mentions.forEach(function (m) {
+      if (m.sinprecio) {
+        notes.push('Sí manejamos ' + m.sinprecio + '; el precio se lo confirma el mostrador.');
+        rail.push('SIN PRECIO EN SISTEMA: ' + m.sinprecio + ' — no entra al carrito');
+        return;
+      }
+      /* "las láminas" and "los sacos" name the only priced things sold that
+         way — against the CART they mean what is in it. */
+      var inCart = cartLines().filter(function (l) { return kindMatch(m.kind, LeyvaOrder.bySku(l.sku).kind); });
+
+      if (m.op === 'remove') {
+        var targets = (m.sku && !m.inferido) ? inCart.filter(function (l) { return l.sku === m.sku; }) : inCart;
+        if (!targets.length) { notes.push('No tenía ' + kw(m.kind, 2) + ' apuntad' + (KIND_FEM[m.kind] ? 'as' : 'os') + '.'); return; }
+        targets.forEach(function (l) {
+          if (m.qty && m.sku && m.qty < l.qty) { upd(l.sku, l.qty - m.qty, 'set'); return; }
+          ST.removed[l.sku] = l.qty; C().remove(l.sku); removedNow.push(l); changed = true;
+          rail.push('PRE|Quitado del carrito: ' + l.sku + ' (tenía ' + l.qty + ')');
+        });
+        return;
+      }
+
+      if (m.qty === null) {
+        if (ex.readd) {
+          var back = Object.keys(ST.removed).filter(function (s) { return m.sku ? s === m.sku : kindMatch(m.kind, LeyvaOrder.bySku(s).kind); });
+          if (back.length) {
+            back.forEach(function (s) { var q0 = ST.removed[s]; upd(s, q0, 'set'); rail.push('PRE|Vuelve con la cantidad que tenía: ' + q0); });
+            return;
+          }
+        }
+        var pd = null;
+        if (m.sku && !PRICEQ_RE.test(t)) { for (var pi = 0; pi < ST.pendSize.length; pi++) if (ST.pendSize[pi].kind === m.kind && ST.pendSize[pi].qty) pd = ST.pendSize[pi]; }
+        if (pd) {
+          // "los tubos de media" answering "¿de cuál son?": the quantity is
+          // in the history — use it, never ask for it again.
+          takePending(m.kind);
+          upd(m.sku, pd.qty, 'inc');
+          rail.push('PRE|Cantidad (' + pd.qty + ') tomada del historial — no se vuelve a preguntar');
+          return;
+        }
+        if (m.sku && ex.change && inCart.length === 1 && inCart[0].sku !== m.sku) {
+          var from = inCart[0];
+          C().remove(from.sku);
+          upd(m.sku, from.qty, 'inc');
+          moved = { to: m.sku, from: from.sku };
+          rail.push('PRE|Cambio de medida: ' + from.sku + ' → ' + m.sku + ', la cantidad (' + from.qty + ') se conserva');
+          return;
+        }
+        var mine = m.sku ? inCart.filter(function (l) { return l.sku === m.sku; }) : inCart;
+        if (mine.length && m.sku && PRICEQ_RE.test(t)) {
+          quotes.push(m.sku); inCartQuote[m.sku] = mine[0].qty;
+          return;
+        }
+        if (mine.length) {
+          mine.forEach(function (l) { if (recalled.indexOf(l.sku) === -1) recalled.push(l.sku); });
+          rail.push('PRE|Ya estaba en el carrito: ' + mine.map(function (l) { return l.qty + ' x ' + l.sku; }).join(', '));
+          return;
+        }
+        if (m.sku) { quotes.push(m.sku); return; }
+        if (m.none) { pend(m.kind, null, m); return; }
+        pend(m.kind, null, m);
+        return;
+      }
+
+      if (!m.sku && (m.kind === 'codo' || m.kind === 'tee') && !m.none &&
+          !mentions.some(function (o) { return o.kind === 'tubo'; })) {      // pipes in THIS message decide
+        /* "ah y también ocupo codos, como 8" right after 12 tubos de media:
+           a ferretero reads those codos as 1/2 too. Inferred AND SAID, so
+           he can correct it — never silently. Only when every pipe in the
+           order is the same size. */
+        var pipeSz = cartLines().map(function (l) { return LeyvaOrder.bySku(l.sku); })
+          .filter(function (r) { return r.kind === 'tubo'; }).map(function (r) { return r.size; })
+          .filter(function (v, i, arr) { return arr.indexOf(v) === i; });
+        if (pipeSz.length === 1) {
+          var inh = C().resolve(m.kind, pipeSz[0]);
+          if (inh.sku) { m.sku = inh.sku; m.inferido = pipeSz[0]; }
+        }
+      }
+      if (m.sku) {
+        if (m.inferido) notes.push('inferido:' + m.kind + ':' + m.inferido);
+        upd(m.sku, m.qty, m.op === 'inc' ? 'inc' : 'set');
+        return;
+      }
+      /* A quantity for a kind we cannot pin down, said AS A REFERENCE ("de
+         las láminas póngame 8", "cámbieme los codos a 10", "mejor 5 bolsas")
+         means the one line of that kind he already has. */
+      if ((ex.change || m.ref || m.kind === 'lamina' || m.kind === 'bolsa') && inCart.length === 1) {
+        upd(inCart[0].sku, m.qty, 'set');
+        rail.push('PRE|"' + kw(m.kind, 2) + '" = la única línea de ese tipo en el carrito (' + inCart[0].sku + ')');
+        return;
+      }
+      pend(m.kind, m.qty, m);
+    });
+
+    /* 3. Off-catalog clauses sitting next to stocked ones. */
+    var refusals = [];
+    if (mentions.length) {
+      clauses(t).forEach(function (cl) {
+        var g = catalogGuard(cl);
+        if (g) { refusals.push(g.bubbles[0]); rail.push('Fuera de catálogo en el mismo mensaje: ' + g.bubbles[0]); }
+      });
+    }
+
+    if (quotes.length === 1 && !updated.length && !asks.length) ST.pendQty = quotes[0];
+    Object.keys(incBy).forEach(function (s0) { notes.push('inc:' + s0 + ':' + incBy[s0]); });
+
+    /* 4. Compose. Order: what changed, what is still open, then the total or
+       the confirmation. Every price is computed from the cart. */
+    if (removedNow.length) out.push('Le quité ' + humanList(removedNow.map(function (l) {
+      var fem = KIND_FEM[LeyvaOrder.bySku(l.sku).kind];
+      return l.qty === 1 ? (fem ? 'la ' : 'el ') + corto(l) : (fem ? 'las ' : 'los ') + l.qty + ' ' + corto(l);
+    })) + '.');
+    if (moved) out.push('Ah, entonces mejor ' + (KIND_FEM[LeyvaOrder.bySku(moved.to).kind] ? 'la de ' : 'el de ') + C().prettySize(LeyvaOrder.bySku(moved.to).kind, LeyvaOrder.bySku(moved.to).size) + '.');
+
+    var upLines = updated.map(function (s) { return toLine(C().find(s)); });
+    var all = cartLines();
+    if (upLines.length === 1 && all.length === 1 && !recalled.length) {
+      if (ST.uso && !ST.usoDicho) { out.push(usoLead(ST.uso, upLines[0])); ST.usoDicho = true; }
+      out = out.concat(unitAndTotal(upLines[0]));
+    } else if (upLines.length) {
+      var sumo = upLines.filter(function (l) { return incBy[l.sku]; });
+      var lead = sumo.length === upLines.length && sumo.length === 1
+        ? 'Le sumo ' + incBy[sumo[0].sku] + ', quedan ' : (upLines.length === 1 ? 'Le apunto ' : 'Le apunto:\n');
+      out.push(lead + listBubble(upLines));
+    }
+    notes.filter(function (n) { return /^inferido:/.test(n); }).forEach(function (n) {
+      var p = n.split(':');
+      out.push((p[1] === 'tee' ? 'Las T se las puse de ' : 'Los ' + kw(p[1], 2) + ' se los puse de ') + '' + C().prettySize(p[1], p[2]) + ', como los tubos — si son de otra medida me dice.');
+    });
+    if (recalled.length) {
+      var rl = recalled.map(function (s) { return toLine(C().find(s)); });
+      out.push('Eso ya lo tengo apuntado:\n' + listBubble(rl));
+    }
+    quotes.forEach(function (s) {
+      var ql = quoteLine(s);
+      out.push(art(ql) + ql.n + ' anda a ' + money(ql.unit) + ' ' + uart(ql) + ql.u + '.' +
+               (inCartQuote[s] ? ' Ya lleva ' + inCartQuote[s] + ' apuntad' + (KIND_FEM[LeyvaOrder.bySku(s).kind] ? 'as' : 'os') + '; si quiere otra cantidad me dice.' : ''));
+    });
+    notes.filter(function (n) { return !/^(inferido|inc):/.test(n); }).forEach(function (n) { out.push(n); });
+    refusals.forEach(function (r) { out.push(r); });
+
+    if (DELIVERY_RE.test(t)) out.push('De la entrega le confirmo con el mostrador.');
+
+    var openAsks = asks.slice();
+    if (docReq || (ST.docWanted && changed)) {
+      // pending items from earlier turns block the document too — ask them
+      ST.pendSize.forEach(function (p) { if (openAsks.indexOf(p) === -1 && p.qty) openAsks.push(p); });
+    }
+    if (openAsks.length && ST.uso && !ST.usoDicho) { out.push('Para ' + ST.uso + ', le paso las medidas.'); ST.usoDicho = true; }
+    openAsks.forEach(function (p) { out.push(pendingAsk(p)); });
+    ST.pendSize = ST.pendSize.filter(function (p) { return p.qty || p.turn === turn; });   // a bare price question does not linger
+
+    if (quotes.length && !openAsks.length && !updated.length && !quotes.some(function (q) { return inCartQuote[q]; })) {
+      var qf = quoteLine(quotes[quotes.length - 1]);
+      out.push(quotes.length === 1 ? cuantos(qf) : '¿Cuántos de cada uno?');
+    }
+
+    all = cartLines();
+    var blocking = ST.pendSize.filter(function (p) { return p.qty; });
+    if (docReq) ST.docWanted = true;
+
+    if (totReq) {
+      if (all.length) { out.push('Hasta ahorita lleva:\n' + listBubble(all)); out.push('Suma ' + money(C().total()) + '.'); }
+      else out.push('Todavía no llevamos nada apuntado.');
+      rail.push('Total en curso: ' + all.length + ' líneas del carrito, ' + money(C().total()));
+    }
+
+    if (ST.docWanted && (docReq || changed || consumed)) {
+      if (blocking.length) {
+        out.push('Con eso le armo la proforma.');
+        rail.push('Proforma en espera: falta resolver ' + blocking.length + ' producto(s) — sin documento');
+      } else if (!all.length) {
+        out.push('Todavía no tengo nada apuntado para la proforma.');
+        out.push('¿Qué le pongo?');
+        ST.docWanted = false;
+      } else {
+        out = out.concat(confirmBubbles());
+        rail.push('Confirmación UNA vez, con el carrito COMPLETO (' + all.length + ' líneas)');
+      }
+    } else if (changed && !openAsks.length && all.length >= 2 && !totReq) {
+      out.push('Lleva ' + money(C().total()) + ' en total.');
+    }
+
+    if (!out.length) return null;
+    rail.unshift('Carrito: ' + all.length + ' líneas · ' + money(C().total()) + ' — calculado desde el catálogo');
+    return { bubbles: out, rail: rail, localOnly: true, suppressDoc: true };
   }
 
   function local(text) {
@@ -540,96 +871,68 @@ var LeyvaDemo = (function () {
          (mm && mm.wiped()) ? 'Verificado: sin registro para este número' : 'ADVERTENCIA: el borrado no se pudo verificar'], true);
     }
 
-    /* Answering the ONE confirmation. A "sí" here does not produce a document
-       either — it advances to the naming question, which stays the only door a
-       document comes through. The confirmation is cleared whatever the answer,
-       so it is never asked twice. */
+    var ex = C().extract(text);
+    ex.mentions.forEach(function (m) { if (m.kind) ST.named[m.kind] = true; });
+    var docReq = DOC_RE.test(t), totReq = TOTAL_RE.test(t);
+    var isEdit = ex.mentions.length > 0 || ex.remove || EDIT_RE.test(t) || docReq || totReq;
+
+    /* Answering the ONE confirmation. A "sí" advances to the naming question,
+       which stays the only door a document comes through. An EDIT is not an
+       answer to "¿así está bien?" — it is the change that answer implies, so
+       it goes to the cart and the confirmation comes back, whole, after it. */
     if (ST.awaitingConfirm) {
-      /* Same trap as awaitingName: "no, quítame los codos" is not an answer to
-         "¿así está bien?", it is the EDIT that answer implies. Swallowing it
-         made the assistant ask what to change and then forget it had been
-         told. An edit instruction drops the pending confirmation and is
-         handled by the branch that actually knows how to do it. */
-      if (/\bqu[íi]t|\bquita|\bsaca|\belimin|\bya no (quiero|ocupo|va)|\bagrega|\bagregue|\bsuma(le)?\b|\bcambia/.test(t)) {
-        ST.awaitingConfirm = null;
-      }
-    }
-    if (ST.awaitingConfirm) {
-      var cLines = ST.awaitingConfirm;
-      ST.awaitingConfirm = null;
       var ca = parseNameAnswer(text);
-      if (!ca.confirm) {
-        // Anything but a yes means the order is being edited. Drop it and let
-        // the message be handled as an ordinary request rather than carrying
-        // quantities he just disputed onto a document.
-        return hit(['Ah, va — dígame cómo queda entonces.', '¿Qué le cambio?'],
-          ['Cantidades NO confirmadas', 'Se descarta el pedido pendiente', 'Se vuelve a preguntar'], true);
+      if (ca.confirm && !ex.mentions.length && !ex.remove) {
+        ST.awaitingConfirm = false;
+        ST.awaitingName = true;
+        /* "sí, a nombre de Constructora Herrera S.A." answers BOTH questions
+           in one breath. Asking for the name he just gave proves the system
+           is matching keywords, not listening. */
+        if (ca.razon || ca.ruc || ca.nombre) return local(text);
+        var cAsk = nameAsk();
+        return {
+          bubbles: ['Perfecto.'].concat(cAsk.q),
+          rail: ['PRE|Cantidades confirmadas por el cliente',
+                 'Total ' + money(C().total()) + ' — calculado desde el carrito'].concat(cAsk.rail)
+                .concat(['Documento: ruta determinista, sin modelo']),
+          localOnly: true, suppressDoc: true
+        };
       }
-      var cTot = cLines.reduce(function (a, l) { return a + l.total; }, 0);
-      ST.awaitingName = { lines: cLines, total: cTot };
-
-      /* "sí, a nombre de Constructora Herrera S.A." answers BOTH questions in
-         one breath, the way anyone actually talks. Asking for the name he just
-         gave, in the same sentence, is the single most irritating thing a
-         system can do — it proves it is matching keywords, not listening.
-         Hand the message straight to the naming branch instead. */
-      if (ca.razon || ca.ruc || ca.nombre) return local(text);
-
-      var cAsk = nameAsk();
-      return {
-        bubbles: ['Perfecto.'].concat(cAsk.q),
-        rail: ['PRE|Cantidades confirmadas por el cliente',
-               'Total ' + money(cTot) + ' — calculado desde el catálogo'].concat(cAsk.rail)
-              .concat(['Documento: ruta determinista, sin modelo']),
-        localOnly: true,
-        suppressDoc: true
-      };
+      if (isEdit) ST.awaitingConfirm = false;
+      else if (ca.decline) {
+        ST.awaitingConfirm = false;
+        return hit(['Va. ¿Qué le quito o le cambio?'], ['Cantidades NO confirmadas', 'El carrito se conserva; se espera la corrección'], true);
+      }
     }
 
-    /* Confirming the quantities on a recalled order. A "sí" here does NOT
-       produce a document — it advances to the naming question, which is the
-       only door a document comes through. */
+    /* Confirming the quantities on a recalled order. A "sí" puts those lines
+       in the cart and advances to the naming question. */
     if (ST.awaitingQty) {
       var qa = parseNameAnswer(text);
-      if (qa.confirm) {
-        var qLines = ST.awaitingQty;
-        ST.awaitingQty = null;
-        var qTot = qLines.reduce(function (a, l) { return a + l.total; }, 0);
+      var qLines = ST.awaitingQty;
+      ST.awaitingQty = null;
+      if (qa.confirm && !ex.mentions.length) {
+        qLines.forEach(function (l) { C().add(l.sku, l.qty); ST.named[LeyvaOrder.bySku(l.sku).kind] = true; });
+        ST.docWanted = true; ST.awaitingName = true;
         var qAsk = nameAsk();
-        ST.awaitingName = { lines: qLines, total: qTot };
         return {
           bubbles: ['Perfecto, las mismas cantidades.'].concat(qAsk.q),
           rail: ['PRE|Cantidades confirmadas por el cliente',
-                 'Total ' + money(qTot) + ' — mismas líneas, precios de hoy'].concat(qAsk.rail)
+                 'Total ' + money(C().total()) + ' — mismas líneas, precios de hoy'].concat(qAsk.rail)
                 .concat(['Documento: ruta determinista, sin modelo']),
-          localOnly: true,
-          suppressDoc: true
+          localOnly: true, suppressDoc: true
         };
       }
-      // Anything else means the quantities are changing. Drop the pending
-      // order rather than carrying stale numbers into a document, and let the
-      // message be handled as an ordinary question.
-      ST.awaitingQty = null;
     }
 
     /* Answering the naming question. Only reachable while a proforma is
-       actually being built — there is no other path into it, so a stray
-       "sí" in an unrelated conversation cannot write a name to a profile. */
-    if (ST.awaitingName) {
-      /* An answer to "¿a nombre de quién?" is not the only thing he can say
-         next. "quítame los codos" used to be parsed as a NAME and answered
-         "no le entendí el nombre", which is the assistant refusing to hear a
-         correction to the document it is about to issue. Anything that is
-         plainly an instruction drops the pending question and is handled
-         normally. */
-      if (/\bqu[íi]t|\bquita|\bsaca|\belimin|\bya no (quiero|ocupo|va)|\bmejor no|\bagrega|\bagregue|\bsuma|\bcambia|\bcotiza|\bcu[áa]nto (llevo|va|tengo)/.test(t)) {
-        ST.awaitingName = null;
-      }
-    }
+       actually being built. An instruction ("quítame los codos") is not a
+       name: it drops the question and goes to the cart, and the confirmation
+       comes back after it. */
+    if (ST.awaitingName && isEdit) ST.awaitingName = false;
     if (ST.awaitingName) {
       var m2 = M();
       var ans = parseNameAnswer(text);
-      var ord = ST.awaitingName;
       var rsMem = m2 && m2.declared('razon_social');
       var nbMem = m2 && m2.declared('nombre');
       var chosen = null, railM = [];
@@ -658,15 +961,19 @@ var LeyvaDemo = (function () {
         return hit(['No le entendí el nombre.', '¿Me lo escribe tal cual va en la proforma?'],
           ['Respuesta no reconocida', 'Se vuelve a preguntar — no se escribe un nombre adivinado'], true);
       }
+      if (!C().list().length) {
+        ST.awaitingName = false; ST.docWanted = false;
+        return hit(['Todavía no tengo nada apuntado para la proforma.', '¿Qué le pongo?'],
+          ['Sin carrito no hay documento — hay pregunta'], true);
+      }
 
-      ST.awaitingName = null;
       var rucMem = m2 && m2.declared('ruc');
       var dirMem = m2 && m2.declared('direccion');
+      var ord = issueDoc(chosen, railM);
       // No double period after an abbreviation ("... S.A..").
       var msgs = ['Va, se la mando a nombre de ' + chosen + (/\.$/.test(chosen) ? '' : '.')];
       // NULL-GUARD EXTENSION: a field we do not have produces a QUESTION,
-      // never a blank line on the document. Dirección is deliberately absent
-      // from the seeded profile so this fires in the demo.
+      // never a blank line on the document.
       if (!dirMem) msgs.push('No tengo dirección suya para la proforma. Si me la pasa se la agrego.');
       railM.push(rucMem ? ('MEM|RUC: ' + rucMem.v + (rucMem.fake ? ' (de ejemplo)' : '')) : 'Sin RUC en memoria → la proforma sale sin línea de RUC');
       railM.push(dirMem ? ('MEM|Dirección: ' + dirMem.v) : 'Sin dirección en memoria → se pregunta, no se deja en blanco');
@@ -674,32 +981,19 @@ var LeyvaDemo = (function () {
       return { bubbles: msgs, rail: railM, localOnly: true, order: ord, profileName: chosen };
     }
 
-    /* Repeat order — "lo mismo del mes pasado". The single most valuable
-       interaction in this demo for a contractor: it collapses a five-message
-       exchange into one. The prior proforma is pulled by correlativo, its
-       lines are re-priced against TODAY's catalog (storage holds {sku, qty}
-       only), and the quantities are ASKED, not assumed. */
-    if (/\blo mismo\b|\blo de siempre\b|\bigual que la (vez|ves) pasada\b|\bel mismo pedido\b|\bcomo la (vez|ves) pasada\b|\blo del mes pasado\b|\brepet\w* el pedido\b|\blo de la otra vez\b|\blo mismo del mes pasado\b/.test(t)) {
+    /* Repeat order — "lo mismo del mes pasado". The prior proforma is pulled
+       by correlativo, its lines are re-priced against TODAY's catalog
+       (storage holds {sku, qty} only), and the quantities are ASKED, not
+       assumed. Nothing enters the cart until he says yes. */
+    if (/\blo mismo\b|\blo de siempre\b|\bigual que la (vez|ves) pasada\b|\bel mismo pedido\b|\bcomo la (vez|ves) pasada\b|\blo del mes pasado\b|\brepet\w* el pedido\b|\brepit\w* el pedido\b|\blo de la otra vez\b|\blo mismo del mes pasado\b/.test(t)) {
       var m3 = M();
       var last = m3 && m3.ultimoPedido();
       if (!last) {
-        // A remembered fact we do not have becomes a QUESTION. Never
-        // "como siempre" with nothing behind it.
         return hit(['No tengo un pedido anterior suyo aquí.', '¿Qué ocupa?'],
           ['Consulta: repetir pedido', 'Sin pedidos anteriores en memoria', 'Se pregunta en vez de suponer'], true);
       }
-      /* suppressDoc is LOAD-BEARING here, not a detail.
-
-         These bubbles itemise real lines with real totals, so the proforma
-         parser recognises them as a complete order and used to emit a PDF on
-         the spot — with a customer's proforma issued before anyone had been
-         asked whose name goes on it, which is the exact gate the two-step
-         flow exists to hold. Recalling an order is a QUESTION about
-         quantities; it is not an instruction to issue a document. */
-      ST.awaitingQty = last.lines.map(function (l) {
-        return { sku: l.sku, qty: l.qty, desc: l.n, unit: l.unit, total: l.total };
-      });
-      ST.awaitingName = null;
+      ST.awaitingQty = last.lines.map(function (l) { return { sku: l.sku, qty: l.qty }; });
+      ST.awaitingName = false;
       return {
         bubbles: [
           'Va. El último fue la ' + last.correlativo + ', del ' + m3.fmtDate(last.fecha) + '.',
@@ -718,31 +1012,63 @@ var LeyvaDemo = (function () {
       };
     }
 
-    /* Off-catalog product asks are settled HERE, before any product branch and
-       before the model. This is the only place that decides whether we carry
-       something. */
-    var guarded = catalogGuard(t);
-    if (guarded) { rail = guarded.rail; return guarded; }
+    /* Price arithmetic runs BEFORE the cart: "calcule el IVA de 10 tubos"
+       asks about a number that is not in the catalog, and answering with the
+       price alone ignores the question that was actually asked. It does NOT
+       touch the cart. */
+    /* "rebájeme 2 T de 1" with a quantity and a product is taking two
+       off the order, not asking for a discount. */
+    var qtyEdit = ex.mentions.some(function (m) { return m.op === 'remove' && m.qty; }) ||
+                  // "media docena de codos" is a quantity, not a wholesale question
+                  (/\bdocena\b/.test(t) && ex.mentions.some(function (m) { return m.qty; }));
+    for (var pm = 0; pm < PRICE_MATH.length && !qtyEdit; pm++) {
+      if (!PRICE_MATH[pm].re.test(t)) continue;
+      var rec = priceOfRecord(text);
+      var pmOut = [PRICE_MATH[pm].say];
+      if (rec) pmOut.push(rec);
+      pmOut.push('¿Le paso la consulta al mostrador?');
+      return hit(pmOut, ['Consulta: ' + PRICE_MATH[pm].tag,
+                         'Pide una cifra que NO está en el catálogo',
+                         'Se escala — no se calcula ni se estima',
+                         rec ? 'Se repite el precio de sistema, calculado' : 'Sin pedido en curso que citar'], true);
+    }
+
+    // Stock — we have no inventory. Escalate, never invent. Only when no
+    // quantity was given: "¿cuántos codos tienen?" is stock, "5 codos" is an order.
+    if (STOCK_RE.test(t) && !ex.mentions.some(function (m) { return m.qty; })) {
+      return hit(['Déjeme confirmarlo con el mostrador antes de prometerle.', '¿Cuántas ocupa?'],
+        ['Consulta: existencia', 'Sin inventario en sistema', 'Escalar al mostrador']);
+    }
+
+    /* Off-catalog product asks with NOTHING stocked in the message are
+       settled here, before the model. With stocked products in the same
+       message, cartTurn refuses the off-catalog clause by name instead. */
+    if (!ex.mentions.length) {
+      var guarded = catalogGuard(t);
+      if (guarded) { rail = guarded.rail; return guarded; }
+    }
+
+    // THE ORDER. Anything that names a product, answers our question about
+    // one, edits the list, asks for the running total or for the document.
+    rememberUse(t);
+    var ct = cartTurn(text, t, ex, docReq, totReq);
+    if (ct) return ct;
 
     // Greeting.
     if (/^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|que tal|saludos)\b/.test(t) && t.length < 30) {
       return hit(['Buenas.', '¿Qué ocupa?'], ['Saludo', 'Abre la conversación']);
     }
     // NOTE: the greeting above is NEUTRAL BY DESIGN and must stay that way.
-    // Never "¡Buenas, don Marvin!" — a phone shared in a cuadrilla makes
-    // greeting the wrong person by name a memorable failure in front of a
-    // buyer. The remembered name goes on the proforma question instead,
-    // where it is load-bearing. See HANDOFF.md §0.
+    // Never "¡Buenas, don Marvin!" — see HANDOFF.md §0.
 
-    // English — answer in Spanish, do not switch. This is a Nicaraguan
-    // ferretería's WhatsApp; a bilingual counter would break the illusion.
+    // English — answer in Spanish, do not switch.
     if (/\b(how much|do you have|price|hello|hi there|what is|can i|i need|looking for)\b/.test(t)) {
       return hit(['Disculpe, aquí le atiendo en español.', '¿Qué producto anda buscando?'],
         ['Consulta en inglés', 'Responde en español']);
     }
 
     // Off-topic (politics, jokes, chit-chat) — deflect back to the counter.
-    if (/\b(chiste|broma|futbol|politica|presidente|ortega|clima|amor|novia|como estas|quien gano|cancion|pelicula)\b/.test(t)) {
+    if (/\b(chiste|broma|futbol|partido|politica|presidente|ortega|clima|calor|amor|novia|como esta|como estas|quien gano|cancion|pelicula)\b/.test(t)) {
       return hit(['Jaja, de eso no sé.', 'Yo le ayudo con material, ¿qué ocupa?'],
         ['Fuera de tema', 'Redirige al catálogo']);
     }
@@ -754,23 +1080,15 @@ var LeyvaDemo = (function () {
     }
 
     // Delivery — we have no policy. Escalate, never invent.
-    if (/\b(env[íi]o|entrega|flete|domicilio|reparto|mandan|llevan)\b/.test(t)) {
+    if (DELIVERY_RE.test(t)) {
       return hit(['De la entrega le confirmo con el mostrador, no quiero darle un dato malo.', '¿Para qué zona sería?'],
         ['Consulta: entrega', 'Sin dato de entrega en sistema', 'Escalar al mostrador']);
     }
 
-    // Stock — we have no inventory. Escalate, never invent.
-    // The quantifier and the verb are usually SEPARATED by the product
-    // ("¿cuántas láminas de gypsum tienen?"), so this cannot require them to
-    // be adjacent. Getting that wrong made a stock question fall through to
-    // the price branch and answer C$370 to "how many do you have" — caught in
-    // the browser pass, and exactly the kind of thing that reads as evasion
-    // in front of a buyer.
-    if (/\b(existencia|inventario|stock|hay en bodega)\b/.test(t) ||
-        /\bcu[áa]nt[oa]s?\b[^?]*\b(hay|tiene|tienen|quedan|le quedan|disponibles?)\b/.test(t) ||
-        /\b(tiene|tienen|queda|quedan)\b[^?]*\ben (existencia|bodega|stock)\b/.test(t)) {
-      return hit(['Déjeme confirmarlo con el mostrador antes de prometerle.', '¿Cuántas ocupa?'],
-        ['Consulta: existencia', 'Sin inventario en sistema', 'Escalar al mostrador']);
+    // Hours / location — from the catalog's contact block, never invented.
+    if (/\b(a que hora|horario|cierran|abren|donde quedan|donde estan|direccion de la ferreteria)\b/.test(t)) {
+      return hit(['Estamos de la esquina del Dr. Cayetano 25 varas al oeste, en León.', 'El horario se lo confirma el mostrador al 2315-1177.'],
+        ['Consulta: ubicación / horario', 'Dirección del catálogo', 'Horario: sin dato → escalar']);
     }
 
     // Caterpillar tools — real specs, no price, offer to confirm.
@@ -785,224 +1103,16 @@ var LeyvaDemo = (function () {
         ['Consulta: herramienta Caterpillar', 'Producto en catálogo', 'SIN PRECIO EN SISTEMA', 'Escalar al mostrador']);
     }
 
-    // Carried, but we have no current price. Saying "no lo manejo" here would
-    // be a false statement about their own stock — the safe answer is the
-    // honest one: we have it, the price needs confirming. Its known
-    // precio_antes is deliberately NOT repeated; a stale price is the exact
-    // failure this demo cannot afford.
+    // Carried, but we have no current price. Its precio_antes is deliberately
+    // NOT repeated; a stale price is the exact failure this demo cannot afford.
     if (/revestimiento|kl8231|m[áa]rmol|marmol/.test(t)) {
       return hit(['Sí, esa lámina de revestimiento negra mármol la manejamos.', 'El precio actual se lo confirmo con el mostrador.'],
         ['Consulta: lámina de revestimiento', 'Producto en catálogo', 'SIN PRECIO EN SISTEMA', 'Escalar al mostrador']);
     }
 
-    /* ---- COTIZACIÓN: confirm the quantities ONCE, then the name ---------
-       Fede's rule B: "Una sola vez, antes de la proforma, repitiendo
-       cantidades. No después de cada mensaje — eso cansa y suena a
-       formulario." So the confirmation is bound to the moment the document is
-       requested, not to every turn that touches a product. */
-    if (/cotiza|proforma|proform|proformar|presupuesto|me arma|s[úu]meme|cu[áa]nto me sale todo/.test(t)) {
-      var acc = ST.order.filter(function (l) { return l.qty; });
-      if (acc.length) {
-        ST.awaitingConfirm = acc.slice();
-        return {
-          bubbles: [
-            'Para confirmarle: ' + humanList(acc.map(function (l) {
-              var r = LeyvaOrder.bySku(l.sku);
-              return l.qty + ' ' + LeyvaOrder.plural((r && r.corto) || l.n, l.qty);
-            })) + '.',
-            '¿Así está bien?'
-          ],
-          rail: ['Consulta: cotización',
-                 'PRE|' + acc.length + ' líneas tomadas de lo que pidió el cliente',
-                 'Total ' + money(acc.reduce(function (a, l) { return a + l.total; }, 0)),
-                 'Se confirman las cantidades UNA vez antes del documento'],
-          localOnly: true,
-          suppressDoc: true
-        };
-      }
-      /* No accumulated order — the demo's own opening beat, where the operator
-         taps "Me arma una cotización" cold. Keeps the sample so beat 05 of the
-         brief still works. */
-      var sample = [
-        { sku: 'GYP-12-48', n: LeyvaOrder.bySku('GYP-12-48').n, unit: 370, qty: 10, total: 3700, u: 'lámina' },
-        { sku: 'PTA-MET-3T-CAFE', n: LeyvaOrder.bySku('PTA-MET-3T-CAFE').n, unit: 4260, qty: 2, total: 8520, u: 'unidad' }
-      ];
-      var sub = sample.reduce(function (a, l) { return a + l.total; }, 0);
-      var ask0 = nameAsk();
-      ST.awaitingName = { lines: sample, total: sub };
-      return {
-        bubbles: ['Va pues, se la armo.', orderLines(sample), 'Total ' + money(sub) + '.'].concat(ask0.q),
-        rail: ['Consulta: cotización', '2 líneas con precio en sistema', 'Suma ' + money(sub),
-               'Entrega: sin dato → escalar'].concat(ask0.rail).concat(['Documento: ruta determinista, sin modelo']),
-        localOnly: true,
-        suppressDoc: true
-      };
-    }
-
-    /* ---- REMOVING A LINE ------------------------------------------------
-       "quítame los codos". A quote he cannot edit is a quote he has to accept
-       or restart, and restarting in front of a buyer is the demo dying. */
-    if (/\bqu[íi]t|\bquita|\bsaca(me|le)?\b|\belimin|\bya no (quiero|ocupo|va)|\bmejor no/.test(t) && ST.order.length) {
-      var kill = null;
-      for (var ki = 0; ki < LeyvaOrder.KIND.length; ki++) {
-        if (!LeyvaOrder.KIND[ki].re.test(t)) continue;
-        var kk = LeyvaOrder.KIND[ki].kind;
-        kill = ST.order.filter(function (l) { return LeyvaOrder.bySku(l.sku).kind === kk; });
-        if (kill.length) break;
-      }
-      if (kill && kill.length) {
-        ST.order = ST.order.filter(function (l) { return kill.indexOf(l) === -1; });
-        ST.awaitingConfirm = null;
-        var rt = runningTotal();
-        var rmOut = ['Va, le quito ' + LeyvaOrder.plural(LeyvaOrder.bySku(kill[0].sku).corto, 2) + '.'];
-        if (rt) { rmOut.push(orderLines(rt.lines)); rmOut.push('Queda en ' + money(rt.sum) + '.'); }
-        else rmOut.push('Con eso no me queda nada en la lista. ¿Qué le pongo?');
-        return hit(rmOut, ['PRE|El cliente quitó ' + kill.length + ' línea(s)',
-                           rt ? 'Nuevo total ' + money(rt.sum) + ' — recalculado' : 'Pedido vacío',
-                           'Se recalcula, no se ajusta a mano'], true);
-      }
-    }
-
-    /* ---- RUNNING TOTAL --------------------------------------------------
-       "¿cuánto llevo hasta ahorita?" is NOT the confirmation. Rule B says the
-       confirmation happens once, before the proforma; answering this with
-       "Para confirmarle:" (which the model did) burns it early and then it
-       either repeats or is missing where it belongs. */
-    if (/\bcu[áa]nto (llevo|va|vamos|tengo|es en total|ser[íi]a en total)\b|\bc[óo]mo va (la cuenta|eso)\b|\bel total hasta\b|\bcu[áa]nto suma\b/.test(t)) {
-      var rt2 = runningTotal();
-      if (rt2) {
-        return hit(['Hasta ahorita lleva:', orderLines(rt2.lines), 'Suma ' + money(rt2.sum) + '. ¿Le agrego algo más?'],
-          ['Consulta: total en curso', rt2.lines.length + ' líneas acumuladas',
-           'Suma ' + money(rt2.sum) + ' — calculada desde el catálogo',
-           'NO es la confirmación: esa va una sola vez, antes de la proforma'], true);
-      }
-      return hit(['Todavía no llevamos nada apuntado.', '¿Qué le voy poniendo?'],
-        ['Consulta: total en curso', 'Sin líneas acumuladas'], true);
-    }
-
-    /* ---- A BARE QUANTITY ANSWERING OUR OWN QUESTION ---------------------- */
-    if (ST.pendingQty) {
-      var bq = bareQty(t);
-      if (bq) {
-        var bl = lineFor(ST.pendingQty, bq);
-        ST.pendingQty = null;
-        mergeOrder(bl);
-        return hit(unitAndTotal(bl),
-          ['PRE|Cantidad dada en respuesta a "¿cuántos ocupa?": ' + bq,
-           'Unitario ' + money(bl.unit) + ' · ' + bq + ' x ' + money(bl.unit) + ' = ' + money(bl.total),
-           'Aritmética calculada, no redactada'], true);
-      }
-    }
-
-    /* Price arithmetic runs BEFORE the product parser: "calcule el IVA de 10
-       tubos" contains a perfectly parseable order, and answering it with the
-       price alone ignores the question that was actually asked. */
-    for (var pm = 0; pm < PRICE_MATH.length; pm++) {
-      if (!PRICE_MATH[pm].re.test(t)) continue;
-      var rec = priceOfRecord(text);
-      var pmOut = [PRICE_MATH[pm].say];
-      if (rec) pmOut.push(rec);
-      pmOut.push('¿Le paso la consulta al mostrador?');
-      return hit(pmOut, ['Consulta: ' + PRICE_MATH[pm].tag,
-                         'Pide una cifra que NO está en el catálogo',
-                         'Se escala — no se calcula ni se estima',
-                         rec ? 'Se repite el precio de sistema, calculado' : 'Sin pedido en curso que citar'], true);
-    }
-
-    /* ---- CHANGE OF MIND -------------------------------------------------
-       "10 de media" ... "mejor de una pulgada". Rule C: reconocerlo. The
-       QUANTITY CARRIES OVER — he already told us how many, and making him say
-       it again is the thing that makes an assistant feel like a form. */
-    var chg = t.match(/\b(mejor|mejor dicho|cambi[eé]|cambio|en realidad|no,? mejor)\b/);
-    if (chg && !ST.order.length && ST.pendingQty) {
-      // He is changing his mind about the thing we just quoted but had no
-      // quantity for yet. Keep it addressable rather than starting over.
-      ST.order.push(lineFor(ST.pendingQty, null));
-    }
-    if (chg && ST.order.length) {
-      var newSize = null;
-      for (var si = 0; si < LeyvaOrder.SIZEWORDS.length; si++) {
-        if (LeyvaOrder.SIZEWORDS[si].re.test(LeyvaOrder.norm(text))) { newSize = LeyvaOrder.SIZEWORDS[si].size; break; }
-      }
-      if (newSize) {
-        /* Target the product he NAMED, not blindly the last line. "mejor los
-           tubos de una pulgada" after ordering tubos AND codos was changing
-           the codos, because codos also come in 1" — it silently re-priced the
-           wrong line and the customer would never have seen why. */
-        var lastL = null;
-        for (var ci = 0; ci < LeyvaOrder.KIND.length; ci++) {
-          if (!LeyvaOrder.KIND[ci].re.test(t)) continue;
-          var ck2 = LeyvaOrder.KIND[ci].kind;
-          for (var cj = ST.order.length - 1; cj >= 0; cj--) {
-            if (LeyvaOrder.bySku(ST.order[cj].sku).kind === ck2) { lastL = ST.order[cj]; break; }
-          }
-          if (lastL) break;
-        }
-        if (!lastL) lastL = ST.order[ST.order.length - 1];
-        var alt = LeyvaOrder.byKind(LeyvaOrder.bySku(lastL.sku).kind)
-                    .filter(function (x) { return x.size === newSize; })[0];
-        var lastIdx = ST.order.indexOf(lastL);
-        if (alt) {
-          var nl = { sku: alt.sku, n: alt.n, u: alt.u, unit: alt.p, qty: lastL.qty,
-                     total: lastL.qty === null ? null : alt.p * lastL.qty };
-          ST.order[lastIdx] = nl;
-          var msgs = ['Ah, entonces mejor el de ' + prettySize(newSize) + '.'];
-          msgs = msgs.concat(unitAndTotal(nl));
-          return hit(msgs, ['PRE|Cambio de opinión: ' + prettySize(newSize),
-                            'Cantidad anterior (' + (lastL.qty || 's/c') + ') se conserva',
-                            'Unitario ' + money(nl.unit) + (nl.total ? ' · total ' + money(nl.total) : ''),
-                            'Aritmética calculada, no redactada'], true);
-        }
-      }
-    }
-
-    /* ---- PRICED ANSWERS: unit AND total, always -------------------------
-       Rule A. Every priced reply carries the unit price and, when a quantity
-       was given, the computed total. The ferretero has to be able to check the
-       arithmetic in his head; a total he cannot verify is worse than none. */
-    var parsed = LeyvaOrder.parse(text, { inheritSize: ST.lastSize });
-    if (parsed.lines.length || parsed.ambiguous.length) {
-      rememberUse(t);
-      if (parsed.inheritedSize) ST.lastSize = parsed.inheritedSize;
-      parsed.lines.forEach(function (l) { if (l.qty) mergeOrder(l); });
-
-      var out = [], trace = [];
-
-      // one product, nothing ambiguous — the common case, kept short
-      armPendingQty(parsed.lines);
-      if (parsed.lines.length === 1 && !parsed.ambiguous.length) {
-        var l0 = parsed.lines[0];
-        if (ST.uso && !ST.usoDicho) { out.push(usoLead(ST.uso, l0)); ST.usoDicho = true; }
-        out = out.concat(unitAndTotal(l0));
-        trace = ['Consulta: precio', 'Coincidencia en catálogo: ' + l0.sku,
-                 'Unitario ' + money(l0.unit) + (l0.total ? ' · ' + l0.qty + ' x ' + money(l0.unit) + ' = ' + money(l0.total) : ' · sin cantidad'),
-                 l0.total ? 'Aritmética calculada, no redactada' : 'Se pregunta la cantidad',
-                 'Sin dato de existencia'];
-        if (ST.uso) trace.unshift('PRE|Uso declarado por el cliente: ' + ST.uso);
-      } else {
-        if (ST.uso && !ST.usoDicho) { out.push('Para ' + ST.uso + ', le paso los precios.'); ST.usoDicho = true; }
-        else out.push('Va, le paso los precios.');
-        if (parsed.lines.length) out.push(orderLines(parsed.lines));
-        var allQty = parsed.lines.length && parsed.lines.every(function (l) { return l.qty; });
-        if (allQty && parsed.lines.length > 1) out.push('Todo junto: ' + money(parsed.sum) + '.');
-        var inf = parsed.lines.filter(function (l) { return l.inferido; });
-        if (inf.length) out.push('Los ' + inf[0].n.split(' ')[0] + 's se los puse de ' + prettySize(inf[0].inferido) + ', como los tubos — si son de otra medida me dice.');
-        parsed.ambiguous.forEach(function (a) { out.push(ambiguousAsk(a)); });
-        trace = ['Consulta con varios productos',
-                 parsed.lines.length + ' líneas con precio en sistema'];
-        parsed.lines.forEach(function (l) { trace.push('  ' + (l.qty || 's/c') + ' x ' + money(l.unit) + (l.total ? ' = ' + money(l.total) : '')); });
-        if (allQty && parsed.lines.length > 1) trace.push('Suma ' + money(parsed.sum) + ' — calculada, no redactada');
-        parsed.ambiguous.forEach(function (a) { trace.push('AMBIGUO: ' + a.kind + ' → se pregunta, no se elige'); });
-      }
-      return hit(out, trace, true);
-    }
-
-
-    /* Asked for a family we DO stock, but no specific product branch matched —
-       a bare "¿a cómo la lámina?" or "¿qué pegamento tienen?". Falling through
-       to "no lo manejo" here would be a FALSE STATEMENT ABOUT THEIR STOCK,
-       which is the same class of error as substituting, pointed the other way.
-       Answer with what the family actually contains and ask which one. */
+    /* Asked for a family we DO stock, but no specific product matched — a bare
+       "¿qué pegamento tienen?". Falling through to "no lo manejo" would be a
+       FALSE STATEMENT ABOUT THEIR STOCK. List the family and ask. */
     var fam = resolveAsk(t);
     if (fam && !fam.absent && fam.fam.presente) {
       return hit(['En ' + fam.fam.label + ' tengo ' + listOf(fam.fam) + '.', '¿Cuál le sirve?'],
@@ -1011,10 +1121,19 @@ var LeyvaDemo = (function () {
          'Se lista lo de esa familia y se pregunta — no se elige por el cliente']);
     }
 
+    /* A number with no product we recognise is an order we did not
+       understand. That is a QUESTION — never "no lo manejo", which would be
+       a claim about their stock we have no basis for. */
+    if (/\b\d{1,3}\b/.test(t) || C().bareQty(text)) {
+      return hit(['No le entendí cuál producto es.', '¿Cómo se llama lo que ocupa?'],
+        ['Cantidad sin producto reconocible', 'Se pregunta — no se adivina ni se niega'], true);
+    }
+
     // Off catalog.
     return hit(['Uy, ese no lo manejo.', '¿Quiere que le pase la consulta al equipo por WhatsApp?'],
       ['Consulta fuera de catálogo', 'Sin coincidencia', 'Ofrecer pasar al equipo']);
   }
+
 
   /* ---- ARITHMETIC VERIFICATION OF THE MODEL'S REPLY -------------------
      Fede's rule: "Toda aritmética se verifica calculándola, no leyéndola."
@@ -1114,8 +1233,50 @@ var LeyvaDemo = (function () {
     });
   }
 
+  /* ---- THE ONLY DOOR A DOCUMENT COMES THROUGH -------------------------
+     A proforma exists only when the naming branch built one FROM THE CART.
+     leyva-chat.js used to fall back to parsing the reply text for anything
+     that looked like priced lines — so a price answer, or a model reply,
+     could turn into a PDF nobody asked for. That fallback is gone. */
+  function documentFor(ans) { return (ans && ans.order) ? ans.order : null; }
+
+  /* ---- WHAT THE MODEL MAY SAY -------------------------------------------
+     The model answers only turns that do not touch the order (greetings,
+     delivery, stock, chit-chat). It is not trusted with the order either:
+       · a money figure must be a plain catalog unit price — any product or
+         sum is arithmetic, and arithmetic is the cart's job;
+       · it may not confirm, total or "apuntar" — that would be a second
+         version of the order that the cart does not know about;
+       · it may not name a product the customer never named.
+     A reply that fails any of these is discarded for the local answer. */
+  function modelReplyAllowed(replyText, userText) {
+    var figs = String(replyText).match(/C\$\s?[\d.,]+/g) || [];
+    var unit = {};
+    LeyvaOrder.P.forEach(function (r) { unit[r.p] = 1; if (r.antes) unit[r.antes] = 1; });
+    for (var i = 0; i < figs.length; i++) {
+      if (!unit[parseInt(figs[i].replace(/[^\d]/g, ''), 10)]) return { ok: false, why: 'cifra que no es un precio de lista: ' + figs[i] };
+    }
+    if (/para confirmarle|\btotal\b|todo junto|le apunt|le puse|lleva c\$|proforma lista|se la armo/i.test(replyText)) {
+      return { ok: false, why: 'el modelo intentó llevar el pedido' };
+    }
+    var allowed = {};
+    Object.keys(ST.named).forEach(function (k) { allowed[k] = 1; });
+    C().extract(userText || '').mentions.forEach(function (m) { if (m.kind) allowed[m.kind] = 1; });
+    var tk = C().tokens(replyText);
+    for (var j = 0; j < tk.length; j++) {
+      var k = C().nounKind(tk[j]);
+      if (k && !allowed[k]) return { ok: false, why: 'nombró un producto que el cliente no pidió: ' + tk[j] };
+    }
+    return { ok: true };
+  }
+
+  function cart() { return C().list(); }
+
   return {
     local: local,
+    documentFor: documentFor,
+    modelReplyAllowed: modelReplyAllowed,
+    cart: cart,
     callApi: callApi,
     openProformaNudge: openProformaNudge,
     verifyMoney: verifyMoney,

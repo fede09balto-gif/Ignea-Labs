@@ -165,26 +165,43 @@
                      goes on the document. No PDF yet, deliberately.
        order       — a pre-verified order handed over by the naming branch,
                      used instead of re-parsing the reply text. */
+  /* One event per finished turn, for the conversation harness
+     (scripts/convo-browser.mjs). It carries nothing the page does not
+     already show: which responder answered, and the document if one was
+     issued. The harness reads the bubble TEXT from the DOM, not from here. */
+  var lastMode = null;
+  function turnDone(order) {
+    try {
+      document.dispatchEvent(new CustomEvent('leyva:turn', { detail: {
+        mode: lastMode,
+        doc: order ? { lines: order.lines.map(function (l) { return { sku: l.sku, qty: l.qty, unit: l.unit, total: l.total }; }), total: order.total } : null,
+        cart: (LeyvaDemo.cart ? LeyvaDemo.cart().map(function (l) { return { sku: l.sku, qty: l.cantidad }; }) : null)
+      } }));
+    } catch (e) {}
+  }
+
   function say(bubbles, done, opts) {
     opts = opts || {};
     var i = 0;
     (function next() {
       if (i >= bubbles.length) {
-        // A complete, verifiable order becomes a document the way it would on
-        // real WhatsApp: after the words, as a separate file message.
-        var order = opts.suppressDoc ? null
-                  : (opts.order || ((typeof LeyvaProforma !== 'undefined') ? LeyvaProforma.parse(bubbles.join('\n')) : null));
+        /* A document comes from exactly one place: the naming branch, which
+           builds it FROM THE CART (LeyvaDemo.documentFor). This used to fall
+           back to parsing the reply text for priced lines, so a price answer
+           — or a model reply — could become a PDF nobody asked for. */
+        var order = opts.suppressDoc ? null : LeyvaDemo.documentFor({ order: opts.order });
         if (order) {
           var prof = memProfile(opts.profileName);
           setStatus('escribiendo...');
           setTimeout(function () {
             docBubble(order, prof);
             setStatus('en línea');
+            turnDone(order);
             if (done) done();
           }, 900);
           return;
         }
-        setStatus('en línea'); if (done) done(); return;
+        setStatus('en línea'); turnDone(null); if (done) done(); return;
       }
       setStatus('escribiendo...');
       var t = typing();
@@ -295,6 +312,7 @@
         extra = LeyvaDemo.openProformaNudge(bubbles.join(' '));
         if (extra) { bubbles = bubbles.concat(extra.bubbles); rails = rails.concat(extra.rail); }
       }
+      lastMode = mode;
       paintRail(rails, mode, Date.now() - t0, bubbles.join(' '));
       say(bubbles, function () {
         busy = false;
@@ -328,6 +346,17 @@
       if (res && res.bubbles && !LeyvaDemo.verifyMoney(res.bubbles.join(' '), text)) {
         localAns.rail = (localAns.rail || []).concat(['ARITMÉTICA DEL MODELO NO VERIFICABLE — respuesta descartada',
                                                       'Se usa la cuenta calculada desde el catálogo']);
+        localAns.bubbles.forEach(function (b) { history.push({ role: 'assistant', content: b }); });
+        finish(localAns.bubbles, 'local');
+        return;
+      }
+      /* The model does not keep the order. A reply that totals, confirms,
+         "apunta", or names a product the customer never named is
+         discarded for the deterministic answer — see modelReplyAllowed(). */
+      var allowed = res && res.bubbles ? LeyvaDemo.modelReplyAllowed(res.bubbles.join(' '), text) : null;
+      if (allowed && !allowed.ok) {
+        localAns.rail = (localAns.rail || []).concat(['RESPUESTA DEL MODELO DESCARTADA: ' + allowed.why,
+                                                      'Se usa la respuesta determinista']);
         localAns.bubbles.forEach(function (b) { history.push({ role: 'assistant', content: b }); });
         finish(localAns.bubbles, 'local');
         return;
